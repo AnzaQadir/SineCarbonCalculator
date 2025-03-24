@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from './ui/Card';
 import { Button } from './ui/Button';
@@ -195,9 +194,9 @@ const Calculator: React.FC = () => {
                     onChange={(e) => updateCalculator({ flightType: e.target.value as FlightType })}
                     className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                   >
-                    <option value="SHORT">Mostly Short (< 300 miles)</option>
+                    <option value="SHORT">Mostly Short (&lt; 300 miles)</option>
                     <option value="MEDIUM">Mostly Medium (300-2300 miles)</option>
-                    <option value="LONG">Mostly Long (> 2300 miles)</option>
+                    <option value="LONG">Mostly Long (&gt; 2300 miles)</option>
                   </select>
                 </div>
 
