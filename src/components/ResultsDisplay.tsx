@@ -154,7 +154,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
       recs.push({
         category: 'General',
         title: 'Reduce, Reuse, Recycle',
-        description: 'Follow the waste hierarchy: reduce what you consume, reuse items when possible, and recycle what can't be reused.',
+        description: 'Follow the waste hierarchy: reduce what you consume, reuse items when possible, and recycle what can\'t be reused.',
         impact: 'Could save up to 1 ton CO2e per year',
         difficulty: 'easy'
       });
