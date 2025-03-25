@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,11 +19,13 @@ import {
   Train,
   Apple,
   Beef,
-  Leaf
+  Leaf,
+  Info
 } from 'lucide-react';
 import { useCalculator, CarType, FlightType, TransitType, DietType } from '@/hooks/useCalculator';
 import ResultsDisplay from './ResultsDisplay';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const Calculator: React.FC = () => {
   const { state, results, updateCalculator, nextStep, prevStep, resetCalculator } = useCalculator();
@@ -56,7 +57,14 @@ const Calculator: React.FC = () => {
                     <label htmlFor="electricity" className="text-sm font-medium">
                       Electricity (kWh/month)
                     </label>
-                    <HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">You can find this on your electricity bill. The average US household uses about 900 kWh per month.</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                   <input
                     id="electricity"
@@ -77,7 +85,14 @@ const Calculator: React.FC = () => {
                     <label htmlFor="naturalGas" className="text-sm font-medium">
                       Natural Gas (therms/month)
                     </label>
-                    <HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">Check your gas bill for this information. The average US home uses 50 therms per month.</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                   <input
                     id="naturalGas"
@@ -98,7 +113,14 @@ const Calculator: React.FC = () => {
                     <label htmlFor="heatingOil" className="text-sm font-medium">
                       Heating Oil (gallons/month)
                     </label>
-                    <HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Most common in Northeastern US. Leave as 0 if you don't use heating oil.</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                   <input
                     id="heatingOil"
@@ -116,7 +138,14 @@ const Calculator: React.FC = () => {
                     <label htmlFor="propane" className="text-sm font-medium">
                       Propane (gallons/month)
                     </label>
-                    <HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Used for heating, cooking, or water heating in some homes. Leave as 0 if not applicable.</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                   <input
                     id="propane"
@@ -126,6 +155,18 @@ const Calculator: React.FC = () => {
                     onChange={(e) => updateCalculator({ propaneGallons: Number(e.target.value) || 0 })}
                     className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                   />
+                </div>
+                
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-4">
+                  <div className="flex items-start">
+                    <Info className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="text-sm font-medium text-blue-700 mb-1">Why this matters</h4>
+                      <p className="text-xs text-blue-600">
+                        Home energy use accounts for about 20% of the average carbon footprint in the US. Using renewable energy can reduce this by up to 80%.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -427,7 +468,7 @@ const Calculator: React.FC = () => {
         );
 
       case 5:
-        return <ResultsDisplay results={results} onReset={resetCalculator} />;
+        return <ResultsDisplay results={results} state={state} onReset={resetCalculator} />;
       
       default:
         return null;
