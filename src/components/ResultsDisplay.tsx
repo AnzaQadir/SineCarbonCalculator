@@ -12,9 +12,10 @@ import {
   Cell,
   PieChart,
   Pie,
-  Legend 
+  Legend,
+  ReferenceLine 
 } from 'recharts';
-import { ArrowLeft, Download, Share2, AlertCircle, Leaf, AlertTriangle, Check, MapPin } from 'lucide-react';
+import { ArrowLeft, Download, Share2, AlertCircle, Leaf, AlertTriangle, Check, MapPin, Info } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatNumber } from '@/utils/formatters';
 
@@ -53,7 +54,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
     comparedToTarget,
   } = results;
 
-  // Prepare data for the category breakdown chart
   const categoryData = [
     { name: 'Home', value: homeEmissions },
     { name: 'Transport', value: transportEmissions },
@@ -61,22 +61,34 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
     { name: 'Waste', value: wasteEmissions },
   ];
 
-  // Prepare data for the comparison chart
   const comparisonData = [
-    { name: 'Your Footprint', value: totalFootprint },
-    { name: 'US Average', value: 16 },
-    { name: 'Global Average', value: 4.8 },
-    { name: 'Sustainability Target', value: 2 },
+    { 
+      name: 'Your Footprint', 
+      value: totalFootprint,
+      description: 'Your annual carbon emissions'
+    },
+    { 
+      name: 'US Average', 
+      value: 16,
+      description: 'Average American footprint' 
+    },
+    { 
+      name: 'Global Average', 
+      value: 4.8,
+      description: 'Average worldwide footprint'
+    },
+    { 
+      name: 'Sustainability Target', 
+      value: 2,
+      description: 'UN 2030 climate goal'
+    },
   ];
 
-  // Colors for the charts
   const COLORS = ['#38A169', '#4299E1', '#F59E0B', '#E53E3E'];
 
-  // Generate personalized recommendations based on results
   const getRecommendations = () => {
     const recs = [];
     
-    // Home recommendations
     if (state.electricityKwh > 700) {
       recs.push({
         category: 'Home',
@@ -97,7 +109,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
       });
     }
     
-    // Transportation recommendations
     if (state.carType === 'LARGE' && state.carMiles > 800) {
       recs.push({
         category: 'Transport',
@@ -118,7 +129,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
       });
     }
     
-    // Food recommendations
     if (state.dietType === 'MEAT_HEAVY') {
       recs.push({
         category: 'Food',
@@ -129,7 +139,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
       });
     }
     
-    // Waste recommendations
     if (state.recyclingPercentage < 50) {
       recs.push({
         category: 'Waste',
@@ -140,7 +149,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
       });
     }
     
-    // Add some default recommendations if we don't have many
     if (recs.length < 3) {
       recs.push({
         category: 'General',
@@ -164,13 +172,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
   
   const recommendations = getRecommendations();
   
-  // Get localized information based on browser location
   const getLocalizedInfo = () => {
-    // This would typically use geolocation API or IP-based location detection
-    // For now we'll use a placeholder
     return {
-      region: "United States", // Placeholder - would be dynamically populated
-      energyMix: "Coal (50%), Natural Gas (20%), Nuclear (20%), Renewables (10%)", // Placeholder
+      region: "United States",
+      energyMix: "Coal (50%), Natural Gas (20%), Nuclear (20%), Renewables (10%)",
       transportOptions: "Public transit, bike sharing programs, electric vehicle charging stations",
       localInitiatives: "Community solar projects, city-wide composting, tree planting initiatives",
     };
@@ -178,7 +183,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
   
   const localInfo = getLocalizedInfo();
   
-  // Custom tooltip for charts
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -190,7 +194,28 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
     return null;
   };
 
-  // Determine user's impact level
+  const ComparisonTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-3 border border-gray-200 shadow-md rounded-md max-w-xs">
+          <p className="font-medium text-sm">{data.name}</p>
+          <p className="text-lg font-bold text-primary">{formatNumber(data.value)} tons CO2e</p>
+          <p className="text-xs text-muted-foreground mt-1">{data.description}</p>
+          {data.name === 'Your Footprint' && (
+            <div className="mt-2 pt-2 border-t border-gray-100 text-xs">
+              {data.value > 16 ? 
+                <span className="text-red-500 font-medium">Above US average</span> : 
+                <span className="text-green-500 font-medium">Below US average</span>
+              }
+            </div>
+          )}
+        </div>
+      );
+    }
+    return null;
+  };
+
   const getImpactLevel = () => {
     if (comparedToTarget <= 100) return { level: "Sustainable", color: "green", icon: <Check className="h-5 w-5 text-green-500" /> };
     if (comparedToTarget <= 200) return { level: "Moderate", color: "amber", icon: <AlertTriangle className="h-5 w-5 text-amber-500" /> };
@@ -269,7 +294,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-medium mb-4">How You Compare</h3>
+                  <h3 className="text-xl font-medium mb-4 flex items-center">
+                    How You Compare
+                    <div className="relative ml-2 group">
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 hidden group-hover:block bg-white p-2 rounded shadow-md text-xs w-48 z-10">
+                        Comparison with global and national averages. The sustainability target is based on UN climate goals.
+                      </div>
+                    </div>
+                  </h3>
                   <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
@@ -278,20 +311,51 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
                           top: 5,
                           right: 30,
                           left: 20,
-                          bottom: 5,
+                          bottom: 40,
                         }}
+                        barSize={40}
                       >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis unit=" tons" />
-                        <Tooltip content={<CustomTooltip />} />
-                        <Bar dataKey="value" fill="#38A169">
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis 
+                          dataKey="name" 
+                          angle={-45}
+                          textAnchor="end"
+                          height={70}
+                          tick={{ fontSize: 12 }}
+                        />
+                        <YAxis 
+                          unit=" tons" 
+                          tick={{ fontSize: 12 }}
+                          domain={[0, Math.max(20, Math.ceil(totalFootprint * 1.2))]}
+                        />
+                        <Tooltip content={<ComparisonTooltip />} />
+                        <ReferenceLine 
+                          y={results.totalFootprint} 
+                          stroke="#FF8C00" 
+                          strokeDasharray="5 5"
+                          strokeWidth={2}
+                          label={{ 
+                            value: 'Your footprint', 
+                            position: 'insideBottomRight',
+                            fill: '#FF8C00',
+                            fontSize: 12
+                          }}
+                        />
+                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                           {comparisonData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={index === 0 ? '#38A169' : '#94A3B8'} />
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={index === 0 
+                                ? (entry.value <= 2 ? '#34D399' : entry.value <= 4.8 ? '#6366F1' : entry.value <= 16 ? '#F59E0B' : '#EF4444') 
+                                : (index === 1 ? '#94A3B8' : index === 2 ? '#6B7280' : '#047857')}
+                            />
                           ))}
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
+                  </div>
+                  <div className="text-xs text-center text-muted-foreground mt-2">
+                    Values shown in metric tons of CO2 equivalent per year
                   </div>
                 </div>
               </div>
