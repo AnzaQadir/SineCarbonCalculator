@@ -1,8 +1,9 @@
+
 import React from 'react';
 import Layout from '@/components/Layout';
 import Hero from '@/components/sections/Hero';
 import Calculator from '@/components/Calculator';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/card';
 import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users } from 'lucide-react';
 
 const Index = () => {
