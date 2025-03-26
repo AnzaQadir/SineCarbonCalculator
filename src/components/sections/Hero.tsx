@@ -24,8 +24,7 @@ const Hero: React.FC = () => {
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
           <Card 
             variant="glass" 
-            animation="fadeIn" 
-            className="inline-flex items-center px-4 py-2 mb-6"
+            className="inline-flex items-center px-4 py-2 mb-6 animate-fade-in"
           >
             <span className="text-sm font-medium text-primary">Measure your impact on the planet</span>
           </Card>
