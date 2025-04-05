@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import {
   calculateHomeEmissions,
@@ -20,11 +19,19 @@ export type DietType = keyof typeof EMISSION_FACTORS.FOOD_DIET;
 
 interface CalculatorState {
   step: number;
+  // Demographics
+  name: string;
+  age: number;
+  email: string;
+  gender: string;
+  profession: string;
   // Home energy
   electricityKwh: number;
   naturalGasTherm: number;
   heatingOilGallons: number;
   propaneGallons: number;
+  usesRenewableEnergy: boolean;
+  hasEnergyEfficiencyUpgrades: boolean;
   // Transportation
   carType: CarType;
   carMiles: number;
@@ -32,11 +39,17 @@ interface CalculatorState {
   flightMiles: number;
   transitType: TransitType;
   transitMiles: number;
+  usesActiveTransport: boolean;
+  hasElectricVehicle: boolean;
   // Food
   dietType: DietType;
+  buysLocalFood: boolean;
+  followsSustainableDiet: boolean;
   // Waste
   wasteLbs: number;
   recyclingPercentage: number;
+  minimizesWaste: boolean;
+  avoidsPlastic: boolean;
 }
 
 interface FootprintResults {
@@ -52,12 +65,20 @@ interface FootprintResults {
 
 export const useCalculator = () => {
   const [state, setState] = useState<CalculatorState>({
-    step: 1,
+    step: 0,
+    // Demographics
+    name: '',
+    age: 0,
+    email: '',
+    gender: '',
+    profession: '',
     // Home energy
     electricityKwh: 500, // monthly
     naturalGasTherm: 30, // monthly
     heatingOilGallons: 0, // monthly
     propaneGallons: 0, // monthly
+    usesRenewableEnergy: false,
+    hasEnergyEfficiencyUpgrades: false,
     // Transportation
     carType: 'MEDIUM',
     carMiles: 1000, // monthly
@@ -65,11 +86,17 @@ export const useCalculator = () => {
     flightMiles: 5000, // yearly
     transitType: 'BUS',
     transitMiles: 100, // monthly
+    usesActiveTransport: false,
+    hasElectricVehicle: false,
     // Food
     dietType: 'AVERAGE',
+    buysLocalFood: false,
+    followsSustainableDiet: false,
     // Waste
     wasteLbs: 30, // monthly
     recyclingPercentage: 30, // percentage
+    minimizesWaste: false,
+    avoidsPlastic: false,
   });
 
   // Calculate results based on current state
@@ -146,26 +173,39 @@ export const useCalculator = () => {
 
   // Move to the previous step
   const prevStep = () => {
-    setState(prev => ({ ...prev, step: Math.max(1, prev.step - 1) }));
+    setState(prev => ({ ...prev, step: Math.max(0, prev.step - 1) }));
   };
 
   // Reset the calculator
   const resetCalculator = () => {
     setState({
-      step: 1,
+      step: 0,
+      name: '',
+      age: 0,
+      email: '',
+      gender: '',
+      profession: '',
       electricityKwh: 500,
       naturalGasTherm: 30,
       heatingOilGallons: 0,
       propaneGallons: 0,
+      usesRenewableEnergy: false,
+      hasEnergyEfficiencyUpgrades: false,
       carType: 'MEDIUM',
       carMiles: 1000,
       flightType: 'MEDIUM',
       flightMiles: 5000,
       transitType: 'BUS',
       transitMiles: 100,
+      usesActiveTransport: false,
+      hasElectricVehicle: false,
       dietType: 'AVERAGE',
+      buysLocalFood: false,
+      followsSustainableDiet: false,
       wasteLbs: 30,
       recyclingPercentage: 30,
+      minimizesWaste: false,
+      avoidsPlastic: false,
     });
   };
 

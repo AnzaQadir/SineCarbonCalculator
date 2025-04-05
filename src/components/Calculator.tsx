@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,17 @@ import {
   Apple,
   Beef,
   Leaf,
-  Info
+  Info,
+  User,
+  Mail,
+  Briefcase,
+  Sun,
+  Zap,
+  Bike,
+  Battery,
+  ShoppingBag,
+  Recycle,
+  PackageX
 } from 'lucide-react';
 import { useCalculator, CarType, FlightType, TransitType, DietType } from '@/hooks/useCalculator';
 import ResultsDisplay from './ResultsDisplay';
@@ -38,6 +47,114 @@ const Calculator: React.FC = () => {
 
   const renderStepContent = () => {
     switch (state.step) {
+      case 0:
+        return (
+          <div className="animate-fade-in">
+            <CardHeader>
+              <div className="flex items-center space-x-2 mb-2">
+                <User className="h-5 w-5 text-primary" />
+                <CardTitle>Your Information</CardTitle>
+              </div>
+              <CardDescription>
+                Tell us a bit about yourself to help personalize your carbon footprint calculation.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center mb-2">
+                    <User className="h-4 w-4 text-primary mr-2" />
+                    <label htmlFor="name" className="text-sm font-medium">
+                      Full Name
+                    </label>
+                  </div>
+                  <input
+                    id="name"
+                    type="text"
+                    value={state.name}
+                    onChange={(e) => updateCalculator({ name: e.target.value })}
+                    className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    placeholder="Enter your name"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center mb-2">
+                    <Info className="h-4 w-4 text-primary mr-2" />
+                    <label htmlFor="age" className="text-sm font-medium">
+                      Age
+                    </label>
+                  </div>
+                  <input
+                    id="age"
+                    type="number"
+                    min="0"
+                    value={state.age || ''}
+                    onChange={(e) => updateCalculator({ age: Number(e.target.value) || 0 })}
+                    className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    placeholder="Enter your age"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center mb-2">
+                    <Mail className="h-4 w-4 text-primary mr-2" />
+                    <label htmlFor="email" className="text-sm font-medium">
+                      Email Address
+                    </label>
+                  </div>
+                  <input
+                    id="email"
+                    type="email"
+                    value={state.email}
+                    onChange={(e) => updateCalculator({ email: e.target.value })}
+                    className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    placeholder="Enter your email"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center mb-2">
+                    <User className="h-4 w-4 text-primary mr-2" />
+                    <label htmlFor="gender" className="text-sm font-medium">
+                      Gender
+                    </label>
+                  </div>
+                  <select
+                    id="gender"
+                    value={state.gender}
+                    onChange={(e) => updateCalculator({ gender: e.target.value })}
+                    className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                    <option value="prefer_not_to_say">Prefer not to say</option>
+                  </select>
+                </div>
+
+                <div>
+                  <div className="flex items-center mb-2">
+                    <Briefcase className="h-4 w-4 text-primary mr-2" />
+                    <label htmlFor="profession" className="text-sm font-medium">
+                      Profession
+                    </label>
+                  </div>
+                  <input
+                    id="profession"
+                    type="text"
+                    value={state.profession}
+                    onChange={(e) => updateCalculator({ profession: e.target.value })}
+                    className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    placeholder="Enter your profession"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </div>
+        );
+
       case 1:
         return (
           <div className="animate-fade-in">
@@ -158,6 +275,86 @@ const Calculator: React.FC = () => {
                   />
                 </div>
                 
+                <div className="space-y-4 mt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Sun className="h-4 w-4 text-primary" />
+                      <label className="text-sm font-medium">Do you use renewable energy sources at home?</label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Do you use renewable energy sources at home (e.g., solar panels, wind energy)?</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          className="peer sr-only"
+                          checked={!state.usesRenewableEnergy}
+                          onChange={() => updateCalculator({ usesRenewableEnergy: false })}
+                        />
+                        <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                          No
+                        </div>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          className="peer sr-only"
+                          checked={state.usesRenewableEnergy}
+                          onChange={() => updateCalculator({ usesRenewableEnergy: true })}
+                        />
+                        <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                          Yes
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Zap className="h-4 w-4 text-primary" />
+                      <label className="text-sm font-medium">Have you implemented energy efficiency measures ?</label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Have you implemented energy efficiency measures (insulation, smart thermostats, energy-efficient appliances)?</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          className="peer sr-only"
+                          checked={!state.hasEnergyEfficiencyUpgrades}
+                          onChange={() => updateCalculator({ hasEnergyEfficiencyUpgrades: false })}
+                        />
+                        <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                          No
+                        </div>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          className="peer sr-only"
+                          checked={state.hasEnergyEfficiencyUpgrades}
+                          onChange={() => updateCalculator({ hasEnergyEfficiencyUpgrades: true })}
+                        />
+                        <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                          Yes
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-4">
                   <div className="flex items-start">
                     <Info className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
@@ -297,6 +494,86 @@ const Calculator: React.FC = () => {
                     className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                   />
                 </div>
+
+                <div className="space-y-4 mt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Bike className="h-4 w-4 text-primary" />
+                      <label className="text-sm font-medium">Active Transport</label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Do you prefer walking or cycling for your daily commutes or short trips?</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          className="peer sr-only"
+                          checked={!state.usesActiveTransport}
+                          onChange={() => updateCalculator({ usesActiveTransport: false })}
+                        />
+                        <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                          No
+                        </div>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          className="peer sr-only"
+                          checked={state.usesActiveTransport}
+                          onChange={() => updateCalculator({ usesActiveTransport: true })}
+                        />
+                        <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                          Yes
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Battery className="h-4 w-4 text-primary" />
+                      <label className="text-sm font-medium">Electric Vehicles</label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Do you drive an electric or hybrid vehicle?</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          className="peer sr-only"
+                          checked={!state.hasElectricVehicle}
+                          onChange={() => updateCalculator({ hasElectricVehicle: false })}
+                        />
+                        <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                          No
+                        </div>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          className="peer sr-only"
+                          checked={state.hasElectricVehicle}
+                          onChange={() => updateCalculator({ hasElectricVehicle: true })}
+                        />
+                        <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                          Yes
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </div>
@@ -381,6 +658,86 @@ const Calculator: React.FC = () => {
                 </div>
               </div>
               
+              <div className="space-y-4 mt-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <ShoppingBag className="h-4 w-4 text-primary" />
+                    <label className="text-sm font-medium">Ethical & Local Purchasing</label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Do you prioritize ethical or locally produced food when shopping?</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        className="peer sr-only"
+                        checked={!state.buysLocalFood}
+                        onChange={() => updateCalculator({ buysLocalFood: false })}
+                      />
+                      <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                        No
+                      </div>
+                    </label>
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        className="peer sr-only"
+                        checked={state.buysLocalFood}
+                        onChange={() => updateCalculator({ buysLocalFood: true })}
+                      />
+                      <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                        Yes
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Leaf className="h-4 w-4 text-primary" />
+                    <label className="text-sm font-medium">Sustainable Diet</label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Do you follow a diet that minimizes environmental impact (e.g., plant-based or reduced meat consumption)?</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        className="peer sr-only"
+                        checked={!state.followsSustainableDiet}
+                        onChange={() => updateCalculator({ followsSustainableDiet: false })}
+                      />
+                      <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                        No
+                      </div>
+                    </label>
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        className="peer sr-only"
+                        checked={state.followsSustainableDiet}
+                        onChange={() => updateCalculator({ followsSustainableDiet: true })}
+                      />
+                      <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                        Yes
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
               <div className="mt-6 bg-muted/30 p-4 rounded-lg">
                 <h4 className="font-medium mb-2 flex items-center">
                   <HelpCircle className="h-4 w-4 mr-2" />
@@ -453,6 +810,86 @@ const Calculator: React.FC = () => {
                 </div>
               </div>
 
+              <div className="space-y-4 mt-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Recycle className="h-4 w-4 text-primary" />
+                    <label className="text-sm font-medium">Waste Minimization</label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Do you actively minimize waste by recycling, composting, or reducing overall consumption?</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        className="peer sr-only"
+                        checked={!state.minimizesWaste}
+                        onChange={() => updateCalculator({ minimizesWaste: false })}
+                      />
+                      <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                        No
+                      </div>
+                    </label>
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        className="peer sr-only"
+                        checked={state.minimizesWaste}
+                        onChange={() => updateCalculator({ minimizesWaste: true })}
+                      />
+                      <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                        Yes
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <PackageX className="h-4 w-4 text-primary" />
+                    <label className="text-sm font-medium">Plastic Avoidance</label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Do you consciously avoid single-use plastics in your daily routine?</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        className="peer sr-only"
+                        checked={!state.avoidsPlastic}
+                        onChange={() => updateCalculator({ avoidsPlastic: false })}
+                      />
+                      <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                        No
+                      </div>
+                    </label>
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        className="peer sr-only"
+                        checked={state.avoidsPlastic}
+                        onChange={() => updateCalculator({ avoidsPlastic: true })}
+                      />
+                      <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
+                        Yes
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
               <div className="mt-6 bg-muted/30 p-4 rounded-lg">
                 <h4 className="font-medium mb-2 flex items-center">
                   <HelpCircle className="h-4 w-4 mr-2" />
@@ -479,7 +916,7 @@ const Calculator: React.FC = () => {
   const renderStepIndicator = () => {
     return (
       <div className="flex items-center justify-center mb-8">
-        {[1, 2, 3, 4, 5].map((step) => (
+        {[0, 1, 2, 3, 4, 5].map((step) => (
           <React.Fragment key={step}>
             <div 
               className={cn(
@@ -526,7 +963,7 @@ const Calculator: React.FC = () => {
             <Button 
               variant="outline" 
               onClick={prevStep}
-              disabled={state.step === 1}
+              disabled={state.step === 0}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back

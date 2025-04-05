@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -15,9 +15,11 @@ import {
   Legend,
   ReferenceLine 
 } from 'recharts';
-import { ArrowLeft, Download, Share2, AlertCircle, Leaf, AlertTriangle, Check, MapPin, Info } from 'lucide-react';
+import { ArrowLeft, Download, Share2, AlertCircle, Leaf, AlertTriangle, Check, MapPin, Info, Sprout, Flower2, Trees, Palmtree } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatNumber } from '@/utils/formatters';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface ResultsDisplayProps {
   results: {
@@ -31,16 +33,37 @@ interface ResultsDisplayProps {
     comparedToTarget: number;
   };
   state: {
+    name: string;
+    email: string;
+    age: number;
+    gender: string;
+    profession: string;
     electricityKwh: number;
     naturalGasTherm: number;
-    carType: string;
+    heatingOilGallons: number;
+    propaneGallons: number;
     carMiles: number;
+    carType: string;
     flightMiles: number;
+    flightType: string;
+    transitMiles: number;
+    transitType: string;
     dietType: string;
     recyclingPercentage: number;
+    wasteLbs: number;
+    usesRenewableEnergy: boolean;
+    hasEnergyEfficiencyUpgrades: boolean;
+    usesActiveTransport: boolean;
+    hasElectricVehicle: boolean;
+    buysLocalFood: boolean;
+    followsSustainableDiet: boolean;
+    minimizesWaste: boolean;
+    avoidsPlastic: boolean;
   };
   onReset: () => void;
 }
+
+type CalculatorState = ResultsDisplayProps['state'];
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset }) => {
   const {
@@ -84,7 +107,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
     },
   ];
 
-  const COLORS = ['#38A169', '#4299E1', '#F59E0B', '#E53E3E'];
+  const COLORS = ['#22c55e', '#3b82f6', '#f97316', '#ef4444'];
 
   const getRecommendations = () => {
     const recs = [];
@@ -224,8 +247,173 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
   
   const impactLevel = getImpactLevel();
 
+  const calculateSustainabilityScore = (state: CalculatorState): number => {
+    let score = 0;
+    if (state.usesRenewableEnergy) score++;
+    if (state.hasEnergyEfficiencyUpgrades) score++;
+    if (state.usesActiveTransport) score++;
+    if (state.hasElectricVehicle) score++;
+    if (state.buysLocalFood) score++;
+    if (state.followsSustainableDiet) score++;
+    if (state.minimizesWaste) score++;
+    if (state.avoidsPlastic) score++;
+    return score;
+  };
+
+  const getPersonalityLabel = (score: number): string => {
+    if (score <= 2) return "Eco Novice";
+    if (score <= 4) return "Green Starter";
+    if (score <= 6) return "Eco Advocate";
+    return "Sustainability Champion";
+  };
+
+  const getPersonalityDescription = (score: number): string => {
+    if (score <= 2) {
+      return "Just starting your sustainable journey. There's plenty of room to grow your eco-friendly habits.";
+    }
+    if (score <= 4) {
+      return "You're taking your first steps towards sustainability. Keep it up—small changes add up!";
+    }
+    if (score <= 6) {
+      return "Great job! You're actively engaging in sustainable practices and making a positive impact.";
+    }
+    return "Outstanding! You're leading the charge in eco-friendly living and setting a strong example for others.";
+  };
+
+  const getPersonalityIcon = (score: number) => {
+    if (score <= 2) {
+      return <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+        <Sprout className="w-8 h-8 text-green-500" />
+      </div>;
+    }
+    if (score <= 4) {
+      return <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+        <Flower2 className="w-8 h-8 text-green-600" />
+      </div>;
+    }
+    if (score <= 6) {
+      return <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+        <Trees className="w-8 h-8 text-green-700" />
+      </div>;
+    }
+    return <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+      <Palmtree className="w-8 h-8 text-green-800" />
+    </div>;
+  };
+
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  const generatePDF = async () => {
+    try {
+      // Create a new PDF document
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      // Get the overview content
+      const overviewContent = document.querySelector('[data-testid="overview-tab"]');
+      
+      if (overviewContent instanceof HTMLElement) {
+        // Add title and header
+        pdf.setFillColor(34, 197, 94); // Green color
+        pdf.rect(0, 0, pdf.internal.pageSize.width, 40, 'F');
+        
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(24);
+        pdf.text('Carbon Footprint Report', 20, 25);
+
+        // Add user info section
+        pdf.setFontSize(12);
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(`Name: ${state.name}`, 20, 50);
+        pdf.text(`Date: ${new Date().toLocaleDateString()}`, 20, 57);
+        pdf.text(`Total Footprint: ${formatNumber(totalFootprint)} metric tons CO2e/year`, 20, 64);
+
+        // Convert the overview content to canvas
+        const canvas = await html2canvas(overviewContent, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          windowWidth: 1200,
+          onclone: (document, element) => {
+            // Adjust styles for better PDF rendering
+            element.style.padding = '20px';
+            element.style.width = '1100px';
+            const charts = element.querySelectorAll('.recharts-wrapper');
+            charts.forEach(chart => {
+              (chart as HTMLElement).style.width = '100%';
+            });
+          }
+        });
+
+        // Calculate dimensions to fit on A4
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        // Add the overview content
+        const imgData = canvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', 10, 75, imgWidth, imgHeight);
+
+        // Add footer
+        const pageHeight = pdf.internal.pageSize.height;
+        pdf.setFontSize(10);
+        pdf.setTextColor(128, 128, 128);
+        pdf.text('Generated by Carbon Footprint Calculator', 20, pageHeight - 10);
+        
+        // Save the PDF
+        pdf.save(`carbon-footprint-${state.name.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+      }
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
+  const handleGeneratePDF = async () => {
+    setIsGeneratingPDF(true);
+    try {
+      await generatePDF();
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }: any) => {
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius * 1.15;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    const sin = Math.sin(-midAngle * RADIAN);
+    const cos = Math.cos(-midAngle * RADIAN);
+    
+    const mx = cx + (outerRadius + 3) * cos;
+    const my = cy + (outerRadius + 3) * sin;
+    
+    const textAnchor = cos >= 0 ? 'start' : 'end';
+    const xOffset = cos >= 0 ? 3 : -3;
+
+    return (
+      <g>
+        <path
+          d={`M${mx},${my}L${x},${y}`}
+          stroke={COLORS[index % COLORS.length]}
+          strokeWidth={1}
+          fill="none"
+        />
+        <text
+          x={x + xOffset}
+          y={y}
+          textAnchor={textAnchor}
+          dominantBaseline="middle"
+          className="text-xs"
+          fill="#374151"
+        >
+          {`${name}: ${(percent * 100).toFixed(0)}%`}
+        </text>
+      </g>
+    );
+  };
+
   return (
-    <div className="w-full max-w-4xl mx-auto animate-fade-in">
+    <div className="w-full max-w-6xl mx-auto animate-fade-in">
       <Card className="overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border/20">
           <div className="flex items-center justify-between">
@@ -236,7 +424,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-8">
           <div className="mb-8 p-6 bg-primary/5 rounded-xl text-center">
             <div className="flex items-center justify-center mb-2">
               {impactLevel.icon}
@@ -258,18 +446,21 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
           </div>
 
           <Tabs defaultValue="overview" className="mb-8">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="methodology">Methodology</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="overview" className="pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <TabsContent 
+              value="overview" 
+              className="pt-6 space-y-8" 
+              data-testid="overview-tab"
+            >
+              <div className="grid grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-xl font-medium mb-4">Emissions by Category</h3>
-                  <div className="h-[300px]">
+                  <div className="h-[250px] relative">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
@@ -277,17 +468,29 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          outerRadius={100}
+                          outerRadius={80}
+                          innerRadius={0}
+                          paddingAngle={2}
                           fill="#8884d8"
                           dataKey="value"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={renderCustomizedLabel}
+                          animationBegin={0}
+                          animationDuration={1500}
+                          animationEasing="ease-out"
                         >
                           {categoryData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={COLORS[index % COLORS.length]}
+                              strokeWidth={1}
+                              stroke="#fff"
+                            />
                           ))}
                         </Pie>
-                        <Tooltip content={<CustomTooltip />} />
-                        <Legend />
+                        <Tooltip 
+                          content={<CustomTooltip />}
+                          wrapperStyle={{ outline: 'none' }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -306,99 +509,141 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
                   <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
-                        data={comparisonData}
+                        data={[{ name: 'Your Footprint', value: totalFootprint }]}
                         margin={{
-                          top: 5,
-                          right: 30,
-                          left: 20,
-                          bottom: 40,
+                          top: 30,
+                          right: 180,
+                          left: 60,
+                          bottom: 30,
                         }}
-                        barSize={40}
+                        barSize={50}
                       >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                         <XAxis 
-                          dataKey="name" 
-                          angle={-45}
-                          textAnchor="end"
-                          height={70}
-                          tick={{ fontSize: 12 }}
+                          dataKey="name"
+                          tick={{ fontSize: 14 }}
                         />
                         <YAxis 
                           unit=" tons" 
-                          tick={{ fontSize: 12 }}
+                          tick={{ fontSize: 14 }}
                           domain={[0, Math.max(20, Math.ceil(totalFootprint * 1.2))]}
                         />
                         <Tooltip content={<ComparisonTooltip />} />
+                        <Bar dataKey="value" fill="#22C55E" radius={[6, 6, 0, 0]} />
                         <ReferenceLine 
-                          y={results.totalFootprint} 
-                          stroke="#FF8C00" 
-                          strokeDasharray="5 5"
+                          y={16} 
+                          stroke="#475569" 
                           strokeWidth={2}
+                          strokeDasharray="5 5"
                           label={{ 
-                            value: 'Your footprint', 
-                            position: 'insideBottomRight',
-                            fill: '#FF8C00',
-                            fontSize: 12
+                            value: 'US Average', 
+                            position: 'right',
+                            fill: '#475569',
+                            fontSize: 14
                           }}
                         />
-                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                          {comparisonData.map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={index === 0 
-                                ? (entry.value <= 2 ? '#34D399' : entry.value <= 4.8 ? '#6366F1' : entry.value <= 16 ? '#F59E0B' : '#EF4444') 
-                                : (index === 1 ? '#94A3B8' : index === 2 ? '#6B7280' : '#047857')}
-                            />
-                          ))}
-                        </Bar>
+                        <ReferenceLine 
+                          y={4.8} 
+                          stroke="#64748B" 
+                          strokeWidth={2}
+                          strokeDasharray="5 5"
+                          label={{ 
+                            value: 'Global Average', 
+                            position: 'right',
+                            fill: '#64748B',
+                            fontSize: 14
+                          }}
+                        />
+                        <ReferenceLine 
+                          y={2} 
+                          stroke="#059669" 
+                          strokeWidth={2}
+                          strokeDasharray="5 5"
+                          label={{ 
+                            value: 'Sustainability Target', 
+                            position: 'right',
+                            fill: '#059669',
+                            fontSize: 14
+                          }}
+                        />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="text-xs text-center text-muted-foreground mt-2">
-                    Values shown in metric tons of CO2 equivalent per year
-                  </div>
                 </div>
               </div>
-            </TabsContent>
-            
-            <TabsContent value="recommendations" className="pt-4">
-              <h3 className="text-xl font-medium mb-4">Personalized Recommendations</h3>
-              <p className="text-muted-foreground mb-6">
-                Based on your responses, we've identified these opportunities to reduce your carbon footprint:
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {recommendations.map((rec, index) => (
-                  <Card key={index} className="overflow-hidden">
-                    <div className={`p-1 ${rec.difficulty === 'easy' ? 'bg-green-100' : rec.difficulty === 'medium' ? 'bg-amber-100' : 'bg-red-100'}`}>
-                      <div className="flex justify-between items-center px-3 py-1">
-                        <span className="text-xs font-medium">{rec.category}</span>
-                        <span className={`text-xs font-medium ${rec.difficulty === 'easy' ? 'text-green-600' : rec.difficulty === 'medium' ? 'text-amber-600' : 'text-red-600'}`}>
-                          {rec.difficulty.charAt(0).toUpperCase() + rec.difficulty.slice(1)}
-                        </span>
-                      </div>
+
+              <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-6 border border-green-100">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-green-800">Your Eco Personality</h3>
+                    <p className="text-sm text-green-600">Based on your sustainable practices</p>
+                  </div>
+                  {getPersonalityIcon(calculateSustainabilityScore(state))}
+                </div>
+                
+                <div className="flex items-center mb-4">
+                  <div className="flex-1">
+                    <div className="h-3 bg-gray-200 rounded-full">
+                      <div 
+                        className="h-3 bg-gradient-to-r from-green-300 to-green-500 rounded-full transition-all duration-500"
+                        style={{ width: `${(calculateSustainabilityScore(state) / 8) * 100}%` }}
+                      />
                     </div>
-                    <CardContent className="p-4 pt-3">
-                      <h4 className="font-medium text-lg mb-1">{rec.title}</h4>
-                      <p className="text-sm text-muted-foreground mb-3">{rec.description}</p>
-                      <div className="flex items-center text-xs text-primary font-medium">
-                        <Leaf className="h-3 w-3 mr-1" />
-                        {rec.impact}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                  </div>
+                  <span className="ml-3 font-medium text-green-700">
+                    {calculateSustainabilityScore(state)}/8 Points
+                  </span>
+                </div>
+
+                <div className="bg-white rounded-lg p-4 shadow-sm">
+                  <h4 className="font-medium text-green-800 mb-2">
+                    {getPersonalityLabel(calculateSustainabilityScore(state))}
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    {getPersonalityDescription(calculateSustainabilityScore(state))}
+                  </p>
+                </div>
               </div>
-              
-              <div className="mt-8 bg-blue-50 border border-blue-100 rounded-lg p-4">
-                <h4 className="font-medium mb-2 flex items-center text-blue-700">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  Local Resources
-                </h4>
-                <div className="text-sm space-y-2 text-blue-600">
-                  <p><strong>Local Energy Mix:</strong> {localInfo.energyMix}</p>
-                  <p><strong>Transportation Options:</strong> {localInfo.transportOptions}</p>
-                  <p><strong>Community Initiatives:</strong> {localInfo.localInitiatives}</p>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Personalized Recommendations</h3>
+                <p className="text-muted-foreground mb-6">
+                  Based on your responses, we've identified these opportunities to reduce your carbon footprint:
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recommendations.map((rec, index) => (
+                    <Card key={index} className="overflow-hidden">
+                      <div className={`p-1 ${rec.difficulty === 'easy' ? 'bg-green-100' : rec.difficulty === 'medium' ? 'bg-amber-100' : 'bg-red-100'}`}>
+                        <div className="flex justify-between items-center px-3 py-1">
+                          <span className="text-xs font-medium">{rec.category}</span>
+                          <span className={`text-xs font-medium ${rec.difficulty === 'easy' ? 'text-green-600' : rec.difficulty === 'medium' ? 'text-amber-600' : 'text-red-600'}`}>
+                            {rec.difficulty.charAt(0).toUpperCase() + rec.difficulty.slice(1)}
+                          </span>
+                        </div>
+                      </div>
+                      <CardContent className="p-4 pt-3">
+                        <h4 className="font-medium text-lg mb-1">{rec.title}</h4>
+                        <p className="text-sm text-muted-foreground mb-3">{rec.description}</p>
+                        <div className="flex items-center text-xs text-primary font-medium">
+                          <Leaf className="h-3 w-3 mr-1" />
+                          {rec.impact}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                
+                <div className="mt-8 bg-blue-50 border border-blue-100 rounded-lg p-4">
+                  <h4 className="font-medium mb-2 flex items-center text-blue-700">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Local Resources
+                  </h4>
+                  <div className="text-sm space-y-2 text-blue-600">
+                    <p><strong>Local Energy Mix:</strong> {localInfo.energyMix}</p>
+                    <p><strong>Transportation Options:</strong> {localInfo.transportOptions}</p>
+                    <p><strong>Community Initiatives:</strong> {localInfo.localInitiatives}</p>
+                  </div>
                 </div>
               </div>
             </TabsContent>
@@ -486,9 +731,22 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset
               <Button>
                 Offset Now
               </Button>
-              <Button variant="outline">
-                <Share2 className="mr-2 h-4 w-4" />
-                Share
+              <Button 
+                variant="outline" 
+                onClick={handleGeneratePDF} 
+                disabled={isGeneratingPDF}
+              >
+                {isGeneratingPDF ? (
+                  <>
+                    <span className="animate-spin mr-2">⏳</span>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share PDF
+                  </>
+                )}
               </Button>
               <Button variant="outline">
                 <Download className="mr-2 h-4 w-4" />
