@@ -117,7 +117,19 @@ const Calculator: React.FC<CalculatorProps> = ({
   const [calculationResults, setCalculationResults] = useState<{
     score: number;
     emissions: number;
-    recommendations: string[];
+    categoryEmissions: {
+      home: number;
+      transport: number;
+      food: number;
+      waste: number;
+    };
+    recommendations: {
+      category: string;
+      title: string;
+      description: string;
+      impact: string;
+      difficulty: 'Easy' | 'Medium' | 'Hard';
+    }[];
   } | null>(null);
 
   useEffect(() => {
@@ -140,86 +152,85 @@ const Calculator: React.FC<CalculatorProps> = ({
     onCalculate(results);
   };
 
+  const handleReset = () => {
+    setShowResults(false);
+    setCalculationResults(null);
+    onStepChange(0); // Reset to first step
+  };
+
   const calculateScore = () => {
     let score = 0;
     let emissions = 0;
+    let homeEmissions = 0;
+    let transportEmissions = 0;
+    let foodEmissions = 0;
+    let wasteEmissions = 0;
 
     // Diet score calculation
     switch (state.dietType) {
       case 'VEGAN':
         score += 10;
-        emissions += 1.5; // tons CO2/year
+        foodEmissions += 1.5;
         break;
       case 'VEGETARIAN':
         score += 8;
-        emissions += 1.9;
+        foodEmissions += 1.9;
         break;
       case 'MEAT_MODERATE':
         score += 4;
-        emissions += 2.5;
+        foodEmissions += 2.5;
         break;
       case 'MEAT_HEAVY':
         score += 2;
-        emissions += 3.3;
+        foodEmissions += 3.3;
         break;
       default:
         score += 4;
-        emissions += 2.5;
+        foodEmissions += 2.5;
     }
 
-    // Transportation score
+    // Home energy emissions
+    homeEmissions += (state.electricityKwh * 0.0005); // Example conversion factor
+    homeEmissions += (state.naturalGasTherm * 0.005); // Example conversion factor
+    homeEmissions += (state.heatingOilGallons * 0.01); // Example conversion factor
+    homeEmissions += (state.propaneGallons * 0.005); // Example conversion factor
+
+    // Transportation emissions
     switch (state.primaryTransportMode) {
       case 'WALK_BIKE':
         score += 10;
+        transportEmissions += 0;
         break;
       case 'PUBLIC':
         score += 8;
+        transportEmissions += 1.5;
         break;
       case 'HYBRID':
       case 'ELECTRIC':
         score += 6;
+        transportEmissions += 2;
         break;
       case 'SMALL_CAR':
         score += 4;
+        transportEmissions += 3;
         break;
       case 'MEDIUM_CAR':
         score += 3;
+        transportEmissions += 4;
         break;
       case 'LARGE_CAR':
         score += 2;
+        transportEmissions += 5;
         break;
     }
 
-    // Flight impact
-    switch (state.flightType) {
-      case 'NONE':
-        score += 10;
-        break;
-      case 'RARE':
-        score += 8;
-        break;
-      case 'OCCASIONAL':
-        score += 5;
-        break;
-      case 'FREQUENT':
-        score += 2;
-        break;
-    }
+    // Waste emissions
+    wasteEmissions = state.waste.wasteLbs * 0.0005; // Example conversion factor
+    if (state.waste.minimizesWaste) wasteEmissions *= 0.8;
+    if (state.waste.recyclingPercentage > 50) wasteEmissions *= 0.7;
 
-    // Waste management
-    if (state.waste.minimizesWaste) score += 5;
-    if (state.waste.recyclingPercentage > 50) score += 5;
-    if (state.waste.evaluatesLifecycle) score += 5;
-
-    // Fashion choices
-    if (state.buysEthicalFashion) score += 5;
-    if (state.buysSecondHandClothing) score += 5;
-    if (state.avoidsFastFashion) score += 5;
-    if (state.investsInQuality) score += 5;
-
-    // Home energy
-    if (state.usesRenewableEnergy) score += 10;
-    if (state.hasEnergyEfficiencyUpgrades) score += 5;
+    // Total emissions
+    emissions = homeEmissions + transportEmissions + foodEmissions + wasteEmissions;
 
     // Normalize score to 0-100 range
     const normalizedScore = Math.min(100, Math.max(0, score));
@@ -227,27 +238,53 @@ const Calculator: React.FC<CalculatorProps> = ({
     return {
       score: normalizedScore,
       emissions: emissions,
+      categoryEmissions: {
+        home: homeEmissions,
+        transport: transportEmissions,
+        food: foodEmissions,
+        waste: wasteEmissions
+      },
       recommendations: generateRecommendations(normalizedScore, state)
     };
   };
 
   const generateRecommendations = (score: number, state: CalculatorState) => {
-    const recommendations = [];
+    const recommendations: Array<{
+      category: string;
+      title: string;
+      description: string;
+      impact: string;
+      difficulty: 'Easy' | 'Medium' | 'Hard';
+    }> = [];
+
+    if (!state.waste.minimizesWaste || state.waste.recyclingPercentage < 50) {
+      recommendations.push({
+        category: 'Waste',
+        title: 'Increase Recycling Efforts',
+        description: 'Increasing your recycling rate and composting organic waste can significantly reduce methane emissions from landfills.',
+        impact: 'Could save up to 0.5 tons CO2e per year',
+        difficulty: 'Easy' as const
+      });
+    }
 
     if (!state.usesRenewableEnergy) {
-      recommendations.push("Consider switching to renewable energy sources");
+      recommendations.push({
+        category: 'General',
+        title: 'Switch to Renewable Energy',
+        description: 'Check if your utility offers renewable energy options or consider installing solar panels.',
+        impact: 'Could save up to 3 tons CO2e per year',
+        difficulty: 'Medium' as const
+      });
     }
-    if (state.dietType === 'MEAT_HEAVY') {
-      recommendations.push("Reducing meat consumption can lower your carbon footprint");
-    }
-    if (!state.waste.minimizesWaste) {
-      recommendations.push("Implement waste reduction strategies");
-    }
-    if (state.flightType === 'FREQUENT') {
-      recommendations.push("Consider alternatives to frequent air travel");
-    }
-    if (!state.buysEthicalFashion) {
-      recommendations.push("Look for sustainable and ethical fashion options");
+
+    if (recommendations.length < 3) {
+      recommendations.push({
+        category: 'General',
+        title: 'Reduce, Reuse, Recycle',
+        description: 'Follow the waste hierarchy: reduce what you consume, reuse items when possible, and recycle what can\'t be reused.',
+        impact: 'Could save up to 1 ton CO2e per year',
+        difficulty: 'Easy' as const
+      });
     }
 
     return recommendations;
@@ -361,123 +398,123 @@ const Calculator: React.FC<CalculatorProps> = ({
   );
 
   const renderHomeEnergy = () => (
-    <div className="animate-fade-in">
-      <CardHeader>
-        <div className="flex items-center space-x-2 mb-2">
-          <Home className="h-5 w-5 text-primary" />
-          <CardTitle>Home Energy</CardTitle>
-        </div>
-        <CardDescription>
-          Enter your average monthly usage for each energy source.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <div>
-            <div className="flex items-center mb-2">
-              <PlugZap className="h-4 w-4 text-primary mr-2" />
-              <label htmlFor="electricity" className="text-sm font-medium">
-                Electricity (kWh/month)
-              </label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs">You can find this on your electricity bill. The average US household uses about 900 kWh per month.</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <input
-              id="electricity"
-              type="number"
-              min="0"
-              value={state.electricityKwh}
+          <div className="animate-fade-in">
+            <CardHeader>
+              <div className="flex items-center space-x-2 mb-2">
+                <Home className="h-5 w-5 text-primary" />
+                <CardTitle>Home Energy</CardTitle>
+              </div>
+              <CardDescription>
+                Enter your average monthly usage for each energy source.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center mb-2">
+                    <PlugZap className="h-4 w-4 text-primary mr-2" />
+                    <label htmlFor="electricity" className="text-sm font-medium">
+                      Electricity (kWh/month)
+                    </label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">You can find this on your electricity bill. The average US household uses about 900 kWh per month.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <input
+                    id="electricity"
+                    type="number"
+                    min="0"
+                    value={state.electricityKwh}
               onChange={(e) => onUpdate({ electricityKwh: Number(e.target.value) || 0 })}
-              className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Average US household: 900 kWh/month
-            </p>
-          </div>
+                    className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Average US household: 900 kWh/month
+                  </p>
+                </div>
 
-          <div>
-            <div className="flex items-center mb-2">
-              <Flame className="h-4 w-4 text-primary mr-2" />
-              <label htmlFor="naturalGas" className="text-sm font-medium">
-                Natural Gas (therms/month)
-              </label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs">Check your gas bill for this information. The average US home uses 50 therms per month.</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <input
-              id="naturalGas"
-              type="number"
-              min="0"
-              value={state.naturalGasTherm}
+                <div>
+                  <div className="flex items-center mb-2">
+                    <Flame className="h-4 w-4 text-primary mr-2" />
+                    <label htmlFor="naturalGas" className="text-sm font-medium">
+                      Natural Gas (therms/month)
+                    </label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">Check your gas bill for this information. The average US home uses 50 therms per month.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <input
+                    id="naturalGas"
+                    type="number"
+                    min="0"
+                    value={state.naturalGasTherm}
               onChange={(e) => onUpdate({ naturalGasTherm: Number(e.target.value) || 0 })}
-              className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Average US household: 50 therms/month
-            </p>
-          </div>
+                    className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Average US household: 50 therms/month
+                  </p>
+                </div>
 
-          <div>
-            <div className="flex items-center mb-2">
-              <Wind className="h-4 w-4 text-primary mr-2" />
-              <label htmlFor="heatingOil" className="text-sm font-medium">
-                Heating Oil (gallons/month)
-              </label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Most common in Northeastern US. Leave as 0 if you don't use heating oil.</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <input
-              id="heatingOil"
-              type="number"
-              min="0"
-              value={state.heatingOilGallons}
+                <div>
+                  <div className="flex items-center mb-2">
+                    <Wind className="h-4 w-4 text-primary mr-2" />
+                    <label htmlFor="heatingOil" className="text-sm font-medium">
+                      Heating Oil (gallons/month)
+                    </label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Most common in Northeastern US. Leave as 0 if you don't use heating oil.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <input
+                    id="heatingOil"
+                    type="number"
+                    min="0"
+                    value={state.heatingOilGallons}
               onChange={(e) => onUpdate({ heatingOilGallons: Number(e.target.value) || 0 })}
-              className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-            />
-          </div>
+                    className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                  />
+                </div>
 
-          <div>
-            <div className="flex items-center mb-2">
-              <LifeBuoy className="h-4 w-4 text-primary mr-2" />
-              <label htmlFor="propane" className="text-sm font-medium">
-                Propane (gallons/month)
-              </label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Used for heating, cooking, or water heating in some homes. Leave as 0 if not applicable.</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <input
-              id="propane"
-              type="number"
-              min="0"
-              value={state.propaneGallons}
+                <div>
+                  <div className="flex items-center mb-2">
+                    <LifeBuoy className="h-4 w-4 text-primary mr-2" />
+                    <label htmlFor="propane" className="text-sm font-medium">
+                      Propane (gallons/month)
+                    </label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span><HelpCircle className="h-4 w-4 text-muted-foreground ml-2 cursor-help" /></span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Used for heating, cooking, or water heating in some homes. Leave as 0 if not applicable.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <input
+                    id="propane"
+                    type="number"
+                    min="0"
+                    value={state.propaneGallons}
               onChange={(e) => onUpdate({ propaneGallons: Number(e.target.value) || 0 })}
-              className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-            />
-          </div>
+                    className="w-full border border-input bg-transparent rounded-md h-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                  />
+                </div>
           
           <div className="space-y-4 mt-6">
             <div className="bg-muted/20 p-4 rounded-lg">
@@ -522,36 +559,36 @@ const Calculator: React.FC<CalculatorProps> = ({
               </div>
             </div>
           </div>
-
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-4">
-            <div className="flex items-start">
-              <Info className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-sm font-medium text-blue-700 mb-1">Why this matters</h4>
-                <p className="text-xs text-blue-600">
-                  Home energy use accounts for about 20% of the average carbon footprint in the US. Using renewable energy can reduce this by up to 80%.
-                </p>
+                
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-4">
+                  <div className="flex items-start">
+                    <Info className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="text-sm font-medium text-blue-700 mb-1">Why this matters</h4>
+                      <p className="text-xs text-blue-600">
+                        Home energy use accounts for about 20% of the average carbon footprint in the US. Using renewable energy can reduce this by up to 80%.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            </CardContent>
           </div>
-        </div>
-      </CardContent>
-    </div>
-  );
+        );
 
   const renderTransportationStep = () => (
-    <div className="animate-fade-in">
-      <CardHeader>
-        <div className="flex items-center space-x-2 mb-2">
-          <Car className="h-5 w-5 text-primary" />
-          <CardTitle>Transportation</CardTitle>
-        </div>
-        <CardDescription>
+          <div className="animate-fade-in">
+            <CardHeader>
+              <div className="flex items-center space-x-2 mb-2">
+                <Car className="h-5 w-5 text-primary" />
+                <CardTitle>Transportation</CardTitle>
+              </div>
+              <CardDescription>
           Tell us about your daily commute and travel habits.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div>
           <Label>Primary Commute Mode</Label>
           <Select
             value={state.primaryTransportMode}
@@ -572,32 +609,32 @@ const Calculator: React.FC<CalculatorProps> = ({
               <SelectItem value="LARGE_CAR">Large Car (Very high emissions)</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+                </div>
 
-        <div>
+                <div>
           <Label>Weekly Travel Distance (miles)</Label>
           <Input
-            type="number"
+                    type="number"
             value={state.weeklyCommuteDistance}
             onChange={(e) => onUpdate({ weeklyCommuteDistance: parseFloat(e.target.value) || 0 })}
             placeholder="Enter your weekly travel distance"
           />
-        </div>
+                </div>
 
-        <div>
+                <div>
           <Label>Vehicle Efficiency (MPG)</Label>
           <Input
-            type="number"
+                    type="number"
             value={state.vehicleEfficiency}
             onChange={(e) => onUpdate({ vehicleEfficiency: parseFloat(e.target.value) || 0 })}
             placeholder="Enter your vehicle's fuel efficiency"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
             Leave blank if you don't use a personal vehicle
-          </p>
-        </div>
+                  </p>
+                </div>
 
-        <div>
+                <div>
           <Label>Long-Distance Travel</Label>
           <Select
             value={state.flightType}
@@ -615,7 +652,7 @@ const Calculator: React.FC<CalculatorProps> = ({
               <SelectItem value="FREQUENT">Frequently (6+ times per year)</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+                </div>
 
         <div className="bg-muted/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2 mb-3">
@@ -629,14 +666,14 @@ const Calculator: React.FC<CalculatorProps> = ({
                 <p>Do you offset your travel emissions through carbon credits or other means?</p>
               </TooltipContent>
             </Tooltip>
-          </div>
+                  </div>
           <div className="flex items-center justify-center">
             <YesNoToggle
               value={state.offsetsTravelEmissions}
               onChange={(value) => onUpdate({ offsetsTravelEmissions: value })}
-            />
-          </div>
-        </div>
+                  />
+                </div>
+              </div>
 
         <div className="mt-6 bg-muted/30 p-4 rounded-lg">
           <h4 className="font-medium mb-2 flex items-center">
@@ -649,81 +686,81 @@ const Calculator: React.FC<CalculatorProps> = ({
             emissions can help lower your environmental impact.
           </p>
         </div>
-      </CardContent>
-    </div>
-  );
+            </CardContent>
+          </div>
+        );
 
   const renderFood = () => (
-    <div className="animate-fade-in">
-      <CardHeader>
-        <div className="flex items-center space-x-2 mb-2">
+          <div className="animate-fade-in">
+            <CardHeader>
+              <div className="flex items-center space-x-2 mb-2">
           <ShoppingBag className="h-5 w-5 text-primary" />
-          <CardTitle>Food & Diet</CardTitle>
-        </div>
+                <CardTitle>Food & Diet</CardTitle>
+              </div>
         <CardDescription className="text-gray-600">
-          Your diet has a significant impact on your carbon footprint.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+                Your diet has a significant impact on your carbon footprint.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div
-            className={cn(
+                <div 
+                  className={cn(
               "flex items-start space-x-2 p-3 rounded-lg border cursor-pointer transition-all hover:border-primary/50",
               state.dietType === 'MEAT_HEAVY' ? "border-primary bg-primary/5" : "border-gray-200"
-            )}
+                  )}
             onClick={() => onUpdate({ dietType: 'MEAT_HEAVY' })}
-          >
+                >
             <CircleDot className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-medium">Meat Heavy</h3>
+                    <h3 className="font-medium">Meat Heavy</h3>
               <p className="text-sm text-gray-600">Red meat and dairy multiple times per day</p>
               <p className="text-xs text-muted-foreground">Highest carbon footprint impact</p>
-            </div>
-          </div>
-          
-          <div
-            className={cn(
+                  </div>
+                </div>
+                
+                <div 
+                  className={cn(
               "flex items-start space-x-2 p-3 rounded-lg border cursor-pointer transition-all hover:border-primary/50",
               state.dietType === 'MEAT_MODERATE' ? "border-primary bg-primary/5" : "border-gray-200"
-            )}
+                  )}
             onClick={() => onUpdate({ dietType: 'MEAT_MODERATE' })}
-          >
+                >
             <ThumbsUp className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-medium">Average</h3>
+                    <h3 className="font-medium">Average</h3>
               <p className="text-sm text-gray-600">Meat several times per week</p>
               <p className="text-xs text-muted-foreground">Moderate carbon footprint impact</p>
-            </div>
-          </div>
-
-          <div
-            className={cn(
+                  </div>
+                </div>
+                
+                <div 
+                  className={cn(
               "flex items-start space-x-2 p-3 rounded-lg border cursor-pointer transition-all hover:border-primary/50",
               state.dietType === 'VEGETARIAN' ? "border-primary bg-primary/5" : "border-gray-200"
-            )}
+                  )}
             onClick={() => onUpdate({ dietType: 'VEGETARIAN' })}
-          >
+                >
             <Apple className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-medium">Vegetarian</h3>
+                    <h3 className="font-medium">Vegetarian</h3>
               <p className="text-sm text-gray-600">No meat, but includes dairy and eggs</p>
               <p className="text-xs text-muted-foreground">Lower carbon footprint impact</p>
-            </div>
-          </div>
-
-          <div
-            className={cn(
+                  </div>
+                </div>
+                
+                <div 
+                  className={cn(
               "flex items-start space-x-2 p-3 rounded-lg border cursor-pointer transition-all hover:border-primary/50",
               state.dietType === 'VEGAN' ? "border-primary bg-primary/5" : "border-gray-200"
-            )}
+                  )}
             onClick={() => onUpdate({ dietType: 'VEGAN' })}
-          >
+                >
             <Leaf className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-medium">Vegan</h3>
+                    <h3 className="font-medium">Vegan</h3>
               <p className="text-sm text-gray-600">No animal products whatsoever</p>
               <p className="text-xs text-muted-foreground">Lowest carbon footprint impact</p>
-            </div>
+                  </div>
           </div>
         </div>
 
@@ -819,15 +856,15 @@ const Calculator: React.FC<CalculatorProps> = ({
                 onChange={(value) => onUpdate({ usesReusableContainers: value })}
               />
             </div>
-          </div>
-        </div>
-
-        <div className="mt-6 bg-muted/30 p-4 rounded-lg">
-          <h4 className="font-medium mb-2 flex items-center">
-            <HelpCircle className="h-4 w-4 mr-2" />
+                </div>
+              </div>
+              
+              <div className="mt-6 bg-muted/30 p-4 rounded-lg">
+                <h4 className="font-medium mb-2 flex items-center">
+                  <HelpCircle className="h-4 w-4 mr-2" />
             Food Impact & Insights
-          </h4>
-          <p className="text-sm text-muted-foreground">
+                </h4>
+                <p className="text-sm text-muted-foreground">
             Your food choices significantly impact your carbon footprint. While students and young 
             professionals often choose plant-based meals, frequent dining out can increase emissions. 
             Consider the environmental cost of restaurant meals versus home cooking.
@@ -841,23 +878,23 @@ const Calculator: React.FC<CalculatorProps> = ({
               <li>Reusable containers help reduce plastic waste and packaging emissions</li>
             </ul>
           </div>
-        </div>
-      </CardContent>
-    </div>
-  );
+              </div>
+            </CardContent>
+          </div>
+        );
 
   const renderWaste = () => (
-    <div className="animate-fade-in">
-      <CardHeader>
-        <div className="flex items-center space-x-2 mb-2">
-          <Trash2 className="h-5 w-5 text-primary" />
+          <div className="animate-fade-in">
+            <CardHeader>
+              <div className="flex items-center space-x-2 mb-2">
+                <Trash2 className="h-5 w-5 text-primary" />
           <CardTitle>Waste & Consumption</CardTitle>
-        </div>
-        <CardDescription>
+              </div>
+              <CardDescription>
           Tell us about your waste management and consumption habits.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
         <div className="bg-muted/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2 mb-3">
             <Trash2 className="h-4 w-4 text-primary" />
@@ -870,14 +907,14 @@ const Calculator: React.FC<CalculatorProps> = ({
                 <p>The average person produces about 30-40 lbs of trash per month. Reducing this can significantly lower your environmental impact.</p>
               </TooltipContent>
             </Tooltip>
-          </div>
+                </div>
           <Input
-            type="number"
+                  type="number"
             value={state.waste.wasteLbs}
             onChange={(e) => onUpdate({ waste: { ...state.waste, wasteLbs: parseFloat(e.target.value) || 0 } })}
             placeholder="Enter pounds of trash per month"
           />
-        </div>
+              </div>
 
         <div className="bg-muted/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2 mb-3">
@@ -902,13 +939,13 @@ const Calculator: React.FC<CalculatorProps> = ({
             />
           </div>
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>0%</span>
-            <span>25%</span>
-            <span>50%</span>
-            <span>75%</span>
-            <span>100%</span>
-          </div>
-        </div>
+                  <span>0%</span>
+                  <span>25%</span>
+                  <span>50%</span>
+                  <span>75%</span>
+                  <span>100%</span>
+                </div>
+              </div>
 
         <div className="bg-muted/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2 mb-3">
@@ -1017,12 +1054,12 @@ const Calculator: React.FC<CalculatorProps> = ({
           </div>
         </div>
 
-        <div className="mt-6 bg-muted/30 p-4 rounded-lg">
-          <h4 className="font-medium mb-2 flex items-center">
-            <HelpCircle className="h-4 w-4 mr-2" />
+              <div className="mt-6 bg-muted/30 p-4 rounded-lg">
+                <h4 className="font-medium mb-2 flex items-center">
+                  <HelpCircle className="h-4 w-4 mr-2" />
             Waste Impact & Insights
-          </h4>
-          <p className="text-sm text-muted-foreground">
+                </h4>
+                <p className="text-sm text-muted-foreground">
             Your waste and consumption habits have a significant impact on your carbon footprint. 
             Making conscious choices about purchases, recycling, and product lifecycles can help 
             reduce waste-related emissions.
@@ -1036,10 +1073,10 @@ const Calculator: React.FC<CalculatorProps> = ({
               <li>Minimizing waste helps conserve resources and energy</li>
             </ul>
           </div>
-        </div>
-      </CardContent>
-    </div>
-  );
+              </div>
+            </CardContent>
+          </div>
+        );
 
   const renderFashion = () => (
     <div className="animate-fade-in">
@@ -1111,7 +1148,7 @@ const Calculator: React.FC<CalculatorProps> = ({
               <SelectItem value="LONG">More than 3 years (Low impact)</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+            </div>
 
         <div className="bg-muted/20 p-4 rounded-lg">
           <div className="flex items-center space-x-2 mb-3">
@@ -1217,8 +1254,8 @@ const Calculator: React.FC<CalculatorProps> = ({
           </div>
         </div>
       </CardContent>
-    </div>
-  );
+      </div>
+    );
 
   const steps = [
     { title: 'Demographics', icon: User, content: renderDemographics },
@@ -1255,15 +1292,15 @@ const Calculator: React.FC<CalculatorProps> = ({
             {steps[currentStep].content()}
 
             <div className="flex justify-between mt-8">
-              <Button
-                variant="outline"
+            <Button 
+              variant="outline" 
                 onClick={onBack}
                 disabled={currentStep === 0}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-              
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+            
               {currentStep === steps.length - 1 ? (
                 <Button 
                   onClick={handleCalculate}
@@ -1275,18 +1312,20 @@ const Calculator: React.FC<CalculatorProps> = ({
               ) : (
                 <Button onClick={handleNext}>
                   Next
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              )}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+        )}
             </div>
           </CardContent>
-        </Card>
+      </Card>
       ) : calculationResults ? (
         <ResultsDisplay
           score={calculationResults.score}
           emissions={calculationResults.emissions}
           recommendations={calculationResults.recommendations}
+          categoryEmissions={calculationResults.categoryEmissions}
           isVisible={showResults}
+          onReset={handleReset}
         />
       ) : null}
     </div>
