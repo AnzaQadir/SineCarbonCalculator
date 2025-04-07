@@ -55,12 +55,53 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface CalculatorProps {
   state: CalculatorState;
   onUpdate: (updates: Partial<CalculatorState>) => void;
-  onCalculate: () => void;
+  onCalculate: (results?: any) => void;
   onBack: () => void;
   onNext: () => void;
   onStepChange: (step: number) => void;
   currentStep: number;
 }
+
+const YesNoToggle = ({ 
+  value, 
+  onChange, 
+  className 
+}: { 
+  value: boolean; 
+  onChange: (value: boolean) => void;
+  className?: string;
+}) => (
+  <div className={cn("flex items-center justify-center w-full space-x-4 mt-4", className)}>
+    <label className="inline-flex items-center">
+      <input
+        type="radio"
+        className="peer sr-only"
+        checked={!value}
+        onChange={() => onChange(false)}
+      />
+      <div className={cn(
+        "w-32 h-12 rounded-2xl bg-secondary/50 text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
+        !value && "bg-primary/10 text-primary border-2 border-primary/50"
+      )}>
+        No
+      </div>
+    </label>
+    <label className="inline-flex items-center">
+      <input
+        type="radio"
+        className="peer sr-only"
+        checked={value}
+        onChange={() => onChange(true)}
+      />
+      <div className={cn(
+        "w-32 h-12 rounded-2xl bg-secondary/50 text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
+        value && "bg-primary/10 text-primary border-2 border-primary/50"
+      )}>
+        Yes
+      </div>
+    </label>
+  </div>
+);
 
 const Calculator: React.FC<CalculatorProps> = ({
   state,
@@ -72,45 +113,144 @@ const Calculator: React.FC<CalculatorProps> = ({
   currentStep
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [calculationResults, setCalculationResults] = useState<{
+    score: number;
+    emissions: number;
+    recommendations: string[];
+  } | null>(null);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
   const handleNext = () => {
-    if (currentStep < 5) {
+    if (currentStep < steps.length - 1) {
       onNext();
     } else {
-      onCalculate();
+      const results = calculateScore();
+      onCalculate(results);
     }
+  };
+
+  const handleCalculate = () => {
+    const results = calculateScore();
+    setCalculationResults(results);
+    setShowResults(true);
+    onCalculate(results);
   };
 
   const calculateScore = () => {
     let score = 0;
+    let emissions = 0;
 
-    // Diet score
+    // Diet score calculation
     switch (state.dietType) {
       case 'VEGAN':
         score += 10;
+        emissions += 1.5; // tons CO2/year
         break;
       case 'VEGETARIAN':
         score += 8;
-        break;
-      case 'FLEXITARIAN':
-        score += 6;
+        emissions += 1.9;
         break;
       case 'MEAT_MODERATE':
         score += 4;
+        emissions += 2.5;
         break;
       case 'MEAT_HEAVY':
         score += 2;
+        emissions += 3.3;
         break;
       default:
-        score += 4; // Default to moderate
+        score += 4;
+        emissions += 2.5;
     }
 
-    // ... rest of the score calculation ...
-    return score;
+    // Transportation score
+    switch (state.primaryTransportMode) {
+      case 'WALK_BIKE':
+        score += 10;
+        break;
+      case 'PUBLIC':
+        score += 8;
+        break;
+      case 'HYBRID':
+      case 'ELECTRIC':
+        score += 6;
+        break;
+      case 'SMALL_CAR':
+        score += 4;
+        break;
+      case 'MEDIUM_CAR':
+        score += 3;
+        break;
+      case 'LARGE_CAR':
+        score += 2;
+        break;
+    }
+
+    // Flight impact
+    switch (state.flightType) {
+      case 'NONE':
+        score += 10;
+        break;
+      case 'RARE':
+        score += 8;
+        break;
+      case 'OCCASIONAL':
+        score += 5;
+        break;
+      case 'FREQUENT':
+        score += 2;
+        break;
+    }
+
+    // Waste management
+    if (state.waste.minimizesWaste) score += 5;
+    if (state.waste.recyclingPercentage > 50) score += 5;
+    if (state.waste.evaluatesLifecycle) score += 5;
+
+    // Fashion choices
+    if (state.buysEthicalFashion) score += 5;
+    if (state.buysSecondHandClothing) score += 5;
+    if (state.avoidsFastFashion) score += 5;
+    if (state.investsInQuality) score += 5;
+
+    // Home energy
+    if (state.usesRenewableEnergy) score += 10;
+    if (state.hasEnergyEfficiencyUpgrades) score += 5;
+
+    // Normalize score to 0-100 range
+    const normalizedScore = Math.min(100, Math.max(0, score));
+
+    return {
+      score: normalizedScore,
+      emissions: emissions,
+      recommendations: generateRecommendations(normalizedScore, state)
+    };
+  };
+
+  const generateRecommendations = (score: number, state: CalculatorState) => {
+    const recommendations = [];
+
+    if (!state.usesRenewableEnergy) {
+      recommendations.push("Consider switching to renewable energy sources");
+    }
+    if (state.dietType === 'MEAT_HEAVY') {
+      recommendations.push("Reducing meat consumption can lower your carbon footprint");
+    }
+    if (!state.waste.minimizesWaste) {
+      recommendations.push("Implement waste reduction strategies");
+    }
+    if (state.flightType === 'FREQUENT') {
+      recommendations.push("Consider alternatives to frequent air travel");
+    }
+    if (!state.buysEthicalFashion) {
+      recommendations.push("Look for sustainable and ethical fashion options");
+    }
+
+    return recommendations;
   };
 
   const renderDemographics = () => (
@@ -340,10 +480,10 @@ const Calculator: React.FC<CalculatorProps> = ({
           </div>
           
           <div className="space-y-4 mt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
+            <div className="bg-muted/20 p-4 rounded-lg">
+              <div className="flex items-center space-x-2 mb-3">
                 <Sun className="h-4 w-4 text-primary" />
-                <label className="text-sm font-medium">Do you use renewable energy sources at home?</label>
+                <h3 className="text-sm font-medium">Do you use renewable energy sources at home?</h3>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
@@ -353,36 +493,18 @@ const Calculator: React.FC<CalculatorProps> = ({
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <div className="flex items-center space-x-2">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    className="peer sr-only"
-                    checked={!state.usesRenewableEnergy}
-                    onChange={() => onUpdate({ usesRenewableEnergy: false })}
-                  />
-                  <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
-                    No
-                  </div>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    className="peer sr-only"
-                    checked={state.usesRenewableEnergy}
-                    onChange={() => onUpdate({ usesRenewableEnergy: true })}
-                  />
-                  <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
-                    Yes
-                  </div>
-                </label>
+              <div className="flex items-center justify-center">
+                <YesNoToggle
+                  value={state.usesRenewableEnergy}
+                  onChange={(value) => onUpdate({ usesRenewableEnergy: value })}
+                />
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
+            <div className="bg-muted/20 p-4 rounded-lg">
+              <div className="flex items-center space-x-2 mb-3">
                 <Zap className="h-4 w-4 text-primary" />
-                <label className="text-sm font-medium">Have you implemented energy efficiency measures ?</label>
+                <h3 className="text-sm font-medium">Have you implemented energy efficiency measures?</h3>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
@@ -392,29 +514,11 @@ const Calculator: React.FC<CalculatorProps> = ({
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <div className="flex items-center space-x-2">
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    className="peer sr-only"
-                    checked={!state.hasEnergyEfficiencyUpgrades}
-                    onChange={() => onUpdate({ hasEnergyEfficiencyUpgrades: false })}
-                  />
-                  <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
-                    No
-                  </div>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    className="peer sr-only"
-                    checked={state.hasEnergyEfficiencyUpgrades}
-                    onChange={() => onUpdate({ hasEnergyEfficiencyUpgrades: true })}
-                  />
-                  <div className="w-20 h-8 rounded-full bg-secondary peer-checked:bg-primary/20 peer-checked:text-primary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80">
-                    Yes
-                  </div>
-                </label>
+              <div className="flex items-center justify-center">
+                <YesNoToggle
+                  value={state.hasEnergyEfficiencyUpgrades}
+                  onChange={(value) => onUpdate({ hasEnergyEfficiencyUpgrades: value })}
+                />
               </div>
             </div>
           </div>
@@ -513,10 +617,10 @@ const Calculator: React.FC<CalculatorProps> = ({
           </Select>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
             <Leaf className="h-4 w-4 text-primary" />
-            <label className="text-sm font-medium">Carbon Offset</label>
+            <h3 className="text-sm font-medium">Do you offset your travel emissions?</h3>
             <Tooltip>
               <TooltipTrigger asChild>
                 <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
@@ -526,35 +630,11 @@ const Calculator: React.FC<CalculatorProps> = ({
               </TooltipContent>
             </Tooltip>
           </div>
-          <div className="flex items-center space-x-2">
-            <label className="inline-flex items-center">
-              <input
-                type="radio"
-                className="peer sr-only"
-                checked={!state.offsetsTravelEmissions}
-                onChange={() => onUpdate({ offsetsTravelEmissions: false })}
-              />
-              <div className={cn(
-                "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                !state.offsetsTravelEmissions && "bg-primary/20 text-primary"
-              )}>
-                No
-              </div>
-            </label>
-            <label className="inline-flex items-center">
-              <input
-                type="radio"
-                className="peer sr-only"
-                checked={state.offsetsTravelEmissions}
-                onChange={() => onUpdate({ offsetsTravelEmissions: true })}
-              />
-              <div className={cn(
-                "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                state.offsetsTravelEmissions && "bg-primary/20 text-primary"
-              )}>
-                Yes
-              </div>
-            </label>
+          <div className="flex items-center justify-center">
+            <YesNoToggle
+              value={state.offsetsTravelEmissions}
+              onChange={(value) => onUpdate({ offsetsTravelEmissions: value })}
+            />
           </div>
         </div>
 
@@ -573,89 +653,6 @@ const Calculator: React.FC<CalculatorProps> = ({
     </div>
   );
 
-  const renderFoodStep = () => {
-    return (
-      <div className="space-y-6">
-        <div>
-          <Label>Diet Type</Label>
-          <Select
-            value={state.dietType}
-            onValueChange={(value: 'VEGAN' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MEAT_MODERATE' | 'MEAT_HEAVY') => 
-              onUpdate({ dietType: value })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select your diet type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="VEGAN">Vegan</SelectItem>
-              <SelectItem value="VEGETARIAN">Vegetarian</SelectItem>
-              <SelectItem value="FLEXITARIAN">Flexitarian</SelectItem>
-              <SelectItem value="MEAT_MODERATE">Moderate Meat</SelectItem>
-              <SelectItem value="MEAT_HEAVY">Heavy Meat</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label>Plant-Based Meals per Week</Label>
-          <Input
-            type="number"
-            value={state.plantBasedMealsPerWeek}
-            onChange={(e) => onUpdate({ plantBasedMealsPerWeek: parseFloat(e.target.value) || 0 })}
-          />
-        </div>
-
-        <div className="space-y-4 mt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Leaf className="h-4 w-4 text-primary" />
-              <label className="text-sm font-medium">Sustainable Diet</label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Do you follow a sustainable diet with reduced meat consumption?</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={!state.followsSustainableDiet}
-                  onChange={() => onUpdate({ followsSustainableDiet: false })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  !state.followsSustainableDiet && "bg-primary/20 text-primary"
-                )}>
-                  No
-                </div>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={state.followsSustainableDiet}
-                  onChange={() => onUpdate({ followsSustainableDiet: true })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  state.followsSustainableDiet && "bg-primary/20 text-primary"
-                )}>
-                  Yes
-                </div>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const renderFood = () => (
     <div className="animate-fade-in">
       <CardHeader>
@@ -668,184 +665,121 @@ const Calculator: React.FC<CalculatorProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div
             className={cn(
-              "flex items-center space-x-3 p-6 rounded-xl border-2 cursor-pointer transition-all hover:border-primary/50",
+              "flex items-start space-x-2 p-3 rounded-lg border cursor-pointer transition-all hover:border-primary/50",
               state.dietType === 'MEAT_HEAVY' ? "border-primary bg-primary/5" : "border-gray-200"
             )}
             onClick={() => onUpdate({ dietType: 'MEAT_HEAVY' })}
           >
-            <div className="flex-shrink-0">
-              <CircleDot className="h-8 w-8 text-primary" />
-            </div>
+            <CircleDot className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-lg font-medium">Meat Heavy</h3>
-              <p className="text-gray-600">
-                Red meat and dairy multiple times per day
-              </p>
+              <h3 className="font-medium">Meat Heavy</h3>
+              <p className="text-sm text-gray-600">Red meat and dairy multiple times per day</p>
+              <p className="text-xs text-muted-foreground">Highest carbon footprint impact</p>
             </div>
           </div>
           
           <div
             className={cn(
-              "flex items-center space-x-3 p-6 rounded-xl border-2 cursor-pointer transition-all hover:border-primary/50",
+              "flex items-start space-x-2 p-3 rounded-lg border cursor-pointer transition-all hover:border-primary/50",
               state.dietType === 'MEAT_MODERATE' ? "border-primary bg-primary/5" : "border-gray-200"
             )}
             onClick={() => onUpdate({ dietType: 'MEAT_MODERATE' })}
           >
-            <div className="flex-shrink-0">
-              <ThumbsUp className="h-8 w-8 text-primary" />
-            </div>
+            <ThumbsUp className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-lg font-medium">Average</h3>
-              <p className="text-gray-600">
-                Meat several times per week
-              </p>
+              <h3 className="font-medium">Average</h3>
+              <p className="text-sm text-gray-600">Meat several times per week</p>
+              <p className="text-xs text-muted-foreground">Moderate carbon footprint impact</p>
             </div>
           </div>
 
           <div
             className={cn(
-              "flex items-center space-x-3 p-6 rounded-xl border-2 cursor-pointer transition-all hover:border-primary/50",
+              "flex items-start space-x-2 p-3 rounded-lg border cursor-pointer transition-all hover:border-primary/50",
               state.dietType === 'VEGETARIAN' ? "border-primary bg-primary/5" : "border-gray-200"
             )}
             onClick={() => onUpdate({ dietType: 'VEGETARIAN' })}
           >
-            <div className="flex-shrink-0">
-              <Apple className="h-8 w-8 text-primary" />
-            </div>
+            <Apple className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-lg font-medium">Vegetarian</h3>
-              <p className="text-gray-600">
-                No meat, but includes dairy and eggs
-              </p>
+              <h3 className="font-medium">Vegetarian</h3>
+              <p className="text-sm text-gray-600">No meat, but includes dairy and eggs</p>
+              <p className="text-xs text-muted-foreground">Lower carbon footprint impact</p>
             </div>
           </div>
 
           <div
             className={cn(
-              "flex items-center space-x-3 p-6 rounded-xl border-2 cursor-pointer transition-all hover:border-primary/50",
+              "flex items-start space-x-2 p-3 rounded-lg border cursor-pointer transition-all hover:border-primary/50",
               state.dietType === 'VEGAN' ? "border-primary bg-primary/5" : "border-gray-200"
             )}
             onClick={() => onUpdate({ dietType: 'VEGAN' })}
           >
-            <div className="flex-shrink-0">
-              <Leaf className="h-8 w-8 text-primary" />
-            </div>
+            <Leaf className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-lg font-medium">Vegan</h3>
-              <p className="text-gray-600">
-                No animal products whatsoever
-              </p>
+              <h3 className="font-medium">Vegan</h3>
+              <p className="text-sm text-gray-600">No animal products whatsoever</p>
+              <p className="text-xs text-muted-foreground">Lowest carbon footprint impact</p>
             </div>
           </div>
         </div>
 
-        <div className="space-y-4 mt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+        <div className="space-y-6 mt-8">
+          <div className="bg-muted/20 p-4 rounded-lg">
+            <div className="flex items-center space-x-2 mb-3">
               <Leaf className="h-4 w-4 text-primary" />
-              <label className="text-sm font-medium">Local & Organic Choices</label>
+              <h3 className="text-sm font-medium">Do you prioritize local and organic food choices?</h3>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Choosing local and organic foods reduces transportation emissions and chemical inputs. 
-                     This choice provides a bonus to your sustainability score.</p>
+                  <p>Local food reduces transportation emissions by up to 50%, while organic farming uses fewer chemical inputs.</p>
                 </TooltipContent>
               </Tooltip>
             </div>
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={!state.buysLocalFood}
-                  onChange={() => onUpdate({ buysLocalFood: false })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  !state.buysLocalFood && "bg-primary/20 text-primary"
-                )}>
-                  No
-                </div>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={state.buysLocalFood}
-                  onChange={() => onUpdate({ buysLocalFood: true })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  state.buysLocalFood && "bg-primary/20 text-primary"
-                )}>
-                  Yes
-                </div>
-              </label>
+            <div className="flex items-center justify-center">
+              <YesNoToggle
+                value={state.buysLocalFood}
+                onChange={(value) => onUpdate({ buysLocalFood: value })}
+              />
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+          <div className="bg-muted/20 p-4 rounded-lg">
+            <div className="flex items-center space-x-2 mb-3">
               <PackageX className="h-4 w-4 text-primary" />
-              <label className="text-sm font-medium">Food Waste Management</label>
+              <h3 className="text-sm font-medium">Do you plan meals to minimize food waste?</h3>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Reducing food waste through meal planning and using leftovers helps lower the 
-                     indirect carbon costs of food production. This provides a positive modifier to your score.</p>
+                  <p>Food waste contributes to 8% of global emissions. Planning can reduce waste by 25%.</p>
                 </TooltipContent>
               </Tooltip>
             </div>
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={!state.usesMealPlanning}
-                  onChange={() => onUpdate({ usesMealPlanning: false })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  !state.usesMealPlanning && "bg-primary/20 text-primary"
-                )}>
-                  No
-                </div>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={state.usesMealPlanning}
-                  onChange={() => onUpdate({ usesMealPlanning: true })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  state.usesMealPlanning && "bg-primary/20 text-primary"
-                )}>
-                  Yes
-                </div>
-              </label>
+            <div className="flex items-center justify-center">
+              <YesNoToggle
+                value={state.usesMealPlanning}
+                onChange={(value) => onUpdate({ usesMealPlanning: value })}
+              />
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center space-x-2">
+          <div className="bg-muted/20 p-4 rounded-lg">
+            <div className="flex items-center space-x-2 mb-3">
               <Store className="h-4 w-4 text-primary" />
-              <Label>Dining Habits</Label>
+              <h3 className="text-sm font-medium">How often do you eat at restaurants?</h3>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Home-cooked meals typically have lower energy use and waste compared to dining out. 
-                     Your dining habits affect your overall food emissions profile.</p>
+                  <p>Restaurant meals typically have 3x larger carbon footprint than home cooking.</p>
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -856,59 +790,34 @@ const Calculator: React.FC<CalculatorProps> = ({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="How often do you dine out?" />
+                <SelectValue placeholder="Select your dining frequency" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="RARELY">Rarely (Mostly home-cooked, lowest impact)</SelectItem>
-                <SelectItem value="SOMETIMES">Sometimes (2-3 times/week, moderate impact)</SelectItem>
-                <SelectItem value="FREQUENTLY">Frequently (4+ times/week, highest impact)</SelectItem>
+                <SelectItem value="RARELY">Rarely (1-2 times/month)</SelectItem>
+                <SelectItem value="SOMETIMES">Sometimes (1-2 times/week)</SelectItem>
+                <SelectItem value="FREQUENTLY">Frequently (3+ times/week)</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+          <div className="bg-muted/20 p-4 rounded-lg">
+            <div className="flex items-center space-x-2 mb-3">
               <PackageCheck className="h-4 w-4 text-primary" />
-              <label className="text-sm font-medium">Reusable Practices</label>
+              <h3 className="text-sm font-medium">Do you use reusable containers and bags for food storage and shopping?</h3>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Using reusable containers and bags reduces single-use plastic waste and related emissions. 
-                     This provides an additional bonus to your food/diet section score.</p>
+                  <p>Using reusable containers can prevent up to 150 disposable items per year.</p>
                 </TooltipContent>
               </Tooltip>
             </div>
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={!state.usesReusableContainers}
-                  onChange={() => onUpdate({ usesReusableContainers: false })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  !state.usesReusableContainers && "bg-primary/20 text-primary"
-                )}>
-                  No
-                </div>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={state.usesReusableContainers}
-                  onChange={() => onUpdate({ usesReusableContainers: true })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  state.usesReusableContainers && "bg-primary/20 text-primary"
-                )}>
-                  Yes
-                </div>
-              </label>
+            <div className="flex items-center justify-center">
+              <YesNoToggle
+                value={state.usesReusableContainers}
+                onChange={(value) => onUpdate({ usesReusableContainers: value })}
+              />
             </div>
           </div>
         </div>
@@ -949,16 +858,16 @@ const Calculator: React.FC<CalculatorProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
-          <div className="flex items-center space-x-2">
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
             <Trash2 className="h-4 w-4 text-primary" />
-            <Label>Pounds of trash per month</Label>
+            <h3 className="text-sm font-medium">How many pounds of trash do you produce per month?</h3>
             <Tooltip>
               <TooltipTrigger asChild>
                 <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Average person produces about 30-40 lbs per month</p>
+                <p>The average person produces about 30-40 lbs of trash per month. Reducing this can significantly lower your environmental impact.</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -968,21 +877,18 @@ const Calculator: React.FC<CalculatorProps> = ({
             onChange={(e) => onUpdate({ waste: { ...state.waste, wasteLbs: parseFloat(e.target.value) || 0 } })}
             placeholder="Enter pounds of trash per month"
           />
-          <p className="text-xs text-muted-foreground mt-1">
-            Average person produces about 30-40 lbs per month
-          </p>
         </div>
 
-        <div>
-          <div className="flex items-center space-x-2">
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
             <Recycle className="h-4 w-4 text-primary" />
-            <Label>What percentage of your waste do you recycle?</Label>
+            <h3 className="text-sm font-medium">What percentage of your waste do you recycle?</h3>
             <Tooltip>
               <TooltipTrigger asChild>
                 <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Move the slider to indicate your recycling percentage</p>
+                <p>Recycling helps reduce landfill waste and conserves resources. The average recycling rate in the US is around 32%.</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -1004,151 +910,132 @@ const Calculator: React.FC<CalculatorProps> = ({
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Recycle className="h-4 w-4 text-primary" />
-              <label className="text-sm font-medium">Recycling & Waste Minimization</label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Do you actively recycle, compost, and avoid single-use plastics?</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={!state.waste.minimizesWaste}
-                  onChange={() => onUpdate({ waste: { ...state.waste, minimizesWaste: false } })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  !state.waste.minimizesWaste && "bg-primary/20 text-primary"
-                )}>
-                  No
-                </div>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={state.waste.minimizesWaste}
-                  onChange={() => onUpdate({ waste: { ...state.waste, minimizesWaste: true } })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  state.waste.minimizesWaste && "bg-primary/20 text-primary"
-                )}>
-                  Yes
-                </div>
-              </label>
-            </div>
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
+            <Recycle className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium">Do you actively recycle and minimize waste?</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Active recycling and composting can reduce your waste-related emissions by up to 40%. Avoiding single-use plastics further reduces your impact.</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
-
-          <div>
-            <Label>Product Lifespan & Upgrade Frequency</Label>
-            <Select
-              value={state.waste.productLifespan}
-              onValueChange={(value: 'FREQUENT' | 'MODERATE' | 'LONG') => 
-                onUpdate({ waste: { ...state.waste, productLifespan: value } })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="How frequently do you replace items?" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="FREQUENT">Frequent (Every 1-2 years)</SelectItem>
-                <SelectItem value="MODERATE">Moderate (Every 3-5 years)</SelectItem>
-                <SelectItem value="LONG">Long (More than 5 years)</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center justify-center">
+            <YesNoToggle
+              value={state.waste.minimizesWaste}
+              onChange={(value) => onUpdate({ waste: { ...state.waste, minimizesWaste: value } })}
+            />
           </div>
+        </div>
 
-          <div>
-            <Label>Conscious Purchasing</Label>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-sm text-muted-foreground">Not Conscious</span>
-              <div className="flex space-x-2">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <button
-                    key={value}
-                    onClick={() => onUpdate({ waste: { ...state.waste, consciousPurchasing: value } })}
-                    className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all",
-                      state.waste.consciousPurchasing === value
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-muted-foreground hover:bg-secondary/80"
-                    )}
-                  >
-                    {value}
-                  </button>
-                ))}
-              </div>
-              <span className="text-sm text-muted-foreground">Very Conscious</span>
-            </div>
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
+            <Timer className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium">How often do you replace your items?</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Extending product lifespans reduces waste and manufacturing emissions. Each year of additional use can reduce an item's carbon footprint by 20-30%.</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
+          <Select
+            value={state.waste.productLifespan}
+            onValueChange={(value: 'FREQUENT' | 'MODERATE' | 'LONG') => 
+              onUpdate({ waste: { ...state.waste, productLifespan: value } })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select your replacement frequency" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="FREQUENT">Every 1-2 years (High impact)</SelectItem>
+              <SelectItem value="MODERATE">Every 3-5 years (Medium impact)</SelectItem>
+              <SelectItem value="LONG">More than 5 years (Low impact)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <PackageCheck className="h-4 w-4 text-primary" />
-              <label className="text-sm font-medium">Lifecycle Evaluation</label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Do you evaluate a product's lifecycle or carbon footprint before making significant purchases?</p>
-                </TooltipContent>
-              </Tooltip>
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
+            <Scale className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium">How environmentally conscious are you when making purchases?</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Conscious purchasing considers environmental impact, packaging, and product longevity. This can reduce your consumption-related emissions by up to 50%.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-sm text-muted-foreground">Not Conscious</span>
+            <div className="flex space-x-2">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  onClick={() => onUpdate({ waste: { ...state.waste, consciousPurchasing: value } })}
+                  className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all",
+                    state.waste.consciousPurchasing === value
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                  )}
+                >
+                  {value}
+                </button>
+              ))}
             </div>
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={!state.waste.evaluatesLifecycle}
-                  onChange={() => onUpdate({ waste: { ...state.waste, evaluatesLifecycle: false } })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  !state.waste.evaluatesLifecycle && "bg-primary/20 text-primary"
-                )}>
-                  No
-                </div>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={state.waste.evaluatesLifecycle}
-                  onChange={() => onUpdate({ waste: { ...state.waste, evaluatesLifecycle: true } })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  state.waste.evaluatesLifecycle && "bg-primary/20 text-primary"
-                )}>
-                  Yes
-                </div>
-              </label>
-            </div>
+            <span className="text-sm text-muted-foreground">Very Conscious</span>
+          </div>
+        </div>
+
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
+            <PackageCheck className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium">Do you evaluate product lifecycles before purchasing?</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Considering a product's full lifecycle (production, use, disposal) helps make environmentally responsible choices. This can reduce your purchase-related emissions by 30-40%.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <div className="flex items-center justify-center">
+            <YesNoToggle
+              value={state.waste.evaluatesLifecycle}
+              onChange={(value) => onUpdate({ waste: { ...state.waste, evaluatesLifecycle: value } })}
+            />
           </div>
         </div>
 
         <div className="mt-6 bg-muted/30 p-4 rounded-lg">
           <h4 className="font-medium mb-2 flex items-center">
             <HelpCircle className="h-4 w-4 mr-2" />
-            Waste Impact
+            Waste Impact & Insights
           </h4>
           <p className="text-sm text-muted-foreground">
-            Your waste and consumption habits significantly impact your carbon footprint. 
-            Recycling, conscious purchasing, and evaluating product lifecycles can help 
+            Your waste and consumption habits have a significant impact on your carbon footprint. 
+            Making conscious choices about purchases, recycling, and product lifecycles can help 
             reduce waste-related emissions.
           </p>
+          <div className="mt-2 text-sm text-muted-foreground">
+            <ul className="list-disc list-inside space-y-1">
+              <li>Recycling can reduce waste emissions by up to 40%</li>
+              <li>Extending product life reduces manufacturing emissions</li>
+              <li>Conscious purchasing reduces consumption-related impact</li>
+              <li>Evaluating lifecycles helps make sustainable choices</li>
+              <li>Minimizing waste helps conserve resources and energy</li>
+            </ul>
+          </div>
         </div>
       </CardContent>
     </div>
@@ -1166,8 +1053,19 @@ const Calculator: React.FC<CalculatorProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
-          <Label>Fashion Consumption Level</Label>
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
+            <ShoppingBag className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium">How often do you buy new clothes?</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Frequent clothing purchases increase your fashion footprint. The average person buys 60% more clothes than 15 years ago.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Select
             value={state.fashionConsumption}
             onValueChange={(value: 'MINIMAL' | 'MODERATE' | 'FREQUENT') => 
@@ -1178,15 +1076,26 @@ const Calculator: React.FC<CalculatorProps> = ({
               <SelectValue placeholder="Select your fashion consumption level" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="MINIMAL">Minimal (Few new items per year)</SelectItem>
-              <SelectItem value="MODERATE">Moderate (Seasonal updates)</SelectItem>
-              <SelectItem value="FREQUENT">Frequent (Regular new purchases)</SelectItem>
+              <SelectItem value="MINIMAL">Few new items per year (Low impact)</SelectItem>
+              <SelectItem value="MODERATE">Seasonal updates (Medium impact)</SelectItem>
+              <SelectItem value="FREQUENT">Regular new purchases (High impact)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <div>
-          <Label>Clothing Lifespan</Label>
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
+            <Timer className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium">How long do you typically keep your clothes?</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Extending clothing lifespan by 9 months reduces carbon, water, and waste footprints by 20-30%.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Select
             value={state.clothingLifespan}
             onValueChange={(value: 'SHORT' | 'MEDIUM' | 'LONG') => 
@@ -1194,208 +1103,118 @@ const Calculator: React.FC<CalculatorProps> = ({
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="How long do you typically keep your clothes?" />
+              <SelectValue placeholder="Select your typical clothing lifespan" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="SHORT">Short (Less than 1 year)</SelectItem>
-              <SelectItem value="MEDIUM">Medium (1-3 years)</SelectItem>
-              <SelectItem value="LONG">Long (More than 3 years)</SelectItem>
+              <SelectItem value="SHORT">Less than 1 year (High impact)</SelectItem>
+              <SelectItem value="MEDIUM">1-3 years (Medium impact)</SelectItem>
+              <SelectItem value="LONG">More than 3 years (Low impact)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-4 mt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Store className="h-4 w-4 text-primary" />
-              <label className="text-sm font-medium">Ethical Fashion</label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Do you prioritize buying from ethical and sustainable fashion brands?</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={!state.buysEthicalFashion}
-                  onChange={() => onUpdate({ buysEthicalFashion: false })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  !state.buysEthicalFashion && "bg-primary/20 text-primary"
-                )}>
-                  No
-                </div>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={state.buysEthicalFashion}
-                  onChange={() => onUpdate({ buysEthicalFashion: true })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  state.buysEthicalFashion && "bg-primary/20 text-primary"
-                )}>
-                  Yes
-                </div>
-              </label>
-            </div>
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
+            <Store className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium">Do you prioritize buying from ethical and sustainable fashion brands?</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Sustainable fashion brands typically produce 50% fewer emissions and use 95% less water than fast fashion.</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Repeat className="h-4 w-4 text-primary" />
-              <label className="text-sm font-medium">Second-Hand Shopping</label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Do you regularly buy second-hand or vintage clothing?</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={!state.buysSecondHandClothing}
-                  onChange={() => onUpdate({ buysSecondHandClothing: false })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  !state.buysSecondHandClothing && "bg-primary/20 text-primary"
-                )}>
-                  No
-                </div>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={state.buysSecondHandClothing}
-                  onChange={() => onUpdate({ buysSecondHandClothing: true })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  state.buysSecondHandClothing && "bg-primary/20 text-primary"
-                )}>
-                  Yes
-                </div>
-              </label>
-            </div>
+          <div className="flex items-center justify-center">
+            <YesNoToggle
+              value={state.buysEthicalFashion}
+              onChange={(value) => onUpdate({ buysEthicalFashion: value })}
+            />
           </div>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <PackageX className="h-4 w-4 text-primary" />
-              <label className="text-sm font-medium">Fast Fashion Avoidance</label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Do you avoid buying from fast fashion brands?</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={!state.avoidsFastFashion}
-                  onChange={() => onUpdate({ avoidsFastFashion: false })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  !state.avoidsFastFashion && "bg-primary/20 text-primary"
-                )}>
-                  No
-                </div>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={state.avoidsFastFashion}
-                  onChange={() => onUpdate({ avoidsFastFashion: true })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  state.avoidsFastFashion && "bg-primary/20 text-primary"
-                )}>
-                  Yes
-                </div>
-              </label>
-            </div>
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
+            <Repeat className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium">Do you regularly buy second-hand or vintage clothing?</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Buying second-hand extends clothing life cycles and can reduce your fashion footprint by up to 80%.</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
+          <div className="flex items-center justify-center">
+            <YesNoToggle
+              value={state.buysSecondHandClothing}
+              onChange={(value) => onUpdate({ buysSecondHandClothing: value })}
+            />
+          </div>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <PackageCheck className="h-4 w-4 text-primary" />
-              <label className="text-sm font-medium">Quality Investment</label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Do you invest in high-quality, long-lasting clothing items?</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={!state.investsInQuality}
-                  onChange={() => onUpdate({ investsInQuality: false })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  !state.investsInQuality && "bg-primary/20 text-primary"
-                )}>
-                  No
-                </div>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="peer sr-only"
-                  checked={state.investsInQuality}
-                  onChange={() => onUpdate({ investsInQuality: true })}
-                />
-                <div className={cn(
-                  "w-20 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center text-sm font-medium transition-all cursor-pointer hover:bg-secondary/80",
-                  state.investsInQuality && "bg-primary/20 text-primary"
-                )}>
-                  Yes
-                </div>
-              </label>
-            </div>
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
+            <PackageX className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium">Do you avoid buying from fast fashion brands?</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Fast fashion produces 10% of global carbon emissions and is the second-largest consumer of water worldwide.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <div className="flex items-center justify-center">
+            <YesNoToggle
+              value={state.avoidsFastFashion}
+              onChange={(value) => onUpdate({ avoidsFastFashion: value })}
+            />
+          </div>
+        </div>
+
+        <div className="bg-muted/20 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 mb-3">
+            <PackageCheck className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium">Do you invest in high-quality, long-lasting clothing?</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span><HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" /></span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Quality clothing lasts 5-10 times longer than fast fashion, significantly reducing your long-term environmental impact.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <div className="flex items-center justify-center">
+            <YesNoToggle
+              value={state.investsInQuality}
+              onChange={(value) => onUpdate({ investsInQuality: value })}
+            />
           </div>
         </div>
 
         <div className="mt-6 bg-muted/30 p-4 rounded-lg">
           <h4 className="font-medium mb-2 flex items-center">
             <HelpCircle className="h-4 w-4 mr-2" />
-            Fashion Impact
+            Fashion Impact & Insights
           </h4>
           <p className="text-sm text-muted-foreground">
             The fashion industry is responsible for 10% of global carbon emissions. 
-            Choosing sustainable fashion options, buying second-hand, and investing in 
-            quality pieces can significantly reduce your fashion footprint.
+            Making sustainable fashion choices can significantly reduce your environmental impact.
           </p>
+          <div className="mt-2 text-sm text-muted-foreground">
+            <ul className="list-disc list-inside space-y-1">
+              <li>Fast fashion produces 10% of global carbon emissions</li>
+              <li>Second-hand shopping reduces fashion footprint by up to 80%</li>
+              <li>Sustainable brands use 95% less water than fast fashion</li>
+              <li>Extending clothing life by 9 months reduces impact by 20-30%</li>
+              <li>Quality items last 5-10 times longer than fast fashion</li>
+            </ul>
+          </div>
         </div>
       </CardContent>
     </div>
@@ -1405,7 +1224,7 @@ const Calculator: React.FC<CalculatorProps> = ({
     { title: 'Demographics', icon: User, content: renderDemographics },
     { title: 'Home Energy', icon: Home, content: renderHomeEnergy },
     { title: 'Transportation', icon: Car, content: renderTransportationStep },
-    { title: 'Food & Diet', icon: Utensils, content: renderFoodStep },
+    { title: 'Food & Diet', icon: Utensils, content: renderFood },
     { title: 'Waste', icon: Recycle, content: renderWaste },
     { title: 'Fashion', icon: Shirt, content: renderFashion },
   ];
@@ -1420,44 +1239,56 @@ const Calculator: React.FC<CalculatorProps> = ({
         isVisible ? "opacity-100" : "opacity-0"
       )}
     >
-      <Card variant="elevated" className={currentStep === 5 ? 'w-full' : ''}>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <CurrentStepIcon className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">{steps[currentStep].title}</h2>
+      {!showResults ? (
+        <Card variant="elevated" className={currentStep === 5 ? 'w-full' : ''}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <CurrentStepIcon className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-semibold">{steps[currentStep].title}</h2>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Step {currentStep + 1} of {steps.length}
+              </div>
             </div>
-            <div className="text-sm text-muted-foreground">
-              Step {currentStep + 1} of {steps.length}
+
+            {steps[currentStep].content()}
+
+            <div className="flex justify-between mt-8">
+              <Button
+                variant="outline"
+                onClick={onBack}
+                disabled={currentStep === 0}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+              
+              {currentStep === steps.length - 1 ? (
+                <Button 
+                  onClick={handleCalculate}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  Calculate Impact
+                  <Check className="ml-2 h-4 w-4" />
+                </Button>
+              ) : (
+                <Button onClick={handleNext}>
+                  Next
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              )}
             </div>
-          </div>
-
-          {steps[currentStep].content()}
-
-          <div className="flex justify-between mt-8">
-            <Button
-              variant="outline"
-              onClick={onBack}
-              disabled={currentStep === 0}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-            
-            {currentStep === steps.length - 1 ? (
-              <Button onClick={onCalculate}>
-                Calculate
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button onClick={handleNext}>
-                Next
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ) : calculationResults ? (
+        <ResultsDisplay
+          score={calculationResults.score}
+          emissions={calculationResults.emissions}
+          recommendations={calculationResults.recommendations}
+          isVisible={showResults}
+        />
+      ) : null}
     </div>
   );
 };
