@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from 'react';
 import {
   calculateHomeEmissions,
@@ -5,6 +6,7 @@ import {
   calculateFoodEmissions,
   calculateWasteEmissions,
   calculateTotalFootprint,
+  generateInsights,
   US_AVERAGE_FOOTPRINT,
   GLOBAL_AVERAGE_FOOTPRINT,
   SUSTAINABILITY_TARGET,
@@ -17,7 +19,7 @@ export type FlightType = keyof typeof EMISSION_FACTORS.FLIGHT_MILE;
 export type TransitType = keyof typeof EMISSION_FACTORS.PUBLIC_TRANSIT_MILE;
 export type DietType = keyof typeof EMISSION_FACTORS.FOOD_DIET;
 
-interface CalculatorState {
+export interface CalculatorState {
   step: number;
   // Demographics
   name: string;
@@ -52,7 +54,7 @@ interface CalculatorState {
   avoidsPlastic: boolean;
 }
 
-interface FootprintResults {
+export interface FootprintResults {
   homeEmissions: number;
   transportEmissions: number;
   foodEmissions: number;
@@ -61,6 +63,7 @@ interface FootprintResults {
   comparedToUS: number; // Percentage compared to US average
   comparedToGlobal: number; // Percentage compared to global average
   comparedToTarget: number; // Percentage compared to sustainability target
+  insights: string[]; // Generated insights based on results
 }
 
 export const useCalculator = () => {
@@ -117,7 +120,9 @@ export const useCalculator = () => {
       annualElectricity,
       annualNaturalGas,
       annualHeatingOil,
-      annualPropane
+      annualPropane,
+      state.usesRenewableEnergy,
+      state.hasEnergyEfficiencyUpgrades
     );
 
     const transportEmissions = calculateTransportEmissions(
@@ -126,14 +131,22 @@ export const useCalculator = () => {
       state.flightType,
       state.flightMiles,
       state.transitType,
-      annualTransitMiles
+      annualTransitMiles,
+      state.usesActiveTransport,
+      state.hasElectricVehicle
     );
 
-    const foodEmissions = calculateFoodEmissions(state.dietType);
+    const foodEmissions = calculateFoodEmissions(
+      state.dietType,
+      state.buysLocalFood,
+      state.followsSustainableDiet
+    );
 
     const wasteEmissions = calculateWasteEmissions(
       annualWasteLbs,
-      state.recyclingPercentage
+      state.recyclingPercentage,
+      state.minimizesWaste,
+      state.avoidsPlastic
     );
 
     // Calculate total footprint
@@ -149,6 +162,16 @@ export const useCalculator = () => {
     const comparedToGlobal = (totalFootprint / GLOBAL_AVERAGE_FOOTPRINT) * 100;
     const comparedToTarget = (totalFootprint / SUSTAINABILITY_TARGET) * 100;
 
+    // Generate insights based on the user's results
+    const insights = generateInsights({
+      homeEmissions,
+      transportEmissions,
+      foodEmissions,
+      wasteEmissions,
+      totalFootprint,
+      comparedToUS
+    });
+
     return {
       homeEmissions,
       transportEmissions,
@@ -158,6 +181,7 @@ export const useCalculator = () => {
       comparedToUS,
       comparedToGlobal,
       comparedToTarget,
+      insights,
     };
   }, [state]);
 
