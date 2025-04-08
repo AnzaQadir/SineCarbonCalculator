@@ -7,10 +7,12 @@ import ScenarioAnalysis from '@/components/ScenarioAnalysis';
 import { Card, CardContent } from '@/components/ui/card';
 import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users } from 'lucide-react';
 import { useCalculator } from '@/hooks/useCalculator';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const { state, updateCalculator } = useCalculator();
   const [currentStep, setCurrentStep] = useState(0);
+  const [showingScenarios, setShowingScenarios] = useState(false);
 
   const handleCalculate = () => {
     // Handle calculation completion
@@ -27,6 +29,14 @@ const Index = () => {
 
   const handleStepChange = (step: number) => {
     setCurrentStep(step);
+  };
+
+  const scrollToScenarioAnalysis = () => {
+    const scenarioElement = document.getElementById('scenario-analysis');
+    if (scenarioElement) {
+      scenarioElement.scrollIntoView({ behavior: 'smooth' });
+      setShowingScenarios(true);
+    }
   };
 
   return (
@@ -55,6 +65,19 @@ const Index = () => {
               onStepChange={handleStepChange}
               currentStep={currentStep}
             />
+
+            {currentStep === 5 && (
+              <div className="flex justify-center mt-8">
+                <Button 
+                  onClick={scrollToScenarioAnalysis} 
+                  className="flex items-center gap-2"
+                  size="lg"
+                >
+                  <BarChart4 className="h-5 w-5" />
+                  Run Scenario Analysis
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </section>
