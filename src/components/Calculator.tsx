@@ -128,7 +128,7 @@ const Calculator: React.FC<CalculatorProps> = ({
       title: string;
       description: string;
       impact: string;
-      difficulty: 'Easy' | 'Medium' | 'Hard';
+      difficulty: 'Easy' | 'Medium';
     }[];
   } | null>(null);
 
