@@ -1,12 +1,32 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import Hero from '@/components/sections/Hero';
 import Calculator from '@/components/Calculator';
 import { Card, CardContent } from '@/components/ui/card';
 import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users } from 'lucide-react';
+import { useCalculator } from '@/hooks/useCalculator';
 
 const Index = () => {
+  const { state, updateCalculator } = useCalculator();
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const handleCalculate = () => {
+    // Handle calculation completion
+    console.log('Calculating results...');
+  };
+
+  const handleBack = () => {
+    setCurrentStep(prev => Math.max(0, prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentStep(prev => Math.min(5, prev + 1));
+  };
+
+  const handleStepChange = (step: number) => {
+    setCurrentStep(step);
+  };
+
   return (
     <Layout>
       <Hero />
@@ -24,7 +44,15 @@ const Index = () => {
               </p>
             </div>
             
-            <Calculator />
+            <Calculator 
+              state={state}
+              onUpdate={updateCalculator}
+              onCalculate={handleCalculate}
+              onBack={handleBack}
+              onNext={handleNext}
+              onStepChange={handleStepChange}
+              currentStep={currentStep}
+            />
           </div>
         </div>
       </section>
