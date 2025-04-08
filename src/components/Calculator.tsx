@@ -140,15 +140,14 @@ const Calculator: React.FC<CalculatorProps> = ({
     if (currentStep < steps.length - 1) {
       onNext();
     } else {
-      const results = calculateScore();
+      // Calculate results when reaching the last step
+      const results = calculateScore(state);
       onCalculate(results);
     }
   };
 
   const handleCalculate = () => {
-    const results = calculateScore();
-    setCalculationResults(results);
-    setShowResults(true);
+    const results = calculateScore(state);
     onCalculate(results);
   };
 
@@ -158,7 +157,7 @@ const Calculator: React.FC<CalculatorProps> = ({
     onStepChange(0); // Reset to first step
   };
 
-  const calculateScore = () => {
+  const calculateScore = (state: CalculatorState) => {
     let score = 0;
     let emissions = 0;
     let homeEmissions = 0;
@@ -1330,29 +1329,34 @@ const Calculator: React.FC<CalculatorProps> = ({
             {steps[currentStep].content()}
 
             <div className="flex justify-between mt-8">
-            <Button 
-              variant="outline" 
+            {currentStep > 0 && (
+              <Button
+                variant="outline"
                 onClick={onBack}
-                disabled={currentStep === 0}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+            )}
             
               {currentStep === steps.length - 1 ? (
-                <Button 
+                <Button
                   onClick={handleCalculate}
-                  className="bg-primary hover:bg-primary/90"
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
                 >
                   Calculate Impact
-                  <Check className="ml-2 h-4 w-4" />
+                  <Check className="h-4 w-4" />
                 </Button>
               ) : (
-                <Button onClick={handleNext}>
+                <Button
+                  onClick={handleNext}
+                  className="flex items-center gap-2"
+                >
                   Next
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-        )}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </CardContent>
       </Card>
