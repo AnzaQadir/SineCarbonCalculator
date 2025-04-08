@@ -807,9 +807,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               <p className="text-sm text-muted-foreground">
                 Your actions matter! By offsetting or sharing, you contribute to global sustainability efforts.
               </p>
-            </div>
-          </div>
-        </TabsContent>
+                </div>
+              </div>
+            </TabsContent>
             
         <TabsContent value="details">
           <div className="space-y-6 mt-6">
@@ -904,7 +904,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </div>
                   </div>
                 </CardContent>
-              </Card>
+                </Card>
 
               {/* Food Emissions */}
               <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50">
@@ -935,7 +935,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </div>
                   </div>
                 </CardContent>
-              </Card>
+                </Card>
 
               {/* Waste Emissions */}
               <Card className="bg-gradient-to-br from-red-50 to-red-100/50">
@@ -970,7 +970,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </div>
                   </div>
                 </CardContent>
-              </Card>
+                </Card>
             </div>
 
             {/* Tips Section */}
@@ -1012,9 +1012,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   </div>
                 </div>
               </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+                </Card>
+              </div>
+            </TabsContent>
             
         <TabsContent value="methodology">
           <div className="space-y-12 mt-6 px-8 max-w-4xl mx-auto">

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 
 // Emission factors and constants
@@ -234,60 +233,6 @@ export const useCalculator = () => {
     
     return emissions;
   };
-  // Calculate results based on current state
-  const results = useMemo<FootprintResults>(() => {
-    // Convert monthly values to annual
-    const annualElectricity = state.electricityKwh * 12;
-    const annualNaturalGas = state.naturalGasTherm * 12;
-    const annualHeatingOil = state.heatingOilGallons * 12;
-    const annualPropane = state.propaneGallons * 12;
-    const annualCarMiles = state.carMiles * 12;
-    const annualTransitMiles = state.transitMiles * 12;
-    const annualWasteLbs = state.wasteLbs * 12;
-    
-    // Flight miles are already annual
-
-    // Calculate emissions by category
-    const homeEmissions = calculateHomeEmissions(
-      annualElectricity,
-      annualNaturalGas,
-      annualHeatingOil,
-      annualPropane,
-      state.usesRenewableEnergy,
-      state.hasEnergyEfficiencyUpgrades
-    );
-
-    const transportEmissions = calculateTransportEmissions(
-      state.carType,
-      annualCarMiles,
-      state.flightType,
-      state.flightMiles,
-      state.transitType,
-      annualTransitMiles,
-      state.usesActiveTransport,
-      state.hasElectricVehicle
-    );
-
-    const foodEmissions = calculateFoodEmissions(
-      state.dietType,
-      state.buysLocalFood,
-      state.followsSustainableDiet
-    );
-
-    const wasteEmissions = calculateWasteEmissions(
-      annualWasteLbs,
-      state.recyclingPercentage,
-      state.minimizesWaste,
-      state.avoidsPlastic
-    );
-
-    // Calculate total footprint
-    const totalFootprint = calculateTotalFootprint(
-      homeEmissions,
-      transportEmissions,
-      foodEmissions,
-      wasteEmissions
-    );
 
   const calculateFoodEmissions = () => {
     let emissions = 0;
@@ -331,46 +276,23 @@ export const useCalculator = () => {
     return emissions;
   };
 
-  const calculateFashionEmissions = () => {
-    let emissions = EMISSION_FACTORS.fashion[state.fashionConsumption] * 365;
-    
-    // Apply modifiers
-    if (state.buysEthicalFashion) emissions *= 0.8;
-    if (state.buysSecondHandClothing) emissions *= 0.7;
-    if (state.avoidsFastFashion) emissions *= 0.85;
-    if (state.investsInQuality) emissions *= 0.9;
-    
-    const lifespanMultiplier = {
-      SHORT: 1.2,
-      MEDIUM: 1,
-      LONG: 0.8,
-    }[state.clothingLifespan];
-    
-    emissions *= lifespanMultiplier;
-    
-    return emissions;
-  };
-
-  const calculateResults = () => {
+  const calculateScore = () => {
     const homeEmissions = calculateHomeEmissions();
     const transportEmissions = calculateTransportEmissions();
     const foodEmissions = calculateFoodEmissions();
     const wasteEmissions = calculateWasteEmissions();
-    const fashionEmissions = calculateFashionEmissions();
     
-    const totalFootprint = homeEmissions + transportEmissions + foodEmissions + wasteEmissions + fashionEmissions;
+    const totalFootprint = homeEmissions + transportEmissions + foodEmissions + wasteEmissions;
     
     return {
       homeEmissions,
       transportEmissions,
       foodEmissions,
       wasteEmissions,
-      fashionEmissions,
       totalFootprint,
       comparedToUS: (totalFootprint / 16) * 100,
       comparedToGlobal: (totalFootprint / 4.8) * 100,
       comparedToTarget: (totalFootprint / 2) * 100,
-
     };
   };
 
@@ -448,9 +370,14 @@ export const useCalculator = () => {
 
   return {
     state,
-    results: calculateResults(),
+    setState,
+    calculateHomeEmissions,
+    calculateTransportEmissions,
+    calculateFoodEmissions,
+    calculateWasteEmissions,
+    calculateScore,
     updateCalculator,
-    resetCalculator,
+    resetCalculator
   };
 };
 
