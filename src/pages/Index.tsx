@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import Hero from '@/components/sections/Hero';
@@ -8,15 +7,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users } from 'lucide-react';
 import { useCalculator } from '@/hooks/useCalculator';
 import { Button } from '@/components/ui/button';
+import ResultsDisplay from '@/components/ResultsDisplay';
 
 const Index = () => {
   const { state, updateCalculator } = useCalculator();
   const [currentStep, setCurrentStep] = useState(0);
   const [showingScenarios, setShowingScenarios] = useState(false);
+  const [calculationResults, setCalculationResults] = useState(null);
 
-  const handleCalculate = () => {
-    // Handle calculation completion
-    console.log('Calculating results...');
+  const handleCalculate = (results) => {
+    setCalculationResults(results);
+    setShowingScenarios(true);
+    const scenarioElement = document.getElementById('scenario-analysis');
+    if (scenarioElement) {
+      scenarioElement.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleBack = () => {
@@ -56,15 +61,30 @@ const Index = () => {
               </p>
             </div>
             
-            <Calculator 
-              state={state}
-              onUpdate={updateCalculator}
-              onCalculate={handleCalculate}
-              onBack={handleBack}
-              onNext={handleNext}
-              onStepChange={handleStepChange}
-              currentStep={currentStep}
-            />
+            {!calculationResults ? (
+              <Calculator 
+                state={state}
+                onUpdate={updateCalculator}
+                onCalculate={handleCalculate}
+                onBack={handleBack}
+                onNext={handleNext}
+                onStepChange={handleStepChange}
+                currentStep={currentStep}
+              />
+            ) : (
+              <ResultsDisplay
+                score={calculationResults.score}
+                emissions={calculationResults.emissions}
+                categoryEmissions={calculationResults.categoryEmissions}
+                recommendations={calculationResults.recommendations}
+                isVisible={true}
+                onReset={() => {
+                  setCalculationResults(null);
+                  setCurrentStep(0);
+                }}
+                state={state}
+              />
+            )}
 
             {currentStep === 5 && (
               <div className="flex justify-center mt-8">
