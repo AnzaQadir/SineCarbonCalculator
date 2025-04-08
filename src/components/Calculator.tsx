@@ -704,7 +704,7 @@ const Calculator: React.FC<CalculatorProps> = ({
                 <p>Do you offset your travel emissions through carbon credits or other means?</p>
               </TooltipContent>
             </Tooltip>
-          </div>
+                  </div>
           <div className="flex items-center justify-center">
             <YesNoToggle
               value={state.offsetsTravelEmissions}
