@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 
 // Emission factors and constants
@@ -117,6 +118,7 @@ export interface CalculatorState {
     consciousPurchasing: number;
     evaluatesLifecycle: boolean;
   };
+
 }
 
 export const useCalculator = () => {
@@ -232,6 +234,60 @@ export const useCalculator = () => {
     
     return emissions;
   };
+  // Calculate results based on current state
+  const results = useMemo<FootprintResults>(() => {
+    // Convert monthly values to annual
+    const annualElectricity = state.electricityKwh * 12;
+    const annualNaturalGas = state.naturalGasTherm * 12;
+    const annualHeatingOil = state.heatingOilGallons * 12;
+    const annualPropane = state.propaneGallons * 12;
+    const annualCarMiles = state.carMiles * 12;
+    const annualTransitMiles = state.transitMiles * 12;
+    const annualWasteLbs = state.wasteLbs * 12;
+    
+    // Flight miles are already annual
+
+    // Calculate emissions by category
+    const homeEmissions = calculateHomeEmissions(
+      annualElectricity,
+      annualNaturalGas,
+      annualHeatingOil,
+      annualPropane,
+      state.usesRenewableEnergy,
+      state.hasEnergyEfficiencyUpgrades
+    );
+
+    const transportEmissions = calculateTransportEmissions(
+      state.carType,
+      annualCarMiles,
+      state.flightType,
+      state.flightMiles,
+      state.transitType,
+      annualTransitMiles,
+      state.usesActiveTransport,
+      state.hasElectricVehicle
+    );
+
+    const foodEmissions = calculateFoodEmissions(
+      state.dietType,
+      state.buysLocalFood,
+      state.followsSustainableDiet
+    );
+
+    const wasteEmissions = calculateWasteEmissions(
+      annualWasteLbs,
+      state.recyclingPercentage,
+      state.minimizesWaste,
+      state.avoidsPlastic
+    );
+
+    // Calculate total footprint
+    const totalFootprint = calculateTotalFootprint(
+      homeEmissions,
+      transportEmissions,
+      foodEmissions,
+      wasteEmissions
+    );
 
   const calculateFoodEmissions = () => {
     let emissions = 0;
@@ -314,6 +370,7 @@ export const useCalculator = () => {
       comparedToUS: (totalFootprint / 16) * 100,
       comparedToGlobal: (totalFootprint / 4.8) * 100,
       comparedToTarget: (totalFootprint / 2) * 100,
+
     };
   };
 
