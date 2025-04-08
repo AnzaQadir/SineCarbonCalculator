@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useCalculator } from '@/hooks/useCalculator';
-import { EMISSION_FACTORS } from '@/utils/calculations';
+import { EMISSION_FACTORS } from '@/constants/emissionFactors';
 import ScenarioCard from './ScenarioCard';
 import { Bike, Car, Leaf, Lightbulb, ShoppingBag } from 'lucide-react';
 
