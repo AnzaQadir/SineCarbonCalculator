@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowDown, BarChart4 } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -9,16 +9,6 @@ const Hero: React.FC = () => {
     const calculatorElement = document.getElementById('calculator');
     if (calculatorElement) {
       calculatorElement.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const scrollToScenarioAnalysis = () => {
-    const scenarioElement = document.getElementById('scenario-analysis');
-    if (scenarioElement) {
-      scenarioElement.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      // Fallback to calculator section if scenario section doesn't exist yet
-      scrollToCalculator();
     }
   };
 
@@ -51,10 +41,6 @@ const Hero: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 mb-12 animate-slide-down" style={{ animationDelay: "200ms" }}>
             <Button size="lg" onClick={scrollToCalculator}>
               Start Calculating
-            </Button>
-            <Button variant="outline" size="lg" onClick={scrollToScenarioAnalysis}>
-              <BarChart4 className="mr-2 h-4 w-4" />
-              Scenario Analysis
             </Button>
             <Button variant="outline" size="lg">
               Learn More
