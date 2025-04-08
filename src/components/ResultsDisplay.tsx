@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
   BarChart, 
@@ -15,747 +15,1104 @@ import {
   Legend,
   ReferenceLine 
 } from 'recharts';
-import { ArrowLeft, Download, Share2, AlertCircle, Leaf, AlertTriangle, Check, MapPin, Info, Sprout, Flower2, Trees, Palmtree } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
+  Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatNumber } from '@/utils/formatters';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+import { cn } from '@/lib/utils';
+import { Tooltip as RechartsTooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-interface ResultsDisplayProps {
-  results: {
-    homeEmissions: number;
-    transportEmissions: number;
-    foodEmissions: number;
-    wasteEmissions: number;
-    totalFootprint: number;
-    comparedToUS: number;
-    comparedToGlobal: number;
-    comparedToTarget: number;
-  };
-  state: {
-    name: string;
-    email: string;
-    age: number;
-    gender: string;
-    profession: string;
-    electricityKwh: number;
-    naturalGasTherm: number;
-    heatingOilGallons: number;
-    propaneGallons: number;
-    carMiles: number;
-    carType: string;
-    flightMiles: number;
-    flightType: string;
-    transitMiles: number;
-    transitType: string;
-    dietType: string;
-    recyclingPercentage: number;
-    wasteLbs: number;
-    usesRenewableEnergy: boolean;
-    hasEnergyEfficiencyUpgrades: boolean;
-    usesActiveTransport: boolean;
-    hasElectricVehicle: boolean;
-    buysLocalFood: boolean;
-    followsSustainableDiet: boolean;
-    minimizesWaste: boolean;
-    avoidsPlastic: boolean;
-  };
-  onReset: () => void;
+interface CategoryEmissions {
+  home: number;
+  transport: number;
+  food: number;
+  waste: number;
 }
 
-type CalculatorState = ResultsDisplayProps['state'];
+interface Recommendation {
+  category: string;
+  difficulty: 'Easy' | 'Medium';
+  title: string;
+  description: string;
+  impact: string;
+}
 
-const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, state, onReset }) => {
-  const {
-    homeEmissions,
-    transportEmissions,
-    foodEmissions,
-    wasteEmissions,
-    totalFootprint,
-    comparedToUS,
-    comparedToGlobal,
-    comparedToTarget,
-  } = results;
+interface Achievement {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  color: string;
+  description?: string;
+}
 
-  const categoryData = [
-    { name: 'Home', value: homeEmissions },
-    { name: 'Transport', value: transportEmissions },
-    { name: 'Food', value: foodEmissions },
-    { name: 'Waste', value: wasteEmissions },
-  ];
+interface ResultsDisplayProps {
+  score: number;
+  emissions: number;
+  categoryEmissions: CategoryEmissions;
+  recommendations: Recommendation[];
+  isVisible: boolean;
+  onReset: () => void;
+  state: any;
+}
 
-  const comparisonData = [
-    { 
-      name: 'Your Footprint', 
-      value: totalFootprint,
-      description: 'Your annual carbon emissions'
-    },
-    { 
-      name: 'US Average', 
-      value: 16,
-      description: 'Average American footprint' 
-    },
-    { 
-      name: 'Global Average', 
-      value: 4.8,
-      description: 'Average worldwide footprint'
-    },
-    { 
-      name: 'Sustainability Target', 
-      value: 2,
-      description: 'UN 2030 climate goal'
-    },
-  ];
+const getAchievements = (state: any, categoryEmissions: CategoryEmissions): Achievement[] => {
+  const achievements: Achievement[] = [];
 
-  const COLORS = ['#22c55e', '#3b82f6', '#f97316', '#ef4444'];
+  // Transport achievements
+  if (state?.primaryTransportMode === 'WALK_BIKE') {
+    achievements.push({
+      title: 'Opted not to drive',
+      value: 0.5,
+      icon: <Bike className="h-8 w-8" />,
+      color: 'bg-rose-500',
+      description: 'Choosing active transport'
+    });
+  } else if (state?.primaryTransportMode === 'PUBLIC') {
+    achievements.push({
+      title: 'Used public transit',
+      value: 0.4,
+      icon: <Bus className="h-8 w-8" />,
+      color: 'bg-rose-500',
+      description: 'Choosing sustainable transport'
+    });
+  }
 
-  const getRecommendations = () => {
-    const recs = [];
-    
-    if (state.electricityKwh > 700) {
-      recs.push({
-        category: 'Home',
-        title: 'Reduce Electricity Usage',
-        description: 'Your electricity usage is above average. Consider LED lighting, energy-efficient appliances, and smart power strips to reduce phantom energy use.',
-        impact: 'Could save up to 2 tons CO2e per year',
-        difficulty: 'easy'
-      });
-    }
-    
-    if (state.naturalGasTherm > 40) {
-      recs.push({
-        category: 'Home',
-        title: 'Improve Home Insulation',
-        description: 'Your heating usage suggests you might benefit from better insulation. Sealing drafts and adding insulation can reduce energy needs significantly.',
-        impact: 'Could save up to 1.5 tons CO2e per year',
-        difficulty: 'medium'
-      });
-    }
-    
-    if (state.carType === 'LARGE' && state.carMiles > 800) {
-      recs.push({
-        category: 'Transport',
-        title: 'Consider a More Efficient Vehicle',
-        description: 'Your large vehicle contributes significantly to your carbon footprint. When possible, consider carpooling, public transit, or switching to a hybrid/electric vehicle.',
-        impact: 'Could save up to 4 tons CO2e per year',
-        difficulty: 'hard'
-      });
-    }
-    
-    if (state.flightMiles > 10000) {
-      recs.push({
-        category: 'Transport',
-        title: 'Offset Your Air Travel',
-        description: 'Your air travel has a large impact. Consider video conferencing when possible, and purchase carbon offsets for necessary flights.',
-        impact: 'Could offset up to 3 tons CO2e per year',
-        difficulty: 'easy'
-      });
-    }
-    
-    if (state.dietType === 'MEAT_HEAVY') {
-      recs.push({
-        category: 'Food',
-        title: 'Reduce Red Meat Consumption',
-        description: 'Even reducing red meat consumption by one day per week can have a significant impact on your carbon footprint.',
-        impact: 'Could save up to 0.8 tons CO2e per year',
-        difficulty: 'medium'
-      });
-    }
-    
-    if (state.recyclingPercentage < 50) {
-      recs.push({
-        category: 'Waste',
-        title: 'Increase Recycling Efforts',
-        description: 'Increasing your recycling rate and composting organic waste can significantly reduce methane emissions from landfills.',
-        impact: 'Could save up to 0.5 tons CO2e per year',
-        difficulty: 'easy'
-      });
-    }
-    
-    if (recs.length < 3) {
-      recs.push({
-        category: 'General',
-        title: 'Switch to Renewable Energy',
-        description: 'Check if your utility offers renewable energy options or consider installing solar panels.',
-        impact: 'Could save up to 3 tons CO2e per year',
-        difficulty: 'medium'
-      });
-      
-      recs.push({
-        category: 'General',
-        title: 'Reduce, Reuse, Recycle',
-        description: 'Follow the waste hierarchy: reduce what you consume, reuse items when possible, and recycle what can\'t be reused.',
-        impact: 'Could save up to 1 ton CO2e per year',
-        difficulty: 'easy'
-      });
-    }
-    
-    return recs;
-  };
-  
-  const recommendations = getRecommendations();
-  
-  const getLocalizedInfo = () => {
-    return {
-      region: "United States",
-      energyMix: "Coal (50%), Natural Gas (20%), Nuclear (20%), Renewables (10%)",
-      transportOptions: "Public transit, bike sharing programs, electric vehicle charging stations",
-      localInitiatives: "Community solar projects, city-wide composting, tree planting initiatives",
-    };
-  };
-  
-  const localInfo = getLocalizedInfo();
-  
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-2 border border-gray-200 shadow-sm rounded-md">
-          <p className="font-medium">{`${label}: ${formatNumber(payload[0].value)} metric tons CO2e`}</p>
-        </div>
-      );
-    }
-    return null;
-  };
+  // Diet achievements
+  if (state?.dietType === 'VEGAN') {
+    achievements.push({
+      title: 'Plant-based diet',
+      value: 0.3,
+      icon: <Apple className="h-8 w-8" />,
+      color: 'bg-amber-500',
+      description: '100% plant-based choices'
+    });
+  } else if (state?.dietType === 'VEGETARIAN') {
+    achievements.push({
+      title: 'Vegetarian diet',
+      value: 0.2,
+      icon: <Utensils className="h-8 w-8" />,
+      color: 'bg-amber-500',
+      description: 'Meat-free choices'
+    });
+  }
 
-  const ComparisonTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white p-3 border border-gray-200 shadow-md rounded-md max-w-xs">
-          <p className="font-medium text-sm">{data.name}</p>
-          <p className="text-lg font-bold text-primary">{formatNumber(data.value)} tons CO2e</p>
-          <p className="text-xs text-muted-foreground mt-1">{data.description}</p>
-          {data.name === 'Your Footprint' && (
-            <div className="mt-2 pt-2 border-t border-gray-100 text-xs">
-              {data.value > 16 ? 
-                <span className="text-red-500 font-medium">Above US average</span> : 
-                <span className="text-green-500 font-medium">Below US average</span>
-              }
-            </div>
-          )}
-        </div>
-      );
-    }
-    return null;
-  };
+  // Air travel achievements
+  if (!state?.flightMiles || state?.flightMiles === 0) {
+    achievements.push({
+      title: 'Avoided air travel',
+      value: 0.1,
+      icon: <Plane className="h-8 w-8" />,
+      color: 'bg-blue-500',
+      description: 'Zero flight emissions'
+    });
+  }
 
-  const getImpactLevel = () => {
-    if (comparedToTarget <= 100) return { level: "Sustainable", color: "green", icon: <Check className="h-5 w-5 text-green-500" /> };
-    if (comparedToTarget <= 200) return { level: "Moderate", color: "amber", icon: <AlertTriangle className="h-5 w-5 text-amber-500" /> };
-    return { level: "High Impact", color: "red", icon: <AlertCircle className="h-5 w-5 text-red-500" /> };
-  };
-  
-  const impactLevel = getImpactLevel();
+  // Energy achievements
+  if (state?.usesRenewableEnergy) {
+    achievements.push({
+      title: 'Green energy',
+      value: 0.1,
+      icon: <Wind className="h-8 w-8" />,
+      color: 'bg-purple-500',
+      description: 'Using renewable sources'
+    });
+  }
 
-  const calculateSustainabilityScore = (state: CalculatorState): number => {
-    let score = 0;
-    if (state.usesRenewableEnergy) score++;
-    if (state.hasEnergyEfficiencyUpgrades) score++;
-    if (state.usesActiveTransport) score++;
-    if (state.hasElectricVehicle) score++;
-    if (state.buysLocalFood) score++;
-    if (state.followsSustainableDiet) score++;
-    if (state.minimizesWaste) score++;
-    if (state.avoidsPlastic) score++;
-    return score;
-  };
+  // Waste achievements
+  if (state?.waste?.recyclingPercentage > 75) {
+    achievements.push({
+      title: 'High recycling',
+      value: 0.15,
+      icon: <Recycle className="h-8 w-8" />,
+      color: 'bg-green-500',
+      description: '75%+ recycling rate'
+    });
+  }
 
-  const getPersonalityLabel = (score: number): string => {
-    if (score <= 2) return "Eco Novice";
-    if (score <= 4) return "Green Starter";
-    if (score <= 6) return "Eco Advocate";
-    return "Sustainability Champion";
-  };
+  // Energy efficiency
+  if (state?.hasEnergyEfficiencyUpgrades) {
+    achievements.push({
+      title: 'Energy efficient',
+      value: 0.2,
+      icon: <Battery className="h-8 w-8" />,
+      color: 'bg-indigo-500',
+      description: 'Upgraded efficiency'
+    });
+  }
 
-  const getPersonalityDescription = (score: number): string => {
-    if (score <= 2) {
-      return "Just starting your sustainable journey. There's plenty of room to grow your eco-friendly habits.";
-    }
-    if (score <= 4) {
-      return "You're taking your first steps towards sustainability. Keep it up—small changes add up!";
-    }
-    if (score <= 6) {
-      return "Great job! You're actively engaging in sustainable practices and making a positive impact.";
-    }
-    return "Outstanding! You're leading the charge in eco-friendly living and setting a strong example for others.";
-  };
+  return achievements;
+};
 
-  const getPersonalityIcon = (score: number) => {
-    if (score <= 2) {
-      return <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-        <Sprout className="w-8 h-8 text-green-500" />
-      </div>;
-    }
-    if (score <= 4) {
-      return <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-        <Flower2 className="w-8 h-8 text-green-600" />
-      </div>;
-    }
-    if (score <= 6) {
-      return <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-        <Trees className="w-8 h-8 text-green-700" />
-      </div>;
-    }
-    return <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-      <Palmtree className="w-8 h-8 text-green-800" />
-    </div>;
-  };
+const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
+  score,
+  emissions,
+  categoryEmissions,
+  recommendations,
+  isVisible,
+  onReset,
+  state
+}) => {
+  const [activeTab, setActiveTab] = useState('overview');
 
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-
-  const generatePDF = async () => {
+  const sharePDF = async () => {
     try {
-      // Create a new PDF document
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      // Create a temporary element to hold the content
+      const content = document.createElement('div');
+      content.className = 'p-8 bg-white';
       
-      // Get the overview content
-      const overviewContent = document.querySelector('[data-testid="overview-tab"]');
-      
-      if (overviewContent instanceof HTMLElement) {
-        // Add title and header
-        pdf.setFillColor(34, 197, 94); // Green color
-        pdf.rect(0, 0, pdf.internal.pageSize.width, 40, 'F');
+      // Add the content to the temporary element
+      content.innerHTML = `
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold mb-4">Your Carbon Footprint Report</h1>
+          <p class="text-gray-600">Generated on ${new Date().toLocaleDateString()}</p>
+        </div>
         
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(24);
-        pdf.text('Carbon Footprint Report', 20, 25);
-
-        // Add user info section
-        pdf.setFontSize(12);
-        pdf.setTextColor(0, 0, 0);
-        pdf.text(`Name: ${state.name}`, 20, 50);
-        pdf.text(`Date: ${new Date().toLocaleDateString()}`, 20, 57);
-        pdf.text(`Total Footprint: ${formatNumber(totalFootprint)} metric tons CO2e/year`, 20, 64);
-
-        // Convert the overview content to canvas
-        const canvas = await html2canvas(overviewContent, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: '#ffffff',
-          windowWidth: 1200,
-          onclone: (document, element) => {
-            // Adjust styles for better PDF rendering
-            element.style.padding = '20px';
-            element.style.width = '1100px';
-            const charts = element.querySelectorAll('.recharts-wrapper');
-            charts.forEach(chart => {
-              (chart as HTMLElement).style.width = '100%';
-            });
-          }
-        });
-
-        // Calculate dimensions to fit on A4
-        const imgWidth = 190;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        <div class="mb-8">
+          <h2 class="text-2xl font-semibold mb-4">Summary</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-gray-600">Total Emissions</p>
+              <p class="text-2xl font-bold">${emissions.toFixed(2)} tons CO₂e/year</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-gray-600">Sustainability Score</p>
+              <p class="text-2xl font-bold">${score.toFixed(0)}/100</p>
+            </div>
+          </div>
+        </div>
         
-        // Add the overview content
-        const imgData = canvas.toDataURL('image/png');
-        pdf.addImage(imgData, 'PNG', 10, 75, imgWidth, imgHeight);
-
-        // Add footer
-        const pageHeight = pdf.internal.pageSize.height;
-        pdf.setFontSize(10);
-        pdf.setTextColor(128, 128, 128);
-        pdf.text('Generated by Carbon Footprint Calculator', 20, pageHeight - 10);
+        <div class="mb-8">
+          <h2 class="text-2xl font-semibold mb-4">Emissions by Category</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-gray-600">Home Energy</p>
+              <p class="text-xl font-bold">${categoryEmissions.home.toFixed(2)} tons</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-gray-600">Transport</p>
+              <p class="text-xl font-bold">${categoryEmissions.transport.toFixed(2)} tons</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-gray-600">Food</p>
+              <p class="text-xl font-bold">${categoryEmissions.food.toFixed(2)} tons</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-gray-600">Waste</p>
+              <p class="text-xl font-bold">${categoryEmissions.waste.toFixed(2)} tons</p>
+            </div>
+          </div>
+        </div>
         
-        // Save the PDF
-        pdf.save(`carbon-footprint-${state.name.toLowerCase().replace(/\s+/g, '-')}.pdf`);
-      }
+        <div class="mb-8">
+          <h2 class="text-2xl font-semibold mb-4">Recommendations</h2>
+          <div class="space-y-4">
+            ${recommendations.map(rec => `
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-medium">${rec.category}</span>
+                  <span class="text-sm px-2 py-1 rounded-full ${
+                    rec.difficulty === 'Easy' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  }">${rec.difficulty}</span>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">${rec.title}</h3>
+                <p class="text-gray-600 mb-2">${rec.description}</p>
+                <p class="text-sm text-green-700">${rec.impact}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="text-center text-gray-500 text-sm">
+          <p>Generated by Carbon Footprint Calculator</p>
+          <p>www.carbonfootprintcalculator.com</p>
+        </div>
+      `;
+
+      // Use html2pdf library to generate PDF
+      const opt = {
+        margin: 1,
+        filename: 'carbon-footprint-report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      // Import html2pdf dynamically
+      const html2pdf = (await import('html2pdf.js')).default;
+      await html2pdf().set(opt).from(content).save();
     } catch (error) {
       console.error('Error generating PDF:', error);
+      alert('There was an error generating the PDF. Please try again.');
     }
   };
 
-  const handleGeneratePDF = async () => {
-    setIsGeneratingPDF(true);
-    try {
-      await generatePDF();
-    } finally {
-      setIsGeneratingPDF(false);
+  // Calculate percentages for pie chart
+  const pieData = [
+    { name: 'Home', value: categoryEmissions.home, percentage: Math.round((categoryEmissions.home / emissions) * 100) },
+    { name: 'Transport', value: categoryEmissions.transport, percentage: Math.round((categoryEmissions.transport / emissions) * 100) },
+    { name: 'Food', value: categoryEmissions.food, percentage: Math.round((categoryEmissions.food / emissions) * 100) },
+    { name: 'Waste', value: categoryEmissions.waste, percentage: Math.round((categoryEmissions.waste / emissions) * 100) }
+  ];
+
+  // Colors matching the image
+  const COLORS = ['#4ade80', '#60a5fa', '#fb923c', '#ef4444'];
+
+  const comparisonData = [
+    { name: 'Your\nFootprint', value: emissions },
+  ];
+
+  const getEcoPersonality = (score: number, categoryEmissions: CategoryEmissions) => {
+    // Calculate total emissions and category weights
+    const totalEmissions = Number(categoryEmissions.home) + Number(categoryEmissions.transport) + 
+                          Number(categoryEmissions.food) + Number(categoryEmissions.waste);
+    
+    const weights = {
+      home: Number(categoryEmissions.home) / totalEmissions,
+      transport: Number(categoryEmissions.transport) / totalEmissions,
+      food: Number(categoryEmissions.food) / totalEmissions,
+      waste: Number(categoryEmissions.waste) / totalEmissions
+    };
+
+    // Determine dominant category
+    const dominantCategory = Object.entries(weights).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+
+    // Base personality type based on total emissions and score
+    let personality = {
+      title: '',
+      points: '',
+      description: '',
+      level: 0,
+      badge: '',
+      strengths: [] as string[],
+      nextSteps: [] as string[],
+      subCategory: '',
+      color: ''
+    };
+
+    // Determine level based on score and emissions
+    if (score < 30 || totalEmissions > 16) {
+      personality = {
+        title: 'Eco Novice',
+        points: '1/8 Points',
+        description: 'Just starting your sustainable journey. Every small step counts!',
+        level: 1,
+        badge: '🌱',
+        strengths: ['Taking the first step', 'Open to learning'],
+        nextSteps: ['Try a Meatless Monday', 'Start basic recycling'],
+        subCategory: '',
+        color: 'from-yellow-500 to-yellow-400'
+      };
+    } else if (score < 50 || totalEmissions > 12) {
+      personality = {
+        title: 'Green Starter',
+        points: '2/8 Points',
+        description: 'Building foundational eco-friendly habits. You\'re making progress!',
+        level: 2,
+        badge: '🌿',
+        strengths: ['Growing awareness', 'Basic sustainable practices'],
+        nextSteps: ['Upgrade to LED bulbs', 'Try public transport'],
+        subCategory: '',
+        color: 'from-green-400 to-green-300'
+      };
+    } else if (score < 70 || totalEmissions > 8) {
+      personality = {
+        title: 'Eco Advocate',
+        points: '4/8 Points',
+        description: 'Consistently making sustainable choices. Your impact is growing!',
+        level: 3,
+        badge: '🌳',
+        strengths: ['Regular sustainable practices', 'Influencing others'],
+        nextSteps: ['Install smart thermostats', 'Start composting'],
+        subCategory: '',
+        color: 'from-green-600 to-green-500'
+      };
+    } else if (score < 85 || totalEmissions > 4) {
+      personality = {
+        title: 'Sustainability Pro',
+        points: '6/8 Points',
+        description: 'Leading by example in sustainable living. Impressive commitment!',
+        level: 4,
+        badge: '🌍',
+        strengths: ['Comprehensive approach', 'Community leadership'],
+        nextSteps: ['Consider solar panels', 'Start a community garden'],
+        subCategory: '',
+        color: 'from-blue-600 to-blue-500'
+      };
+    } else {
+      personality = {
+        title: 'Climate Hero',
+        points: '8/8 Points',
+        description: 'Maximum impact achieved! You\'re a beacon of sustainable living.',
+        level: 5,
+        badge: '⭐',
+        strengths: ['Exemplary practices', 'Inspiring others'],
+        nextSteps: ['Mentor others', 'Advocate for policy change'],
+        subCategory: '',
+        color: 'from-purple-600 to-purple-500'
+      };
     }
+
+    // Add category-specific strengths and next steps based on dominant category and emissions
+    switch(dominantCategory) {
+      case 'home':
+        personality.subCategory = categoryEmissions.home < 4 ? 'Energy Efficiency Expert' : 'Eco Homebody';
+        if (categoryEmissions.home < 4) {
+          personality.strengths.push('Efficient home energy use');
+          personality.nextSteps.push('Install solar panels');
+        }
+        break;
+      case 'transport':
+        personality.subCategory = categoryEmissions.transport < 3 ? 'Green Mobility Champion' : 'Green Traveler';
+        if (categoryEmissions.transport < 3) {
+          personality.strengths.push('Low-carbon transportation');
+          personality.nextSteps.push('Consider an electric vehicle');
+        }
+        break;
+      case 'food':
+        personality.subCategory = categoryEmissions.food < 2 ? 'Sustainable Food Pioneer' : 'Conscious Consumer';
+        if (categoryEmissions.food < 2) {
+          personality.strengths.push('Sustainable diet choices');
+          personality.nextSteps.push('Start a vegetable garden');
+        }
+        break;
+      case 'waste':
+        personality.subCategory = categoryEmissions.waste < 1 ? 'Zero Waste Champion' : 'Zero Waste Warrior';
+        if (categoryEmissions.waste < 1) {
+          personality.strengths.push('Minimal waste generation');
+          personality.nextSteps.push('Start composting');
+        }
+        break;
+    }
+
+    return personality;
   };
 
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }: any) => {
-    const RADIAN = Math.PI / 180;
-    const radius = outerRadius * 1.15;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-    const sin = Math.sin(-midAngle * RADIAN);
-    const cos = Math.cos(-midAngle * RADIAN);
-    
-    const mx = cx + (outerRadius + 3) * cos;
-    const my = cy + (outerRadius + 3) * sin;
-    
-    const textAnchor = cos >= 0 ? 'start' : 'end';
-    const xOffset = cos >= 0 ? 3 : -3;
+  const personality = getEcoPersonality(score, categoryEmissions);
 
-    return (
-      <g>
-        <path
-          d={`M${mx},${my}L${x},${y}`}
-          stroke={COLORS[index % COLORS.length]}
-          strokeWidth={1}
-          fill="none"
-        />
-        <text
-          x={x + xOffset}
-          y={y}
-          textAnchor={textAnchor}
-          dominantBaseline="middle"
-          className="text-xs"
-          fill="#374151"
-        >
-          {`${name}: ${(percent * 100).toFixed(0)}%`}
-        </text>
-      </g>
-    );
-  };
+  // Get achievements based on state
+  const achievements = getAchievements(state, categoryEmissions);
 
   return (
-    <div className="w-full max-w-6xl mx-auto animate-fade-in">
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border/20">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl sm:text-3xl font-bold text-primary">Your Carbon Footprint Results</CardTitle>
-            <Button variant="outline" size="sm" onClick={onReset}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Start Over
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-8">
-          <div className="mb-8 p-6 bg-primary/5 rounded-xl text-center">
-            <div className="flex items-center justify-center mb-2">
-              {impactLevel.icon}
-              <h3 className="text-xl font-medium ml-2">{impactLevel.level} Carbon Footprint</h3>
-            </div>
-            <p className="text-4xl sm:text-5xl font-bold text-primary mb-2">
-              {formatNumber(totalFootprint)}
-              <span className="text-base font-normal text-muted-foreground ml-2">metric tons CO2e/year</span>
-            </p>
-            <p className="text-muted-foreground mt-2">
-              {comparedToUS < 100 
-                ? `That's ${formatNumber(100 - comparedToUS)}% lower than the average American.`
-                : `That's ${formatNumber(comparedToUS - 100)}% higher than the average American.`}
-            </p>
-            <div className="mt-4 text-sm inline-flex items-center bg-white/80 px-3 py-1 rounded-full">
-              <MapPin className="h-4 w-4 mr-1 text-primary" />
-              <span>Based on data relevant to {localInfo.region}</span>
+    <div className={cn(
+      "space-y-8 transition-opacity duration-500",
+      isVisible ? "opacity-100" : "opacity-0"
+    )}>
+      {/* Impact Summary */}
+      <Card className="bg-gradient-to-br from-green-50 to-green-100/50 overflow-hidden relative">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(#22c55e15_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black_100%)]" />
+        
+        <CardContent className="p-10 space-y-8 relative">
+          {/* Impact Level Indicator */}
+          <div className="flex items-center justify-center gap-3">
+            <div className="bg-red-50 text-red-600 px-4 py-2 rounded-full font-medium flex items-center gap-2 shadow-sm">
+              <AlertCircle className="h-5 w-5" />
+              <span>High Impact Level</span>
             </div>
           </div>
-
-          <Tabs defaultValue="overview" className="mb-8">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="methodology">Methodology</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent 
-              value="overview" 
-              className="pt-6 space-y-8" 
-              data-testid="overview-tab"
-            >
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-xl font-medium mb-4">Emissions by Category</h3>
-                  <div className="h-[250px] relative">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={categoryData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={80}
-                          innerRadius={0}
-                          paddingAngle={2}
-                          fill="#8884d8"
-                          dataKey="value"
-                          label={renderCustomizedLabel}
-                          animationBegin={0}
-                          animationDuration={1500}
-                          animationEasing="ease-out"
-                        >
-                          {categoryData.map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={COLORS[index % COLORS.length]}
-                              strokeWidth={1}
-                              stroke="#fff"
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip 
-                          content={<CustomTooltip />}
-                          wrapperStyle={{ outline: 'none' }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-xl font-medium mb-4 flex items-center">
-                    How You Compare
-                    <div className="relative ml-2 group">
-                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                      <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 hidden group-hover:block bg-white p-2 rounded shadow-md text-xs w-48 z-10">
-                        Comparison with global and national averages. The sustainability target is based on UN climate goals.
-                      </div>
-                    </div>
-                  </h3>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={[{ name: 'Your Footprint', value: totalFootprint }]}
-                        margin={{
-                          top: 30,
-                          right: 180,
-                          left: 60,
-                          bottom: 30,
-                        }}
-                        barSize={50}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                        <XAxis 
-                          dataKey="name"
-                          tick={{ fontSize: 14 }}
-                        />
-                        <YAxis 
-                          unit=" tons" 
-                          tick={{ fontSize: 14 }}
-                          domain={[0, Math.max(20, Math.ceil(totalFootprint * 1.2))]}
-                        />
-                        <Tooltip content={<ComparisonTooltip />} />
-                        <Bar dataKey="value" fill="#22C55E" radius={[6, 6, 0, 0]} />
-                        <ReferenceLine 
-                          y={16} 
-                          stroke="#475569" 
-                          strokeWidth={2}
-                          strokeDasharray="5 5"
-                          label={{ 
-                            value: 'US Average', 
-                            position: 'right',
-                            fill: '#475569',
-                            fontSize: 14
-                          }}
-                        />
-                        <ReferenceLine 
-                          y={4.8} 
-                          stroke="#64748B" 
-                          strokeWidth={2}
-                          strokeDasharray="5 5"
-                          label={{ 
-                            value: 'Global Average', 
-                            position: 'right',
-                            fill: '#64748B',
-                            fontSize: 14
-                          }}
-                        />
-                        <ReferenceLine 
-                          y={2} 
-                          stroke="#059669" 
-                          strokeWidth={2}
-                          strokeDasharray="5 5"
-                          label={{ 
-                            value: 'Sustainability Target', 
-                            position: 'right',
-                            fill: '#059669',
-                            fontSize: 14
-                          }}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+          
+          {/* Main Stats */}
+          <div className="text-center space-y-6">
+            <div className="flex items-baseline justify-center gap-4">
+              <div className="space-y-1">
+                <span className="text-8xl font-bold bg-gradient-to-br from-green-600 to-green-700 bg-clip-text text-transparent">
+                  {emissions.toFixed(2)}
+                </span>
+                <div className="flex flex-col text-gray-600">
+                  <span className="text-xl font-medium">metric tons CO2e</span>
+                  <span className="text-lg">per year</span>
                 </div>
               </div>
-
-              <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-6 border border-green-100">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-green-800">Your Eco Personality</h3>
-                    <p className="text-sm text-green-600">Based on your sustainable practices</p>
-                  </div>
-                  {getPersonalityIcon(calculateSustainabilityScore(state))}
-                </div>
-                
-                <div className="flex items-center mb-4">
-                  <div className="flex-1">
-                    <div className="h-3 bg-gray-200 rounded-full">
-                      <div 
-                        className="h-3 bg-gradient-to-r from-green-300 to-green-500 rounded-full transition-all duration-500"
-                        style={{ width: `${(calculateSustainabilityScore(state) / 8) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                  <span className="ml-3 font-medium text-green-700">
-                    {calculateSustainabilityScore(state)}/8 Points
-                  </span>
-                </div>
-
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <h4 className="font-medium text-green-800 mb-2">
-                    {getPersonalityLabel(calculateSustainabilityScore(state))}
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    {getPersonalityDescription(calculateSustainabilityScore(state))}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Personalized Recommendations</h3>
-                <p className="text-muted-foreground mb-6">
-                  Based on your responses, we've identified these opportunities to reduce your carbon footprint:
-                </p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {recommendations.map((rec, index) => (
-                    <Card key={index} className="overflow-hidden">
-                      <div className={`p-1 ${rec.difficulty === 'easy' ? 'bg-green-100' : rec.difficulty === 'medium' ? 'bg-amber-100' : 'bg-red-100'}`}>
-                        <div className="flex justify-between items-center px-3 py-1">
-                          <span className="text-xs font-medium">{rec.category}</span>
-                          <span className={`text-xs font-medium ${rec.difficulty === 'easy' ? 'text-green-600' : rec.difficulty === 'medium' ? 'text-amber-600' : 'text-red-600'}`}>
-                            {rec.difficulty.charAt(0).toUpperCase() + rec.difficulty.slice(1)}
-                          </span>
-                        </div>
-                      </div>
-                      <CardContent className="p-4 pt-3">
-                        <h4 className="font-medium text-lg mb-1">{rec.title}</h4>
-                        <p className="text-sm text-muted-foreground mb-3">{rec.description}</p>
-                        <div className="flex items-center text-xs text-primary font-medium">
-                          <Leaf className="h-3 w-3 mr-1" />
-                          {rec.impact}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-                
-                <div className="mt-8 bg-blue-50 border border-blue-100 rounded-lg p-4">
-                  <h4 className="font-medium mb-2 flex items-center text-blue-700">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    Local Resources
-                  </h4>
-                  <div className="text-sm space-y-2 text-blue-600">
-                    <p><strong>Local Energy Mix:</strong> {localInfo.energyMix}</p>
-                    <p><strong>Transportation Options:</strong> {localInfo.transportOptions}</p>
-                    <p><strong>Community Initiatives:</strong> {localInfo.localInitiatives}</p>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="details" className="pt-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Home Emissions</h4>
-                  <p className="text-2xl font-bold">{formatNumber(homeEmissions / 1000)} <span className="text-sm font-normal text-muted-foreground">metric tons</span></p>
-                  <p className="text-sm text-muted-foreground mt-1">From electricity, heating, and cooking</p>
-                  <div className="mt-3 text-xs text-muted-foreground">
-                    <p>• Electricity: {formatNumber(state.electricityKwh * 12 * 0.429 / 1000)} tons</p>
-                    <p>• Natural Gas: {formatNumber(state.naturalGasTherm * 12 * 5.3 / 1000)} tons</p>
-                  </div>
-                </Card>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Transportation Emissions</h4>
-                  <p className="text-2xl font-bold">{formatNumber(transportEmissions / 1000)} <span className="text-sm font-normal text-muted-foreground">metric tons</span></p>
-                  <p className="text-sm text-muted-foreground mt-1">From driving, flying, and public transit</p>
-                  <div className="mt-3 text-xs text-muted-foreground">
-                    <p>• Car ({state.carType.toLowerCase()}): {formatNumber(state.carMiles * 12 * (state.carType === 'MEDIUM' ? 0.35 : 0.44) / 1000)} tons</p>
-                    <p>• Flights: {formatNumber(state.flightMiles * 0.18 / 1000)} tons</p>
-                  </div>
-                </Card>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Food Emissions</h4>
-                  <p className="text-2xl font-bold">{formatNumber(foodEmissions / 1000)} <span className="text-sm font-normal text-muted-foreground">metric tons</span></p>
-                  <p className="text-sm text-muted-foreground mt-1">Based on your {state.dietType.toLowerCase().replace('_', ' ')} diet</p>
-                  <div className="mt-3 text-xs text-muted-foreground">
-                    <p>• Adopting a plant-based diet even 1-2 days per week can reduce this significantly</p>
-                  </div>
-                </Card>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Waste Emissions</h4>
-                  <p className="text-2xl font-bold">{formatNumber(wasteEmissions / 1000)} <span className="text-sm font-normal text-muted-foreground">metric tons</span></p>
-                  <p className="text-sm text-muted-foreground mt-1">From garbage and recycling habits</p>
-                  <div className="mt-3 text-xs text-muted-foreground">
-                    <p>• Recycling rate: {state.recyclingPercentage}%</p>
-                    <p>• Composting food waste can reduce methane emissions from landfills</p>
-                  </div>
-                </Card>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="methodology" className="pt-4">
-              <h3 className="text-xl font-medium mb-4">Our Calculation Methodology</h3>
-              <div className="prose prose-sm max-w-none text-muted-foreground">
-                <p>This calculator uses peer-reviewed emissions factors from governmental and academic sources including:</p>
-                <ul className="list-disc pl-5 mt-2 space-y-1">
-                  <li>U.S. Environmental Protection Agency (EPA) emissions factors</li>
-                  <li>Intergovernmental Panel on Climate Change (IPCC) guidelines</li>
-                  <li>Department of Energy (DOE) data on regional electricity generation</li>
-                  <li>Peer-reviewed studies on food lifecycle emissions</li>
-                </ul>
-                
-                <h4 className="font-medium mt-6 mb-2 text-foreground">Assumptions & Limitations</h4>
-                <p>To provide a user-friendly experience, we make certain assumptions:</p>
-                <ul className="list-disc pl-5 mt-2 space-y-1">
-                  <li>Electricity emissions are based on average grid mix for your region</li>
-                  <li>Vehicle emissions assume average efficiency for each vehicle category</li>
-                  <li>Flight emissions include radiative forcing effects at high altitudes</li>
-                  <li>Food emissions are based on typical diet patterns within each category</li>
-                </ul>
-                
-                <h4 className="font-medium mt-6 mb-2 text-foreground">Data Sources</h4>
-                <p>Our emissions factors are regularly updated based on the latest available data from:</p>
-                <ul className="list-disc pl-5 mt-2 space-y-1">
-                  <li>EPA's Emissions & Generation Resource Integrated Database (eGRID)</li>
-                  <li>IPCC's Fifth Assessment Report</li>
-                  <li>National Renewable Energy Laboratory (NREL) lifecycle assessments</li>
-                  <li>Academic studies published in peer-reviewed journals</li>
-                </ul>
-                
-                <p className="mt-6">For questions about our methodology or to discuss your specific case, please contact us at <a href="mailto:sustainability@example.com" className="text-primary hover:underline">sustainability@example.com</a>.</p>
-              </div>
-            </TabsContent>
-          </Tabs>
-
-          <div className="border-t border-border/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-medium">Ready to take action?</h3>
-              <p className="text-muted-foreground">Support verified carbon reduction projects or share your results.</p>
             </div>
-            <div className="flex gap-3">
-              <Button>
-                Offset Now
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={handleGeneratePDF} 
-                disabled={isGeneratingPDF}
-              >
-                {isGeneratingPDF ? (
-                  <>
-                    <span className="animate-spin mr-2">⏳</span>
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Share PDF
-                  </>
-                )}
-              </Button>
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Download
-              </Button>
+
+            <div className="space-y-3">
+              <p className="text-2xl text-gray-700">
+                Your footprint is <span className="font-semibold text-green-700">{((16 - emissions) / 16 * 100).toFixed(1)}% lower</span> than the average American
+              </p>
+              <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                That's equivalent to planting {Math.round((16 - emissions) * 10)} trees or taking {Math.round((16 - emissions) * 2)} cars off the road for a year
+              </p>
             </div>
+          </div>
+
+          {/* Context & Location */}
+          <div className="flex items-center justify-center gap-3">
+            <div className="bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2 shadow-sm">
+              <div className="p-1.5 bg-green-100 rounded-full">
+                <Leaf className="h-4 w-4 text-green-600" />
+              </div>
+              <span className="text-gray-600">Based on data relevant to United States</span>
+            </div>
+          </div>
+
+          {/* Quick Stats Grid */}
+          <div className="grid grid-cols-4 gap-4 mt-6">
+            {[
+              { 
+                icon: <Home className="h-5 w-5 text-green-600" />,
+                label: 'Home Energy',
+                value: `${categoryEmissions.home.toFixed(1)}t`,
+                change: categoryEmissions.home < 4 ? 'low' : 'high'
+              },
+              {
+                icon: <Car className="h-5 w-5 text-blue-600" />,
+                label: 'Transport',
+                value: `${categoryEmissions.transport.toFixed(1)}t`,
+                change: categoryEmissions.transport < 3 ? 'low' : 'high'
+              },
+              {
+                icon: <Utensils className="h-5 w-5 text-orange-600" />,
+                label: 'Food',
+                value: `${categoryEmissions.food.toFixed(1)}t`,
+                change: categoryEmissions.food < 2 ? 'low' : 'high'
+              },
+              {
+                icon: <Trash2 className="h-5 w-5 text-red-600" />,
+                label: 'Waste',
+                value: `${categoryEmissions.waste.toFixed(1)}t`,
+                change: categoryEmissions.waste < 1 ? 'low' : 'high'
+              }
+            ].map((stat, i) => (
+              <div key={i} className="bg-white/60 backdrop-blur-sm rounded-xl p-3 flex flex-col items-center gap-1">
+                <div className="p-2 bg-gray-50 rounded-lg mb-1">
+                  {stat.icon}
+                </div>
+                <span className="text-sm text-gray-600">{stat.label}</span>
+                <span className="text-lg font-semibold">{stat.value}</span>
+                <span className={cn(
+                  "text-xs px-1.5 py-0.5 rounded-full",
+                  stat.change === 'low' ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                )}>
+                  {stat.change === 'low' ? 'Low Impact' : 'High Impact'}
+                </span>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* Header - Moving it after the impact summary for better visual hierarchy */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-4xl font-bold text-gray-900 text-center flex-1">Your Carbon Footprint Results</h1>
+        <Button 
+          variant="outline" 
+          className="gap-2 px-4 py-2 text-base hover:bg-gray-100" 
+          onClick={onReset}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Start Over
+        </Button>
+          </div>
+
+      {/* Tabs */}
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="w-full">
+          <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
+          <TabsTrigger value="details" className="flex-1">Details</TabsTrigger>
+          <TabsTrigger value="methodology" className="flex-1">Methodology</TabsTrigger>
+            </TabsList>
+            
+        <TabsContent value="overview" className="space-y-8 mt-6">
+          {/* Charts Section */}
+          <div className="grid grid-cols-2 gap-8 px-6">
+                <div>
+              <h3 className="text-xl font-semibold mb-6">Emissions by Category</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                    innerRadius={0}
+                    outerRadius={100}
+                    paddingAngle={0}
+                    label={({ percent }) => (
+                      <text
+                        fill="#ffffff"
+                        fontSize={16}
+                        fontWeight="bold"
+                        dominantBaseline="central"
+                        textAnchor="middle"
+                      >
+                        {`${(percent * 100).toFixed(0)}%`}
+                      </text>
+                    )}
+                          labelLine={false}
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={COLORS[index % COLORS.length]} 
+                      />
+                          ))}
+                        </Pie>
+                  <Legend
+                    verticalAlign="bottom"
+                    align="center"
+                    layout="horizontal"
+                    iconType="circle"
+                    iconSize={10}
+                    formatter={(value) => {
+                      const item = pieData.find(d => d.name === value);
+                      return `${value} (${item?.percentage}%)`;
+                    }}
+                  />
+                      </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
+                <div>
+              <div className="flex items-center gap-2 mb-6">
+                <h3 className="text-xl font-semibold">How You Compare</h3>
+                <RechartsTooltip>
+                  <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>See how your carbon footprint compares to average emissions</p>
+                  </TooltipContent>
+                </RechartsTooltip>
+                      </div>
+              <ResponsiveContainer width="100%" height={300}>
+                      <BarChart
+                        data={comparisonData}
+                  margin={{ top: 20, right: 130, left: -20, bottom: 20 }}
+                >
+                  <YAxis
+                    type="number"
+                    domain={[0, 20]}
+                    ticks={[0, 5, 10, 15, 20]}
+                    label={{ value: 'tons', position: 'left', angle: -90, offset: -10 }}
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    axisLine={{ stroke: '#e2e8f0' }}
+                  />
+                        <XAxis 
+                    type="category"
+                          dataKey="name" 
+                    tick={{ fill: '#64748b', fontSize: 14 }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Bar 
+                    dataKey="value" 
+                    fill="#4ade80" 
+                    radius={[6, 6, 6, 6]} 
+                    barSize={40}
+                  >
+                          {comparisonData.map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                        fill="#4ade80"
+                            />
+                          ))}
+                        </Bar>
+                  <ReferenceLine
+                    y={16}
+                    stroke="#94a3b8"
+                    strokeWidth={1.5}
+                    strokeDasharray="4 4"
+                    segment={[{ x: 0.2, y: 16 }, { x: 1, y: 16 }]}
+                    label={{ 
+                      value: 'US Average', 
+                      position: 'top',
+                      fill: '#64748b',
+                      fontSize: 14,
+                      offset: 10,
+                      fontWeight: 500
+                    }}
+                  />
+                  <ReferenceLine
+                    y={4.7}
+                    stroke="#94a3b8"
+                    strokeWidth={1.5}
+                    strokeDasharray="4 4"
+                    segment={[{ x: 0.2, y: 4.7 }, { x: 1, y: 4.7 }]}
+                    label={{ 
+                      value: 'Global Average', 
+                      position: 'top',
+                      fill: '#64748b',
+                      fontSize: 14,
+                      offset: 10,
+                      fontWeight: 500
+                    }}
+                  />
+                  <ReferenceLine
+                    y={2}
+                    stroke="#22c55e"
+                    strokeWidth={1.5}
+                    strokeDasharray="4 4"
+                    segment={[{ x: 0.2, y: 2 }, { x: 1, y: 2 }]}
+                    label={{ 
+                      value: 'Sustainability Target', 
+                      position: 'top',
+                      fill: '#22c55e',
+                      fontSize: 14,
+                      offset: 10,
+                      fontWeight: 500
+                    }}
+                  />
+                      </BarChart>
+                    </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Eco Personality */}
+          <Card className="bg-white overflow-hidden">
+            <CardContent className="p-0">
+              <div className={`bg-gradient-to-r ${personality.color} p-8 text-white`}>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-4xl">{personality.badge}</span>
+                      <div>
+                        <h3 className="text-2xl font-bold">{personality.title}</h3>
+                        {personality.subCategory && (
+                          <span className="text-white/90 text-sm">{personality.subCategory}</span>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-white/90 text-lg">{personality.description}</p>
+                  </div>
+                  <div className="bg-white/20 rounded-full p-4 backdrop-blur-sm">
+                    <Leaf className="h-8 w-8" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 space-y-6">
+                {/* Progress Bar */}
+                <div>
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Progress to Next Level</span>
+                    <span>{personality.points}</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full bg-gradient-to-r ${personality.color}`}
+                      style={{ width: `${(score / 100) * 100}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Strengths */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Your Strengths</h4>
+                  <ul className="space-y-2">
+                    {personality.strengths.map((strength, index) => (
+                      <li key={index} className="flex items-center gap-2 text-gray-600">
+                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${personality.color}`} />
+                        {strength}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Next Steps */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Next Steps</h4>
+                  <ul className="space-y-2">
+                    {personality.nextSteps.map((step, index) => (
+                      <li key={index} className="flex items-center gap-2 text-gray-600">
+                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${personality.color}`} />
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recommendations */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Personalized Recommendations</h2>
+            <p className="text-gray-600">Based on your responses, we've identified these opportunities to reduce your carbon footprint:</p>
+            
+            <div className="grid grid-cols-2 gap-4">
+                {recommendations.map((rec, index) => (
+                <div 
+                  key={index} 
+                  className={cn(
+                    "rounded-xl overflow-hidden",
+                    rec.difficulty === 'Easy' ? "bg-green-50" : "bg-yellow-50"
+                  )}
+                >
+                  <div className="px-6 py-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-sm">{rec.category}</span>
+                      <span 
+                        className={cn(
+                          "text-sm px-3 py-1 rounded-full",
+                          rec.difficulty === 'Easy' 
+                            ? "text-green-700 bg-green-100" 
+                            : "text-amber-700 bg-amber-100"
+                        )}
+                      >
+                        {rec.difficulty}
+                        </span>
+                      </div>
+
+                    <h3 className="text-xl font-semibold mb-2">{rec.title}</h3>
+                    <p className="text-gray-600 mb-4">{rec.description}</p>
+
+                    <div className="flex items-center gap-2 text-green-700">
+                      <Leaf className="h-4 w-4" />
+                      <span className="text-sm">{rec.impact}</span>
+                    </div>
+                  </div>
+                      </div>
+                ))}
+              </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-8 mt-8 border border-primary/20">
+            <h2 className="text-2xl font-semibold mb-4 text-center">Ready to Take Action?</h2>
+            <p className="text-center text-muted-foreground mb-6 max-w-xl mx-auto">
+              Support verified carbon reduction projects or share your results to inspire others in their sustainability journey.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button 
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2"
+              >
+                <Leaf className="h-5 w-5" />
+                Offset Now
+              </Button>
+              
+              <Button 
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2 border-2"
+                onClick={sharePDF}
+              >
+                <Share className="h-5 w-5" />
+                Share PDF
+              </Button>
+              
+              <Button 
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2 border-2"
+              >
+                <Download className="h-5 w-5" />
+                Download
+              </Button>
+            </div>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Your actions matter! By offsetting or sharing, you contribute to global sustainability efforts.
+              </p>
+            </div>
+          </div>
+        </TabsContent>
+            
+        <TabsContent value="details">
+          <div className="space-y-6 mt-6">
+            {/* Achievement Cards */}
+            {achievements.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4">
+                {achievements.map((achievement, index) => (
+                  <div 
+                    key={index} 
+                    className={`${achievement.color} rounded-xl p-6 text-white`}
+                  >
+                    <div className="flex flex-col h-full">
+                      {achievement.icon}
+                      <h3 className="text-2xl font-semibold mb-2 mt-4">{achievement.title}</h3>
+                      {achievement.description && (
+                        <p className="text-white/80 text-sm mb-4">{achievement.description}</p>
+                      )}
+                      <div className="mt-auto">
+                        <p className="text-2xl font-bold">{achievement.value.toFixed(1)}t CO₂e</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 bg-gray-50 rounded-xl">
+                <PackageCheck className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600">No Achievements Yet</h3>
+                <p className="text-gray-500 mt-2">Complete more sustainable actions to unlock achievements!</p>
+              </div>
+            )}
+
+            {/* Category Details */}
+            <div className="grid grid-cols-2 gap-6 mt-8">
+              {/* Home Emissions */}
+              <Card className="bg-gradient-to-br from-green-50 to-green-100/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <Home className="h-5 w-5 text-green-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800">Home Energy</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.home.toFixed(1)}</span>
+                        <span className="text-gray-500">tons CO₂e/year</span>
+                      </div>
+                      <p className="text-gray-600 mt-1">From electricity and heating</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Electricity</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.home * 0.6).toFixed(1)} tons</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Heating</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.home * 0.4).toFixed(1)} tons</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Transport Emissions */}
+              <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Car className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800">Transport</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.transport.toFixed(1)}</span>
+                        <span className="text-gray-500">tons CO₂e/year</span>
+                      </div>
+                      <p className="text-gray-600 mt-1">From daily commute and travel</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Car Travel</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.transport * 0.7).toFixed(1)} tons</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Public Transit</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.transport * 0.3).toFixed(1)} tons</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Food Emissions */}
+              <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <Utensils className="h-5 w-5 text-orange-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800">Food & Diet</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.food.toFixed(1)}</span>
+                        <span className="text-gray-500">tons CO₂e/year</span>
+                      </div>
+                      <p className="text-gray-600 mt-1">From diet choices and food waste</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Diet Impact</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.food * 0.8).toFixed(1)} tons</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Food Waste</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.food * 0.2).toFixed(1)} tons</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Waste Emissions */}
+              <Card className="bg-gradient-to-br from-red-50 to-red-100/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-red-100 rounded-lg">
+                      <Trash2 className="h-5 w-5 text-red-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800">Waste</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.waste.toFixed(1)}</span>
+                        <span className="text-gray-500">tons CO₂e/year</span>
+                      </div>
+                      <p className="text-gray-600 mt-1">From waste and recycling habits</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Total Waste Generated</span>
+                        <span className="font-medium text-gray-900">{(state.waste?.wasteLbs * 0.0005 * 12).toFixed(1)} tons/year</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Recycling Impact</span>
+                        <span className="font-medium text-green-600">-{(state.waste?.wasteLbs * 0.0005 * 12 * (state.waste?.recyclingPercentage / 100) * 0.5).toFixed(1)} tons</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Waste Reduction</span>
+                        <span className="font-medium text-green-600">{state.waste?.minimizesWaste ? '-20%' : '0%'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Tips Section */}
+            <Card className="mt-8 bg-gradient-to-br from-green-50 to-green-100/50">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Quick Impact Tips</h3>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-700 mb-3">Immediate Actions</h4>
+                    <ul className="space-y-2">
+                      {[
+                        'Switch to LED bulbs',
+                        'Use cold water for laundry',
+                        'Reduce meat consumption',
+                        'Start composting'
+                      ].map((tip) => (
+                        <li key={tip} className="flex items-center gap-2 text-gray-600">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-700 mb-3">Long-term Changes</h4>
+                    <ul className="space-y-2">
+                      {[
+                        'Install solar panels',
+                        'Switch to an electric vehicle',
+                        'Improve home insulation',
+                        'Use public transportation'
+                      ].map((tip) => (
+                        <li key={tip} className="flex items-center gap-2 text-gray-600">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+            
+        <TabsContent value="methodology">
+          <div className="space-y-12 mt-6 px-8 max-w-4xl mx-auto">
+            {/* Calculation Methodology */}
+            <div className="space-y-4">
+              <h2 className="text-3xl font-semibold mb-6 text-gray-800">Our Calculation Methodology</h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                This calculator uses peer-reviewed emissions factors from governmental and academic sources including:
+              </p>
+              <ul className="space-y-3 text-gray-600 pl-1">
+                {[
+                  'U.S. Environmental Protection Agency (EPA) emissions factors',
+                  'Intergovernmental Panel on Climate Change (IPCC) guidelines',
+                  'Department of Energy (DOE) data on regional electricity generation',
+                  'Peer-reviewed studies on food lifecycle emissions'
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    {item}
+                  </li>
+                ))}
+                </ul>
+            </div>
+
+            {/* Assumptions & Limitations */}
+            <div className="space-y-4">
+              <h2 className="text-3xl font-semibold mb-6 text-gray-800">Assumptions & Limitations</h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                To provide a user-friendly experience, we make certain assumptions:
+              </p>
+              <ul className="space-y-3 text-gray-600 pl-1">
+                {[
+                  'Electricity emissions are based on average grid mix for your region',
+                  'Vehicle emissions assume average efficiency for each vehicle category',
+                  'Flight emissions include radiative forcing effects at high altitudes',
+                  'Food emissions are based on typical diet patterns within each category'
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    {item}
+                  </li>
+                ))}
+                </ul>
+            </div>
+
+            {/* Data Sources */}
+            <div className="space-y-4">
+              <h2 className="text-3xl font-semibold mb-6 text-gray-800">Data Sources</h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Our emissions factors are regularly updated based on the latest available data from:
+              </p>
+              <ul className="space-y-3 text-gray-600 pl-1">
+                {[
+                  "EPA's Emissions & Generation Resource Integrated Database (eGRID)",
+                  "IPCC's Fifth Assessment Report",
+                  "National Renewable Energy Laboratory (NREL) lifecycle assessments",
+                  "Academic studies published in peer-reviewed journals"
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    {item}
+                  </li>
+                ))}
+                </ul>
+              </div>
+
+            {/* Contact Information */}
+            <div className="text-lg text-gray-600 leading-relaxed border-t pt-8 mt-12">
+              <p>
+                For questions about our methodology or to discuss your specific case, please contact us at{' '}
+                <a href="mailto:sustainability@example.com" className="text-green-700 hover:underline font-medium">
+                  sustainability@example.com
+                </a>
+                .
+              </p>
+            </div>
+
+            {/* Action Section */}
+            <div className="border-t pt-12 mt-12">
+              <h2 className="text-3xl font-semibold mb-4 text-gray-800">Ready to take action?</h2>
+              <p className="text-lg text-gray-600 mb-8">Support verified carbon reduction projects or share your results.</p>
+              <div className="flex gap-4">
+                <Button className="bg-green-700 hover:bg-green-800 text-white px-8 py-6 text-lg h-auto">
+                Offset Now
+              </Button>
+                <Button variant="outline" className="gap-2 px-6 py-6 text-lg h-auto">
+                  <Share2 className="h-5 w-5" />
+                  Share PDF
+              </Button>
+                <Button variant="outline" className="gap-2 px-6 py-6 text-lg h-auto">
+                  <Download className="h-5 w-5" />
+                Download
+              </Button>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
