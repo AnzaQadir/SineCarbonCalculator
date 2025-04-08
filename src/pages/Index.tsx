@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import Hero from '@/components/sections/Hero';
 import Calculator from '@/components/Calculator';
-import ScenarioAnalysis from '@/components/ScenarioAnalysis';
+import ScenarioAnalysis from '@/components/scenarios/ScenarioAnalysis';
 import { Card, CardContent } from '@/components/ui/card';
 import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users } from 'lucide-react';
 import { useCalculator } from '@/hooks/useCalculator';
