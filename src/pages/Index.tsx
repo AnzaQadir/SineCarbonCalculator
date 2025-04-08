@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import Hero from '@/components/sections/Hero';
 import Calculator from '@/components/Calculator';
+import ScenarioAnalysis from '@/components/ScenarioAnalysis';
 import { Card, CardContent } from '@/components/ui/card';
 import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users } from 'lucide-react';
 import { useCalculator } from '@/hooks/useCalculator';
@@ -31,7 +33,7 @@ const Index = () => {
     <Layout>
       <Hero />
       
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white" id="calculator">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
@@ -56,6 +58,8 @@ const Index = () => {
           </div>
         </div>
       </section>
+      
+      <ScenarioAnalysis className="bg-secondary/30" />
       
       <section className="py-20 bg-gradient-to-b from-white to-secondary/30">
         <div className="container mx-auto px-4">
