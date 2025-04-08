@@ -15,37 +15,41 @@ import {
   Legend,
   ReferenceLine 
 } from 'recharts';
-import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { Tooltip as RechartsTooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
+interface CategoryEmissions {
+  home: number;
+  transport: number;
+  food: number;
+  waste: number;
+}
+
+interface Recommendation {
+  category: string;
+  title: string;
+  description: string;
+  impact: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+}
+
 interface ResultsDisplayProps {
   score: number;
   emissions: number;
-  recommendations: Array<{
-    category: string;
-    title: string;
-    description: string;
-    impact: string;
-    difficulty: 'Easy' | 'Medium' | 'Hard';
-  }>;
+  categoryEmissions: CategoryEmissions;
+  recommendations: Recommendation[];
   isVisible: boolean;
-  categoryEmissions: {
-    home: number;
-    transport: number;
-    food: number;
-    waste: number;
-  };
   onReset: () => void;
 }
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   score,
   emissions,
+  categoryEmissions,
   recommendations,
   isVisible,
-  categoryEmissions,
   onReset
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -65,15 +69,133 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     { name: 'Your\nFootprint', value: emissions },
   ];
 
-  const getEcoPersonality = (score: number) => {
-    if (score <= 20) return { title: 'Eco Novice', points: '1/8 Points', description: 'Just starting your sustainable journey. There\'s plenty of room to grow your eco-friendly habits.' };
-    if (score <= 40) return { title: 'Green Starter', points: '2/8 Points', description: 'Taking your first steps towards sustainability. Keep building those eco-friendly habits!' };
-    if (score <= 60) return { title: 'Eco Advocate', points: '4/8 Points', description: 'Making good progress on your sustainability journey. Your choices are making a difference.' };
-    if (score <= 80) return { title: 'Sustainability Pro', points: '6/8 Points', description: 'You\'re a sustainability champion! Your choices significantly reduce your environmental impact.' };
-    return { title: 'Climate Hero', points: '8/8 Points', description: 'Outstanding! You\'re leading the way in sustainable living and inspiring others.' };
+  const getEcoPersonality = (score: number, categoryEmissions: CategoryEmissions) => {
+    // Calculate total emissions and category weights
+    const totalEmissions = Number(categoryEmissions.home) + Number(categoryEmissions.transport) + 
+                          Number(categoryEmissions.food) + Number(categoryEmissions.waste);
+    
+    const weights = {
+      home: Number(categoryEmissions.home) / totalEmissions,
+      transport: Number(categoryEmissions.transport) / totalEmissions,
+      food: Number(categoryEmissions.food) / totalEmissions,
+      waste: Number(categoryEmissions.waste) / totalEmissions
+    };
+
+    // Determine dominant category
+    const dominantCategory = Object.entries(weights).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+
+    // Base personality type based on total emissions and score
+    let personality = {
+      title: '',
+      points: '',
+      description: '',
+      level: 0,
+      badge: '',
+      strengths: [] as string[],
+      nextSteps: [] as string[],
+      subCategory: '',
+      color: ''
+    };
+
+    // Determine level based on score and emissions
+    if (score < 30 || totalEmissions > 16) {
+      personality = {
+        title: 'Eco Novice',
+        points: '1/8 Points',
+        description: 'Just starting your sustainable journey. Every small step counts!',
+        level: 1,
+        badge: '🌱',
+        strengths: ['Taking the first step', 'Open to learning'],
+        nextSteps: ['Try a Meatless Monday', 'Start basic recycling'],
+        subCategory: '',
+        color: 'from-yellow-500 to-yellow-400'
+      };
+    } else if (score < 50 || totalEmissions > 12) {
+      personality = {
+        title: 'Green Starter',
+        points: '2/8 Points',
+        description: 'Building foundational eco-friendly habits. You\'re making progress!',
+        level: 2,
+        badge: '🌿',
+        strengths: ['Growing awareness', 'Basic sustainable practices'],
+        nextSteps: ['Upgrade to LED bulbs', 'Try public transport'],
+        subCategory: '',
+        color: 'from-green-400 to-green-300'
+      };
+    } else if (score < 70 || totalEmissions > 8) {
+      personality = {
+        title: 'Eco Advocate',
+        points: '4/8 Points',
+        description: 'Consistently making sustainable choices. Your impact is growing!',
+        level: 3,
+        badge: '🌳',
+        strengths: ['Regular sustainable practices', 'Influencing others'],
+        nextSteps: ['Install smart thermostats', 'Start composting'],
+        subCategory: '',
+        color: 'from-green-600 to-green-500'
+      };
+    } else if (score < 85 || totalEmissions > 4) {
+      personality = {
+        title: 'Sustainability Pro',
+        points: '6/8 Points',
+        description: 'Leading by example in sustainable living. Impressive commitment!',
+        level: 4,
+        badge: '🌍',
+        strengths: ['Comprehensive approach', 'Community leadership'],
+        nextSteps: ['Consider solar panels', 'Start a community garden'],
+        subCategory: '',
+        color: 'from-blue-600 to-blue-500'
+      };
+    } else {
+      personality = {
+        title: 'Climate Hero',
+        points: '8/8 Points',
+        description: 'Maximum impact achieved! You\'re a beacon of sustainable living.',
+        level: 5,
+        badge: '⭐',
+        strengths: ['Exemplary practices', 'Inspiring others'],
+        nextSteps: ['Mentor others', 'Advocate for policy change'],
+        subCategory: '',
+        color: 'from-purple-600 to-purple-500'
+      };
+    }
+
+    // Add category-specific strengths and next steps based on dominant category and emissions
+    switch(dominantCategory) {
+      case 'home':
+        personality.subCategory = categoryEmissions.home < 4 ? 'Energy Efficiency Expert' : 'Eco Homebody';
+        if (categoryEmissions.home < 4) {
+          personality.strengths.push('Efficient home energy use');
+          personality.nextSteps.push('Install solar panels');
+        }
+        break;
+      case 'transport':
+        personality.subCategory = categoryEmissions.transport < 3 ? 'Green Mobility Champion' : 'Green Traveler';
+        if (categoryEmissions.transport < 3) {
+          personality.strengths.push('Low-carbon transportation');
+          personality.nextSteps.push('Consider an electric vehicle');
+        }
+        break;
+      case 'food':
+        personality.subCategory = categoryEmissions.food < 2 ? 'Sustainable Food Pioneer' : 'Conscious Consumer';
+        if (categoryEmissions.food < 2) {
+          personality.strengths.push('Sustainable diet choices');
+          personality.nextSteps.push('Start a vegetable garden');
+        }
+        break;
+      case 'waste':
+        personality.subCategory = categoryEmissions.waste < 1 ? 'Zero Waste Champion' : 'Zero Waste Warrior';
+        if (categoryEmissions.waste < 1) {
+          personality.strengths.push('Minimal waste generation');
+          personality.nextSteps.push('Start composting');
+        }
+        break;
+    }
+
+    return personality;
   };
 
-  const personality = getEcoPersonality(score);
+  const personality = getEcoPersonality(score, categoryEmissions);
 
   return (
     <div className={cn(
@@ -121,7 +243,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <ArrowLeft className="h-4 w-4" />
           Start Over
         </Button>
-      </div>
+          </div>
 
       {/* Tabs */}
       <Tabs defaultValue="overview" className="w-full">
@@ -129,21 +251,21 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
           <TabsTrigger value="details" className="flex-1">Details</TabsTrigger>
           <TabsTrigger value="methodology" className="flex-1">Methodology</TabsTrigger>
-        </TabsList>
-
+            </TabsList>
+            
         <TabsContent value="overview" className="space-y-8 mt-6">
           {/* Charts Section */}
           <div className="grid grid-cols-2 gap-8 px-6">
-            <div>
+                <div>
               <h3 className="text-xl font-semibold mb-6">Emissions by Category</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
+                      <PieChart>
+                        <Pie
                     data={pieData}
                     dataKey="value"
                     nameKey="name"
-                    cx="50%"
-                    cy="50%"
+                          cx="50%"
+                          cy="50%"
                     innerRadius={0}
                     outerRadius={100}
                     paddingAngle={0}
@@ -158,15 +280,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                         {`${(percent * 100).toFixed(0)}%`}
                       </text>
                     )}
-                    labelLine={false}
+                          labelLine={false}
                   >
                     {pieData.map((entry, index) => (
                       <Cell 
                         key={`cell-${index}`} 
                         fill={COLORS[index % COLORS.length]} 
                       />
-                    ))}
-                  </Pie>
+                          ))}
+                        </Pie>
                   <Legend
                     verticalAlign="bottom"
                     align="center"
@@ -178,25 +300,25 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                       return `${value} (${item?.percentage}%)`;
                     }}
                   />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+                      </PieChart>
+                    </ResponsiveContainer>
+                </div>
 
-            <div>
+                <div>
               <div className="flex items-center gap-2 mb-6">
                 <h3 className="text-xl font-semibold">How You Compare</h3>
                 <RechartsTooltip>
                   <TooltipTrigger asChild>
-                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>See how your carbon footprint compares to average emissions</p>
                   </TooltipContent>
                 </RechartsTooltip>
-              </div>
+                      </div>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={comparisonData}
+                      <BarChart
+                        data={comparisonData}
                   margin={{ top: 20, right: 130, left: -20, bottom: 20 }}
                 >
                   <YAxis
@@ -207,9 +329,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     tick={{ fill: '#64748b', fontSize: 12 }}
                     axisLine={{ stroke: '#e2e8f0' }}
                   />
-                  <XAxis
+                        <XAxis 
                     type="category"
-                    dataKey="name"
+                          dataKey="name" 
                     tick={{ fill: '#64748b', fontSize: 14 }}
                     tickLine={false}
                     axisLine={false}
@@ -220,13 +342,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     radius={[6, 6, 6, 6]} 
                     barSize={40}
                   >
-                    {comparisonData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
+                          {comparisonData.map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
                         fill="#4ade80"
-                      />
-                    ))}
-                  </Bar>
+                            />
+                          ))}
+                        </Bar>
                   <ReferenceLine
                     y={16}
                     stroke="#94a3b8"
@@ -272,39 +394,74 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                       fontWeight: 500
                     }}
                   />
-                </BarChart>
-              </ResponsiveContainer>
+                      </BarChart>
+                    </ResponsiveContainer>
             </div>
           </div>
 
           {/* Eco Personality */}
-          <Card className="bg-green-50">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xl font-semibold text-green-700">Your Eco Personality</h3>
-                  <p className="text-gray-600">Based on your sustainable practices</p>
-                </div>
-                <div className="bg-green-100 rounded-full p-4">
-                  <Leaf className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-              
-              <div className="mt-4">
-                <div className="h-2 bg-gray-200 rounded-full">
-                  <div 
-                    className="h-2 bg-green-500 rounded-full" 
-                    style={{ width: `${(score / 100) * 100}%` }}
-                  />
-                </div>
-                <div className="mt-2 flex justify-end">
-                  <span className="text-sm text-gray-600">{personality.points}</span>
+          <Card className="bg-white overflow-hidden">
+            <CardContent className="p-0">
+              <div className={`bg-gradient-to-r ${personality.color} p-8 text-white`}>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-4xl">{personality.badge}</span>
+                      <div>
+                        <h3 className="text-2xl font-bold">{personality.title}</h3>
+                        {personality.subCategory && (
+                          <span className="text-white/90 text-sm">{personality.subCategory}</span>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-white/90 text-lg">{personality.description}</p>
+                  </div>
+                  <div className="bg-white/20 rounded-full p-4 backdrop-blur-sm">
+                    <Leaf className="h-8 w-8" />
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-4">
-                <h4 className="text-lg font-semibold">{personality.title}</h4>
-                <p className="text-gray-600">{personality.description}</p>
+              <div className="p-8 space-y-6">
+                {/* Progress Bar */}
+                <div>
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Progress to Next Level</span>
+                    <span>{personality.points}</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full bg-gradient-to-r ${personality.color}`}
+                      style={{ width: `${(score / 100) * 100}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Strengths */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Your Strengths</h4>
+                  <ul className="space-y-2">
+                    {personality.strengths.map((strength, index) => (
+                      <li key={index} className="flex items-center gap-2 text-gray-600">
+                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${personality.color}`} />
+                        {strength}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Next Steps */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Next Steps</h4>
+                  <ul className="space-y-2">
+                    {personality.nextSteps.map((step, index) => (
+                      <li key={index} className="flex items-center gap-2 text-gray-600">
+                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${personality.color}`} />
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -315,7 +472,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <p className="text-gray-600">Based on your responses, we've identified these opportunities to reduce your carbon footprint:</p>
             
             <div className="grid grid-cols-2 gap-4">
-              {recommendations.map((rec, index) => (
+                {recommendations.map((rec, index) => (
                 <div 
                   key={index} 
                   className={cn(
@@ -335,8 +492,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                         )}
                       >
                         {rec.difficulty}
-                      </span>
-                    </div>
+                        </span>
+                      </div>
 
                     <h3 className="text-xl font-semibold mb-2">{rec.title}</h3>
                     <p className="text-gray-600 mb-4">{rec.description}</p>
@@ -346,9 +503,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                       <span className="text-sm">{rec.impact}</span>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                      </div>
+                ))}
+              </div>
           </div>
 
           {/* Action Buttons */}
@@ -368,129 +525,228 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 <Download className="h-4 w-4" />
                 Download
               </Button>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="details">
-          <div className="space-y-8 mt-6 px-4">
-            <div className="grid grid-cols-2 gap-8">
-              {/* Home Emissions */}
-              <Card className="p-8 hover:shadow-lg transition-shadow duration-200">
-                <h3 className="text-2xl font-semibold mb-4 text-gray-800">Home Emissions</h3>
-                <div className="space-y-3">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-5xl font-bold text-gray-900">{categoryEmissions.home.toFixed(2)}</span>
-                    <span className="text-lg text-gray-500">metric tons</span>
-                  </div>
-                  <p className="text-gray-600 text-lg">From electricity, heating, and cooking</p>
                 </div>
-                <ul className="mt-6 space-y-3 text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    Electricity: {(categoryEmissions.home * 0.57).toFixed(2)} tons
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    Natural Gas: {(categoryEmissions.home * 0.43).toFixed(2)} tons
-                  </li>
-                </ul>
+              </div>
+            </TabsContent>
+            
+        <TabsContent value="details">
+          <div className="space-y-6 mt-6">
+            <div className="grid grid-cols-2 gap-4">
+              {/* Not Driving Card */}
+              <div className="bg-rose-500 rounded-xl p-6 text-white">
+                <div className="flex flex-col h-full">
+                  <Car className="h-8 w-8 mb-4" />
+                  <h3 className="text-2xl font-semibold mb-2">Opted not to drive</h3>
+                  <div className="mt-auto">
+                    <p className="text-2xl font-bold">{(0.5).toFixed(1)}t CO₂e</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Plant-Rich Diet Card */}
+              <div className="bg-amber-500 rounded-xl p-6 text-white">
+                <div className="flex flex-col h-full">
+                  <Utensils className="h-8 w-8 mb-4" />
+                  <h3 className="text-2xl font-semibold mb-2">Ate a plant-rich diet</h3>
+                  <div className="mt-auto">
+                    <p className="text-2xl font-bold">{(0.3).toFixed(1)}t CO₂e</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Air Travel Card */}
+              <div className="bg-blue-500 rounded-xl p-6 text-white">
+                <div className="flex flex-col h-full">
+                  <Plane className="h-8 w-8 mb-4" />
+                  <h3 className="text-2xl font-semibold mb-2">Avoided air travel</h3>
+                  <div className="mt-auto">
+                    <p className="text-2xl font-bold">{(0.1).toFixed(1)}t CO₂e</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Green Energy Card */}
+              <div className="bg-purple-500 rounded-xl p-6 text-white">
+                <div className="flex flex-col h-full">
+                  <Zap className="h-8 w-8 mb-4" />
+                  <h3 className="text-2xl font-semibold mb-2">Bought green energy</h3>
+                  <div className="mt-auto">
+                    <p className="text-2xl font-bold">{(0.1).toFixed(1)}t CO₂e</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Category Details */}
+            <div className="grid grid-cols-2 gap-6 mt-8">
+              {/* Home Emissions */}
+              <Card className="bg-gradient-to-br from-green-50 to-green-100/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <Home className="h-5 w-5 text-green-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800">Home Energy</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.home.toFixed(1)}</span>
+                        <span className="text-gray-500">tons CO₂e/year</span>
+                      </div>
+                      <p className="text-gray-600 mt-1">From electricity and heating</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Electricity</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.home * 0.6).toFixed(1)} tons</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Heating</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.home * 0.4).toFixed(1)} tons</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
               </Card>
 
-              {/* Transportation Emissions */}
-              <Card className="p-8 hover:shadow-lg transition-shadow duration-200">
-                <h3 className="text-2xl font-semibold mb-4 text-gray-800">Transportation Emissions</h3>
-                <div className="space-y-3">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-5xl font-bold text-gray-900">{categoryEmissions.transport.toFixed(2)}</span>
-                    <span className="text-lg text-gray-500">metric tons</span>
+              {/* Transport Emissions */}
+              <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Car className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800">Transport</h3>
                   </div>
-                  <p className="text-gray-600 text-lg">From driving, flying, and public transit</p>
-                </div>
-                <ul className="mt-6 space-y-3 text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    Car (medium): {(categoryEmissions.transport * 0.82).toFixed(2)} tons
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    Flights: {(categoryEmissions.transport * 0.18).toFixed(2)} tons
-                  </li>
-                </ul>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.transport.toFixed(1)}</span>
+                        <span className="text-gray-500">tons CO₂e/year</span>
+                      </div>
+                      <p className="text-gray-600 mt-1">From daily commute and travel</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Car Travel</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.transport * 0.7).toFixed(1)} tons</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Public Transit</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.transport * 0.3).toFixed(1)} tons</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
               </Card>
 
               {/* Food Emissions */}
-              <Card className="p-8 hover:shadow-lg transition-shadow duration-200">
-                <h3 className="text-2xl font-semibold mb-4 text-gray-800">Food Emissions</h3>
-                <div className="space-y-3">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-5xl font-bold text-gray-900">{categoryEmissions.food.toFixed(2)}</span>
-                    <span className="text-lg text-gray-500">metric tons</span>
+              <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <Utensils className="h-5 w-5 text-orange-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800">Food & Diet</h3>
                   </div>
-                  <p className="text-gray-600 text-lg">Based on your average diet</p>
-                </div>
-                <div className="mt-6 text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    Adopting a plant-based diet even 1-2 days per week can reduce this significantly
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.food.toFixed(1)}</span>
+                        <span className="text-gray-500">tons CO₂e/year</span>
+                      </div>
+                      <p className="text-gray-600 mt-1">From diet choices and food waste</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Diet Impact</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.food * 0.8).toFixed(1)} tons</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Food Waste</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.food * 0.2).toFixed(1)} tons</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </CardContent>
               </Card>
 
               {/* Waste Emissions */}
-              <Card className="p-8 hover:shadow-lg transition-shadow duration-200">
-                <h3 className="text-2xl font-semibold mb-4 text-gray-800">Waste Emissions</h3>
-                <div className="space-y-3">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-5xl font-bold text-gray-900">{categoryEmissions.waste.toFixed(2)}</span>
-                    <span className="text-lg text-gray-500">metric tons</span>
+              <Card className="bg-gradient-to-br from-red-50 to-red-100/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-red-100 rounded-lg">
+                      <Trash2 className="h-5 w-5 text-red-600" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800">Waste</h3>
                   </div>
-                  <p className="text-gray-600 text-lg">From garbage and recycling habits</p>
-                </div>
-                <ul className="mt-6 space-y-3 text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    Recycling rate: 30%
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    Composting food waste can reduce methane emissions from landfills
-                  </li>
-                </ul>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.waste.toFixed(1)}</span>
+                        <span className="text-gray-500">tons CO₂e/year</span>
+                      </div>
+                      <p className="text-gray-600 mt-1">From waste and recycling</p>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Landfill Waste</span>
+                        <span className="font-medium text-gray-900">{(categoryEmissions.waste * 0.7).toFixed(1)} tons</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Recycling Impact</span>
+                        <span className="font-medium text-gray-900">-{(categoryEmissions.waste * 0.3).toFixed(1)} tons</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
               </Card>
             </div>
 
             {/* Tips Section */}
-            <Card className="p-8 bg-gradient-to-br from-green-50 to-green-100/50 mt-8 hover:shadow-lg transition-shadow duration-200">
-              <h3 className="text-2xl font-semibold mb-6 text-gray-800">Tips to Reduce Your Footprint</h3>
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <h4 className="text-lg font-semibold mb-4 text-gray-700">Quick Wins</h4>
-                  <ul className="space-y-3 text-gray-600">
-                    {['Switch to LED bulbs', 'Use cold water for laundry', 'Reduce meat consumption', 'Start composting'].map((tip) => (
-                      <li key={tip} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        {tip}
-                      </li>
-                    ))}
-                  </ul>
+            <Card className="mt-8 bg-gradient-to-br from-green-50 to-green-100/50">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Quick Impact Tips</h3>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-700 mb-3">Immediate Actions</h4>
+                    <ul className="space-y-2">
+                      {[
+                        'Switch to LED bulbs',
+                        'Use cold water for laundry',
+                        'Reduce meat consumption',
+                        'Start composting'
+                      ].map((tip) => (
+                        <li key={tip} className="flex items-center gap-2 text-gray-600">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-700 mb-3">Long-term Changes</h4>
+                    <ul className="space-y-2">
+                      {[
+                        'Install solar panels',
+                        'Switch to an electric vehicle',
+                        'Improve home insulation',
+                        'Use public transportation'
+                      ].map((tip) => (
+                        <li key={tip} className="flex items-center gap-2 text-gray-600">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-lg font-semibold mb-4 text-gray-700">Long-term Impact</h4>
-                  <ul className="space-y-3 text-gray-600">
-                    {['Install solar panels', 'Switch to an electric vehicle', 'Improve home insulation', 'Use public transportation'].map((tip) => (
-                      <li key={tip} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        {tip}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+              </CardContent>
             </Card>
           </div>
         </TabsContent>
-
+            
         <TabsContent value="methodology">
           <div className="space-y-12 mt-6 px-8 max-w-4xl mx-auto">
             {/* Calculation Methodology */}
@@ -511,7 +767,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     {item}
                   </li>
                 ))}
-              </ul>
+                </ul>
             </div>
 
             {/* Assumptions & Limitations */}
@@ -532,7 +788,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     {item}
                   </li>
                 ))}
-              </ul>
+                </ul>
             </div>
 
             {/* Data Sources */}
@@ -553,8 +809,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     {item}
                   </li>
                 ))}
-              </ul>
-            </div>
+                </ul>
+              </div>
 
             {/* Contact Information */}
             <div className="text-lg text-gray-600 leading-relaxed border-t pt-8 mt-12">
@@ -573,16 +829,16 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               <p className="text-lg text-gray-600 mb-8">Support verified carbon reduction projects or share your results.</p>
               <div className="flex gap-4">
                 <Button className="bg-green-700 hover:bg-green-800 text-white px-8 py-6 text-lg h-auto">
-                  Offset Now
-                </Button>
+                Offset Now
+              </Button>
                 <Button variant="outline" className="gap-2 px-6 py-6 text-lg h-auto">
                   <Share2 className="h-5 w-5" />
                   Share PDF
-                </Button>
+              </Button>
                 <Button variant="outline" className="gap-2 px-6 py-6 text-lg h-auto">
                   <Download className="h-5 w-5" />
-                  Download
-                </Button>
+                Download
+              </Button>
               </div>
             </div>
           </div>

@@ -166,56 +166,39 @@ const Calculator: React.FC<CalculatorProps> = ({
     let foodEmissions = 0;
     let wasteEmissions = 0;
 
-    // Diet score calculation
-    switch (state.dietType) {
-      case 'VEGAN':
-        score += 10;
-        foodEmissions += 1.5;
-        break;
-      case 'VEGETARIAN':
-        score += 8;
-        foodEmissions += 1.9;
-        break;
-      case 'MEAT_MODERATE':
-        score += 4;
-        foodEmissions += 2.5;
-        break;
-      case 'MEAT_HEAVY':
-        score += 2;
-        foodEmissions += 3.3;
-        break;
-      default:
-        score += 4;
-        foodEmissions += 2.5;
-    }
+    // Home energy score and emissions
+    homeEmissions += (state.electricityKwh * 0.0005);
+    homeEmissions += (state.naturalGasTherm * 0.005);
+    homeEmissions += (state.heatingOilGallons * 0.01);
+    homeEmissions += (state.propaneGallons * 0.005);
+    
+    // Add points for energy-saving practices
+    if (state.usesRenewableEnergy) score += 10;
+    if (state.hasEnergyEfficiencyUpgrades) score += 5;
+    if (state.hasSmartThermostats) score += 3;
+    if (state.hasEnergyStarAppliances) score += 2;
 
-    // Home energy emissions
-    homeEmissions += (state.electricityKwh * 0.0005); // Example conversion factor
-    homeEmissions += (state.naturalGasTherm * 0.005); // Example conversion factor
-    homeEmissions += (state.heatingOilGallons * 0.01); // Example conversion factor
-    homeEmissions += (state.propaneGallons * 0.005); // Example conversion factor
-
-    // Transportation emissions
+    // Transportation score and emissions
     switch (state.primaryTransportMode) {
       case 'WALK_BIKE':
-        score += 10;
+        score += 15;
         transportEmissions += 0;
         break;
       case 'PUBLIC':
-        score += 8;
+        score += 12;
         transportEmissions += 1.5;
         break;
       case 'HYBRID':
       case 'ELECTRIC':
-        score += 6;
+        score += 10;
         transportEmissions += 2;
         break;
       case 'SMALL_CAR':
-        score += 4;
+        score += 6;
         transportEmissions += 3;
         break;
       case 'MEDIUM_CAR':
-        score += 3;
+        score += 4;
         transportEmissions += 4;
         break;
       case 'LARGE_CAR':
@@ -224,16 +207,61 @@ const Calculator: React.FC<CalculatorProps> = ({
         break;
     }
 
-    // Waste emissions
-    wasteEmissions = state.waste.wasteLbs * 0.0005; // Example conversion factor
-    if (state.waste.minimizesWaste) wasteEmissions *= 0.8;
-    if (state.waste.recyclingPercentage > 50) wasteEmissions *= 0.7;
+    // Add points for sustainable transport practices
+    if (state.offsetsTravelEmissions) score += 5;
+    if (state.usesActiveTransport) score += 5;
+    if (state.hasElectricVehicle) score += 8;
+
+    // Diet score and emissions
+    switch (state.dietType) {
+      case 'VEGAN':
+        score += 15;
+        foodEmissions += 1.5;
+        break;
+      case 'VEGETARIAN':
+        score += 12;
+        foodEmissions += 1.9;
+        break;
+      case 'MEAT_MODERATE':
+        score += 6;
+        foodEmissions += 2.5;
+        break;
+      case 'MEAT_HEAVY':
+        score += 2;
+        foodEmissions += 3.3;
+        break;
+    }
+
+    // Add points for sustainable food practices
+    if (state.buysLocalFood) score += 3;
+    if (state.followsSustainableDiet) score += 3;
+    if (state.growsOwnFood) score += 4;
+    if (state.compostsFood) score += 3;
+    if (state.usesMealPlanning) score += 2;
+    score += state.plantBasedMealsPerWeek;
+
+    // Waste score and emissions
+    wasteEmissions = state.waste.wasteLbs * 0.0005;
+    if (state.waste.minimizesWaste) {
+      score += 5;
+      wasteEmissions *= 0.8;
+    }
+    if (state.waste.recyclingPercentage > 0) {
+      score += Math.min(10, state.waste.recyclingPercentage / 10);
+      wasteEmissions *= (1 - (state.waste.recyclingPercentage / 100) * 0.5);
+    }
+    
+    // Add points for waste reduction practices
+    if (state.waste.avoidsPlastic) score += 4;
+    if (state.waste.evaluatesLifecycle) score += 3;
+    score += state.waste.consciousPurchasing * 2;
 
     // Total emissions
     emissions = homeEmissions + transportEmissions + foodEmissions + wasteEmissions;
 
     // Normalize score to 0-100 range
-    const normalizedScore = Math.min(100, Math.max(0, score));
+    // Maximum possible score is around 120, so we'll normalize to 100
+    const normalizedScore = Math.min(100, Math.max(0, (score / 120) * 100));
 
     return {
       score: normalizedScore,
@@ -558,7 +586,7 @@ const Calculator: React.FC<CalculatorProps> = ({
                 />
               </div>
             </div>
-          </div>
+                </div>
                 
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-4">
                   <div className="flex items-start">
@@ -666,7 +694,7 @@ const Calculator: React.FC<CalculatorProps> = ({
                 <p>Do you offset your travel emissions through carbon credits or other means?</p>
               </TooltipContent>
             </Tooltip>
-                  </div>
+          </div>
           <div className="flex items-center justify-center">
             <YesNoToggle
               value={state.offsetsTravelEmissions}
@@ -685,7 +713,7 @@ const Calculator: React.FC<CalculatorProps> = ({
             Choosing sustainable modes of transport, reducing travel distance, and offsetting 
             emissions can help lower your environmental impact.
           </p>
-        </div>
+              </div>
             </CardContent>
           </div>
         );
@@ -1051,8 +1079,8 @@ const Calculator: React.FC<CalculatorProps> = ({
               value={state.waste.evaluatesLifecycle}
               onChange={(value) => onUpdate({ waste: { ...state.waste, evaluatesLifecycle: value } })}
             />
-          </div>
-        </div>
+                </div>
+              </div>
 
               <div className="mt-6 bg-muted/30 p-4 rounded-lg">
                 <h4 className="font-medium mb-2 flex items-center">
