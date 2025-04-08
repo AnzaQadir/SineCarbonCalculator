@@ -241,14 +241,23 @@ const Calculator: React.FC<CalculatorProps> = ({
     score += state.plantBasedMealsPerWeek;
 
     // Waste score and emissions
-    wasteEmissions = state.waste.wasteLbs * 0.0005;
-    if (state.waste.minimizesWaste) {
-      score += 5;
-      wasteEmissions *= 0.8;
-    }
+    // Convert monthly waste to annual and calculate base emissions
+    // Base conversion: 1 lb of waste = 0.0005 tons CO2e
+    const monthlyWaste = state.waste.wasteLbs || 0;
+    const annualWaste = monthlyWaste * 12;
+    wasteEmissions = annualWaste * 0.0005;
+    
+    // Apply recycling reduction
     if (state.waste.recyclingPercentage > 0) {
+      const recyclingReduction = (state.waste.recyclingPercentage / 100) * 0.5; // Up to 50% reduction based on recycling
+      wasteEmissions *= (1 - recyclingReduction);
       score += Math.min(10, state.waste.recyclingPercentage / 10);
-      wasteEmissions *= (1 - (state.waste.recyclingPercentage / 100) * 0.5);
+    }
+    
+    // Apply waste minimization reduction
+    if (state.waste.minimizesWaste) {
+      wasteEmissions *= 0.8; // 20% reduction for waste minimization efforts
+      score += 5;
     }
     
     // Add points for waste reduction practices
@@ -282,38 +291,39 @@ const Calculator: React.FC<CalculatorProps> = ({
       title: string;
       description: string;
       impact: string;
-      difficulty: 'Easy' | 'Medium' | 'Hard';
+      difficulty: 'Easy' | 'Medium';
     }> = [];
 
+    // Add waste-related recommendations
     if (!state.waste.minimizesWaste || state.waste.recyclingPercentage < 50) {
       recommendations.push({
         category: 'Waste',
         title: 'Increase Recycling Efforts',
         description: 'Increasing your recycling rate and composting organic waste can significantly reduce methane emissions from landfills.',
         impact: 'Could save up to 0.5 tons CO2e per year',
-        difficulty: 'Easy' as const
+        difficulty: 'Easy'
       });
     }
 
+    // Add energy-related recommendations
     if (!state.usesRenewableEnergy) {
       recommendations.push({
-        category: 'General',
+        category: 'Energy',
         title: 'Switch to Renewable Energy',
         description: 'Check if your utility offers renewable energy options or consider installing solar panels.',
         impact: 'Could save up to 3 tons CO2e per year',
-        difficulty: 'Medium' as const
+        difficulty: 'Medium'
       });
     }
 
-    if (recommendations.length < 3) {
-      recommendations.push({
-        category: 'General',
-        title: 'Reduce, Reuse, Recycle',
-        description: 'Follow the waste hierarchy: reduce what you consume, reuse items when possible, and recycle what can\'t be reused.',
-        impact: 'Could save up to 1 ton CO2e per year',
-        difficulty: 'Easy' as const
-      });
-    }
+    // Add general recommendations
+    recommendations.push({
+      category: 'General',
+      title: 'Reduce, Reuse, Recycle',
+      description: 'Follow the waste hierarchy: reduce what you consume, reuse items when possible, and recycle what can\'t be reused.',
+      impact: 'Could save up to 1 ton CO2e per year',
+      difficulty: 'Easy'
+    });
 
     return recommendations;
   };
@@ -1354,6 +1364,7 @@ const Calculator: React.FC<CalculatorProps> = ({
           categoryEmissions={calculationResults.categoryEmissions}
           isVisible={showResults}
           onReset={handleReset}
+          state={state}
         />
       ) : null}
     </div>

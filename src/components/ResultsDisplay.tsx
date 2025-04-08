@@ -15,7 +15,9 @@ import {
   Legend,
   ReferenceLine 
 } from 'recharts';
-import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
+  Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { Tooltip as RechartsTooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -29,10 +31,18 @@ interface CategoryEmissions {
 
 interface Recommendation {
   category: string;
+  difficulty: 'Easy' | 'Medium';
   title: string;
   description: string;
   impact: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
+}
+
+interface Achievement {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  color: string;
+  description?: string;
 }
 
 interface ResultsDisplayProps {
@@ -42,7 +52,96 @@ interface ResultsDisplayProps {
   recommendations: Recommendation[];
   isVisible: boolean;
   onReset: () => void;
+  state: any;
 }
+
+const getAchievements = (state: any, categoryEmissions: CategoryEmissions): Achievement[] => {
+  const achievements: Achievement[] = [];
+
+  // Transport achievements
+  if (state?.primaryTransportMode === 'WALK_BIKE') {
+    achievements.push({
+      title: 'Opted not to drive',
+      value: 0.5,
+      icon: <Bike className="h-8 w-8" />,
+      color: 'bg-rose-500',
+      description: 'Choosing active transport'
+    });
+  } else if (state?.primaryTransportMode === 'PUBLIC') {
+    achievements.push({
+      title: 'Used public transit',
+      value: 0.4,
+      icon: <Bus className="h-8 w-8" />,
+      color: 'bg-rose-500',
+      description: 'Choosing sustainable transport'
+    });
+  }
+
+  // Diet achievements
+  if (state?.dietType === 'VEGAN') {
+    achievements.push({
+      title: 'Plant-based diet',
+      value: 0.3,
+      icon: <Apple className="h-8 w-8" />,
+      color: 'bg-amber-500',
+      description: '100% plant-based choices'
+    });
+  } else if (state?.dietType === 'VEGETARIAN') {
+    achievements.push({
+      title: 'Vegetarian diet',
+      value: 0.2,
+      icon: <Utensils className="h-8 w-8" />,
+      color: 'bg-amber-500',
+      description: 'Meat-free choices'
+    });
+  }
+
+  // Air travel achievements
+  if (!state?.flightMiles || state?.flightMiles === 0) {
+    achievements.push({
+      title: 'Avoided air travel',
+      value: 0.1,
+      icon: <Plane className="h-8 w-8" />,
+      color: 'bg-blue-500',
+      description: 'Zero flight emissions'
+    });
+  }
+
+  // Energy achievements
+  if (state?.usesRenewableEnergy) {
+    achievements.push({
+      title: 'Green energy',
+      value: 0.1,
+      icon: <Wind className="h-8 w-8" />,
+      color: 'bg-purple-500',
+      description: 'Using renewable sources'
+    });
+  }
+
+  // Waste achievements
+  if (state?.waste?.recyclingPercentage > 75) {
+    achievements.push({
+      title: 'High recycling',
+      value: 0.15,
+      icon: <Recycle className="h-8 w-8" />,
+      color: 'bg-green-500',
+      description: '75%+ recycling rate'
+    });
+  }
+
+  // Energy efficiency
+  if (state?.hasEnergyEfficiencyUpgrades) {
+    achievements.push({
+      title: 'Energy efficient',
+      value: 0.2,
+      icon: <Battery className="h-8 w-8" />,
+      color: 'bg-indigo-500',
+      description: 'Upgraded efficiency'
+    });
+  }
+
+  return achievements;
+};
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   score,
@@ -50,7 +149,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   categoryEmissions,
   recommendations,
   isVisible,
-  onReset
+  onReset,
+  state
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -196,6 +296,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   };
 
   const personality = getEcoPersonality(score, categoryEmissions);
+
+  // Get achievements based on state
+  const achievements = getAchievements(state, categoryEmissions);
 
   return (
     <div className={cn(
@@ -509,73 +612,78 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="space-y-4">
-            <h3 className="text-xl">Ready to take action?</h3>
-            <p className="text-gray-600">Support verified carbon reduction projects or share your results.</p>
+          <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-8 mt-8 border border-primary/20">
+            <h2 className="text-2xl font-semibold mb-4 text-center">Ready to Take Action?</h2>
+            <p className="text-center text-muted-foreground mb-6 max-w-xl mx-auto">
+              Support verified carbon reduction projects or share your results to inspire others in their sustainability journey.
+            </p>
             
-            <div className="flex gap-4">
-              <Button className="bg-green-700 hover:bg-green-800 text-white">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button 
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2"
+              >
+                <Leaf className="h-5 w-5" />
                 Offset Now
               </Button>
-              <Button variant="outline" className="gap-2">
-                <Share2 className="h-4 w-4" />
+              
+              <Button 
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2 border-2"
+              >
+                <Share className="h-5 w-5" />
                 Share PDF
               </Button>
-              <Button variant="outline" className="gap-2">
-                <Download className="h-4 w-4" />
+              
+              <Button 
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2 border-2"
+              >
+                <Download className="h-5 w-5" />
                 Download
               </Button>
-                </div>
-              </div>
-            </TabsContent>
+            </div>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Your actions matter! By offsetting or sharing, you contribute to global sustainability efforts.
+              </p>
+            </div>
+          </div>
+        </TabsContent>
             
         <TabsContent value="details">
           <div className="space-y-6 mt-6">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Not Driving Card */}
-              <div className="bg-rose-500 rounded-xl p-6 text-white">
-                <div className="flex flex-col h-full">
-                  <Car className="h-8 w-8 mb-4" />
-                  <h3 className="text-2xl font-semibold mb-2">Opted not to drive</h3>
-                  <div className="mt-auto">
-                    <p className="text-2xl font-bold">{(0.5).toFixed(1)}t CO₂e</p>
+            {/* Achievement Cards */}
+            {achievements.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4">
+                {achievements.map((achievement, index) => (
+                  <div 
+                    key={index} 
+                    className={`${achievement.color} rounded-xl p-6 text-white`}
+                  >
+                    <div className="flex flex-col h-full">
+                      {achievement.icon}
+                      <h3 className="text-2xl font-semibold mb-2 mt-4">{achievement.title}</h3>
+                      {achievement.description && (
+                        <p className="text-white/80 text-sm mb-4">{achievement.description}</p>
+                      )}
+                      <div className="mt-auto">
+                        <p className="text-2xl font-bold">{achievement.value.toFixed(1)}t CO₂e</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-
-              {/* Plant-Rich Diet Card */}
-              <div className="bg-amber-500 rounded-xl p-6 text-white">
-                <div className="flex flex-col h-full">
-                  <Utensils className="h-8 w-8 mb-4" />
-                  <h3 className="text-2xl font-semibold mb-2">Ate a plant-rich diet</h3>
-                  <div className="mt-auto">
-                    <p className="text-2xl font-bold">{(0.3).toFixed(1)}t CO₂e</p>
-                  </div>
-                </div>
+            ) : (
+              <div className="text-center py-8 bg-gray-50 rounded-xl">
+                <PackageCheck className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600">No Achievements Yet</h3>
+                <p className="text-gray-500 mt-2">Complete more sustainable actions to unlock achievements!</p>
               </div>
-
-              {/* Air Travel Card */}
-              <div className="bg-blue-500 rounded-xl p-6 text-white">
-                <div className="flex flex-col h-full">
-                  <Plane className="h-8 w-8 mb-4" />
-                  <h3 className="text-2xl font-semibold mb-2">Avoided air travel</h3>
-                  <div className="mt-auto">
-                    <p className="text-2xl font-bold">{(0.1).toFixed(1)}t CO₂e</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Green Energy Card */}
-              <div className="bg-purple-500 rounded-xl p-6 text-white">
-                <div className="flex flex-col h-full">
-                  <Zap className="h-8 w-8 mb-4" />
-                  <h3 className="text-2xl font-semibold mb-2">Bought green energy</h3>
-                  <div className="mt-auto">
-                    <p className="text-2xl font-bold">{(0.1).toFixed(1)}t CO₂e</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
 
             {/* Category Details */}
             <div className="grid grid-cols-2 gap-6 mt-8">
@@ -687,16 +795,20 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                         <span className="text-4xl font-bold text-gray-900">{categoryEmissions.waste.toFixed(1)}</span>
                         <span className="text-gray-500">tons CO₂e/year</span>
                       </div>
-                      <p className="text-gray-600 mt-1">From waste and recycling</p>
+                      <p className="text-gray-600 mt-1">From waste and recycling habits</p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Landfill Waste</span>
-                        <span className="font-medium text-gray-900">{(categoryEmissions.waste * 0.7).toFixed(1)} tons</span>
+                        <span className="text-gray-600">Total Waste Generated</span>
+                        <span className="font-medium text-gray-900">{(state.waste?.wasteLbs * 0.0005 * 12).toFixed(1)} tons/year</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-600">Recycling Impact</span>
-                        <span className="font-medium text-gray-900">-{(categoryEmissions.waste * 0.3).toFixed(1)} tons</span>
+                        <span className="font-medium text-green-600">-{(state.waste?.wasteLbs * 0.0005 * 12 * (state.waste?.recyclingPercentage / 100) * 0.5).toFixed(1)} tons</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Waste Reduction</span>
+                        <span className="font-medium text-green-600">{state.waste?.minimizesWaste ? '-20%' : '0%'}</span>
                       </div>
                     </div>
                   </div>
