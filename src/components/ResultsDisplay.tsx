@@ -16,13 +16,16 @@ import {
   ReferenceLine 
 } from 'recharts';
 import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
-  Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2, Check
+  Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2, Check, BookOpen
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { Tooltip as RechartsTooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { determineEcoPersonality } from '@/utils/ecoPersonality';
 import useSound from 'use-sound';
+import { EcoAvatar } from '@/components/EcoAvatar';
+import { getOutfitForPersonality, getAccessoryForPersonality, getBackgroundForCategory } from '@/utils/ecoPersonality';
+import { Badge } from '@/components/ui/badge';
 
 interface CategoryEmissions {
   home: number;
@@ -145,6 +148,19 @@ const getAchievements = (state: any, categoryEmissions: CategoryEmissions): Achi
   return achievements;
 };
 
+const getPersonalityRole = (personalityTitle: string): 'pioneer' | 'guardian' | 'innovator' | 'advocate' => {
+  switch (personalityTitle) {
+    case 'Sustainability Slayer':
+      return 'pioneer';
+    case "Planet's Main Character":
+      return 'innovator';
+    case 'Sustainability Soft Launch':
+      return 'guardian';
+    default:
+      return 'advocate';
+  }
+};
+
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   score,
   emissions,
@@ -156,8 +172,107 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isPersonalityLoading, setIsPersonalityLoading] = useState(true);
+  const [isGeneratingStory, setIsGeneratingStory] = useState(false);
+  const [generatedStory, setGeneratedStory] = useState<string | null>(null);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [playRevealSound] = useSound('/sounds/reveal.mp3');
   const [playSuccessSound] = useSound('/sounds/success.mp3');
+
+  // Calculate dominant category
+  const categoryScores = {
+    home: (state.homeEfficiency === 'A' ? 3 : state.homeEfficiency === 'B' ? 2 : 1) +
+          (state.energyManagement === 'A' ? 3 : state.energyManagement === 'B' ? 2 : 1),
+    transport: (state.primaryTransportMode === 'A' ? 3 : state.primaryTransportMode === 'B' ? 2 : 1) +
+               (state.carProfile === 'A' ? 3 : state.carProfile === 'B' ? 2 : 1),
+    food: (state.dietType === 'VEGAN' ? 3 : state.dietType === 'VEGETARIAN' ? 2 : 1) +
+          (state.plateProfile === 'A' ? 3 : state.plateProfile === 'B' ? 2 : 1),
+    waste: (state.waste?.wastePrevention === 'A' ? 3 : state.waste?.wastePrevention === 'B' ? 2 : 1) +
+           (state.waste?.wasteManagement === 'A' ? 3 : state.waste?.wasteManagement === 'B' ? 2 : 1)
+  };
+
+  const dominantCategory = Object.entries(categoryScores)
+    .reduce((a, b) => a[1] > b[1] ? a : b)[0];
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'home':
+        return <Home className="h-5 w-5" />;
+      case 'transport':
+        return <Car className="h-5 w-5" />;
+      case 'food':
+        return <Utensils className="h-5 w-5" />;
+      case 'waste':
+        return <Trash2 className="h-5 w-5" />;
+      default:
+        return <Info className="h-5 w-5" />;
+    }
+  };
+
+  const getCategoryTitle = (category: string) => {
+    return category.charAt(0).toUpperCase() + category.slice(1);
+  };
+
+  const getStepIcon = (index: number) => {
+    const icons = [
+      <Leaf key="leaf" className="h-5 w-5" />,
+      <Zap key="zap" className="h-5 w-5" />,
+      <Share2 key="share" className="h-5 w-5" />
+    ];
+    return icons[index % icons.length];
+  };
+
+  const getStepDescription = (step: string) => {
+    // Add custom descriptions based on the step
+    const descriptions: Record<string, string> = {
+      'Start a community sustainability initiative': 'Connect with local environmental groups and organize eco-friendly events.',
+      'Mentor others in eco-friendly practices': 'Share your knowledge and experience with those starting their sustainability journey.',
+      'Advocate for environmental policies': 'Get involved in local government and support green initiatives.',
+      // Add more descriptions as needed
+    };
+    return descriptions[step] || 'Take this step to reduce your environmental impact.';
+  };
+
+  const getStepDifficulty = (step: string) => {
+    // Add custom difficulty levels based on the step
+    const difficulties: Record<string, string> = {
+      'Start a community sustainability initiative': 'Medium',
+      'Mentor others in eco-friendly practices': 'Easy',
+      'Advocate for environmental policies': 'Hard',
+      // Add more difficulties as needed
+    };
+    return difficulties[step] || 'Medium';
+  };
+
+  const getStepImpact = (step: string) => {
+    // Add custom impact levels based on the step
+    const impacts: Record<string, string> = {
+      'Start a community sustainability initiative': 'High Impact',
+      'Mentor others in eco-friendly practices': 'Medium Impact',
+      'Advocate for environmental policies': 'Very High Impact',
+      // Add more impacts as needed
+    };
+    return impacts[step] || 'Medium Impact';
+  };
+
+  const generatePersonalizedStory = async () => {
+    setIsGeneratingStory(true);
+    try {
+      // Generate a personalized story based on the user's data
+      const story = `As a ${personality.title}, your journey in sustainable living has been remarkable. 
+        Your strongest impact comes from your ${dominantCategory} choices, where you've shown exceptional 
+        commitment. Through your actions, you've already prevented ${(16 - emissions).toFixed(1)} tons 
+        of CO2 emissions - equivalent to planting ${Math.round((16 - emissions) * 10)} trees! 
+        Your next challenge awaits in ${Object.entries(categoryScores)
+          .sort(([,a], [,b]) => a - b)[0][0]}, where small changes can lead to big impacts.`;
+      
+      setGeneratedStory(story);
+      playSuccessSound();
+    } catch (error) {
+      console.error('Error generating story:', error);
+    } finally {
+      setIsGeneratingStory(false);
+    }
+  };
 
   const sharePDF = async () => {
     try {
@@ -723,7 +838,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <CardContent className="p-0">
               <div className={`bg-gradient-to-r ${personality.color} p-8 text-white transition-all duration-1000 ${isPersonalityLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
                 <div className="flex justify-between items-start">
-                  <div>
+                  <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       {isPersonalityLoading ? (
                         <Loader2 className="h-8 w-8 animate-spin" />
@@ -739,8 +854,29 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </div>
                     <p className="text-white/90 text-lg">{personality.description}</p>
                   </div>
-                  <div className="bg-white/20 rounded-full p-4 backdrop-blur-sm">
-                    <Leaf className="h-8 w-8" />
+                  
+                  {/* Avatar Integration */}
+                  <div className="relative">
+                    <EcoAvatar
+                      outfit={getOutfitForPersonality(personality.title)}
+                      accessory={getAccessoryForPersonality(personality.title)}
+                      background={getBackgroundForCategory(dominantCategory)}
+                      role={getPersonalityRole(personality.title)}
+                      size="lg"
+                      animate={!isPersonalityLoading}
+                      className="transform hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute -top-2 -right-2">
+                      <div className={cn(
+                        "bg-white/20 backdrop-blur-sm rounded-full p-2",
+                        personality.color.includes('green') && "bg-green-500/20",
+                        personality.color.includes('blue') && "bg-blue-500/20",
+                        personality.color.includes('yellow') && "bg-yellow-500/20",
+                        personality.color.includes('red') && "bg-red-500/20"
+                      )}>
+                        <Leaf className="h-6 w-6" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -762,6 +898,63 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   </div>
                 </div>
 
+                {/* Story Generation Button */}
+                <div className="flex flex-col items-center gap-4 py-4">
+                  <Button 
+                    onClick={generatePersonalizedStory}
+                    className="w-full max-w-md bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                    disabled={isGeneratingStory}
+                  >
+                    <div className="flex items-center gap-2">
+                      {isGeneratingStory ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <BookOpen className="h-4 w-4" />
+                      )}
+                      Listen to Your Eco Story
+                    </div>
+                  </Button>
+                  {generatedStory && (
+                    <div className="w-full max-w-md bg-purple-50 rounded-lg p-4 animate-fadeIn">
+                      <p className="text-purple-800 italic">{generatedStory}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Category Deep Dive */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-gray-900">Category Analysis</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {Object.entries(categoryScores).map(([category, score]) => (
+                      <Button
+                        key={category}
+                        variant="outline"
+                        className={cn(
+                          "h-auto p-4 flex flex-col items-start gap-2",
+                          category === dominantCategory && "border-2 border-green-500"
+                        )}
+                        onClick={() => setExpandedCategory(category)}
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          {getCategoryIcon(category)}
+                          <span className="font-medium">{getCategoryTitle(category)}</span>
+                          {category === dominantCategory && (
+                            <Badge className="ml-auto" variant="secondary">
+                              Strongest
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-green-500"
+                            style={{ width: `${(score / 6) * 100}%` }}
+                          />
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Strengths */}
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-3">Your Strengths</h4>
@@ -775,17 +968,37 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   </ul>
                 </div>
 
-                {/* Next Steps */}
+                {/* Next Steps with Enhanced Recommendations */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-3">Next Steps</h4>
-                  <ul className="space-y-2">
+                  <h4 className="font-semibold text-gray-900 mb-3">Personalized Action Plan</h4>
+                  <div className="space-y-3">
                     {personality.nextSteps.map((step, index) => (
-                      <li key={index} className="flex items-center gap-2 text-gray-600">
-                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${personality.color}`} />
-                        {step}
-                      </li>
+                      <div
+                        key={index}
+                        className="bg-gray-50 rounded-lg p-4 transition-all hover:bg-gray-100"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`p-2 rounded-lg bg-gradient-to-r ${personality.color} text-white`}>
+                            {getStepIcon(index)}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-800">{step}</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {getStepDescription(step)}
+                            </p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Badge variant="outline" className="text-xs">
+                                {getStepDifficulty(step)}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                {getStepImpact(step)}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               </div>
             </CardContent>
