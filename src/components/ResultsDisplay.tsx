@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -16,11 +16,13 @@ import {
   ReferenceLine 
 } from 'recharts';
 import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
-  Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share
+  Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { Tooltip as RechartsTooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { determineEcoPersonality } from '@/utils/ecoPersonality';
+import useSound from 'use-sound';
 
 interface CategoryEmissions {
   home: number;
@@ -153,6 +155,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   state
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isPersonalityLoading, setIsPersonalityLoading] = useState(true);
+  const [playRevealSound] = useSound('/sounds/reveal.mp3');
+  const [playSuccessSound] = useSound('/sounds/success.mp3');
 
   const sharePDF = async () => {
     try {
@@ -261,133 +266,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     { name: 'Your\nFootprint', value: emissions },
   ];
 
-  const getEcoPersonality = (score: number, categoryEmissions: CategoryEmissions) => {
-    // Calculate total emissions and category weights
-    const totalEmissions = Number(categoryEmissions.home) + Number(categoryEmissions.transport) + 
-                          Number(categoryEmissions.food) + Number(categoryEmissions.waste);
-    
-    const weights = {
-      home: Number(categoryEmissions.home) / totalEmissions,
-      transport: Number(categoryEmissions.transport) / totalEmissions,
-      food: Number(categoryEmissions.food) / totalEmissions,
-      waste: Number(categoryEmissions.waste) / totalEmissions
-    };
+  // Replace the old getEcoPersonality function with the new one
+  const personality = determineEcoPersonality(state);
 
-    // Determine dominant category
-    const dominantCategory = Object.entries(weights).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+  useEffect(() => {
+    // Simulate loading time for personality determination
+    const timer = setTimeout(() => {
+      setIsPersonalityLoading(false);
+      playRevealSound();
+      setTimeout(() => playSuccessSound(), 1000);
+    }, 2000);
 
-    // Base personality type based on total emissions and score
-    let personality = {
-      title: '',
-      points: '',
-      description: '',
-      level: 0,
-      badge: '',
-      strengths: [] as string[],
-      nextSteps: [] as string[],
-      subCategory: '',
-      color: ''
-    };
-
-    // Determine level based on score and emissions
-    if (score < 30 || totalEmissions > 16) {
-      personality = {
-        title: 'Eco Novice',
-        points: '1/8 Points',
-        description: 'Just starting your sustainable journey. Every small step counts!',
-        level: 1,
-        badge: '🌱',
-        strengths: ['Taking the first step', 'Open to learning'],
-        nextSteps: ['Try a Meatless Monday', 'Start basic recycling'],
-        subCategory: '',
-        color: 'from-yellow-500 to-yellow-400'
-      };
-    } else if (score < 50 || totalEmissions > 12) {
-      personality = {
-        title: 'Green Starter',
-        points: '2/8 Points',
-        description: 'Building foundational eco-friendly habits. You\'re making progress!',
-        level: 2,
-        badge: '🌿',
-        strengths: ['Growing awareness', 'Basic sustainable practices'],
-        nextSteps: ['Upgrade to LED bulbs', 'Try public transport'],
-        subCategory: '',
-        color: 'from-green-400 to-green-300'
-      };
-    } else if (score < 70 || totalEmissions > 8) {
-      personality = {
-        title: 'Eco Advocate',
-        points: '4/8 Points',
-        description: 'Consistently making sustainable choices. Your impact is growing!',
-        level: 3,
-        badge: '🌳',
-        strengths: ['Regular sustainable practices', 'Influencing others'],
-        nextSteps: ['Install smart thermostats', 'Start composting'],
-        subCategory: '',
-        color: 'from-green-600 to-green-500'
-      };
-    } else if (score < 85 || totalEmissions > 4) {
-      personality = {
-        title: 'Sustainability Pro',
-        points: '6/8 Points',
-        description: 'Leading by example in sustainable living. Impressive commitment!',
-        level: 4,
-        badge: '🌍',
-        strengths: ['Comprehensive approach', 'Community leadership'],
-        nextSteps: ['Consider solar panels', 'Start a community garden'],
-        subCategory: '',
-        color: 'from-blue-600 to-blue-500'
-      };
-    } else {
-      personality = {
-        title: 'Climate Hero',
-        points: '8/8 Points',
-        description: 'Maximum impact achieved! You\'re a beacon of sustainable living.',
-        level: 5,
-        badge: '⭐',
-        strengths: ['Exemplary practices', 'Inspiring others'],
-        nextSteps: ['Mentor others', 'Advocate for policy change'],
-        subCategory: '',
-        color: 'from-purple-600 to-purple-500'
-      };
-    }
-
-    // Add category-specific strengths and next steps based on dominant category and emissions
-    switch(dominantCategory) {
-      case 'home':
-        personality.subCategory = categoryEmissions.home < 4 ? 'Energy Efficiency Expert' : 'Eco Homebody';
-        if (categoryEmissions.home < 4) {
-          personality.strengths.push('Efficient home energy use');
-          personality.nextSteps.push('Install solar panels');
-        }
-        break;
-      case 'transport':
-        personality.subCategory = categoryEmissions.transport < 3 ? 'Green Mobility Champion' : 'Green Traveler';
-        if (categoryEmissions.transport < 3) {
-          personality.strengths.push('Low-carbon transportation');
-          personality.nextSteps.push('Consider an electric vehicle');
-        }
-        break;
-      case 'food':
-        personality.subCategory = categoryEmissions.food < 2 ? 'Sustainable Food Pioneer' : 'Conscious Consumer';
-        if (categoryEmissions.food < 2) {
-          personality.strengths.push('Sustainable diet choices');
-          personality.nextSteps.push('Start a vegetable garden');
-        }
-        break;
-      case 'waste':
-        personality.subCategory = categoryEmissions.waste < 1 ? 'Zero Waste Champion' : 'Zero Waste Warrior';
-        if (categoryEmissions.waste < 1) {
-          personality.strengths.push('Minimal waste generation');
-          personality.nextSteps.push('Start composting');
-        }
-        break;
-    }
-
-    return personality;
-  };
-
-  const personality = getEcoPersonality(score, categoryEmissions);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Get achievements based on state
   const achievements = getAchievements(state, categoryEmissions);
@@ -449,42 +340,92 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="grid grid-cols-4 gap-4 mt-6">
             {[
               { 
-                icon: <Home className="h-5 w-5 text-green-600" />,
+                icon: <Home className="h-5 w-5" />,
                 label: 'Home Energy',
-                value: `${categoryEmissions.home.toFixed(1)}t`,
-                change: categoryEmissions.home < 4 ? 'low' : 'high'
+                value: categoryEmissions.home,
+                impact: categoryEmissions.home < 4 ? 'low' : categoryEmissions.home < 8 ? 'medium' : 'high'
               },
               {
-                icon: <Car className="h-5 w-5 text-blue-600" />,
+                icon: <Car className="h-5 w-5" />,
                 label: 'Transport',
-                value: `${categoryEmissions.transport.toFixed(1)}t`,
-                change: categoryEmissions.transport < 3 ? 'low' : 'high'
+                value: categoryEmissions.transport,
+                impact: categoryEmissions.transport < 3 ? 'low' : categoryEmissions.transport < 6 ? 'medium' : 'high'
               },
               {
-                icon: <Utensils className="h-5 w-5 text-orange-600" />,
+                icon: <Utensils className="h-5 w-5" />,
                 label: 'Food',
-                value: `${categoryEmissions.food.toFixed(1)}t`,
-                change: categoryEmissions.food < 2 ? 'low' : 'high'
+                value: categoryEmissions.food,
+                impact: categoryEmissions.food < 2 ? 'low' : categoryEmissions.food < 4 ? 'medium' : 'high'
               },
               {
-                icon: <Trash2 className="h-5 w-5 text-red-600" />,
+                icon: <Trash2 className="h-5 w-5" />,
                 label: 'Waste',
-                value: `${categoryEmissions.waste.toFixed(1)}t`,
-                change: categoryEmissions.waste < 1 ? 'low' : 'high'
+                value: categoryEmissions.waste,
+                impact: categoryEmissions.waste < 1 ? 'low' : categoryEmissions.waste < 2 ? 'medium' : 'high'
               }
             ].map((stat, i) => (
-              <div key={i} className="bg-white/60 backdrop-blur-sm rounded-xl p-3 flex flex-col items-center gap-1">
-                <div className="p-2 bg-gray-50 rounded-lg mb-1">
-                  {stat.icon}
+              <div 
+                key={i} 
+                className={cn(
+                  "relative overflow-hidden rounded-xl p-6",
+                  "transition-all duration-500 transform hover:scale-105",
+                  stat.impact === 'low' 
+                    ? "bg-gradient-to-br from-green-50 to-green-100 border border-green-200" 
+                    : stat.impact === 'medium'
+                    ? "bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200"
+                    : "bg-gradient-to-br from-red-50 to-red-100 border border-red-200"
+                )}
+              >
+                {/* Background Pattern */}
+                <div 
+                  className={cn(
+                    "absolute inset-0 opacity-10",
+                    "bg-[radial-gradient(circle_at_center,currentColor_1px,transparent_1px)]",
+                    "[background-size:8px_8px]",
+                    stat.impact === 'low' ? "text-green-600" : stat.impact === 'medium' ? "text-yellow-600" : "text-red-600"
+                  )}
+                />
+                
+                <div className="relative flex flex-col items-center gap-3">
+                  <div className={cn(
+                    "p-3 rounded-lg relative group cursor-pointer",
+                    stat.impact === 'low' 
+                      ? "bg-green-100 text-green-600" 
+                      : stat.impact === 'medium'
+                      ? "bg-yellow-100 text-yellow-600"
+                      : "bg-red-100 text-red-600",
+                    stat.label === 'Home Energy' && "hover:animate-bounce",
+                    stat.label === 'Transport' && "hover:animate-wiggle",
+                    stat.label === 'Food' && "hover:animate-spin",
+                    stat.label === 'Waste' && "hover:animate-shake"
+                  )}>
+                    <div className={cn(
+                      "transition-transform duration-300",
+                      stat.label === 'Home Energy' && "group-hover:animate-bounce",
+                      stat.label === 'Transport' && "group-hover:animate-wiggle",
+                      stat.label === 'Food' && "group-hover:animate-spin",
+                      stat.label === 'Waste' && "group-hover:animate-shake"
+                    )}>
+                      {stat.icon}
+                    </div>
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">{stat.label}</span>
+                  <span className={cn(
+                    "text-xs px-2.5 py-1 rounded-full font-medium",
+                    stat.impact === 'low' 
+                      ? "bg-green-100 text-green-700" 
+                      : stat.impact === 'medium'
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-red-100 text-red-700"
+                  )}>
+                    {stat.impact === 'low' ? 'Low Impact' : stat.impact === 'medium' ? 'Medium Impact' : 'High Impact'}
+                  </span>
+                  
+                  {/* Animated Pulse Effect for High Impact */}
+                  {stat.impact === 'high' && (
+                    <div className="absolute -inset-1 bg-red-400/20 rounded-xl animate-pulse" />
+                  )}
                 </div>
-                <span className="text-sm text-gray-600">{stat.label}</span>
-                <span className="text-lg font-semibold">{stat.value}</span>
-                <span className={cn(
-                  "text-xs px-1.5 py-0.5 rounded-full",
-                  stat.change === 'low' ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                )}>
-                  {stat.change === 'low' ? 'Low Impact' : 'High Impact'}
-                </span>
               </div>
             ))}
           </div>
@@ -661,11 +602,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           {/* Eco Personality */}
           <Card className="bg-white overflow-hidden">
             <CardContent className="p-0">
-              <div className={`bg-gradient-to-r ${personality.color} p-8 text-white`}>
+              <div className={`bg-gradient-to-r ${personality.color} p-8 text-white transition-all duration-1000 ${isPersonalityLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-4xl">{personality.badge}</span>
+                      {isPersonalityLoading ? (
+                        <Loader2 className="h-8 w-8 animate-spin" />
+                      ) : (
+                        <span className="text-4xl animate-bounce">{personality.badge}</span>
+                      )}
                       <div>
                         <h3 className="text-2xl font-bold">{personality.title}</h3>
                         {personality.subCategory && (
@@ -681,7 +626,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 </div>
               </div>
 
-              <div className="p-8 space-y-6">
+              <div className={`p-8 space-y-6 transition-all duration-1000 ${isPersonalityLoading ? 'opacity-0' : 'opacity-100'}`}>
                 {/* Progress Bar */}
                 <div>
                   <div className="flex justify-between text-sm text-gray-600 mb-2">
@@ -690,8 +635,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full bg-gradient-to-r ${personality.color}`}
-                      style={{ width: `${(score / 100) * 100}%` }}
+                      className={`h-full bg-gradient-to-r ${personality.color} transition-all duration-1000`}
+                      style={{ 
+                        width: `${(parseInt(personality.points.split('/')[0]) / parseInt(personality.points.split('/')[1])) * 100}%` 
+                      }}
                     />
                   </div>
                 </div>
