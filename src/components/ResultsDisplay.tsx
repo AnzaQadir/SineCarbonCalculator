@@ -16,7 +16,7 @@ import {
   ReferenceLine 
 } from 'recharts';
 import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
-  Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2
+  Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2, Check
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
@@ -296,9 +296,28 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         <CardContent className="p-10 space-y-8 relative">
           {/* Impact Level Indicator */}
           <div className="flex items-center justify-center gap-3">
-            <div className="bg-red-50 text-red-600 px-4 py-2 rounded-full font-medium flex items-center gap-2 shadow-sm">
-              <AlertCircle className="h-5 w-5" />
-              <span>High Impact Level</span>
+            <div className={cn(
+              "px-4 py-2 rounded-full font-medium flex items-center gap-2 shadow-sm",
+              emissions < 4 ? "bg-green-50 text-green-600" :
+              emissions < 8 ? "bg-yellow-50 text-yellow-600" :
+              "bg-red-50 text-red-600"
+            )}>
+              {emissions < 4 ? (
+                <>
+                  <Leaf className="h-5 w-5" />
+                  <span>Low Impact Level</span>
+                </>
+              ) : emissions < 8 ? (
+                <>
+                  <AlertCircle className="h-5 w-5" />
+                  <span>Medium Impact Level</span>
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="h-5 w-5" />
+                  <span>High Impact Level</span>
+                </>
+              )}
             </div>
           </div>
           
@@ -306,7 +325,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="text-center space-y-6">
             <div className="flex items-baseline justify-center gap-4">
               <div className="space-y-1">
-                <span className="text-8xl font-bold bg-gradient-to-br from-green-600 to-green-700 bg-clip-text text-transparent">
+                <span className={cn(
+                  "text-8xl font-bold bg-clip-text text-transparent",
+                  emissions < 4 ? "bg-gradient-to-br from-green-600 to-green-700" :
+                  emissions < 8 ? "bg-gradient-to-br from-yellow-600 to-yellow-700" :
+                  "bg-gradient-to-br from-red-600 to-red-700"
+                )}>
                   {emissions.toFixed(2)}
                 </span>
                 <div className="flex flex-col text-gray-600">
@@ -318,11 +342,46 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
             <div className="space-y-3">
               <p className="text-2xl text-gray-700">
-                Your footprint is <span className="font-semibold text-green-700">{((16 - emissions) / 16 * 100).toFixed(1)}% lower</span> than the average American
+                Your footprint is{' '}
+                <span className={cn(
+                  "font-semibold",
+                  emissions < 4 ? "text-green-700" :
+                  emissions < 8 ? "text-yellow-700" :
+                  "text-red-700"
+                )}>
+                  {((16 - emissions) / 16 * 100).toFixed(1)}% lower
+                </span>{' '}
+                than the average American
               </p>
-              <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                That's equivalent to planting {Math.round((16 - emissions) * 10)} trees or taking {Math.round((16 - emissions) * 2)} cars off the road for a year
-              </p>
+              <div className="space-y-2">
+                <p className="text-gray-600 text-lg">
+                  That's equivalent to:
+                </p>
+                <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+                  <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 flex items-center gap-3">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <Leaf className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div className="text-left">
+                      <span className="block font-semibold text-gray-900">
+                        {Math.round((16 - emissions) * 10)} trees
+                      </span>
+                      <span className="text-sm text-gray-600">planted for one year</span>
+                    </div>
+                  </div>
+                  <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Car className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div className="text-left">
+                      <span className="block font-semibold text-gray-900">
+                        {Math.round((16 - emissions) * 2)} cars
+                      </span>
+                      <span className="text-sm text-gray-600">taken off the road</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -458,144 +517,204 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="grid grid-cols-2 gap-8 px-6">
                 <div>
               <h3 className="text-xl font-semibold mb-6">Emissions by Category</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                          cx="50%"
-                          cy="50%"
-                    innerRadius={0}
-                    outerRadius={100}
-                    paddingAngle={0}
-                    label={({ percent }) => (
-                      <text
-                        fill="#ffffff"
-                        fontSize={16}
-                        fontWeight="bold"
-                        dominantBaseline="central"
-                        textAnchor="middle"
-                      >
-                        {`${(percent * 100).toFixed(0)}%`}
-                      </text>
-                    )}
-                          labelLine={false}
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={COLORS[index % COLORS.length]} 
+              <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-gray-100">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={2}
+                      label={({ name, value, percent }) => (
+                        <text
+                          x={0}
+                          y={0}
+                          fill="#374151"
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          fontSize={12}
+                        >
+                          {`${name}\n${(percent * 100).toFixed(0)}%`}
+                        </text>
+                      )}
+                      labelLine={true}
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={COLORS[index % COLORS.length]}
+                          className="transition-all duration-300 hover:opacity-80"
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-100">
+                              <p className="font-medium text-gray-900">{data.name}</p>
+                              <p className="text-sm text-gray-600">{data.value.toFixed(2)} tons CO₂e</p>
+                              <p className="text-sm text-gray-600">{data.percentage}% of total</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="mt-6 grid grid-cols-2 gap-4">
+                  {pieData.map((item, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-white/50 border border-gray-100"
+                    >
+                      <div 
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
                       />
-                          ))}
-                        </Pie>
-                  <Legend
-                    verticalAlign="bottom"
-                    align="center"
-                    layout="horizontal"
-                    iconType="circle"
-                    iconSize={10}
-                    formatter={(value) => {
-                      const item = pieData.find(d => d.name === value);
-                      return `${value} (${item?.percentage}%)`;
-                    }}
-                  />
-                      </PieChart>
-                    </ResponsiveContainer>
+                      <div>
+                        <p className="font-medium text-gray-900">{item.name}</p>
+                        <p className="text-sm text-gray-600">{item.value.toFixed(2)} tons</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+              </div>
+            </div>
 
                 <div>
               <div className="flex items-center gap-2 mb-6">
                 <h3 className="text-xl font-semibold">How You Compare</h3>
                 <RechartsTooltip>
                   <TooltipTrigger asChild>
-                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>See how your carbon footprint compares to average emissions</p>
+                    <p>See how your carbon footprint compares to global averages</p>
                   </TooltipContent>
                 </RechartsTooltip>
-                      </div>
-              <ResponsiveContainer width="100%" height={300}>
-                      <BarChart
-                        data={comparisonData}
-                  margin={{ top: 20, right: 130, left: -20, bottom: 20 }}
-                >
-                  <YAxis
-                    type="number"
-                    domain={[0, 20]}
-                    ticks={[0, 5, 10, 15, 20]}
-                    label={{ value: 'tons', position: 'left', angle: -90, offset: -10 }}
-                    tick={{ fill: '#64748b', fontSize: 12 }}
-                    axisLine={{ stroke: '#e2e8f0' }}
-                  />
-                        <XAxis 
-                    type="category"
-                          dataKey="name" 
-                    tick={{ fill: '#64748b', fontSize: 14 }}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Bar 
-                    dataKey="value" 
-                    fill="#4ade80" 
-                    radius={[6, 6, 6, 6]} 
-                    barSize={40}
+              </div>
+              <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-gray-100">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={comparisonData}
+                    margin={{ top: 20, right: 130, left: -20, bottom: 20 }}
                   >
-                          {comparisonData.map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                        fill="#4ade80"
-                            />
-                          ))}
-                        </Bar>
-                  <ReferenceLine
-                    y={16}
-                    stroke="#94a3b8"
-                    strokeWidth={1.5}
-                    strokeDasharray="4 4"
-                    segment={[{ x: 0.2, y: 16 }, { x: 1, y: 16 }]}
-                    label={{ 
-                      value: 'US Average', 
-                      position: 'top',
-                      fill: '#64748b',
-                      fontSize: 14,
-                      offset: 10,
-                      fontWeight: 500
-                    }}
-                  />
-                  <ReferenceLine
-                    y={4.7}
-                    stroke="#94a3b8"
-                    strokeWidth={1.5}
-                    strokeDasharray="4 4"
-                    segment={[{ x: 0.2, y: 4.7 }, { x: 1, y: 4.7 }]}
-                    label={{ 
-                      value: 'Global Average', 
-                      position: 'top',
-                      fill: '#64748b',
-                      fontSize: 14,
-                      offset: 10,
-                      fontWeight: 500
-                    }}
-                  />
-                  <ReferenceLine
-                    y={2}
-                    stroke="#22c55e"
-                    strokeWidth={1.5}
-                    strokeDasharray="4 4"
-                    segment={[{ x: 0.2, y: 2 }, { x: 1, y: 2 }]}
-                    label={{ 
-                      value: 'Sustainability Target', 
-                      position: 'top',
-                      fill: '#22c55e',
-                      fontSize: 14,
-                      offset: 10,
-                      fontWeight: 500
-                    }}
-                  />
-                      </BarChart>
-                    </ResponsiveContainer>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <YAxis
+                      type="number"
+                      domain={[0, 20]}
+                      ticks={[0, 5, 10, 15, 20]}
+                      label={{ value: 'Metric Tons CO₂e/year', position: 'left', angle: -90, offset: 0 }}
+                      tick={{ fill: '#64748b', fontSize: 12 }}
+                      axisLine={{ stroke: '#e2e8f0' }}
+                    />
+                    <XAxis 
+                      type="category"
+                      dataKey="name" 
+                      tick={{ fill: '#64748b', fontSize: 14 }}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const value = payload[0].value;
+                          return (
+                            <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-100">
+                              <p className="font-medium text-gray-900">Your Footprint</p>
+                              <p className="text-sm text-gray-600">
+                                {typeof value === 'number' ? value.toFixed(2) : value} tons CO₂e/year
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar 
+                      dataKey="value" 
+                      fill="#4ade80" 
+                      radius={[6, 6, 6, 6]} 
+                      barSize={40}
+                    >
+                      {comparisonData.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={emissions < 4 ? "#4ade80" : emissions < 8 ? "#facc15" : "#f87171"}
+                        />
+                      ))}
+                    </Bar>
+                    <ReferenceLine
+                      y={16}
+                      stroke="#94a3b8"
+                      strokeWidth={1.5}
+                      strokeDasharray="4 4"
+                      label={{ 
+                        value: 'US Average (16 tons)', 
+                        position: 'right',
+                        fill: '#64748b',
+                        fontSize: 12
+                      }}
+                    />
+                    <ReferenceLine
+                      y={4.7}
+                      stroke="#94a3b8"
+                      strokeWidth={1.5}
+                      strokeDasharray="4 4"
+                      label={{ 
+                        value: 'Global Average (4.7 tons)', 
+                        position: 'right',
+                        fill: '#64748b',
+                        fontSize: 12
+                      }}
+                    />
+                    <ReferenceLine
+                      y={2}
+                      stroke="#22c55e"
+                      strokeWidth={1.5}
+                      strokeDasharray="4 4"
+                      label={{ 
+                        value: 'Sustainability Target (2 tons)', 
+                        position: 'right',
+                        fill: '#22c55e',
+                        fontSize: 12
+                      }}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+                <div className="mt-6 space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Your Emissions</span>
+                    <span className={cn(
+                      "font-medium",
+                      emissions < 4 ? "text-green-600" :
+                      emissions < 8 ? "text-yellow-600" :
+                      "text-red-600"
+                    )}>
+                      {emissions.toFixed(2)} tons
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Distance to Target</span>
+                    <span className="font-medium text-gray-900">
+                      {(emissions - 2).toFixed(2)} tons to go
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Compared to US Average</span>
+                    <span className="font-medium text-green-600">
+                      {((16 - emissions) / 16 * 100).toFixed(1)}% lower
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -673,119 +792,225 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </Card>
 
           {/* Recommendations */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Personalized Recommendations</h2>
-            <p className="text-gray-600">Based on your responses, we've identified these opportunities to reduce your carbon footprint:</p>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold">Personalized Recommendations</h2>
+                <p className="text-gray-600">Based on your responses, we've identified these opportunities to reduce your carbon footprint:</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" className="text-sm">
+                  <PackageCheck className="h-4 w-4 mr-2" />
+                  Mark All Complete
+                </Button>
+              </div>
+            </div>
             
-            <div className="grid grid-cols-2 gap-4">
-                {recommendations.map((rec, index) => (
+            <div className="grid grid-cols-2 gap-6">
+              {recommendations.map((rec, index) => (
                 <div 
                   key={index} 
                   className={cn(
-                    "rounded-xl overflow-hidden",
-                    rec.difficulty === 'Easy' ? "bg-green-50" : "bg-yellow-50"
+                    "rounded-xl overflow-hidden group transition-all duration-300 hover:shadow-lg",
+                    rec.difficulty === 'Easy' 
+                      ? "bg-gradient-to-br from-green-50 to-green-100/50 border border-green-100" 
+                      : "bg-gradient-to-br from-yellow-50 to-yellow-100/50 border border-yellow-100"
                   )}
                 >
-                  <div className="px-6 py-4">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="text-sm">{rec.category}</span>
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          "p-2 rounded-lg",
+                          rec.difficulty === 'Easy' ? "bg-green-100" : "bg-yellow-100"
+                        )}>
+                          {rec.category === 'Home Energy' ? <Home className="h-5 w-5 text-gray-700" /> :
+                           rec.category === 'Transport' ? <Car className="h-5 w-5 text-gray-700" /> :
+                           rec.category === 'Food' ? <Utensils className="h-5 w-5 text-gray-700" /> :
+                           <Trash2 className="h-5 w-5 text-gray-700" />}
+                        </div>
+                        <span className="text-sm font-medium text-gray-600">{rec.category}</span>
+                      </div>
                       <span 
                         className={cn(
                           "text-sm px-3 py-1 rounded-full",
                           rec.difficulty === 'Easy' 
                             ? "text-green-700 bg-green-100" 
-                            : "text-amber-700 bg-amber-100"
+                            : "text-yellow-700 bg-yellow-100"
                         )}
                       >
                         {rec.difficulty}
-                        </span>
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2 text-gray-900">{rec.title}</h3>
+                      <p className="text-gray-600 mb-4">{rec.description}</p>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-green-700">
+                        <Leaf className="h-4 w-4" />
+                        <span className="text-sm">{rec.impact}</span>
                       </div>
-
-                    <h3 className="text-xl font-semibold mb-2">{rec.title}</h3>
-                    <p className="text-gray-600 mb-4">{rec.description}</p>
-
-                    <div className="flex items-center gap-2 text-green-700">
-                      <Leaf className="h-4 w-4" />
-                      <span className="text-sm">{rec.impact}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className={cn(
+                          "text-sm transition-colors",
+                          rec.difficulty === 'Easy' 
+                            ? "hover:bg-green-100" 
+                            : "hover:bg-yellow-100"
+                        )}
+                      >
+                        <Check className="h-4 w-4 mr-2" />
+                        Mark Complete
+                      </Button>
                     </div>
                   </div>
-                      </div>
-                ))}
-              </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-8 mt-8 border border-primary/20">
-            <h2 className="text-2xl font-semibold mb-4 text-center">Ready to Take Action?</h2>
-            <p className="text-center text-muted-foreground mb-6 max-w-xl mx-auto">
-              Support verified carbon reduction projects or share your results to inspire others in their sustainability journey.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button 
-                size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2"
-              >
-                <Leaf className="h-5 w-5" />
-                Offset Now
-              </Button>
-              
-              <Button 
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2 border-2"
-                onClick={sharePDF}
-              >
-                <Share className="h-5 w-5" />
-                Share PDF
-              </Button>
-              
-              <Button 
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2 border-2"
-              >
-                <Download className="h-5 w-5" />
-                Download
-              </Button>
+                  {/* Progress Indicator */}
+                  <div className="h-1 w-full bg-gray-100">
+                    <div 
+                      className={cn(
+                        "h-full transition-all duration-500 group-hover:opacity-100",
+                        rec.difficulty === 'Easy' ? "bg-green-500" : "bg-yellow-500",
+                        "opacity-50"
+                      )}
+                      style={{ width: '0%' }}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Your actions matter! By offsetting or sharing, you contribute to global sustainability efforts.
-              </p>
+            {/* Action Buttons */}
+            <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-8 mt-8 border border-primary/20">
+              <div className="max-w-2xl mx-auto text-center space-y-6">
+                <h2 className="text-2xl font-semibold">Ready to Take Action?</h2>
+                <p className="text-muted-foreground">
+                  Support verified carbon reduction projects or share your results to inspire others in their sustainability journey.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Button 
+                    size="lg"
+                    className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2 group"
+                  >
+                    <Leaf className="h-5 w-5 group-hover:animate-bounce" />
+                    Offset Now
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2 border-2 group"
+                    onClick={sharePDF}
+                  >
+                    <Share className="h-5 w-5 group-hover:rotate-12 transition-transform" />
+                    Share PDF
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto min-w-[160px] flex items-center justify-center gap-2 border-2 group"
+                  >
+                    <Download className="h-5 w-5 group-hover:translate-y-1 transition-transform" />
+                    Download
+                  </Button>
                 </div>
+
+                <p className="text-sm text-muted-foreground">
+                  Your actions matter! By offsetting or sharing, you contribute to global sustainability efforts.
+                </p>
               </div>
-            </TabsContent>
+            </div>
+          </div>
+        </TabsContent>
             
         <TabsContent value="details">
           <div className="space-y-6 mt-6">
             {/* Achievement Cards */}
             {achievements.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4">
-                {achievements.map((achievement, index) => (
-                  <div 
-                    key={index} 
-                    className={`${achievement.color} rounded-xl p-6 text-white`}
-                  >
-                    <div className="flex flex-col h-full">
-                      {achievement.icon}
-                      <h3 className="text-2xl font-semibold mb-2 mt-4">{achievement.title}</h3>
-                      {achievement.description && (
-                        <p className="text-white/80 text-sm mb-4">{achievement.description}</p>
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold text-gray-900">Your Achievements</h3>
+                <p className="text-gray-600">You've earned these badges through your sustainable choices:</p>
+                <div className="grid grid-cols-2 gap-4">
+                  {achievements.map((achievement, index) => (
+                    <div 
+                      key={index} 
+                      className={cn(
+                        "rounded-xl p-6 text-white relative overflow-hidden group transition-all duration-300 hover:scale-[1.02]",
+                        achievement.color
                       )}
-                      <div className="mt-auto">
-                        <p className="text-2xl font-bold">{achievement.value.toFixed(1)}t CO₂e</p>
+                    >
+                      {/* Background Pattern */}
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,currentColor_1px,transparent_1px)] [background-size:8px_8px] opacity-10" />
+                      
+                      <div className="relative flex flex-col h-full">
+                        <div className="flex items-start justify-between">
+                          <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+                            {achievement.icon}
+                          </div>
+                          <div className="bg-white/20 rounded-full px-3 py-1 text-sm backdrop-blur-sm">
+                            {achievement.value.toFixed(1)}t CO₂e saved
+                          </div>
+                        </div>
+                        
+                        <div className="mt-6">
+                          <h3 className="text-2xl font-semibold mb-2">{achievement.title}</h3>
+                          {achievement.description && (
+                            <p className="text-white/90 text-sm">{achievement.description}</p>
+                          )}
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-white/20">
+                          <div className="flex items-center gap-2 text-sm text-white/80">
+                            <Leaf className="h-4 w-4" />
+                            <span>Keep up the great work!</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Hover Effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-8 p-6 bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl border border-green-100">
+                  <h4 className="text-lg font-semibold text-green-800 mb-3">Achievement Progress</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Total CO₂e Saved</span>
+                        <span>{achievements.reduce((acc, curr) => acc + curr.value, 0).toFixed(1)} tons</span>
+                      </div>
+                      <div className="h-2 bg-green-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-green-500 transition-all duration-1000"
+                          style={{ width: `${Math.min(achievements.reduce((acc, curr) => acc + curr.value, 0) / 5 * 100, 100)}%` }}
+                        />
                       </div>
                     </div>
+                    <div className="flex items-center gap-3 text-sm text-green-700">
+                      <Info className="h-4 w-4" />
+                      <span>You're making a real difference! Keep collecting achievements to increase your impact.</span>
+                    </div>
                   </div>
-                ))}
+                </div>
               </div>
             ) : (
-              <div className="text-center py-8 bg-gray-50 rounded-xl">
-                <PackageCheck className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600">No Achievements Yet</h3>
-                <p className="text-gray-500 mt-2">Complete more sustainable actions to unlock achievements!</p>
+              <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-200">
+                <div className="max-w-md mx-auto space-y-4">
+                  <PackageCheck className="h-16 w-16 mx-auto text-gray-400" />
+                  <h3 className="text-2xl font-semibold text-gray-900">No Achievements Yet</h3>
+                  <p className="text-gray-600">Start your sustainability journey by making eco-friendly choices. Each small action counts towards earning achievements!</p>
+                  <Button variant="outline" className="mt-4">
+                    <Leaf className="h-4 w-4 mr-2" />
+                    Learn How to Earn
+                  </Button>
+                </div>
               </div>
             )}
 
