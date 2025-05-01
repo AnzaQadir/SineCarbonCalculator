@@ -57,6 +57,7 @@ import { Switch } from '@/components/ui/switch';
 import ResultsDisplay from './ResultsDisplay';
 import { Label } from '@/components/ui/label';
 import { QuestionTiles } from './QuestionTiles';
+import { AgeTiles } from '@/components/AgeTiles';
 
 interface BaseCalculatorState {
   // Demographics
@@ -544,14 +545,9 @@ const Calculator = ({
           <p className="text-sm text-muted-foreground">
             How many years young are you?
           </p>
-          <Input
-                    type="number"
-            placeholder="Enter your age"
+          <AgeTiles
             value={state.age}
-            onChange={(e) => onUpdate({ age: e.target.value })}
-            className="h-12 text-lg"
-            min="1"
-            max="120"
+            onChange={(value) => onUpdate({ age: value })}
           />
         </div>
 
@@ -1337,13 +1333,13 @@ const Calculator = ({
     <div 
       id="calculator" 
       className={cn(
-        "w-full max-w-3xl mx-auto transition-opacity duration-500 py-10",
+        "w-max mx-auto transition-opacity duration-500 py-10",
         isVisible ? "opacity-100" : "opacity-0"
       )}
     >
       {!showResults ? (
         <Card variant="elevated">
-          <CardContent className="p-6">
+          <CardContent className="p-6 w-max" >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <CurrentStepIcon className="h-5 w-5 text-primary" />

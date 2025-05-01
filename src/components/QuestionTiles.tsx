@@ -14,7 +14,6 @@ interface QuestionTileProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  impact: 'low' | 'medium' | 'high';
 }
 
 const QuestionTile: React.FC<QuestionTileProps> = ({
@@ -22,8 +21,7 @@ const QuestionTile: React.FC<QuestionTileProps> = ({
   onClick,
   icon,
   title,
-  description,
-  impact
+  description
 }) => {
   return (
     <div
@@ -31,21 +29,13 @@ const QuestionTile: React.FC<QuestionTileProps> = ({
       className={cn(
         "relative p-6 rounded-xl cursor-pointer transition-all duration-300",
         "border-2 hover:shadow-lg transform hover:-translate-y-1",
-        selected ? [
-          impact === 'low' && "border-green-500 bg-green-50",
-          impact === 'medium' && "border-yellow-500 bg-yellow-50",
-          impact === 'high' && "border-red-500 bg-red-50",
-        ] : "border-gray-200 bg-white hover:border-gray-300"
+        selected ? "border-green-500 bg-green-50" : "border-gray-200 bg-white hover:border-gray-300"
       )}
     >
       <div className="flex flex-col gap-4">
         <div className={cn(
           "p-3 rounded-lg w-fit",
-          selected ? [
-            impact === 'low' && "bg-green-100 text-green-600",
-            impact === 'medium' && "bg-yellow-100 text-yellow-600",
-            impact === 'high' && "bg-red-100 text-red-600",
-          ] : "bg-gray-100 text-gray-600"
+          selected ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-600"
         )}>
           {icon}
         </div>
@@ -53,26 +43,9 @@ const QuestionTile: React.FC<QuestionTileProps> = ({
           <h3 className="font-semibold text-lg mb-2">{title}</h3>
           <p className="text-gray-600 text-sm">{description}</p>
         </div>
-        <div className={cn(
-          "text-sm font-medium px-3 py-1 rounded-full w-fit",
-          selected ? [
-            impact === 'low' && "bg-green-100 text-green-700",
-            impact === 'medium' && "bg-yellow-100 text-yellow-700",
-            impact === 'high' && "bg-red-100 text-red-700",
-          ] : "bg-gray-100 text-gray-600"
-        )}>
-          {impact === 'low' && "Low Impact"}
-          {impact === 'medium' && "Medium Impact"}
-          {impact === 'high' && "High Impact"}
-        </div>
       </div>
       {selected && (
-        <div className={cn(
-          "absolute -top-2 -right-2 p-1 rounded-full",
-          impact === 'low' && "bg-green-500",
-          impact === 'medium' && "bg-yellow-500",
-          impact === 'high' && "bg-red-500",
-        )}>
+        <div className="absolute -top-2 -right-2 p-1 rounded-full bg-green-500">
           <Leaf className="h-4 w-4 text-white" />
         </div>
       )}
@@ -102,22 +75,19 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <Battery className="h-6 w-6" />,
               title: 'Energy Efficient Home',
-              description: 'Smart thermostats, LED lights, and energy-efficient appliances',
-              impact: 'low'
+              description: 'Smart thermostats, LED lights, and energy-efficient appliances'
             },
             {
               value: 'B',
               icon: <Zap className="h-6 w-6" />,
               title: 'Mixed Efficiency',
-              description: 'Some energy-efficient features but room for improvement',
-              impact: 'medium'
+              description: 'Some energy-efficient features but room for improvement'
             },
             {
               value: 'C',
               icon: <Home className="h-6 w-6" />,
               title: 'Standard Home',
-              description: 'Traditional appliances and lighting systems',
-              impact: 'high'
+              description: 'Traditional appliances and lighting systems'
             }
           ];
         } else {
@@ -126,22 +96,19 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <Wind className="h-6 w-6" />,
               title: 'Renewable Energy',
-              description: 'Solar panels or renewable energy provider',
-              impact: 'low'
+              description: 'Solar panels or renewable energy provider'
             },
             {
               value: 'B',
               icon: <Zap className="h-6 w-6" />,
               title: 'Mixed Sources',
-              description: 'Combination of renewable and traditional energy',
-              impact: 'medium'
+              description: 'Combination of renewable and traditional energy'
             },
             {
               value: 'C',
               icon: <Home className="h-6 w-6" />,
               title: 'Traditional Grid',
-              description: 'Standard utility provider without renewable options',
-              impact: 'high'
+              description: 'Standard utility provider without renewable options'
             }
           ];
         }
@@ -153,22 +120,19 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <Bike className="h-6 w-6" />,
               title: 'Active Transport',
-              description: 'Walking or cycling for most trips',
-              impact: 'low'
+              description: 'Walking or cycling for most trips'
             },
             {
               value: 'B',
               icon: <Bus className="h-6 w-6" />,
               title: 'Public Transit',
-              description: 'Regular use of buses, trains, or shared transport',
-              impact: 'low'
+              description: 'Regular use of buses, trains, or shared transport'
             },
             {
               value: 'C',
               icon: <Car className="h-6 w-6" />,
               title: 'Personal Vehicle',
-              description: 'Primary use of personal car for transport',
-              impact: 'high'
+              description: 'Primary use of personal car for transport'
             }
           ];
         } else {
@@ -177,22 +141,19 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <Leaf className="h-6 w-6" />,
               title: 'Electric Vehicle',
-              description: 'Zero-emission electric vehicle',
-              impact: 'low'
+              description: 'Zero-emission electric vehicle'
             },
             {
               value: 'B',
               icon: <Car className="h-6 w-6" />,
               title: 'Hybrid Vehicle',
-              description: 'Hybrid or fuel-efficient vehicle',
-              impact: 'medium'
+              description: 'Hybrid or fuel-efficient vehicle'
             },
             {
               value: 'C',
               icon: <Car className="h-6 w-6" />,
               title: 'Standard Vehicle',
-              description: 'Traditional gasoline/diesel vehicle',
-              impact: 'high'
+              description: 'Traditional gasoline/diesel vehicle'
             }
           ];
         }
@@ -204,29 +165,25 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'VEGAN',
               icon: <Apple className="h-6 w-6" />,
               title: 'Plant-Based Diet',
-              description: '100% plant-based foods',
-              impact: 'low'
+              description: '100% plant-based foods'
             },
             {
               value: 'VEGETARIAN',
               icon: <Utensils className="h-6 w-6" />,
               title: 'Vegetarian',
-              description: 'No meat, but includes dairy and eggs',
-              impact: 'low'
+              description: 'No meat, but includes dairy and eggs'
             },
             {
               value: 'FLEXITARIAN',
               icon: <Beef className="h-6 w-6" />,
               title: 'Flexitarian',
-              description: 'Mostly plant-based with occasional meat',
-              impact: 'medium'
+              description: 'Mostly plant-based with occasional meat'
             },
             {
               value: 'MEAT_MODERATE',
               icon: <Beef className="h-6 w-6" />,
               title: 'Moderate Meat',
-              description: 'Regular meat consumption',
-              impact: 'high'
+              description: 'Regular meat consumption'
             }
           ];
         } else {
@@ -235,22 +192,19 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <Leaf className="h-6 w-6" />,
               title: 'Local & Seasonal',
-              description: 'Primarily local, seasonal, and organic foods',
-              impact: 'low'
+              description: 'Primarily local, seasonal, and organic foods'
             },
             {
               value: 'B',
               icon: <Utensils className="h-6 w-6" />,
               title: 'Mixed Sources',
-              description: 'Combination of local and imported foods',
-              impact: 'medium'
+              description: 'Combination of local and imported foods'
             },
             {
               value: 'C',
               icon: <PackageCheck className="h-6 w-6" />,
               title: 'Conventional',
-              description: 'Primarily conventional and imported foods',
-              impact: 'high'
+              description: 'Primarily conventional and imported foods'
             }
           ];
         }
@@ -262,29 +216,25 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <PackageCheck className="h-6 w-6" />,
               title: 'Zero Waste Champion',
-              description: 'I always carry reusable bags, a water bottle, and containers—so I can refuse single-use items every time',
-              impact: 'low'
+              description: 'I always carry reusable bags, a water bottle, and containers—so I can refuse single-use items every time'
             },
             {
               value: 'B',
               icon: <Recycle className="h-6 w-6" />,
               title: 'Consistent Reuser',
-              description: 'I bring my reusables most days, but sometimes I grab disposables if I forget',
-              impact: 'medium'
+              description: 'I bring my reusables most days, but sometimes I grab disposables if I forget'
             },
             {
               value: 'C',
               icon: <Trash2 className="h-6 w-6" />,
               title: 'Occasional Reuser',
-              description: 'I occasionally use reusable items but often rely on whatever is convenient',
-              impact: 'medium'
+              description: 'I occasionally use reusable items but often rely on whatever is convenient'
             },
             {
               value: 'D',
               icon: <PackageX className="h-6 w-6" />,
               title: 'Basic Disposer',
-              description: 'I rarely think about reusables until I see the trash piling up',
-              impact: 'high'
+              description: 'I rarely think about reusables until I see the trash piling up'
             }
           ];
         } else if (subCategory === 'wasteManagement') {
@@ -293,22 +243,19 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <Recycle className="h-6 w-6" />,
               title: 'Dedicated Recycler',
-              description: 'I carefully sort, recycle, and even repurpose items to keep waste to a minimum',
-              impact: 'low'
+              description: 'I carefully sort, recycle, and even repurpose items to keep waste to a minimum'
             },
             {
               value: 'B',
               icon: <PackageCheck className="h-6 w-6" />,
               title: 'Casual Recycler',
-              description: 'I recycle when possible, but I might not always sort everything correctly',
-              impact: 'medium'
+              description: 'I recycle when possible, but I might not always sort everything correctly'
             },
             {
               value: 'C',
               icon: <Trash2 className="h-6 w-6" />,
               title: 'Basic Disposer',
-              description: 'I typically dispose of everything in the same bin, without much thought for separation',
-              impact: 'high'
+              description: 'I typically dispose of everything in the same bin, without much thought for separation'
             }
           ];
         } else if (subCategory === 'shopping') {
@@ -317,22 +264,19 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <ShoppingBag className="h-6 w-6" />,
               title: 'Conscious Consumer',
-              description: 'I always opt for reusable products, consciously avoiding single-use items and packaging',
-              impact: 'low'
+              description: 'I always opt for reusable products, consciously avoiding single-use items and packaging'
             },
             {
               value: 'B',
               icon: <ShoppingCart className="h-6 w-6" />,
               title: 'Balanced Shopper',
-              description: 'I try to choose eco-friendly products, though sometimes convenience prevails',
-              impact: 'medium'
+              description: 'I try to choose eco-friendly products, though sometimes convenience prevails'
             },
             {
               value: 'C',
               icon: <Store className="h-6 w-6" />,
               title: 'Convenience Shopper',
-              description: 'I rarely consider the waste factor—I usually buy what is readily available',
-              impact: 'high'
+              description: 'I rarely consider the waste factor—I usually buy what is readily available'
             }
           ];
         }
@@ -345,29 +289,25 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <MapPin className="h-6 w-6" />,
               title: 'Air Quality Conscious',
-              description: 'I plan my trips to steer clear of heavy traffic and high-pollution areas',
-              impact: 'low'
+              description: 'I plan my trips to steer clear of heavy traffic and high-pollution areas'
             },
             {
               value: 'B',
               icon: <Timer className="h-6 w-6" />,
               title: 'Sometimes Considerate',
-              description: 'I adjust my schedule or route if I know the air is bad',
-              impact: 'medium'
+              description: 'I adjust my schedule or route if I know the air is bad'
             },
             {
               value: 'C',
               icon: <Car className="h-6 w-6" />,
               title: 'Not Considered',
-              description: 'I do not consider air quality when I am out and about',
-              impact: 'high'
+              description: 'I do not consider air quality when I am out and about'
             },
             {
               value: 'D',
               icon: <Info className="h-6 w-6" />,
               title: 'Never Thought About It',
-              description: 'I have not thought about air quality during commuting',
-              impact: 'high'
+              description: 'I have not thought about air quality during commuting'
             }
           ];
         } else if (subCategory === 'indoorQuality') {
@@ -376,29 +316,25 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <Leaf className="h-6 w-6" />,
               title: 'Air Purifiers & Plants',
-              description: 'I use air purifiers and maintain indoor plants for optimal air quality',
-              impact: 'low'
+              description: 'I use air purifiers and maintain indoor plants for optimal air quality'
             },
             {
               value: 'B',
               icon: <Wind className="h-6 w-6" />,
               title: 'Natural Ventilation',
-              description: 'I regularly open windows and use natural ventilation',
-              impact: 'medium'
+              description: 'I regularly open windows and use natural ventilation'
             },
             {
               value: 'C',
               icon: <Cloud className="h-6 w-6" />,
               title: 'Basic Management',
-              description: 'No special steps for indoor air quality',
-              impact: 'high'
+              description: 'No special steps for indoor air quality'
             },
             {
               value: 'D',
               icon: <Info className="h-6 w-6" />,
               title: 'Not Considered',
-              description: 'I have not thought about indoor air quality management',
-              impact: 'high'
+              description: 'I have not thought about indoor air quality management'
             }
           ];
         } else if (subCategory === 'outdoorQuality') {
@@ -407,29 +343,25 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <Wind className="h-6 w-6" />,
               title: 'Fresh and Clean',
-              description: 'It feels crisp, clean, and refreshing—like a breath of pure air',
-              impact: 'low'
+              description: 'It feels crisp, clean, and refreshing—like a breath of pure air'
             },
             {
               value: 'B',
               icon: <Sun className="h-6 w-6" />,
               title: 'Generally Clear',
-              description: 'It is generally clear, though I notice a little haze on busy days',
-              impact: 'medium'
+              description: 'It is generally clear, though I notice a little haze on busy days'
             },
             {
               value: 'C',
               icon: <Cloud className="h-6 w-6" />,
               title: 'Sometimes Polluted',
-              description: 'It is often a bit smoggy or polluted, especially during rush hours',
-              impact: 'high'
+              description: 'It is often a bit smoggy or polluted, especially during rush hours'
             },
             {
               value: 'D',
               icon: <Info className="h-6 w-6" />,
               title: 'Not Sure',
-              description: 'I rarely pay attention to the air quality',
-              impact: 'high'
+              description: 'I rarely pay attention to the air quality'
             }
           ];
         } else if (subCategory === 'monitoring') {
@@ -438,22 +370,19 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <CloudSun className="h-6 w-6" />,
               title: 'Active Monitoring',
-              description: 'Regular air quality monitoring and filtration',
-              impact: 'low'
+              description: 'Regular air quality monitoring and filtration'
             },
             {
               value: 'B',
               icon: <Wind className="h-6 w-6" />,
               title: 'Basic Awareness',
-              description: 'Occasional monitoring of air quality',
-              impact: 'medium'
+              description: 'Occasional monitoring of air quality'
             },
             {
               value: 'C',
               icon: <Wind className="h-6 w-6" />,
               title: 'No Monitoring',
-              description: 'No air quality monitoring systems',
-              impact: 'high'
+              description: 'No air quality monitoring systems'
             }
           ];
         } else {
@@ -462,22 +391,19 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <Leaf className="h-6 w-6" />,
               title: 'Low Impact',
-              description: 'Use of air-friendly products and practices',
-              impact: 'low'
+              description: 'Use of air-friendly products and practices'
             },
             {
               value: 'B',
               icon: <Wind className="h-6 w-6" />,
               title: 'Moderate Impact',
-              description: 'Some consideration for air quality',
-              impact: 'medium'
+              description: 'Some consideration for air quality'
             },
             {
               value: 'C',
               icon: <Wind className="h-6 w-6" />,
               title: 'High Impact',
-              description: 'Limited consideration for air quality',
-              impact: 'high'
+              description: 'Limited consideration for air quality'
             }
           ];
         }
@@ -490,7 +416,7 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
   const options = getTileOptions();
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {options.map((option) => (
         <QuestionTile
           key={option.value}
@@ -499,7 +425,6 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
           icon={option.icon}
           title={option.title}
           description={option.description}
-          impact={option.impact as 'low' | 'medium' | 'high'}
         />
       ))}
     </div>

@@ -8,114 +8,126 @@ export interface EcoPersonalityType {
   nextSteps: string[];
   points: string;
   subCategory?: string;
-  role: 'visionary' | 'guardian' | 'catalyst' | 'sage';
-  mood: 'determined' | 'peaceful' | 'energetic' | 'wise';
 }
 
 export const EcoPersonalityTypes: Record<string, EcoPersonalityType> = {
-  ECO_VISIONARY: {
-    title: "Eco Visionary",
-    badge: "🌟",
-    description: "You're a forward-thinking environmental pioneer, seeing possibilities where others see challenges. Your innovative approach to sustainability inspires and leads the way.",
-    color: "from-teal-600 to-teal-500",
-    role: "visionary",
-    mood: "determined",
+  SUSTAINABILITY_SLAYER: {
+    title: "Sustainability Slayer",
+    badge: "🌍",
+    description: "You're a champion of eco-friendly living, consistently making choices that benefit the planet.",
+    color: "from-green-600 to-green-500",
     points: "8/8 Points",
     strengths: [
-      "Innovative environmental problem-solving",
-      "Long-term sustainability planning",
-      "Inspiring others through creative solutions",
-      "Pioneering eco-friendly technologies"
+      "Leading by example in sustainable practices",
+      "Comprehensive understanding of environmental impact",
+      "Influencing others through positive action"
     ],
     nextSteps: [
-      "Launch a community sustainability initiative",
-      "Develop innovative eco-solutions",
-      "Create environmental education programs",
-      "Partner with local green businesses"
+      "Start a community sustainability initiative",
+      "Mentor others in eco-friendly practices",
+      "Advocate for environmental policies"
     ]
   },
-  EARTH_GUARDIAN: {
-    title: "Earth Guardian",
-    badge: "🌍",
-    description: "You're a steadfast protector of our planet, maintaining balance between progress and preservation. Your consistent efforts create lasting positive change.",
+  PLANETS_MAIN_CHARACTER: {
+    title: "Planet's Main Character",
+    badge: "🌀",
+    description: "You're making significant strides in sustainable living with room to grow into a true environmental leader.",
     color: "from-blue-600 to-blue-500",
-    role: "guardian",
-    mood: "peaceful",
-    points: "7/8 Points",
-    strengths: [
-      "Consistent environmental stewardship",
-      "Balanced approach to sustainability",
-      "Strong conservation ethics",
-      "Community environmental leadership"
-    ],
-    nextSteps: [
-      "Establish local conservation projects",
-      "Create sustainable living guidelines",
-      "Organize community clean-up events",
-      "Develop waste reduction programs"
-    ]
-  },
-  ECO_CATALYST: {
-    title: "Eco Catalyst",
-    badge: "⚡",
-    description: "You're a dynamic force for environmental change, energizing others and sparking eco-conscious movements. Your enthusiasm is contagious and transformative.",
-    color: "from-purple-600 to-purple-500",
-    role: "catalyst",
-    mood: "energetic",
     points: "6/8 Points",
     strengths: [
-      "Energetic environmental advocacy",
-      "Rapid adoption of eco-innovations",
-      "Social influence for sustainability",
-      "Quick implementation of green practices"
+      "Strong commitment to sustainable practices",
+      "Active engagement in environmental initiatives",
+      "Regular sustainable choices"
     ],
     nextSteps: [
-      "Start viral eco-challenges",
-      "Create engaging sustainability content",
-      "Lead quick-impact green initiatives",
-      "Network with environmental influencers"
+      "Expand your influence in the community",
+      "Explore advanced sustainability practices",
+      "Share your journey to inspire others"
     ]
   },
-  SUSTAINABILITY_SAGE: {
-    title: "Sustainability Sage",
-    badge: "🌿",
-    description: "You're a wise environmental steward, understanding the deep connections between nature and human activity. Your thoughtful approach creates lasting impact.",
-    color: "from-lime-600 to-lime-500",
-    role: "sage",
-    mood: "wise",
-    points: "5/8 Points",
-    strengths: [
-      "Deep ecological understanding",
-      "Holistic environmental perspective",
-      "Mindful resource management",
-      "Traditional ecological knowledge"
-    ],
-    nextSteps: [
-      "Share environmental wisdom",
-      "Mentor eco-conscious individuals",
-      "Document sustainable practices",
-      "Research traditional conservation methods"
-    ]
-  },
-  GREEN_APPRENTICE: {
-    title: "Green Apprentice",
+  SUSTAINABILITY_SOFT_LAUNCH: {
+    title: "Sustainability Soft Launch",
     badge: "🌱",
-    description: "You're beginning your sustainability journey with enthusiasm and openness to learn. Your fresh perspective brings new energy to environmental efforts.",
-    color: "from-emerald-500 to-emerald-400",
-    role: "catalyst",
-    mood: "energetic",
+    description: "You're making conscious efforts to live more sustainably and building momentum for bigger changes.",
+    color: "from-teal-600 to-teal-500",
     points: "4/8 Points",
     strengths: [
-      "Eager to learn and adapt",
-      "Fresh perspective on sustainability",
-      "Quick adoption of eco-habits",
-      "Openness to new ideas"
+      "Growing awareness of environmental impact",
+      "Implementing basic sustainable practices",
+      "Openness to eco-friendly alternatives"
     ],
     nextSteps: [
-      "Build foundational eco-knowledge",
-      "Start small sustainable habits",
-      "Connect with environmental mentors",
-      "Experiment with green lifestyle changes"
+      "Establish more consistent eco-habits",
+      "Learn about advanced sustainability practices",
+      "Connect with like-minded individuals"
+    ]
+  },
+  KIND_OF_CONSCIOUS: {
+    title: "Kind of Conscious, Kind of Confused",
+    badge: "🍃",
+    description: "You're aware of environmental issues and making some efforts, but could use more direction and consistency.",
+    color: "from-yellow-500 to-yellow-400",
+    points: "3/8 Points",
+    strengths: [
+      "Basic environmental awareness",
+      "Some sustainable practices in place",
+      "Interest in improvement"
+    ],
+    nextSteps: [
+      "Establish daily eco-friendly routines",
+      "Learn more about environmental impact",
+      "Start with simple sustainable swaps"
+    ]
+  },
+  ECO_IN_PROGRESS: {
+    title: "Eco in Progress…",
+    badge: "☁️",
+    description: "You're at the beginning of your sustainability journey with lots of potential for positive change.",
+    color: "from-orange-500 to-orange-400",
+    points: "2/8 Points",
+    strengths: [
+      "Open to learning",
+      "Taking first steps",
+      "Recognizing need for change"
+    ],
+    nextSteps: [
+      "Start with one sustainable habit",
+      "Learn about basic environmental issues",
+      "Find easy eco-friendly alternatives"
+    ]
+  },
+  DOING_NOTHING: {
+    title: "DND: Doing Nothing for the Planet",
+    badge: "💤",
+    description: "Your current lifestyle has significant room for improvement in terms of environmental impact.",
+    color: "from-red-500 to-red-400",
+    points: "1/8 Points",
+    strengths: [
+      "Potential for significant impact",
+      "Room for easy improvements",
+      "Opportunity for fresh start"
+    ],
+    nextSteps: [
+      "Start with simple eco-friendly changes",
+      "Learn about environmental basics",
+      "Track your daily habits"
+    ]
+  },
+  CLIMATE_SNOOZER: {
+    title: "Certified Climate Snoozer",
+    badge: "❌",
+    description: "It's time to wake up to environmental issues and start making positive changes.",
+    color: "from-gray-600 to-gray-500",
+    points: "0/8 Points",
+    strengths: [
+      "Opportunity for major improvement",
+      "Clean slate for new habits",
+      "Potential for immediate impact"
+    ],
+    nextSteps: [
+      "Begin with basic awareness",
+      "Make one eco-friendly change",
+      "Learn about environmental impact"
     ]
   }
 };
@@ -124,90 +136,92 @@ export const EcoPersonalityTypes: Record<string, EcoPersonalityType> = {
 const personalityMappings = {
   homeEnergy: {
     efficiency: {
-      A: ["ECO_VISIONARY", "EARTH_GUARDIAN"],
-      B: ["ECO_CATALYST", "SUSTAINABILITY_SAGE"],
-      C: ["GREEN_APPRENTICE"],
-      "": ["GREEN_APPRENTICE"]
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      C: ["ECO_IN_PROGRESS", "DOING_NOTHING"],
+      "": ["CLIMATE_SNOOZER"]
     },
     management: {
-      A: ["ECO_VISIONARY", "SUSTAINABILITY_SAGE"],
-      B: ["EARTH_GUARDIAN", "ECO_CATALYST"],
-      C: ["GREEN_APPRENTICE"],
-      "": ["GREEN_APPRENTICE"]
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH"],
+      C: ["ECO_IN_PROGRESS", "DOING_NOTHING"],
+      "": ["CLIMATE_SNOOZER"]
     }
   },
   transport: {
     primary: {
-      A: ["ECO_VISIONARY", "EARTH_GUARDIAN"],
-      B: ["ECO_CATALYST"],
-      C: ["SUSTAINABILITY_SAGE"],
-      D: ["GREEN_APPRENTICE"],
-      "": ["GREEN_APPRENTICE"]
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH"],
+      C: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"],
+      D: ["DOING_NOTHING", "CLIMATE_SNOOZER"],
+      "": ["CLIMATE_SNOOZER"]
     },
     carProfile: {
-      A: ["ECO_VISIONARY"],
-      B: ["EARTH_GUARDIAN"],
-      C: ["ECO_CATALYST"],
-      D: ["SUSTAINABILITY_SAGE"],
-      E: ["GREEN_APPRENTICE"],
-      "": ["GREEN_APPRENTICE"]
+      A: ["SUSTAINABILITY_SLAYER"],
+      B: ["PLANETS_MAIN_CHARACTER"],
+      C: ["SUSTAINABILITY_SOFT_LAUNCH"],
+      D: ["KIND_OF_CONSCIOUS"],
+      E: ["ECO_IN_PROGRESS", "DOING_NOTHING"],
+      "": ["CLIMATE_SNOOZER"]
     }
   },
   food: {
     diet: {
-      VEGAN: ["ECO_VISIONARY"],
-      VEGETARIAN: ["EARTH_GUARDIAN"],
-      FLEXITARIAN: ["ECO_CATALYST"],
-      MEAT_MODERATE: ["SUSTAINABILITY_SAGE"],
-      MEAT_HEAVY: ["GREEN_APPRENTICE"]
+      VEGAN: ["SUSTAINABILITY_SLAYER"],
+      VEGETARIAN: ["PLANETS_MAIN_CHARACTER"],
+      FLEXITARIAN: ["SUSTAINABILITY_SOFT_LAUNCH"],
+      MEAT_MODERATE: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"],
+      MEAT_HEAVY: ["DOING_NOTHING", "CLIMATE_SNOOZER"]
     },
     plateProfile: {
-      A: ["ECO_VISIONARY", "EARTH_GUARDIAN"],
-      B: ["ECO_CATALYST", "SUSTAINABILITY_SAGE"],
-      C: ["GREEN_APPRENTICE"],
-      "": ["GREEN_APPRENTICE"]
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      C: ["ECO_IN_PROGRESS", "DOING_NOTHING"],
+      "": ["CLIMATE_SNOOZER"]
     }
   },
   waste: {
     prevention: {
-      A: ["ECO_VISIONARY"],
-      B: ["EARTH_GUARDIAN", "ECO_CATALYST"],
-      C: ["SUSTAINABILITY_SAGE"],
-      D: ["GREEN_APPRENTICE"],
-      "": ["GREEN_APPRENTICE"]
+      A: ["SUSTAINABILITY_SLAYER"],
+      B: ["PLANETS_MAIN_CHARACTER", "SUSTAINABILITY_SOFT_LAUNCH"],
+      C: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"],
+      D: ["DOING_NOTHING", "CLIMATE_SNOOZER"],
+      "": ["CLIMATE_SNOOZER"]
     },
     management: {
-      A: ["ECO_VISIONARY", "EARTH_GUARDIAN"],
-      B: ["ECO_CATALYST", "SUSTAINABILITY_SAGE"],
-      C: ["GREEN_APPRENTICE"],
-      "": ["GREEN_APPRENTICE"]
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      C: ["ECO_IN_PROGRESS", "DOING_NOTHING"],
+      "": ["CLIMATE_SNOOZER"]
     }
   },
   airQuality: {
     monitoring: {
-      A: ["ECO_VISIONARY", "EARTH_GUARDIAN"],
-      B: ["ECO_CATALYST"],
-      C: ["SUSTAINABILITY_SAGE"],
-      D: ["GREEN_APPRENTICE"],
-      "": ["GREEN_APPRENTICE"]
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH"],
+      C: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"],
+      D: ["DOING_NOTHING", "CLIMATE_SNOOZER"],
+      "": ["CLIMATE_SNOOZER"]
     },
     impact: {
-      A: ["ECO_VISIONARY"],
-      B: ["EARTH_GUARDIAN", "ECO_CATALYST"],
-      C: ["SUSTAINABILITY_SAGE"],
-      D: ["GREEN_APPRENTICE"],
-      "": ["GREEN_APPRENTICE"]
+      A: ["SUSTAINABILITY_SLAYER"],
+      B: ["PLANETS_MAIN_CHARACTER", "SUSTAINABILITY_SOFT_LAUNCH"],
+      C: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"],
+      D: ["DOING_NOTHING", "CLIMATE_SNOOZER"],
+      "": ["CLIMATE_SNOOZER"]
     }
   }
 };
 
 // Personality hierarchy for tiebreaking
 const personalityHierarchy = [
-  "ECO_VISIONARY",
-  "EARTH_GUARDIAN",
-  "ECO_CATALYST",
-  "SUSTAINABILITY_SAGE",
-  "GREEN_APPRENTICE"
+  "SUSTAINABILITY_SLAYER",
+  "PLANETS_MAIN_CHARACTER",
+  "SUSTAINABILITY_SOFT_LAUNCH",
+  "KIND_OF_CONSCIOUS",
+  "ECO_IN_PROGRESS",
+  "DOING_NOTHING",
+  "CLIMATE_SNOOZER"
 ];
 
 export const determineEcoPersonality = (state: any) => {
@@ -317,9 +331,9 @@ export const determineEcoPersonality = (state: any) => {
 
 export const getOutfitForPersonality = (personalityTitle: string): string => {
   switch (personalityTitle) {
-    case 'Eco Visionary':
+    case 'Sustainability Slayer':
       return 'eco-warrior';
-    case "Earth Guardian":
+    case "Planet's Main Character":
       return 'solar-powered';
     default:
       return 'recycled-denim';
@@ -328,9 +342,9 @@ export const getOutfitForPersonality = (personalityTitle: string): string => {
 
 export const getAccessoryForPersonality = (personalityTitle: string): string => {
   switch (personalityTitle) {
-    case 'Eco Visionary':
+    case 'Sustainability Slayer':
       return 'leaf-halo';
-    case "Earth Guardian":
+    case "Planet's Main Character":
       return 'solar-crown';
     default:
       return 'eco-badge';
