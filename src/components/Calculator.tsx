@@ -143,6 +143,13 @@ interface BaseCalculatorState {
       completed: boolean;
     }>;
   };
+
+  // Clothing
+  clothing?: {
+    wardrobeImpact: string;
+    mindfulUpgrades: string;
+    durability: string;
+  };
 }
 
 type CalculatorState = BaseCalculatorState;
@@ -264,7 +271,8 @@ const Calculator = ({
         indoorAirQuality: 'A',
         airQualityCommuting: 'A',
         airQualityImpact: 'A'
-      }
+      },
+      clothing: undefined
     });
   };
 
@@ -939,21 +947,101 @@ const Calculator = ({
     </div>
   );
 
+  const renderClothing = () => (
+    <div className="animate-fade-in">
+      <CardHeader className="pb-8">
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="p-2 bg-primary/10 rounded-full">
+            <ShoppingBag className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <CardTitle className="text-2xl">Clothes & Fashion</CardTitle>
+            <CardDescription className="text-base mt-1">
+              Tell us about your clothing and fashion habits.
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-8">
+        {/* Wardrobe Impact */}
+        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="flex items-start gap-4 mb-5">
+            <div className="p-2 bg-primary/10 rounded-lg mt-1">
+              <ShoppingBag className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <label className="text-lg font-medium text-foreground block mb-2">
+                How do you approach shopping for clothes?
+              </label>
+              <p className="text-muted-foreground text-sm">Your shopping habits can have a big impact on sustainability.</p>
+            </div>
+          </div>
+          <QuestionTiles
+            category="clothing"
+            subCategory="wardrobeImpact"
+            value={state.clothing?.wardrobeImpact || ''}
+            onChange={(value) => onUpdate({ clothing: { ...state.clothing, wardrobeImpact: value } })}
+          />
+        </div>
+        {/* Mindful Upgrades */}
+        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="flex items-start gap-4 mb-5">
+            <div className="p-2 bg-primary/10 rounded-lg mt-1">
+              <PackageCheck className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <label className="text-lg font-medium text-foreground block mb-2">
+                When you upgrade your wardrobe, what do you consider?
+              </label>
+              <p className="text-muted-foreground text-sm">Thinking about durability and environmental impact is key.</p>
+            </div>
+          </div>
+          <QuestionTiles
+            category="clothing"
+            subCategory="mindfulUpgrades"
+            value={state.clothing?.mindfulUpgrades || ''}
+            onChange={(value) => onUpdate({ clothing: { ...state.clothing, mindfulUpgrades: value } })}
+          />
+        </div>
+        {/* Durability */}
+        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="flex items-start gap-4 mb-5">
+            <div className="p-2 bg-primary/10 rounded-lg mt-1">
+              <Timer className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <label className="text-lg font-medium text-foreground block mb-2">
+                How long do your clothes typically last?
+              </label>
+              <p className="text-muted-foreground text-sm">Durability is a sign of mindful fashion choices.</p>
+            </div>
+          </div>
+          <QuestionTiles
+            category="clothing"
+            subCategory="durability"
+            value={state.clothing?.durability || ''}
+            onChange={(value) => onUpdate({ clothing: { ...state.clothing, durability: value } })}
+          />
+        </div>
+      </CardContent>
+    </div>
+  );
+
   const renderWaste = () => (
-          <div className="animate-fade-in">
+    <div className="animate-fade-in">
       <CardHeader className="pb-8">
         <div className="flex items-center space-x-3 mb-4">
           <div className="p-2 bg-primary/10 rounded-full">
             <Recycle className="h-6 w-6 text-primary" />
-              </div>
+          </div>
           <div>
             <CardTitle className="text-2xl">Your Waste Impact</CardTitle>
             <CardDescription className="text-base mt-1">
               Tell us about your waste management and consumption habits.
-              </CardDescription>
+            </CardDescription>
           </div>
         </div>
-            </CardHeader>
+      </CardHeader>
       <CardContent className="space-y-8">
         {/* Waste Prevention Question */}
         <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
@@ -970,12 +1058,11 @@ const Calculator = ({
           </div>
           <QuestionTiles
             category="waste"
-            subCategory="wasteManagement"
-            value={state.waste.wasteManagement}
-            onChange={(value) => onUpdate({ waste: { ...state.waste, wasteManagement: value as "" | "A" | "B" | "C" } })}
+            subCategory="prevention"
+            value={state.waste.wastePrevention}
+            onChange={(value) => onUpdate({ waste: { ...state.waste, wastePrevention: value as "" | "A" | "B" | "C" | "D" } })}
           />
         </div>
-
         {/* Waste Composition Question */}
         <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
           <div className="flex items-start gap-4 mb-5">
@@ -989,110 +1076,14 @@ const Calculator = ({
               <p className="text-muted-foreground text-sm">Understanding your waste composition helps identify reduction opportunities.</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <button
-              onClick={() => onUpdate({ waste: { ...state.waste, wasteComposition: "A" } })}
-                  className={cn(
-                "p-4 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02]",
-                state.waste.wasteComposition === "A" 
-                  ? "border-primary bg-primary/5" 
-                  : "border-border/50 hover:border-primary/50"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Apple className="h-5 w-5 text-primary" />
-                  </div>
-                <div>
-                  <h3 className="font-medium text-foreground">Food Scraps</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Kitchen leftovers and organic waste</p>
-                </div>
-              </div>
-            </button>
-                
-            <button
-              onClick={() => onUpdate({ waste: { ...state.waste, wasteComposition: "B" } })}
-                  className={cn(
-                "p-4 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02]",
-                state.waste.wasteComposition === "B" 
-                  ? "border-primary bg-primary/5" 
-                  : "border-border/50 hover:border-primary/50"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <PackageX className="h-5 w-5 text-primary" />
-                  </div>
-                <div>
-                  <h3 className="font-medium text-foreground">Single-Use Packaging</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Plastic wrappers and takeout containers</p>
-                </div>
-              </div>
-            </button>
-                
-            <button
-              onClick={() => onUpdate({ waste: { ...state.waste, wasteComposition: "C" } })}
-                  className={cn(
-                "p-4 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02]",
-                state.waste.wasteComposition === "C" 
-                  ? "border-primary bg-primary/5" 
-                  : "border-border/50 hover:border-primary/50"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <FileText className="h-5 w-5 text-primary" />
-                  </div>
-                <div>
-                  <h3 className="font-medium text-foreground">Paper & Cardboard</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Mail, boxes, and receipts</p>
-                </div>
-              </div>
-            </button>
-                
-            <button
-              onClick={() => onUpdate({ waste: { ...state.waste, wasteComposition: "D" } })}
-                  className={cn(
-                "p-4 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02]",
-                state.waste.wasteComposition === "D" 
-                  ? "border-primary bg-primary/5" 
-                  : "border-border/50 hover:border-primary/50"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Battery className="h-5 w-5 text-primary" />
-                  </div>
-                <div>
-                  <h3 className="font-medium text-foreground">Electronics</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Broken devices and batteries</p>
-                </div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => onUpdate({ waste: { ...state.waste, wasteComposition: "E" } })}
-              className={cn(
-                "p-4 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02]",
-                state.waste.wasteComposition === "E" 
-                  ? "border-primary bg-primary/5" 
-                  : "border-border/50 hover:border-primary/50"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Shirt className="h-5 w-5 text-primary" />
-              </div>
-                <div>
-                  <h3 className="font-medium text-foreground">Textiles</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Old garments and linens</p>
-          </div>
-              </div>
-            </button>
-          </div>
+          <QuestionTiles
+            category="waste"
+            subCategory="wasteComposition"
+            value={state.waste.wasteComposition}
+            onChange={(value) => onUpdate({ waste: { ...state.waste, wasteComposition: value as "" | "A" | "B" | "C" | "D" | "E" } })}
+          />
         </div>
-
-        {/* Smart Shopping & Waste Choices */}
+        {/* Shopping Approach Question */}
         <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
@@ -1112,19 +1103,18 @@ const Calculator = ({
             onChange={(value) => onUpdate({ waste: { ...state.waste, shoppingApproach: value as "" | "A" | "B" | "C" } })}
           />
         </div>
-
-        {/* Daily Trash Management */}
+        {/* Waste Management Question */}
         <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
-                <Trash2 className="h-5 w-5 text-primary" />
-              </div>
-              <div>
+              <Recycle className="h-5 w-5 text-primary" />
+            </div>
+            <div>
               <label className="text-lg font-medium text-foreground block mb-2">
                 Think about how you manage your everyday waste—what best reflects your habits?
-                  </label>
+              </label>
               <p className="text-muted-foreground text-sm">Proper waste management can significantly reduce your environmental impact.</p>
-                </div>
+            </div>
           </div>
           <QuestionTiles
             category="waste"
@@ -1132,61 +1122,56 @@ const Calculator = ({
             value={state.waste.wasteManagement}
             onChange={(value) => onUpdate({ waste: { ...state.waste, wasteManagement: value as "" | "A" | "B" | "C" } })}
           />
-              </div>
-
-        {/* Repair or Replace Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
-          <div className="flex items-start gap-4 mb-5">
-            <div className="p-2 bg-primary/10 rounded-lg mt-1">
-              <Wrench className="h-5 w-5 text-primary" />
+        </div>
+        {/* Repairs Items Question */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 flex flex-col gap-4 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="bg-green-50 rounded-full p-3 flex items-center justify-center">
+              <Wrench className="h-6 w-6 text-green-600" />
             </div>
-              <div>
-              <label className="text-lg font-medium text-foreground block mb-2">
+            <div>
+              <div className="text-lg md:text-xl font-semibold text-gray-900">
                 When something breaks, do you try to repair it instead of replacing it right away?
-                </label>
-              <p className="text-muted-foreground text-sm">Repairing items can significantly reduce waste and resource consumption.</p>
+              </div>
+              <div className="text-gray-500 text-sm mt-1">
+                Repairing items can significantly reduce waste and resource consumption.
+              </div>
             </div>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-4 mt-2">
             <YesNoToggle
               value={state.waste.repairsItems}
               onChange={(value) => onUpdate({ waste: { ...state.waste, repairsItems: value } })}
               className="w-full max-w-md"
             />
-                </div>
-              </div>
-
-        <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-6 mt-8">
-          <div className="flex items-start gap-4">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Info className="h-5 w-5 text-blue-600" />
+          </div>
+        </div>
+        {/* Evaluates Lifecycle Question */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 flex flex-col gap-4 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="bg-green-50 rounded-full p-3 flex items-center justify-center">
+              <Info className="h-6 w-6 text-green-600" />
             </div>
             <div>
-              <h4 className="text-lg font-medium text-blue-900 mb-2">Why this matters</h4>
-              <p className="text-blue-700 text-sm leading-relaxed">
-                Waste management is crucial for reducing environmental impact. The average person generates about 4.5 pounds of waste per day, 
-                but conscious choices can significantly reduce this amount.
-              </p>
-              <ul className="mt-4 space-y-2">
-                <li className="flex items-center gap-2 text-sm text-blue-700">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                  Recycling can reduce waste-related emissions by up to 50%
-                </li>
-                <li className="flex items-center gap-2 text-sm text-blue-700">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                  Repairing items instead of replacing them can save significant resources
-                </li>
-                <li className="flex items-center gap-2 text-sm text-blue-700">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                  Conscious shopping choices can reduce packaging waste by up to 70%
-                </li>
-              </ul>
+              <div className="text-lg md:text-xl font-semibold text-gray-900">
+                Do you consider the lifecycle of products before buying?
+              </div>
+              <div className="text-gray-500 text-sm mt-1">
+                Thinking about what happens to an item after use is key to sustainability.
+              </div>
             </div>
           </div>
-              </div>
-            </CardContent>
+          <div className="flex justify-center gap-4 mt-2">
+            <YesNoToggle
+              value={state.waste.evaluatesLifecycle}
+              onChange={(value) => onUpdate({ waste: { ...state.waste, evaluatesLifecycle: value } })}
+              className="w-full max-w-md"
+            />
           </div>
-        );
+        </div>
+      </CardContent>
+    </div>
+  );
 
   const renderAirQuality = () => (
     <div className="animate-fade-in">
@@ -1213,7 +1198,6 @@ const Calculator = ({
             onChange={(value) => onUpdate({ airQuality: { ...state.airQuality, outdoorAirQuality: value as "" | "A" | "B" | "C" | "D" } })}
           />
         </div>
-
         {/* AQI Monitoring */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -1230,7 +1214,6 @@ const Calculator = ({
             onChange={(value) => onUpdate({ airQuality: { ...state.airQuality, aqiMonitoring: value as "" | "A" | "B" | "C" | "D" } })}
           />
         </div>
-
         {/* Indoor Air Quality */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -1247,7 +1230,6 @@ const Calculator = ({
             onChange={(value) => onUpdate({ airQuality: { ...state.airQuality, indoorAirQuality: value as "" | "A" | "B" | "C" | "D" } })}
           />
         </div>
-
         {/* Air Quality Commuting */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -1264,7 +1246,6 @@ const Calculator = ({
             onChange={(value) => onUpdate({ airQuality: { ...state.airQuality, airQualityCommuting: value as "" | "A" | "B" | "C" | "D" } })}
           />
         </div>
-
         {/* Air Quality Impact */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -1282,13 +1263,14 @@ const Calculator = ({
           />
         </div>
       </CardContent>
-      </div>
-    );
+    </div>
+  );
 
   const steps = [
     { title: 'Home Energy', icon: Home, content: renderHomeEnergy },
     { title: 'Transportation', icon: Car, content: renderTransportationStep },
     { title: 'Food & Diet', icon: Utensils, content: renderFood },
+    { title: 'Clothes & Fashion', icon: ShoppingBag, content: renderClothing },
     { title: 'Waste', icon: Recycle, content: renderWaste },
     { title: 'Air Quality', icon: Leaf, content: renderAirQuality },
     { title: 'Results', icon: PackageCheck, content: renderResults },
@@ -1306,12 +1288,14 @@ const Calculator = ({
       case 2:
         return renderFood();
       case 3:
-        return renderWaste();
+        return renderClothing();
       case 4:
-        return renderAirQuality();
+        return renderWaste();
       case 5:
-        return renderResults();
+        return renderAirQuality();
       case 6:
+        return renderResults();
+      case 7:
         return renderDemographics();
       default:
         return renderHomeEnergy();
@@ -1319,11 +1303,11 @@ const Calculator = ({
   };
 
   const handleNext = () => {
-    if (currentStep === 4) { // Air Quality step
+    if (currentStep === 5) { // Air Quality step (now index 5)
       handleCalculate();
-      onStepChange(5); // Go to results
-    } else if (currentStep === 5) { // Results step
-      onStepChange(6); // Go to demographics
+      onStepChange(6); // Go to results
+    } else if (currentStep === 6) { // Results step
+      onStepChange(7); // Go to demographics
     } else {
       onNext();
     }

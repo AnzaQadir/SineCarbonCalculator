@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
   Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2, Check, BookOpen,
   Book, Star, Sparkles, Trophy, Heart, 
-  Lightbulb, Users, Target, ArrowRight 
+  Lightbulb, Users, Target, ArrowRight, ShoppingBag 
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { determineEcoPersonality } from '@/utils/ecoPersonality';
+import { determineEcoPersonality, assignEcoPersonality, PersonalityDetails } from '@/utils/ecoPersonality';
 import useSound from 'use-sound';
 import { EcoAvatar } from '@/components/EcoAvatar';
 import { getOutfitForPersonality, getAccessoryForPersonality, getBackgroundForCategory } from '@/utils/ecoPersonality';
@@ -446,8 +446,53 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
     }
   };
 
-  // Replace the old getEcoPersonality function with the new one
-  const personality = determineEcoPersonality(state);
+  // Map state to scored responses (0-2 per answer, grouped by category)
+  function mapStateToScoredResponses(state: any) {
+    // This mapping should be adapted to your actual state structure and scoring logic
+    return {
+      "Transportation": {
+        commute: state.primaryTransportMode === 'WALK_BIKE' ? 2 : state.primaryTransportMode === 'PUBLIC' ? 1 : 0,
+        electric_vehicle: state.carProfile === 'A' ? 2 : state.carProfile === 'B' ? 1 : 0,
+        annual_miles: state.annualMiles < 5000 ? 2 : state.annualMiles < 10000 ? 1 : 0
+      },
+      "Home Energy": {
+        energy_monitoring: state.energyManagement === 'A' ? 2 : state.energyManagement === 'B' ? 1 : 0,
+        renewable_energy: state.usesRenewableEnergy ? 2 : 0,
+        appliances: state.hasEnergyEfficiencyUpgrades ? 2 : 0
+      },
+      "Food & Diet": {
+        meat_frequency: state.dietType === 'VEGAN' ? 2 : state.dietType === 'VEGETARIAN' ? 1 : 0,
+        local_food: state.buysLocalFood ? 2 : 0,
+        composting: state.composting ? 2 : 0
+      },
+      "Waste": {
+        recycling: state.waste?.recyclingPercentage > 75 ? 2 : state.waste?.recyclingPercentage > 50 ? 1 : 0,
+        plastic_avoidance: state.waste?.avoidsPlastic ? 2 : 0,
+        reusing_items: state.waste?.minimizesWaste ? 2 : 0
+      },
+      "Clothing": {
+        buying_frequency: state.clothing?.buyingFrequency === 'RARELY' ? 2 : state.clothing?.buyingFrequency === 'SOMETIMES' ? 1 : 0,
+        eco_consideration: state.clothing?.ecoConsideration ? 2 : 0
+      },
+      "Air Quality": {
+        outdoor_check: state.airQuality?.outdoorCheck ? 2 : 0,
+        indoor_monitoring: state.airQuality?.indoorMonitoring ? 2 : 0
+      },
+      "Purchasing Habits": {
+        lifecycle_eval: state.purchasing?.lifecycleEval ? 2 : 0,
+        sustainable_brands: state.purchasing?.sustainableBrands ? 2 : 0
+      }
+    };
+  }
+
+  const scoredResponses = mapStateToScoredResponses(state);
+  const dynamicPersonality = assignEcoPersonality(scoredResponses);
+  console.log('Your dynamic personality object:', dynamicPersonality);
+  // You can now use dynamicPersonality.personality, .emoji, .story, .avatarSuggestion, .nextAction, .badge, .champion
+  // For now, use this for the main personality display and story
+  const personality = dynamicPersonality;
+  // Get display fields from PersonalityDetails
+  const personalityDisplay = PersonalityDetails[personality.personality];
 
   useEffect(() => {
     // Simulate loading time for personality determination
@@ -517,14 +562,26 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
           <Leaf className="h-7 w-7 text-green-500" />
           <h2 className="text-2xl font-serif text-gray-800">Your Sustainability Journey</h2>
         </div>
-        <SustainabilityJourney
-          currentMilestone={Math.floor(score / 12.5)}
-          personalityType={personality.title}
-          score={score}
-          onMilestoneReached={(milestone) => {
-            console.log('Reached milestone:', milestone);
-          }}
-        />
+        {/* Map personality to milestone index for functional progress */}
+        {(() => {
+          // Define the order of personalities as milestones
+          const milestoneOrder = [
+            "Certified Climate Snoozer",
+            "Doing Nothing for the Planet",
+            "Eco in Progress",
+            "Kind of Conscious, Kind of Confused",
+            "Sustainability Soft Launch",
+            "Planet's Main Character",
+            "Sustainability Slayer"
+          ];
+          const currentMilestone = milestoneOrder.indexOf(personality.personality);
+          return (
+            <SustainabilityJourney
+              currentMilestone={currentMilestone}
+              score={score}
+            />
+          );
+        })()}
       </div>
 
       {/* Eco Story Card */}
@@ -535,24 +592,15 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
             <div className="flex flex-col lg:flex-row items-start gap-8">
               {/* Personality Info */}
               <div className="flex-1 space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                    {isPersonalityLoading ? (
-                      <Loader2 className="h-6 w-6 animate-spin text-green-600" />
-                    ) : (
-                      <span className="text-2xl">{personality.badge}</span>
-                    )}
+                <div className="rounded-2xl shadow-lg overflow-hidden max-w-2xl mx-auto">
+                  <div className="bg-gradient-to-br from-emerald-400 to-teal-500 p-8 flex flex-col items-start justify-between">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">{personality.emoji}</span>
+                      <h2 className="text-2xl md:text-3xl font-bold text-white">{personality.personality}</h2>
+                    </div>
+                    <div className="text-emerald-100 text-sm font-medium mb-2">{personality.badge}</div>
+                    <p className="text-white text-base md:text-lg">{personality.story.split('.')[0]}.</p>
                   </div>
-                  <div>
-                    <h2 className="text-4xl font-serif text-gray-800">{personality.title}</h2>
-                    <p className="text-lg text-gray-600">{personality.subCategory || 'Green Mobility Champion'}</p>
-                  </div>
-                </div>
-                
-                <div className="prose prose-lg text-gray-600">
-                  <p className="text-xl leading-relaxed">
-                    You're a remarkable force for change in our fight against climate change. Your journey as a {personality.title} shows your deep commitment to creating a sustainable future.
-                  </p>
                 </div>
               </div>
 
@@ -561,10 +609,10 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
                 <div className="relative aspect-square">
                   <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl overflow-hidden flex items-center justify-center">
                     <EcoAvatar
-                      outfit={getOutfitForPersonality(personality.title)}
-                      accessory={getAccessoryForPersonality(personality.title)}
+                      outfit={getOutfitForPersonality(personality.personality)}
+                      accessory={getAccessoryForPersonality(personality.personality)}
                       background={getBackgroundForCategory(dominantCategory)}
-                      role={getPersonalityRole(personality.title)}
+                      role={getPersonalityRole(personality.personality)}
                       size="xl"
                       animate={!isPersonalityLoading}
                       className="w-full h-full object-contain"
@@ -681,73 +729,87 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
           </div>
 
           {/* Categories Impact Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Home Category */}
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Home className="h-6 w-6 text-green-600" />
-                </div>
-                <Badge variant="outline" className={categoryEmissions.home < 3 ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>
-                  {categoryEmissions.home.toFixed(1)} tons CO₂
-                </Badge>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Home Energy</h3>
-              <p className="text-sm text-gray-600">
-                {state?.usesRenewableEnergy ? "Using renewable energy sources" : "Traditional energy consumption"}
-                {state?.hasEnergyEfficiencyUpgrades ? " with efficiency upgrades" : ""}
-              </p>
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <Leaf className="h-7 w-7 text-green-500" />
+              <h2 className="text-2xl font-serif text-gray-800">Your impact across categories</h2>
             </div>
-
-            {/* Transport Category */}
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Car className="h-6 w-6 text-blue-600" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+              {/* Home Category */}
+              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                <div className="mb-4">
+                  <Home className="h-7 w-7 text-green-600" />
                 </div>
-                <Badge variant="outline" className={categoryEmissions.transport < 4 ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>
-                  {categoryEmissions.transport.toFixed(1)} tons CO₂
-                </Badge>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Transport</h3>
-              <p className="text-sm text-gray-600">
-                {state?.primaryTransportMode === 'WALK_BIKE' ? "Primarily using active transport" :
-                 state?.primaryTransportMode === 'PUBLIC' ? "Regular public transit user" : "Car-based transportation"}
-              </p>
-            </div>
-
-            {/* Food Category */}
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-2 bg-amber-100 rounded-lg">
-                  <Utensils className="h-6 w-6 text-amber-600" />
+                <div className="text-lg font-semibold mb-1">Home</div>
+                <div className="text-gray-500 text-sm mb-2">
+                  {state?.usesRenewableEnergy ? "Using renewable energy sources" : "Traditional energy consumption"}
+                  {state?.hasEnergyEfficiencyUpgrades ? " with efficiency upgrades" : ""}
                 </div>
-                <Badge variant="outline" className={categoryEmissions.food < 2 ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>
-                  {categoryEmissions.food.toFixed(1)} tons CO₂
-                </Badge>
+                <div className="mt-auto text-green-700 font-medium">Top 50% for Home</div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Food Choices</h3>
-              <p className="text-sm text-gray-600">
-                {state?.dietType === 'VEGAN' ? "Plant-based diet champion" :
-                 state?.dietType === 'VEGETARIAN' ? "Vegetarian diet follower" : "Mixed diet consumer"}
-              </p>
-            </div>
-
-            {/* Waste Category */}
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Recycle className="h-6 w-6 text-purple-600" />
+              {/* Transport Category */}
+              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                <div className="mb-4">
+                  <Car className="h-7 w-7 text-blue-600" />
                 </div>
-                <Badge variant="outline" className={categoryEmissions.waste < 1 ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>
-                  {categoryEmissions.waste.toFixed(1)} tons CO₂
-                </Badge>
+                <div className="text-lg font-semibold mb-1">Transport</div>
+                <div className="text-gray-500 text-sm mb-2">
+                  {state?.primaryTransportMode === 'WALK_BIKE' ? "Primarily using active transport" :
+                    state?.primaryTransportMode === 'PUBLIC' ? "Regular public transit user" : "Car-based transportation"}
+                </div>
+                <div className="mt-auto text-green-700 font-medium">Top 40% for Transport</div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Waste Management</h3>
-              <p className="text-sm text-gray-600">
-                {state?.waste?.recyclingPercentage > 75 ? "High recycling achiever" :
-                 state?.waste?.recyclingPercentage > 50 ? "Active recycler" : "Starting recycling journey"}
-              </p>
+              {/* Food Category */}
+              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                <div className="mb-4">
+                  <Utensils className="h-7 w-7 text-amber-600" />
+                </div>
+                <div className="text-lg font-semibold mb-1">Food</div>
+                <div className="text-gray-500 text-sm mb-2">
+                  {state?.dietType === 'VEGAN' ? "Plant-based diet champion" :
+                    state?.dietType === 'VEGETARIAN' ? "Vegetarian diet follower" : "Mixed diet consumer"}
+                </div>
+                <div className="mt-auto text-green-700 font-medium">Top 30% for Food</div>
+              </div>
+              {/* Clothes Category */}
+              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                <div className="mb-4">
+                  <ShoppingBag className="h-7 w-7 text-pink-600" />
+                </div>
+                <div className="text-lg font-semibold mb-1">Clothes</div>
+                <div className="text-gray-500 text-sm mb-2">
+                  {state?.clothing?.wardrobeImpact === 'A' ? "Sustainable shopper" :
+                    state?.clothing?.wardrobeImpact === 'B' ? "Mix & match" :
+                    state?.clothing?.wardrobeImpact === 'C' ? "Trend follower" : "Fashion choices"}
+                </div>
+                <div className="mt-auto text-green-700 font-medium">Top 35% for Clothes</div>
+              </div>
+              {/* Waste Category */}
+              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                <div className="mb-4">
+                  <Recycle className="h-7 w-7 text-purple-600" />
+                </div>
+                <div className="text-lg font-semibold mb-1">Waste</div>
+                <div className="text-gray-500 text-sm mb-2">
+                  {state?.waste?.recyclingPercentage > 75 ? "High recycling achiever" :
+                    state?.waste?.recyclingPercentage > 50 ? "Active recycler" : "Starting recycling journey"}
+                </div>
+                <div className="mt-auto text-green-700 font-medium">Top 30% for Waste</div>
+              </div>
+              {/* Air Quality Category */}
+              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                <div className="mb-4">
+                  <Wind className="h-7 w-7 text-cyan-600" />
+                </div>
+                <div className="text-lg font-semibold mb-1">Air Quality</div>
+                <div className="text-gray-500 text-sm mb-2">
+                  {state?.airQuality?.outdoorAirQuality === 'A' ? "Fresh and clean" :
+                    state?.airQuality?.outdoorAirQuality === 'B' ? "Generally clear" :
+                    state?.airQuality?.outdoorAirQuality === 'C' ? "Sometimes polluted" :
+                    state?.airQuality?.outdoorAirQuality === 'D' ? "Not sure" : "Air quality awareness"}
+                </div>
+                <div className="mt-auto text-green-700 font-medium">Top 45% for Air Quality</div>
+              </div>
             </div>
           </div>
 

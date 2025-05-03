@@ -122,7 +122,7 @@ export const SustainabilityJourney = ({
   return (
     <div className="w-full">
       <div className="mb-8">
-        <h2 className="flex items-center gap-2 text-3xl font-extrabold text-green-900">
+        <h2 className="flex items-center gap-2 text-2xl font-serif text-gray-800">
           <Leaf className="w-7 h-7 text-green-600" />
           Your Sustainability Journey
         </h2>
@@ -257,15 +257,18 @@ export const SustainabilityJourney = ({
           {/* Earth icon at current progress */}
           <g style={{ pointerEvents: 'none' }}>
             <g transform={`translate(${earthPos.x},${earthPos.y})`}>
-              <EarthIcon className="w-16 h-16" glow={true} />
-              {/* You are here badge */}
+              <EarthIcon className="w-16 h-16" glow={false} />
+              {/* You are here badge - classy, elegant style */}
               <text
                 x={0}
-                y={-32}
+                y={-36}
+                dy={-4}
                 textAnchor="middle"
-                className="font-extrabold text-green-900"
-                fontSize={20}
-                style={{ filter: 'drop-shadow(0 2px 8px #fff)' }}
+                className="font-serif font-medium"
+                fontSize={16}
+                fill="#5A8376"
+                letterSpacing="0.5px"
+                style={{ filter: 'drop-shadow(0 1px 2px #EAF8F0)' }}
               >
                 You are here
               </text>

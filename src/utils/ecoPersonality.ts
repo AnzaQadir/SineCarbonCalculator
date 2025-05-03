@@ -210,6 +210,26 @@ const personalityMappings = {
       D: ["DOING_NOTHING", "CLIMATE_SNOOZER"],
       "": ["CLIMATE_SNOOZER"]
     }
+  },
+  clothing: {
+    wardrobeImpact: {
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      C: ["ECO_IN_PROGRESS", "DOING_NOTHING", "CLIMATE_SNOOZER"],
+      "": ["CLIMATE_SNOOZER"]
+    },
+    mindfulUpgrades: {
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      C: ["ECO_IN_PROGRESS", "DOING_NOTHING", "CLIMATE_SNOOZER"],
+      "": ["CLIMATE_SNOOZER"]
+    },
+    durability: {
+      forever: ["SUSTAINABILITY_SLAYER"],
+      years: ["PLANETS_MAIN_CHARACTER", "SUSTAINABILITY_SOFT_LAUNCH"],
+      months: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS", "DOING_NOTHING", "CLIMATE_SNOOZER"],
+      "": ["CLIMATE_SNOOZER"]
+    }
   }
 };
 
@@ -268,6 +288,17 @@ export const determineEcoPersonality = (state: any) => {
   }
   if (state.airQuality?.airQualityImpact) {
     personalityMappings.airQuality.impact[state.airQuality.airQualityImpact]?.forEach(p => tally[p]++);
+  }
+
+  // Process clothing responses
+  if (state.clothing?.wardrobeImpact) {
+    personalityMappings.clothing.wardrobeImpact[state.clothing.wardrobeImpact]?.forEach(p => tally[p]++);
+  }
+  if (state.clothing?.mindfulUpgrades) {
+    personalityMappings.clothing.mindfulUpgrades[state.clothing.mindfulUpgrades]?.forEach(p => tally[p]++);
+  }
+  if (state.clothing?.durability) {
+    personalityMappings.clothing.durability[state.clothing.durability]?.forEach(p => tally[p]++);
   }
 
   // Find personality with highest count
@@ -363,4 +394,106 @@ export const getBackgroundForCategory = (category: string): string => {
     default:
       return 'forest';
   }
-}; 
+};
+
+// Score mapping logic
+function calculateTotalScoreFromResponses(responses: Record<string, Record<string, number>>): number {
+  let total = 0;
+  for (const category of Object.values(responses)) {
+    for (const score of Object.values(category)) {
+      total += score;
+    }
+  }
+  return total;
+}
+
+function getPersonalityTypeFromScore(score: number): keyof typeof PersonalityDetails {
+  if (score >= 16) return "Sustainability Slayer";
+  if (score >= 13) return "Planet's Main Character";
+  if (score >= 10) return "Sustainability Soft Launch";
+  if (score >= 7) return "Kind of Conscious, Kind of Confused";
+  if (score >= 5) return "Eco in Progress";
+  if (score >= 3) return "Doing Nothing for the Planet";
+  return "Certified Climate Snoozer";
+}
+
+// --- Dynamic, score-based eco-personality assignment ---
+
+export const PersonalityDetails = {
+  "Sustainability Slayer": {
+    emoji: "🌍",
+    story: `You are a Sustainability Slayer! Your lifestyle is a beacon of hope for the planet. Every choice you make is rooted in deep environmental awareness and a drive to inspire others. You lead by example, showing that a sustainable life is not only possible, but rewarding and impactful.\n\nYour journey is one of mastery—your home, habits, and heart are all aligned with the planet's needs. Others look to you for guidance, and you're always ready to take on the next big eco-challenge!`,
+    avatar: "A radiant eco-hero, surrounded by lush forests and a sparkling clean river, with a golden aura.",
+    nextAction: "Mentor someone new to sustainability or start a community green project.",
+    badge: "First Meatless Week",
+    champion: "Greta Thunberg – for her relentless climate activism."
+  },
+  "Planet's Main Character": {
+    emoji: "🌀",
+    story: `You are Planet's Main Character! You're making significant strides in sustainable living, and your actions are shaping a better world. You're not just a participant—you're a protagonist in the story of our planet's future.\n\nYour journey is inspiring, and you're on the verge of becoming a true eco-leader. Keep pushing boundaries and sharing your story!`,
+    avatar: "A confident explorer with a reusable water bottle, standing in a vibrant meadow with wind turbines in the background.",
+    nextAction: "Switch to a renewable energy provider or organize a local clean-up.",
+    badge: "Conscious Shopper",
+    champion: "Jane Goodall – for her lifelong dedication to conservation."
+  },
+  "Sustainability Soft Launch": {
+    emoji: "🌱",
+    story: `You're in your Sustainability Soft Launch! You're making conscious efforts and building momentum for bigger changes. Every step you take is a seed for a greener tomorrow.\n\nYou're learning, growing, and your impact is starting to show. Stay curious and keep nurturing your eco-habits!`,
+    avatar: "A cheerful character tending a small garden, with a compost bin and solar lights.",
+    nextAction: "Try a plant-based meal or start composting at home.",
+    badge: "Compost Starter",
+    champion: "Immy Lucas (Sustainably Vegan) – for practical low-impact living."
+  },
+  "Kind of Conscious, Kind of Confused": {
+    emoji: "🍃",
+    story: `You're Kind of Conscious, Kind of Confused. You're aware of environmental issues and making some efforts, but there's room for more direction and consistency.\n\nYou're on the right path—just keep learning and experimenting with new habits!`,
+    avatar: "A thoughtful person with a reusable tote, surrounded by both green and gray areas, symbolizing transition.",
+    nextAction: "Replace single-use plastics with reusables this week.",
+    badge: "Plastic-Free Day",
+    champion: "Lauren Singer – for pioneering the zero-waste movement."
+  },
+  "Eco in Progress": {
+    emoji: "☁️",
+    story: `You're Eco in Progress… You're at the beginning of your sustainability journey, with lots of potential for positive change.\n\nEvery small step counts—celebrate your progress and keep going!`,
+    avatar: "A hopeful character planting their first tree, with a partly cloudy sky and a few green sprouts.",
+    nextAction: "Start recycling or track your energy use for a week.",
+    badge: "First Recycle",
+    champion: "Boyan Slat – for innovative ocean cleanup efforts."
+  },
+  "Doing Nothing for the Planet": {
+    emoji: "💤",
+    story: `You're Doing Nothing for the Planet (for now). Your current lifestyle has significant room for improvement, but that means you have the power to make a big difference!\n\nStart with one simple change and watch your impact grow.`,
+    avatar: "A sleepy character on a gray couch, with a single plant in the background, ready to wake up.",
+    nextAction: "Switch off unused lights or try a meatless meal.",
+    badge: "First Green Step",
+    champion: "David Attenborough – for awakening millions to nature's wonders."
+  },
+  "Certified Climate Snoozer": {
+    emoji: "❌",
+    story: `You're a Certified Climate Snoozer. It's time to wake up to environmental issues and start making positive changes.\n\nThe good news? Every journey starts with a single step.`,
+    avatar: "A character with an alarm clock, surrounded by smog, but a sunrise is visible in the distance.",
+    nextAction: "Read one article about climate change and share it with a friend.",
+    badge: "Awareness Unlocked",
+    champion: "Katharine Hayhoe – for climate science communication."
+  }
+};
+
+/**
+ * Assigns eco-personality and returns all required output fields.
+ * @param responses - User responses with scores (0–2 per answer)
+ */
+export function assignEcoPersonality(responses: Record<string, Record<string, number>>) {
+  const totalScore = calculateTotalScoreFromResponses(responses);
+  const personalityType = getPersonalityTypeFromScore(totalScore);
+  const details = PersonalityDetails[personalityType];
+  return {
+    totalScore,
+    personality: personalityType,
+    emoji: details.emoji,
+    story: details.story,
+    avatarSuggestion: details.avatar,
+    nextAction: details.nextAction,
+    badge: details.badge,
+    champion: details.champion
+  };
+} 
