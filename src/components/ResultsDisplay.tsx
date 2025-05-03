@@ -810,29 +810,7 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
               </div>
 
               {/* Progress Bar */}
-              <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Leaf className="h-5 w-5 text-green-500" />
-                      <span className="text-sm font-medium text-gray-700">Sustainability Progress</span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">{score}%</span>
-                  </div>
-                  <Progress value={score} className="h-3" />
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>Eco Novice</span>
-                    <span>Summit Achiever</span>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-600">
-                    {score >= 90 ? "Outstanding! You're already performing at champion level." :
-                     score >= 75 ? "Excellent work! You're well on your way to becoming a climate leader." :
-                     score >= 60 ? "Great progress! You're making a real difference." :
-                     score >= 45 ? "Good start! You're building momentum for positive change." :
-                     "Welcome to your climate journey! Every step counts."}
-                  </div>
-                </div>
-              </div>
+        
             </div>
 
             {/* Story Preview */}
@@ -870,6 +848,28 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
                   </div>
                 </div>
               </div>
+              {personalityDisplay.powerMoves && (
+                <div className="bg-white/80 rounded-xl border border-green-100 shadow p-6 mt-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Star className="h-6 w-6 text-yellow-400 drop-shadow" />
+                    <span className="text-xl font-serif font-semibold text-green-800 tracking-tight">Power Moves</span>
+                  </div>
+                  <hr className="border-green-100 mb-4" />
+                  <ul className="list-none pl-0 space-y-3">
+                    {personalityDisplay.powerMoves.map((move, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-start gap-3 text-green-900 text-base font-medium"
+                      >
+                        <span className="inline-block mt-1">
+                          <Star className="h-5 w-5 text-green-400" />
+                        </span>
+                        <span>{move}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
 
