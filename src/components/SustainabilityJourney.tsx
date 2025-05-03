@@ -121,12 +121,6 @@ export const SustainabilityJourney = ({
 
   return (
     <div className="w-full">
-      <div className="mb-8">
-        <h2 className="flex items-center gap-2 text-2xl font-serif text-gray-800">
-          <Leaf className="w-7 h-7 text-green-600" />
-          Your Sustainability Journey
-        </h2>
-      </div>
       <div
         ref={containerRef}
         className="relative w-full rounded-3xl shadow-2xl overflow-visible px-12 pt-6 pb-2"
@@ -199,16 +193,24 @@ export const SustainabilityJourney = ({
           {milestones.map((m, i) => (
             <g key={m.name}>
               {/* Completed, current, upcoming states */}
-              <circle
-                cx={peakX[i]}
-                cy={peakY[i]}
-                r={28}
-                fill={THEME.milestoneBg}
-                stroke={THEME.milestoneBorder}
-                strokeWidth={i === currentMilestone ? 6 : 2}
-                opacity={i <= currentMilestone ? 1 : 0.92}
-                style={{ filter: i === currentMilestone ? 'drop-shadow(0 0 12px #34D399)' : 'drop-shadow(0 2px 8px #A7F3D0)' }}
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <circle
+                    cx={peakX[i]}
+                    cy={peakY[i]}
+                    r={28}
+                    fill={THEME.milestoneBg}
+                    stroke={THEME.milestoneBorder}
+                    strokeWidth={i === currentMilestone ? 6 : 2}
+                    opacity={i <= currentMilestone ? 1 : 0.92}
+                    style={{ filter: i === currentMilestone ? 'drop-shadow(0 0 16px #34D399)' : 'drop-shadow(0 2px 8px #A7F3D0)' }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="top" align="center">
+                  <div className="text-base font-semibold mb-1">{m.name}</div>
+                  <div className="text-sm text-gray-600">{m.detail}</div>
+                </TooltipContent>
+              </Tooltip>
               {/* Icon with colored circular border and pastel shadow */}
               <g transform={`translate(${peakX[i] - 16},${peakY[i] - 16})`}>
                 <circle
@@ -254,10 +256,17 @@ export const SustainabilityJourney = ({
               </foreignObject>
             </g>
           ))}
-          {/* Earth icon at current progress */}
+          {/* Earth icon at current progress (animated) */}
           <g style={{ pointerEvents: 'none' }}>
-            <g transform={`translate(${earthPos.x},${earthPos.y})`}>
-              <EarthIcon className="w-16 h-16" glow={false} />
+            <motion.g
+              animate={{
+                x: earthPos.x,
+                y: earthPos.y,
+                filter: currentMilestone === numPeaks - 1 ? 'drop-shadow(0 0 32px #fbbf24)' : 'none'
+              }}
+              transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+            >
+              <EarthIcon className="w-16 h-16" glow={currentMilestone === numPeaks - 1} />
               {/* You are here badge - classy, elegant style */}
               <text
                 x={0}
@@ -272,7 +281,7 @@ export const SustainabilityJourney = ({
               >
                 You are here
               </text>
-            </g>
+            </motion.g>
           </g>
           {/* Summit celebration */}
           {currentMilestone === numPeaks - 1 && (

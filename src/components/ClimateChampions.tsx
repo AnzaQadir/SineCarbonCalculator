@@ -553,23 +553,14 @@ export const ClimateChampions: React.FC<ClimateChampionsProps> = ({
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto px-8 py-12">
-      <div className="text-left mb-16">
-        <div className="max-w-[600px] ml-0 space-y-6">
-          <h2 className="text-5xl font-serif text-gray-900 leading-tight">Your Climate Champion Match</h2>
-          <p className="text-xl text-gray-600 italic leading-relaxed">Welcome to your climate journey! Every step counts.</p>
-          <div className="w-24 h-0.5 bg-green-500 ml-0 rounded-full" />
-        </div>
-      </div>
-
-      <Card className="overflow-hidden bg-white border-0 shadow-lg rounded-2xl">
-        <div className="p-8 lg:p-12">
+    <div className="max-w-6xl mx-auto">
+      <Card className="overflow-hidden bg-white border-0 shadow-lg rounded-3xl">
+        <div className="p-12 lg:p-16">
           {/* Hero Section */}
-          <div className="flex flex-col lg:flex-row items-start gap-12">
-            {/* Left Column */}
-            <div className="w-full lg:w-[380px] shrink-0">
-              {/* Profile Image */}
-              <div className="relative rounded-2xl overflow-hidden bg-gray-100 mb-8">
+          <div className="flex flex-col lg:flex-row items-start gap-16">
+            {/* Left Column - Champion Profile */}
+            <div className="w-full lg:w-1/3">
+              <div className="relative rounded-2xl overflow-hidden bg-gray-100 mb-10">
                 <img
                   src={imageError ? championImage.fallback : championImage.src}
                   alt={champion.name}
@@ -577,169 +568,96 @@ export const ClimateChampions: React.FC<ClimateChampionsProps> = ({
                   onError={handleImageError}
                   loading="eager"
                 />
-                <div className="absolute bottom-4 left-4 space-y-2">
-                  <Badge className="bg-white/90 text-gray-900 backdrop-blur-sm px-3 py-1.5 text-sm">
+                <div className="absolute bottom-5 left-5 space-y-2">
+                  <Badge className="bg-white/90 text-gray-900 backdrop-blur-sm px-4 py-2 text-base">
                     <Globe className="h-4 w-4 mr-2 text-green-600" />
                     {champion.country}
                   </Badge>
-                  <Badge className="bg-white/90 text-gray-900 backdrop-blur-sm px-3 py-1.5 text-sm">
+                  <Badge className="bg-white/90 text-gray-900 backdrop-blur-sm px-4 py-2 text-base">
                     <Award className="h-4 w-4 mr-2 text-green-600" />
                     {champion.role}
                   </Badge>
                 </div>
               </div>
 
-              {/* Impact Overview */}
-              <div className="bg-gray-50 rounded-xl p-6 lg:p-8">
-                <h3 className="text-2xl font-serif mb-8">Impact Overview</h3>
-                
-                <div className="space-y-6">
-                  <div className="border-b border-gray-100 pb-4">
-                    <h4 className="text-sm text-gray-500 mb-1">People Impacted</h4>
-                    <p className="text-xl font-medium">{champion.impact.people}</p>
+              {/* Quick Stats */}
+              <div className="bg-gray-50 rounded-2xl p-8">
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-base text-gray-500">Impact</p>
+                    <p className="text-lg font-semibold">{champion.impact.people}</p>
                   </div>
-                  
-                  <div className="border-b border-gray-100 pb-4">
-                    <h4 className="text-sm text-gray-500 mb-1">Primary Region</h4>
-                    <p className="text-xl font-medium">{champion.impact.region}</p>
+                  <div>
+                    <p className="text-base text-gray-500">Region</p>
+                    <p className="text-lg font-semibold">{champion.impact.region}</p>
                   </div>
-                  
-                  <div className="border-b border-gray-100 pb-4">
-                    <h4 className="text-sm text-gray-500 mb-1">Focus Area</h4>
-                    <p className="text-xl font-medium">{champion.impact.focus}</p>
-                  </div>
-
-                  <div className="pt-4">
-                    <h4 className="text-sm text-gray-500 mb-3">Key Metrics</h4>
-                    <div className="space-y-3">
-                      {Object.entries(champion.impact.metrics).map(([key, value]) => (
-                        <div key={key} className="flex justify-between items-baseline">
-                          <span className="text-sm text-gray-600 capitalize">{key}</span>
-                          <span className="text-base font-medium">{value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Notable Achievements */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h3 className="text-2xl font-serif mb-6">Notable Achievements</h3>
-                <div className="space-y-4">
-                  {champion.achievements.map((achievement, index) => (
-                    <div
-                      key={index}
-                      className="border-b border-gray-100 last:border-0 pb-4 last:pb-0"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="p-2 bg-white rounded-lg">
-                          {achievement.icon}
-                        </div>
-                        <span className="text-sm text-gray-500">{achievement.year}</span>
-                      </div>
-                      <h4 className="text-lg font-medium mb-1">{achievement.title}</h4>
-                      <p className="text-sm text-gray-600">{achievement.description}</p>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Right Column */}
-            <div className="flex-1 min-w-0 space-y-12">
+            {/* Right Column - Champion Info */}
+            <div className="flex-1 min-w-0 space-y-10">
               <div>
-                <h1 className="text-5xl font-serif mb-6 break-words">{champion.name}</h1>
-                <p className="text-2xl text-gray-600 font-light leading-relaxed">
-                  {champion.contribution}
-                </p>
+                <h2 className="text-4xl font-serif mb-4">{champion.name}</h2>
+                <p className="text-2xl text-gray-600">{champion.contribution}</p>
               </div>
 
-              <blockquote className="text-2xl text-gray-600 italic font-light leading-relaxed bg-gray-50 rounded-xl p-6">
+              <blockquote className="text-2xl text-gray-600 italic bg-gray-50 rounded-2xl p-8">
                 {champion.quote}
               </blockquote>
 
-              {/* Champion's Journey */}
-              <div className="space-y-8">
-                <h3 className="text-2xl font-serif">Champion's Journey</h3>
-                <div className="relative pl-6">
-                  <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-green-100" />
-                  <div className="space-y-8">
-                    {champion.timeline.map((event, index) => (
-                      <div key={index} className="relative pl-8">
-                        <div className="absolute left-0 top-3 w-4 h-4 rounded-full bg-green-100 border-2 border-green-500 transform -translate-x-1/2" />
-                        <div className="bg-gray-50 rounded-xl p-4">
-                          <div className="text-sm text-gray-500 mb-1">{event.year}</div>
-                          <h4 className="text-lg font-medium mb-2">{event.title}</h4>
-                          <p className="text-base text-gray-600">{event.description}</p>
-                        </div>
-                      </div>
-                    ))}
+              {/* Key Achievement */}
+              {champion.achievements[0] && (
+                <div className="bg-green-50 rounded-2xl p-8">
+                  <div className="flex items-center gap-4 mb-3">
+                    {champion.achievements[0].icon}
+                    <span className="text-lg text-gray-500">{champion.achievements[0].year}</span>
                   </div>
+                  <h4 className="text-2xl font-semibold">{champion.achievements[0].title}</h4>
+                  <p className="text-lg text-gray-600">{champion.achievements[0].description}</p>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
           {/* Action Section */}
-          <div className="border-t pt-16">
-            <div className="text-left">
-              <div className="max-w-[800px] ml-0">
-                <h3 className="text-5xl font-serif text-gray-900 leading-tight mb-6">Join the Movement</h3>
-                <p className="text-xl text-gray-600 leading-relaxed font-light max-w-2xl ml-0">
-                  {champion.relatedAction.description}
-                </p>
-                <div className="w-32 h-0.5 bg-green-500/30 ml-0 mt-8 mb-16" />
-              </div>
+          <div className="mt-16 pt-10 border-t">
+            <div className="text-center mb-10">
+              <h3 className="text-3xl font-serif text-gray-900 mb-4">Join the Movement</h3>
+              <p className="text-xl text-gray-600">{champion.relatedAction.description}</p>
             </div>
             
-            <div className="space-y-8">
-              {champion.relatedAction.localActions.map((action, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {champion.relatedAction.localActions.slice(0, 2).map((action, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-2xl p-8 lg:p-10 border border-gray-100 hover:border-green-100 transition-all duration-500 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] group flex flex-col"
+                  className="bg-white rounded-2xl p-8 border border-gray-100 hover:border-green-100 transition-all duration-300"
                 >
-                  <div className="flex items-start justify-between gap-4 mb-6">
-                    <h4 className="text-3xl font-light text-gray-900 leading-[1.2] break-words max-w-[80%]">{action.title}</h4>
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <h4 className="text-2xl font-semibold">{action.title}</h4>
                     <Badge className={cn(
-                      "shrink-0 px-4 py-1.5 text-sm font-medium rounded-full whitespace-nowrap",
+                      "shrink-0 px-4 py-2 text-base font-medium rounded-full",
                       getDifficultyColor(action.difficulty)
                     )}>
                       {action.difficulty}
                     </Badge>
                   </div>
-                  <p className="text-lg text-gray-600 font-light mb-8 leading-relaxed break-words">{action.description}</p>
-                  <div className="space-y-6 text-base mt-auto w-full">
-                    <div className="flex items-center gap-4 text-gray-600">
-                      <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-gray-100/80 transition-colors duration-500 shrink-0">
-                        <Calendar className="h-5 w-5" />
-                      </div>
-                      <span className="font-light break-words">{action.timeframe}</span>
-                    </div>
-                    <div className="flex items-center gap-4 text-gray-600">
-                      <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-gray-100/80 transition-colors duration-500 shrink-0">
-                        <Users className="h-5 w-5" />
-                      </div>
-                      <span className="font-light break-words">{action.participants}</span>
-                    </div>
-                    <div className="flex items-center gap-4 text-green-600">
-                      <div className="p-2 bg-green-50 rounded-lg group-hover:bg-green-100/80 transition-colors duration-500 shrink-0">
-                        <Target className="h-5 w-5" />
-                      </div>
-                      <span className="font-medium break-words">{action.impact}</span>
-                    </div>
+                  <p className="text-lg text-gray-600 mb-4">{action.description}</p>
+                  <div className="flex items-center gap-3 text-lg text-green-600">
+                    <Target className="h-5 w-5" />
+                    <span>{action.impact}</span>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="text-left mt-12">
+            <div className="text-center mt-10">
               <Button
-                className="bg-white text-gray-900 hover:text-white hover:bg-green-600 border-2 border-gray-200 hover:border-green-600 px-12 py-6 text-lg rounded-xl shadow-sm hover:shadow-xl transition-all duration-500 font-light"
+                className="bg-green-600 hover:bg-green-700 text-white px-12 py-5 rounded-2xl shadow-md hover:shadow-lg text-xl font-semibold transition-all duration-300"
                 onClick={() => onActionSelect(champion.relatedAction)}
               >
                 Join {champion.name}'s Mission
-                <ArrowUpRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" />
+                <ArrowUpRight className="h-5 w-5 ml-3" />
               </Button>
             </div>
           </div>

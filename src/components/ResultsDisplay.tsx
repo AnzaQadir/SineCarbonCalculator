@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
   Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2, Check, BookOpen,
   Book, Star, Sparkles, Trophy, Heart, 
-  Lightbulb, Users, Target, ArrowRight, ShoppingBag 
+  Lightbulb, Users, Target, ArrowRight, ShoppingBag, Droplet, Shirt 
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { ClimateChampions } from '@/components/ClimateChampions';
 import { Progress } from "@/components/ui/progress";
 import { SustainabilityJourney } from './SustainabilityJourney';
+import { impactMappings } from '@/utils/impactMappings';
 
 interface CategoryEmissions {
   home: number;
@@ -493,6 +494,7 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
   const personality = dynamicPersonality;
   // Get display fields from PersonalityDetails
   const personalityDisplay = PersonalityDetails[personality.personality];
+  console.log('Personality object:', personality);
 
   useEffect(() => {
     // Simulate loading time for personality determination
@@ -535,6 +537,57 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
     return 'Getting Started';
   };
 
+  // Before split hero layout, define currentMilestone
+  // Define the order of personalities as milestones
+  const milestoneOrder = [
+    "Certified Climate Snoozer",
+    "Doing Nothing for the Planet",
+    "Eco in Progress",
+    "Kind of Conscious, Kind of Confused",
+    "Sustainability Soft Launch",
+    "Planet's Main Character",
+    "Sustainability Slayer"
+  ];
+  const currentMilestone = milestoneOrder.indexOf(personality.personality);
+  const nextMilestone = currentMilestone < milestoneOrder.length - 1 
+    ? milestoneOrder[currentMilestone + 1] 
+    : milestoneOrder[currentMilestone];
+
+  const totalMilestones = 7;
+  const progressPercent = Math.max(0, Math.round((currentMilestone / totalMilestones) * 100));
+  const userName = state?.name || 'Eco Hero';
+  const shareText = `I'm a ${personality.personality} on my sustainability journey! 🌱 What's your eco-personality?`;
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'My Eco-Personality',
+        text: shareText,
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(shareText);
+      alert('Eco-personality summary copied to clipboard!');
+    }
+  };
+
+  function generateImpactHighlights(state, impactMappings) {
+    const highlights = [];
+    Object.keys(impactMappings).forEach((key) => {
+      const userResponse = state[key];
+      const mapping = impactMappings[key]?.[userResponse];
+      if (mapping) {
+        highlights.push({
+          key,
+          ...mapping,
+        });
+      }
+    });
+    return highlights;
+  }
+
+  const highlights = generateImpactHighlights(state, impactMappings);
+
   return (
     <div 
       className={cn(
@@ -556,32 +609,157 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
         </p>
       </div>
 
-      {/* Sustainability Journey */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <Leaf className="h-7 w-7 text-green-500" />
-          <h2 className="text-2xl font-serif text-gray-800">Your Sustainability Journey</h2>
+      {/* Split Hero Layout */}
+      <div className="space-y-8">
+        {/* Fancy Heading for Top Section */}
+        <div className="w-full flex flex-col items-center mb-8">
+          <div className="flex items-center gap-4">
+            <Sparkles className="h-10 w-10 text-yellow-400 animate-pulse" />
+            <h2 className="text-4xl md:text-5xl font-extrabold font-serif bg-gradient-to-r from-green-700 via-emerald-500 to-green-400 bg-clip-text text-transparent drop-shadow-lg">
+              Your Story So Far & The Next Chapter
+            </h2>
+            <Sparkles className="h-10 w-10 text-green-400 animate-pulse" />
+          </div>
+          <p className="text-lg text-gray-600 mt-2 text-center max-w-2xl">
+            Every choice shapes your journey. See your unique path and discover the next move in your story.
+          </p>
         </div>
-        {/* Map personality to milestone index for functional progress */}
-        {(() => {
-          // Define the order of personalities as milestones
-          const milestoneOrder = [
-            "Certified Climate Snoozer",
-            "Doing Nothing for the Planet",
-            "Eco in Progress",
-            "Kind of Conscious, Kind of Confused",
-            "Sustainability Soft Launch",
-            "Planet's Main Character",
-            "Sustainability Slayer"
-          ];
-          const currentMilestone = milestoneOrder.indexOf(personality.personality);
-          return (
-            <SustainabilityJourney
-              currentMilestone={currentMilestone}
-              score={score}
+        {/* New: Personality Visual Card */}
+        <div className="flex justify-center w-full mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-0 flex flex-col items-center max-w-2xl w-full border border-green-100 overflow-hidden">
+            {/* Personality Image */}
+            <img
+              src="/profile.jpg"
+              alt="Personality Illustration"
+              className="w-full object-contain bg-green-50 border-b-4 border-green-100 p-4"
+              style={{ maxHeight: 320 }}
             />
-          );
-        })()}
+            <div className="w-full p-8 flex flex-col items-center">
+              {/* Personality Description */}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-3xl">{personality.emoji}</span>
+                <h2 className="text-2xl font-bold text-green-700 font-serif">{personality.personality}</h2>
+              </div>
+              <Badge className="mb-2">{personality.badge}</Badge>
+              <p className="text-gray-700 text-center mb-2">{personality.story.split('.')[0]}.</p>
+              <div className="text-green-700 font-medium mb-2">{personality.nextAction}</div>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col lg:flex-row gap-8 items-stretch w-full mt-8 justify-center">
+          {/* Profile Card */}
+          <div className="flex-1 max-w-xl mx-auto bg-gradient-to-br from-green-100 to-green-50 rounded-2xl shadow-2xl p-10 flex flex-col items-center min-h-[460px]">
+            {/* Remove Animated Avatar (without progress ring) */}
+            {/* Personalized Greeting */}
+            <div className="text-lg font-semibold text-green-900 mb-2 text-center">
+              Hi {userName}, you're a {personality.personality}!
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-3xl">{personality.emoji}</span>
+              <h2 className="text-2xl font-bold text-green-700 font-serif">{personality.personality}</h2>
+            </div>
+            <Badge className="mb-2">{personality.badge}</Badge>
+            <p className="text-gray-700 text-center mb-2">{personality.story.split('.')[0]}.</p>
+            <div className="text-green-700 font-medium mb-4">{personality.nextAction}</div>
+            {/* New: Strengths/Highlights */}
+            <div className="bg-green-50 rounded-lg p-3 mb-3 w-full text-center">
+              <div className="text-sm font-semibold text-green-700 mb-1">Your Strengths</div>
+              <div className="text-sm text-gray-700">
+                You excel at making conscious choices and inspiring others to start their journey.
+              </div>
+            </div>
+            {/* New: Fun Fact/Stat */}
+            <div className="bg-green-50 rounded-lg p-3 mb-3 w-full text-center">
+              <div className="text-sm font-semibold text-green-700 mb-1">Did you know?</div>
+              <div className="text-sm text-gray-700">
+                People with your profile are likely to influence at least 3 friends to take action!
+              </div>
+            </div>
+            {/* New: Motivational Quote/Tip */}
+            <div className="text-xs italic text-green-600 text-center mb-4">
+              "Every small step you take creates a ripple of positive change.”
+            </div>
+            {/* Share Button */}
+            <button
+              onClick={handleShare}
+              className="mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition text-base font-semibold"
+            >
+              Share Your Eco-Personality
+            </button>
+          </div>
+          {/* Recommendation Engine Card */}
+          <div className="flex-1 max-w-xl mx-auto bg-gradient-to-br from-green-100 to-green-50 rounded-2xl shadow-2xl p-10 flex flex-col items-center min-h-[460px]">
+            <div className="flex items-center gap-2 mb-4">
+              <Lightbulb className="h-7 w-7 text-green-500" />
+              <h2 className="text-2xl font-bold text-green-700 font-serif">Recommendation Engine</h2>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-5 w-5 text-green-500 cursor-pointer ml-1" />
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <span>Why this matters: This recommendation is chosen based on your answers and has the biggest impact for you right now.</span>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            {recommendations && recommendations.length > 0 ? (
+              <>
+                <div className="w-full mb-4">
+                  <div className="text-lg font-semibold text-green-700 mb-1 flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-green-500" />
+                    {recommendations[0].title}
+                  </div>
+                  <div className="text-sm text-gray-600 mb-2">{recommendations[0].description}</div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className={recommendations[0].difficulty === 'Easy' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                      {recommendations[0].difficulty}
+                    </Badge>
+                    <span className="text-xs text-green-700 font-medium">{recommendations[0].impact}</span>
+                  </div>
+                  {/* Why this is recommended */}
+                  <div className="mt-4 bg-green-50 rounded-lg p-3 flex items-start gap-2">
+                    <Info className="h-5 w-5 text-green-500 mt-0.5" />
+                    <div>
+                      <div className="text-sm font-semibold text-green-700 mb-1">Why this is recommended</div>
+                      <div className="text-sm text-gray-700">Switching to renewable energy is one of the most effective ways to reduce your carbon footprint and support a cleaner future.</div>
+                    </div>
+                  </div>
+                  {/* How to get started */}
+                  <div className="mt-4 bg-green-50 rounded-lg p-3 flex items-start gap-2">
+                    <Lightbulb className="h-5 w-5 text-green-500 mt-0.5" />
+                    <div>
+                      <div className="text-sm font-semibold text-green-700 mb-1">How to get started</div>
+                      <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                        <li>Contact your local utility to ask about green energy options.</li>
+                        <li>Research solar panel providers in your area.</li>
+                        <li>Start with small steps, like using energy-efficient appliances.</li>
+                      </ul>
+                    </div>
+                  </div>
+                  {/* Inspirational tip */}
+                  <div className="mt-4 text-xs italic text-green-600 text-center">
+                    "Every small switch adds up to a brighter, cleaner tomorrow."
+                  </div>
+                </div>
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition text-lg py-3 font-semibold"
+                  onClick={() => alert('Simulate recommendation: ' + recommendations[0].title)}
+                >
+                  Simulate Recommendation
+                </Button>
+              </>
+            ) : (
+              <div className="text-gray-500">No recommendations available.</div>
+            )}
+          </div>
+        </div>
+
+        {/* Sustainability Journey */}
+        <div className="w-full flex flex-col justify-center bg-white/60 rounded-3xl shadow-2xl p-12 mt-8">
+          <h2 className="text-3xl font-serif text-green-700 mb-8 flex items-center gap-3">
+            <Leaf className="h-8 w-8 text-green-500" /> Your Sustainability Journey
+          </h2>
+          <SustainabilityJourney currentMilestone={currentMilestone} score={score} />
+        </div>
       </div>
 
       {/* Eco Story Card */}
@@ -590,41 +768,8 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
           {/* Hero Section with Personality */}
           <div className="relative">
             <div className="flex flex-col lg:flex-row items-start gap-8">
-              {/* Personality Info */}
-              <div className="flex-1 space-y-6">
-                <div className="rounded-2xl shadow-lg overflow-hidden max-w-2xl mx-auto">
-                  <div className="bg-gradient-to-br from-emerald-400 to-teal-500 p-8 flex flex-col items-start justify-between">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">{personality.emoji}</span>
-                      <h2 className="text-2xl md:text-3xl font-bold text-white">{personality.personality}</h2>
-                    </div>
-                    <div className="text-emerald-100 text-sm font-medium mb-2">{personality.badge}</div>
-                    <p className="text-white text-base md:text-lg">{personality.story.split('.')[0]}.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Avatar Display */}
-              <div className="lg:w-1/3">
-                <div className="relative aspect-square">
-                  <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl overflow-hidden flex items-center justify-center">
-                    <EcoAvatar
-                      outfit={getOutfitForPersonality(personality.personality)}
-                      accessory={getAccessoryForPersonality(personality.personality)}
-                      background={getBackgroundForCategory(dominantCategory)}
-                      role={getPersonalityRole(personality.personality)}
-                      size="xl"
-                      animate={!isPersonalityLoading}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <div className="absolute -top-2 -right-2">
-                    <div className="p-2 bg-white rounded-full shadow-lg">
-                      <Leaf className="h-6 w-6 text-green-500" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Personality Info (keep only this, remove avatar on right) */}
+              {/* Avatar Display removed */}
             </div>
           </div>
 
@@ -700,12 +845,12 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-green-100 rounded-lg">
-                      <Users className="h-5 w-5 text-green-600" />
+                      <Star className="h-5 w-5 text-green-600" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Community Impact</h4>
-                      <p className="text-sm text-gray-600">
-                        Your choices inspire {Math.round(score / 2)} people in your community to adopt sustainable practices.
+                      <h4 className="font-medium text-gray-900">Keep it up!</h4>
+                      <p className="text-base text-green-700 font-semibold">
+                        You are part of the <span className="text-green-900 font-bold">5%</span> that does XYZ.
                       </p>
                     </div>
                   </div>
@@ -891,7 +1036,7 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
       </Card>
 
       {/* Climate Champions Card */}
-      <Card className="bg-gradient-to-br from-purple-50 to-purple-100/50 overflow-hidden rounded-2xl shadow-lg">
+      <Card className="bg-green-50 overflow-hidden rounded-2xl shadow-lg">
         <CardContent className="p-8 lg:p-12">
           <div className="space-y-8">
             <div className="flex items-center gap-3">
@@ -915,344 +1060,6 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
           </div>
         </CardContent>
       </Card>
-
-      {/* Tabs Section */}
-      <Tabs defaultValue="details" className="w-full">
-        <TabsList className="w-full mb-6 bg-gray-100/80 p-1 rounded-lg">
-          <TabsTrigger value="details" className="flex-1 py-3 text-base">Details</TabsTrigger>
-          <TabsTrigger value="methodology" className="flex-1 py-3 text-base">Methodology</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview">
-          {/* Climate Champions Section */}
-          <ClimateChampions
-            dominantCategory={dominantCategory}
-            userScore={score}
-            onActionSelect={(action) => {
-              // Handle action selection
-              console.log('Selected action:', action);
-            }}
-          />
-        </TabsContent>
-            
-        <TabsContent value="details">
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {achievements.map((achievement, index) => (
-                <div 
-                  key={index} 
-                  className={cn(
-                    "rounded-xl p-6 lg:p-8 text-white relative overflow-hidden group transition-all duration-300 hover:scale-[1.02]",
-                    achievement.color
-                  )}
-                >
-                  {/* Background Pattern */}
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,currentColor_1px,transparent_1px)] [background-size:8px_8px] opacity-10" />
-                  
-                  <div className="relative flex flex-col h-full">
-                    <div className="flex items-start justify-between">
-                      <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-                        {achievement.icon}
-                      </div>
-                      <div className="bg-white/20 rounded-full px-3 py-1 text-sm backdrop-blur-sm">
-                        {achievement.value.toFixed(1)}t CO₂e saved
-                      </div>
-                    </div>
-                    
-                    <div className="mt-6">
-                      <h3 className="text-2xl font-semibold mb-2">{achievement.title}</h3>
-                      {achievement.description && (
-                        <p className="text-white/90 text-sm">{achievement.description}</p>
-                      )}
-                    </div>
-
-                    <div className="mt-4 pt-4 border-t border-white/20">
-                      <div className="flex items-center gap-2 text-sm text-white/80">
-                        <Leaf className="h-4 w-4" />
-                        <span>Keep up the great work!</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Hover Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                </div>
-              ))}
-            </div>
-
-            {/* Category Details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Home Emissions */}
-              <Card className="bg-gradient-to-br from-green-50 to-green-100/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <Home className="h-5 w-5 text-green-600" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-800">Home Energy</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.home.toFixed(1)}</span>
-                        <span className="text-gray-500">tons CO₂e/year</span>
-                      </div>
-                      <p className="text-gray-600 mt-1">From electricity and heating</p>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Electricity</span>
-                        <span className="font-medium text-gray-900">{(categoryEmissions.home * 0.6).toFixed(1)} tons</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Heating</span>
-                        <span className="font-medium text-gray-900">{(categoryEmissions.home * 0.4).toFixed(1)} tons</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Transport Emissions */}
-              <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Car className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-800">Transport</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.transport.toFixed(1)}</span>
-                        <span className="text-gray-500">tons CO₂e/year</span>
-                      </div>
-                      <p className="text-gray-600 mt-1">From daily commute and travel</p>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Car Travel</span>
-                        <span className="font-medium text-gray-900">{(categoryEmissions.transport * 0.7).toFixed(1)} tons</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Public Transit</span>
-                        <span className="font-medium text-gray-900">{(categoryEmissions.transport * 0.3).toFixed(1)} tons</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                </Card>
-
-              {/* Food Emissions */}
-              <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-orange-100 rounded-lg">
-                      <Utensils className="h-5 w-5 text-orange-600" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-800">Food & Diet</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.food.toFixed(1)}</span>
-                        <span className="text-gray-500">tons CO₂e/year</span>
-                      </div>
-                      <p className="text-gray-600 mt-1">From diet choices and food waste</p>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Diet Impact</span>
-                        <span className="font-medium text-gray-900">{(categoryEmissions.food * 0.8).toFixed(1)} tons</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Food Waste</span>
-                        <span className="font-medium text-gray-900">{(categoryEmissions.food * 0.2).toFixed(1)} tons</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                </Card>
-
-              {/* Waste Emissions */}
-              <Card className="bg-gradient-to-br from-red-50 to-red-100/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-red-100 rounded-lg">
-                      <Trash2 className="h-5 w-5 text-red-600" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-800">Waste</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-bold text-gray-900">{categoryEmissions.waste.toFixed(1)}</span>
-                        <span className="text-gray-500">tons CO₂e/year</span>
-                      </div>
-                      <p className="text-gray-600 mt-1">From waste and recycling habits</p>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Total Waste Generated</span>
-                        <span className="font-medium text-gray-900">{(state.waste?.wasteLbs * 0.0005 * 12).toFixed(1)} tons/year</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Recycling Impact</span>
-                        <span className="font-medium text-green-600">-{(state.waste?.wasteLbs * 0.0005 * 12 * (state.waste?.recyclingPercentage / 100) * 0.5).toFixed(1)} tons</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Waste Reduction</span>
-                        <span className="font-medium text-green-600">{state.waste?.minimizesWaste ? '-20%' : '0%'}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                </Card>
-            </div>
-
-            {/* Tips Section */}
-            <Card className="mt-8 bg-gradient-to-br from-green-50 to-green-100/50">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Quick Impact Tips</h3>
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-700 mb-3">Immediate Actions</h4>
-                    <ul className="space-y-2">
-                      {[
-                        'Switch to LED bulbs',
-                        'Use cold water for laundry',
-                        'Reduce meat consumption',
-                        'Start composting'
-                      ].map((tip) => (
-                        <li key={tip} className="flex items-center gap-2 text-gray-600">
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                          {tip}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-700 mb-3">Long-term Changes</h4>
-                    <ul className="space-y-2">
-                      {[
-                        'Install solar panels',
-                        'Switch to an electric vehicle',
-                        'Improve home insulation',
-                        'Use public transportation'
-                      ].map((tip) => (
-                        <li key={tip} className="flex items-center gap-2 text-gray-600">
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                          {tip}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-            
-        <TabsContent value="methodology">
-          <div className="space-y-8 max-w-4xl">
-            <div className="space-y-6">
-              {/* Calculation Methodology */}
-              <div className="space-y-4">
-                <h2 className="text-3xl font-serif mb-6 text-gray-800">Our Calculation Methodology</h2>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  This calculator uses peer-reviewed emissions factors from governmental and academic sources including:
-                </p>
-                <ul className="space-y-3 text-gray-600 pl-1">
-                  {[
-                    'U.S. Environmental Protection Agency (EPA) emissions factors',
-                    'Intergovernmental Panel on Climate Change (IPCC) guidelines',
-                    'Department of Energy (DOE) data on regional electricity generation',
-                    'Peer-reviewed studies on food lifecycle emissions'
-                  ].map((item) => (
-                    <li key={item} className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Assumptions & Limitations */}
-              <div className="space-y-4">
-                <h2 className="text-3xl font-semibold mb-6 text-gray-800">Assumptions & Limitations</h2>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  To provide a user-friendly experience, we make certain assumptions:
-                </p>
-                <ul className="space-y-3 text-gray-600 pl-1">
-                  {[
-                    'Electricity emissions are based on average grid mix for your region',
-                    'Vehicle emissions assume average efficiency for each vehicle category',
-                    'Flight emissions include radiative forcing effects at high altitudes',
-                    'Food emissions are based on typical diet patterns within each category'
-                  ].map((item) => (
-                    <li key={item} className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Data Sources */}
-              <div className="space-y-4">
-                <h2 className="text-3xl font-semibold mb-6 text-gray-800">Data Sources</h2>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  Our emissions factors are regularly updated based on the latest available data from:
-                </p>
-                <ul className="space-y-3 text-gray-600 pl-1">
-                  {[
-                    "EPA's Emissions & Generation Resource Integrated Database (eGRID)",
-                    "IPCC's Fifth Assessment Report",
-                    "National Renewable Energy Laboratory (NREL) lifecycle assessments",
-                    "Academic studies published in peer-reviewed journals"
-                  ].map((item) => (
-                    <li key={item} className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Contact Information */}
-              <div className="text-lg text-gray-600 leading-relaxed border-t pt-8 mt-12">
-                <p>
-                  For questions about our methodology or to discuss your specific case, please contact us at{' '}
-                  <a href="mailto:sustainability@example.com" className="text-green-700 hover:underline font-medium">
-                    sustainability@example.com
-                  </a>
-                  .
-                </p>
-              </div>
-
-              {/* Action Section */}
-              <div className="border-t pt-12 mt-12">
-                <h2 className="text-3xl font-semibold mb-4 text-gray-800">Ready to take action?</h2>
-                <p className="text-lg text-gray-600 mb-8">Support verified carbon reduction projects or share your results.</p>
-                <div className="flex gap-4">
-                  <Button className="bg-green-700 hover:bg-green-800 text-white px-8 py-6 text-lg h-auto">
-                    Offset Now
-                  </Button>
-                  <Button variant="outline" className="gap-2 px-6 py-6 text-lg h-auto">
-                    <Share2 className="h-5 w-5" />
-                    Share PDF
-                  </Button>
-                  <Button variant="outline" className="gap-2 px-6 py-6 text-lg h-auto">
-                    <Download className="h-5 w-5" />
-                    Download
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
     </div>
   );
 };
