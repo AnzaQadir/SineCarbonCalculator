@@ -5,7 +5,7 @@ import {
   Zap, Leaf, Bus, Bike, Train,
   Apple, Beef, PackageCheck, Recycle,
   Battery, CloudSun, PackageX, ShoppingBag, ShoppingCart, Store,
-  Sun, Cloud, Info, MapPin, Timer
+  Sun, Cloud, Info, MapPin, Timer, FileText, Shirt
 } from 'lucide-react';
 
 interface QuestionTileProps {
@@ -54,8 +54,8 @@ const QuestionTile: React.FC<QuestionTileProps> = ({
 };
 
 interface QuestionTilesProps {
-  category: 'homeEnergy' | 'transport' | 'food' | 'waste' | 'airQuality';
-  subCategory: 'efficiency' | 'management' | 'primary' | 'carProfile' | 'diet' | 'plateProfile' | 'prevention' | 'monitoring' | 'impact' | 'shopping' | 'wasteManagement' | 'outdoorQuality' | 'indoorQuality' | 'commuting';
+  category: 'homeEnergy' | 'transport' | 'food' | 'waste' | 'airQuality' | 'clothing';
+  subCategory: 'efficiency' | 'management' | 'primary' | 'carProfile' | 'diet' | 'plateProfile' | 'prevention' | 'monitoring' | 'impact' | 'shopping' | 'wasteManagement' | 'outdoorQuality' | 'indoorQuality' | 'commuting' | 'wardrobeImpact' | 'mindfulUpgrades' | 'durability' | 'wasteComposition';
   value: string;
   onChange: (value: string) => void;
 }
@@ -279,6 +279,39 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               description: 'I rarely consider the waste factor—I usually buy what is readily available'
             }
           ];
+        } else if (subCategory === 'wasteComposition') {
+          return [
+            {
+              value: 'A',
+              icon: <Apple className="h-6 w-6" />,
+              title: 'Food Scraps',
+              description: 'Kitchen leftovers and organic waste'
+            },
+            {
+              value: 'B',
+              icon: <PackageX className="h-6 w-6" />,
+              title: 'Single-Use Packaging',
+              description: 'Plastic wrappers and takeout containers'
+            },
+            {
+              value: 'C',
+              icon: <FileText className="h-6 w-6" />,
+              title: 'Paper & Cardboard',
+              description: 'Mail, boxes, and receipts'
+            },
+            {
+              value: 'D',
+              icon: <Battery className="h-6 w-6" />,
+              title: 'Electronics',
+              description: 'Broken devices and batteries'
+            },
+            {
+              value: 'E',
+              icon: <Shirt className="h-6 w-6" />,
+              title: 'Textiles',
+              description: 'Old garments and linens'
+            }
+          ];
         }
         break;
 
@@ -407,6 +440,73 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
             }
           ];
         }
+
+      case 'clothing':
+        if (subCategory === 'wardrobeImpact') {
+          return [
+            {
+              value: 'A',
+              icon: <ShoppingBag className="h-6 w-6" />,
+              title: 'Sustainable Shopper',
+              description: 'I consciously choose sustainable, ethical, or second-hand fashion every time I shop.'
+            },
+            {
+              value: 'B',
+              icon: <ShoppingCart className="h-6 w-6" />,
+              title: 'Mix & Match',
+              description: 'I mix sustainable choices with fast fashion—sometimes I plan my purchases, sometimes not.'
+            },
+            {
+              value: 'C',
+              icon: <Store className="h-6 w-6" />,
+              title: 'Trend Follower',
+              description: 'I tend to follow fast fashion trends and update my wardrobe regularly without much thought for impact.'
+            }
+          ];
+        } else if (subCategory === 'mindfulUpgrades') {
+          return [
+            {
+              value: 'A',
+              icon: <PackageCheck className="h-6 w-6" />,
+              title: 'Mindful Upgrader',
+              description: 'I always consider the garment\'s durability and environmental footprint before buying.'
+            },
+            {
+              value: 'B',
+              icon: <PackageCheck className="h-6 w-6" />,
+              title: 'Quality Sometimes',
+              description: 'I try to think about quality over quantity, but convenience sometimes wins.'
+            },
+            {
+              value: 'C',
+              icon: <Store className="h-6 w-6" />,
+              title: 'Style & Price',
+              description: 'Style and price are my top priorities, and sustainability isn\'t usually a factor.'
+            }
+          ];
+        } else if (subCategory === 'durability') {
+          return [
+            {
+              value: 'months',
+              icon: <Timer className="h-6 w-6" />,
+              title: 'A few months',
+              description: 'My clothes last a few months.'
+            },
+            {
+              value: 'years',
+              icon: <Timer className="h-6 w-6" />,
+              title: 'A few years',
+              description: 'My clothes last a few years.'
+            },
+            {
+              value: 'forever',
+              icon: <PackageCheck className="h-6 w-6" />,
+              title: 'Forever',
+              description: 'My clothes last forever!'
+            }
+          ];
+        }
+        break;
 
       default:
         return [];
