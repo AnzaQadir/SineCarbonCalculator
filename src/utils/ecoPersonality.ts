@@ -426,7 +426,12 @@ export const PersonalityDetails = {
     avatar: "A radiant eco-hero, surrounded by lush forests and a sparkling clean river, with a golden aura.",
     nextAction: "Mentor someone new to sustainability or start a community green project.",
     badge: "First Meatless Week",
-    champion: "Greta Thunberg – for her relentless climate activism."
+    champion: "Greta Thunberg – for her relentless climate activism.",
+    powerMoves: [
+      'Deep knowledge of sustainable practices',
+      'Consistent, intentional behavior',
+      'Leading by example in your community'
+    ],
   },
   "Planet's Main Character": {
     emoji: "🌀",
@@ -434,7 +439,12 @@ export const PersonalityDetails = {
     avatar: "A confident explorer with a reusable water bottle, standing in a vibrant meadow with wind turbines in the background.",
     nextAction: "Switch to a renewable energy provider or organize a local clean-up.",
     badge: "Conscious Shopper",
-    champion: "Jane Goodall – for her lifelong dedication to conservation."
+    champion: "Jane Goodall – for her lifelong dedication to conservation.",
+    powerMoves: [
+      'Deep commitment to sustainable practices',
+      'Active engagement in environmental initiatives',
+      'Regular sustainable choices'
+    ],
   },
   "Sustainability Soft Launch": {
     emoji: "🌱",
@@ -442,7 +452,12 @@ export const PersonalityDetails = {
     avatar: "A cheerful character tending a small garden, with a compost bin and solar lights.",
     nextAction: "Try a plant-based meal or start composting at home.",
     badge: "Compost Starter",
-    champion: "Immy Lucas (Sustainably Vegan) – for practical low-impact living."
+    champion: "Immy Lucas (Sustainably Vegan) – for practical low-impact living.",
+    powerMoves: [
+      'Growing awareness of environmental impact',
+      'Implementing basic sustainable practices',
+      'Openness to eco-friendly alternatives'
+    ],
   },
   "Kind of Conscious, Kind of Confused": {
     emoji: "🍃",
@@ -450,7 +465,12 @@ export const PersonalityDetails = {
     avatar: "A thoughtful person with a reusable tote, surrounded by both green and gray areas, symbolizing transition.",
     nextAction: "Replace single-use plastics with reusables this week.",
     badge: "Plastic-Free Day",
-    champion: "Lauren Singer – for pioneering the zero-waste movement."
+    champion: "Lauren Singer – for pioneering the zero-waste movement.",
+    powerMoves: [
+      'Basic environmental awareness',
+      'Some sustainable practices in place',
+      'Interest in improvement'
+    ],
   },
   "Eco in Progress": {
     emoji: "☁️",
@@ -458,7 +478,12 @@ export const PersonalityDetails = {
     avatar: "A hopeful character planting their first tree, with a partly cloudy sky and a few green sprouts.",
     nextAction: "Start recycling or track your energy use for a week.",
     badge: "First Recycle",
-    champion: "Boyan Slat – for innovative ocean cleanup efforts."
+    champion: "Boyan Slat – for innovative ocean cleanup efforts.",
+    powerMoves: [
+      'Open to learning',
+      'Taking first steps',
+      'Recognizing need for change'
+    ],
   },
   "Doing Nothing for the Planet": {
     emoji: "💤",
@@ -466,7 +491,12 @@ export const PersonalityDetails = {
     avatar: "A sleepy character on a gray couch, with a single plant in the background, ready to wake up.",
     nextAction: "Switch off unused lights or try a meatless meal.",
     badge: "First Green Step",
-    champion: "David Attenborough – for awakening millions to nature's wonders."
+    champion: "David Attenborough – for awakening millions to nature's wonders.",
+    powerMoves: [
+      'Potential for significant impact',
+      'Room for easy improvements',
+      'Opportunity for fresh start'
+    ],
   },
   "Certified Climate Snoozer": {
     emoji: "❌",
@@ -474,7 +504,12 @@ export const PersonalityDetails = {
     avatar: "A character with an alarm clock, surrounded by smog, but a sunrise is visible in the distance.",
     nextAction: "Read one article about climate change and share it with a friend.",
     badge: "Awareness Unlocked",
-    champion: "Katharine Hayhoe – for climate science communication."
+    champion: "Katharine Hayhoe – for climate science communication.",
+    powerMoves: [
+      'Opportunity for major improvement',
+      'Clean slate for new habits',
+      'Potential for immediate impact'
+    ],
   }
 };
 
@@ -494,6 +529,7 @@ export function assignEcoPersonality(responses: Record<string, Record<string, nu
     avatarSuggestion: details.avatar,
     nextAction: details.nextAction,
     badge: details.badge,
-    champion: details.champion
+    champion: details.champion,
+    powerMoves: details.powerMoves
   };
 } 
