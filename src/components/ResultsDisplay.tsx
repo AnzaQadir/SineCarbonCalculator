@@ -15,6 +15,8 @@ import { EcoAvatar } from '@/components/EcoAvatar';
 import { getOutfitForPersonality, getAccessoryForPersonality, getBackgroundForCategory } from '@/utils/ecoPersonality';
 import { Badge } from '@/components/ui/badge';
 import { ClimateChampions } from '@/components/ClimateChampions';
+import { Progress } from "@/components/ui/progress";
+import { SustainabilityJourney } from './SustainabilityJourney';
 
 interface CategoryEmissions {
   home: number;
@@ -503,10 +505,26 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
             <Sparkles className="h-6 w-6 text-yellow-500 absolute -top-2 -right-2" />
           </div>
         </div>
-        <h1 className="text-5xl font-serif text-green-700">Your Eco Journey Starts Here</h1>
+        <h1 className="text-5xl font-serif text-green-700">Your Planet, Your Impact: Let's Begin!</h1>
         <p className="text-xl text-gray-600 max-w-2xl">
           Every step you take shapes our planet's future. Let's discover your unique path to sustainability.
         </p>
+      </div>
+
+      {/* Sustainability Journey */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <Leaf className="h-7 w-7 text-green-500" />
+          <h2 className="text-2xl font-serif text-gray-800">Your Sustainability Journey</h2>
+        </div>
+        <SustainabilityJourney
+          currentMilestone={Math.floor(score / 12.5)}
+          personalityType={personality.title}
+          score={score}
+          onMilestoneReached={(milestone) => {
+            console.log('Reached milestone:', milestone);
+          }}
+        />
       </div>
 
       {/* Eco Story Card */}
@@ -535,20 +553,6 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
                   <p className="text-xl leading-relaxed">
                     You're a remarkable force for change in our fight against climate change. Your journey as a {personality.title} shows your deep commitment to creating a sustainable future.
                   </p>
-                </div>
-
-                {/* Progress Indicator */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Impact Progress</span>
-                    <span className="font-medium">8/8 Points</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-green-500 rounded-full transition-all duration-1000" 
-                      style={{ width: '100%' }}
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -609,6 +613,31 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
                   <p className="text-sm text-gray-600 mt-2">
                     Leading by example
                   </p>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Leaf className="h-5 w-5 text-green-500" />
+                      <span className="text-sm font-medium text-gray-700">Sustainability Progress</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">{score}%</span>
+                  </div>
+                  <Progress value={score} className="h-3" />
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>Eco Novice</span>
+                    <span>Summit Achiever</span>
+                  </div>
+                  <div className="mt-2 text-sm text-gray-600">
+                    {score >= 90 ? "Outstanding! You're already performing at champion level." :
+                     score >= 75 ? "Excellent work! You're well on your way to becoming a climate leader." :
+                     score >= 60 ? "Great progress! You're making a real difference." :
+                     score >= 45 ? "Good start! You're building momentum for positive change." :
+                     "Welcome to your climate journey! Every step counts."}
+                  </div>
                 </div>
               </div>
             </div>
