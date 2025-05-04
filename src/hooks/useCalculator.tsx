@@ -45,10 +45,11 @@ export interface CalculatorState {
   // Demographics
   name: string;
   email: string;
-  age: 'UNDER_10' | '10_TO_15' | '15_TO_20' | '20_TO_30' | 'OVER_30' | '';
+  age: 'UNDER_10' | '10_TO_15' | '15_TO_20' | '20_TO_30' | '30_TO_40' | 'OVER_40' | '';
   gender: string;
   profession: string;
   location: string;
+  country: string;
   householdSize: number;
 
   // Home Energy
@@ -168,6 +169,7 @@ export const useCalculator = () => {
     gender: '',
     profession: '',
     location: '',
+    country: '',
     householdSize: 1,
 
     // Home Energy defaults
@@ -412,6 +414,7 @@ export const useCalculator = () => {
       gender: '',
       profession: '',
       location: '',
+      country: '',
       householdSize: 1,
 
       // Home Energy defaults

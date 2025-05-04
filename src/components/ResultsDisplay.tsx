@@ -18,6 +18,10 @@ import { ClimateChampions } from '@/components/ClimateChampions';
 import { Progress } from "@/components/ui/progress";
 import { SustainabilityJourney } from './SustainabilityJourney';
 import { impactMappings } from '@/utils/impactMappings';
+import { generateEcoStory, formatStoryForDisplay, StoryCard, generateNarrativeStory, NarrativeStory } from '@/utils/ecoStoryEngine';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { WrappedStoryCarousel } from './WrappedStoryCarousel';
 
 interface CategoryEmissions {
   home: number;
@@ -165,7 +169,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [activeTab, setActiveTab] = useState('overview');
   const [isPersonalityLoading, setIsPersonalityLoading] = useState(true);
   const [isGeneratingStory, setIsGeneratingStory] = useState(false);
-  const [generatedStory, setGeneratedStory] = useState<string | null>(null);
+  const [generatedStory, setGeneratedStory] = useState<string>('');
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [playRevealSound] = useSound('/sounds/reveal.mp3', { 
     onError: (e) => console.error('Error playing reveal sound:', e) 
@@ -173,6 +177,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [playSuccessSound] = useSound('/sounds/success.mp3', { 
     onError: (e) => console.error('Error playing success sound:', e) 
   });
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [showStory, setShowStory] = useState(false);
+  const [storyCards, setStoryCards] = useState<StoryCard[]>([]);
+  const [narrativeStory, setNarrativeStory] = useState<NarrativeStory | null>(null);
 
   // Debug logging for state changes
   useEffect(() => {
@@ -278,42 +286,37 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       console.log('Generated personality:', personality);
 
       // Generate personalized achievements
-      let achievements = [];
+      const newHabits = [];
       
-      // Transport achievements
+      // Transport habits
       if (state.primaryTransportMode === 'WALK_BIKE') {
-        achievements.push('choosing active transport like walking and cycling');
+        newHabits.push('biking to work');
       } else if (state.primaryTransportMode === 'PUBLIC') {
-        achievements.push('regularly using public transportation');
+        newHabits.push('using public transit');
       }
 
-      // Diet achievements
+      // Diet habits
       if (state.dietType === 'VEGAN') {
-        achievements.push('maintaining a plant-based diet');
+        newHabits.push('adopting a plant-based diet');
       } else if (state.dietType === 'VEGETARIAN') {
-        achievements.push('choosing vegetarian meals');
+        newHabits.push('choosing vegetarian meals');
       }
 
-      // Energy achievements
+      // Energy habits
       if (state.usesRenewableEnergy) {
-        achievements.push('switching to renewable energy sources');
+        newHabits.push('switching to renewable energy');
       }
       if (state.hasEnergyEfficiencyUpgrades) {
-        achievements.push('implementing energy-efficient home improvements');
+        newHabits.push('upgrading to energy-efficient appliances');
       }
 
-      // Waste achievements
+      // Waste habits
       if (state.waste?.recyclingPercentage > 75) {
-        achievements.push('maintaining a high recycling rate');
+        newHabits.push('becoming a recycling pro');
       }
       if (state.waste?.minimizesWaste) {
-        achievements.push('actively reducing waste production');
+        newHabits.push('reducing waste production');
       }
-
-      // Format achievements nicely
-      const achievementText = achievements.length > 0
-        ? `You've made significant strides by ${achievements.join(', and ')}.`
-        : 'You are taking your first steps towards a more sustainable lifestyle.';
 
       // Calculate impact metrics
       const treesPlanted = Math.round((16 - emissions) * 10);
@@ -325,21 +328,44 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         .sort(([,a], [,b]) => a - b)[0][0];
       
       const nextSteps = {
-        home: 'exploring home energy efficiency upgrades',
-        transport: 'considering more sustainable transportation options',
-        food: 'adopting more plant-based meal choices',
-        waste: 'implementing better waste reduction practices'
+        home: 'Go car-free one day a week',
+        transport: 'Switch to a renewable energy provider',
+        food: 'Try a plant-based meal once a week',
+        waste: 'Start composting at home'
       };
 
-      // Generate the personalized story
-      const story = `As a ${personality?.title || 'sustainability champion'}, your journey towards a greener future has been inspiring. ${achievementText}
+      // Generate story using the new engine
+      const storyCards = generateEcoStory({
+        name: state.name || 'Eco Hero',
+        ecoPersonality: personality.title,
+        co2Saved: parseFloat(carbonReduced),
+        topCategory: dominantCategory,
+        newHabits,
+        impactEquivalent: `planting ${treesPlanted} trees`,
+        nextStep: nextSteps[weakestCategory as keyof typeof nextSteps],
+        badge: personality.badge,
+        score,
+        categoryEmissions
+      });
 
-Through your conscious choices, you've prevented ${carbonReduced} tons of CO₂ emissions from entering our atmosphere - equivalent to planting ${treesPlanted} trees! Your actions in ${dominantCategory} have been particularly impactful, and you're inspiring approximately ${communityImpact} people in your community to adopt more sustainable practices.
+      // Generate narrative story
+      const narrativeStory = generateNarrativeStory({
+        name: state.name || 'Eco Hero',
+        ecoPersonality: personality.title,
+        co2Saved: parseFloat(carbonReduced),
+        topCategory: dominantCategory,
+        newHabits,
+        impactEquivalent: `planting ${treesPlanted} trees`,
+        nextStep: nextSteps[weakestCategory as keyof typeof nextSteps],
+        badge: personality.badge,
+        score,
+        categoryEmissions
+      });
 
-Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof typeof nextSteps]}. Every step you take brings us closer to a more sustainable world. Keep up the amazing work!`;
-      
-      console.log('Generated story:', story);
-      setGeneratedStory(story);
+      setStoryCards(storyCards);
+      setNarrativeStory(narrativeStory);
+      setShowStory(true);
+      setCurrentCardIndex(0);
       
       try {
         await playSuccessSound();
@@ -587,6 +613,32 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
   }
 
   const highlights = generateImpactHighlights(state, impactMappings);
+
+  const handleNextCard = () => {
+    if (currentCardIndex < storyCards.length - 1) {
+      setCurrentCardIndex(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousCard = () => {
+    if (currentCardIndex > 0) {
+      setCurrentCardIndex(prev => prev - 1);
+    }
+  };
+
+  // Map the story to the carousel format (add more slides as needed)
+  const wrappedSlides = storyCards.length > 0 ? [
+    {
+      personality: personality.personality,
+      name: userName,
+      co2Saved: `${(16 - emissions).toFixed(1)} tons`,
+      topCategory: dominantCategory.charAt(0).toUpperCase() + dominantCategory.slice(1),
+      nextStep: recommendations[0]?.title || '',
+      badge: personality.badge,
+      shareText: `@${userName.replace(/\s+/g, '')} saved ${(16 - emissions).toFixed(1)} tons CO₂ this year! 🌍 Top Habit: ${recommendations[0]?.title || ''} 🌿 Role: ${personality.personality} 🏅 Badge: ${personality.badge} #EcoWrapped #ImpactInAction`,
+    },
+    // Add more slides for each story section if desired
+  ] : [];
 
   return (
     <div 
@@ -997,24 +1049,66 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
             </div>
 
             {/* Generated Story Display */}
-            {generatedStory && (
-              <div 
-                className="bg-white/50 backdrop-blur-sm rounded-xl p-8 border border-purple-100 animate-fadeIn"
-                style={{
-                  animation: 'fadeIn 0.5s ease-out'
-                }}
-              >
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3">
-                    <Star className="h-6 w-6 text-yellow-500" />
-                    <h3 className="text-2xl font-serif text-gray-800">Your Journey So Far</h3>
+            {showStory && storyCards.length > 0 && narrativeStory && (
+              <div className="space-y-8">
+                <div className="story-cards bg-white/50 backdrop-blur-sm rounded-xl p-8 border border-purple-100 animate-fadeIn">
+                  <div className="story-card space-y-6">
+                    <div className="flex items-center gap-3">
+                      <Star className="h-6 w-6 text-yellow-500" />
+                      <h3 className="text-2xl font-serif text-gray-800">{storyCards[currentCardIndex].title}</h3>
+                    </div>
+                    <p className="text-lg text-gray-700 leading-relaxed">
+                      {storyCards[currentCardIndex].content}
+                    </p>
+                    {storyCards[currentCardIndex].stats && (
+                      <div className="text-sm text-gray-600">
+                        {storyCards[currentCardIndex].stats}
+                      </div>
+                    )}
+                    <div className="card-navigation flex items-center justify-between pt-4">
+                      <button 
+                        onClick={handlePreviousCard}
+                        disabled={currentCardIndex === 0}
+                        className="nav-button px-4 py-2 rounded-lg bg-purple-100 text-purple-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-200 transition-colors"
+                      >
+                        ← Previous
+                      </button>
+                      <span className="card-counter text-gray-600">
+                        {currentCardIndex + 1} / {storyCards.length}
+                      </span>
+                      <button 
+                        onClick={handleNextCard}
+                        disabled={currentCardIndex === storyCards.length - 1}
+                        className="nav-button px-4 py-2 rounded-lg bg-purple-100 text-purple-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-200 transition-colors"
+                      >
+                        Next →
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-lg text-gray-700 leading-relaxed italic">
-                    {generatedStory}
-                  </p>
-                  <div className="pt-4 flex items-center gap-2 text-sm text-gray-600">
-                    <Info className="h-4 w-4" />
-                    <span>This story is generated based on your sustainable choices and impact.</span>
+                </div>
+
+                {/* New Narrative Story Section */}
+                <div className="bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl p-8 border border-green-100">
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                      <BookOpen className="h-6 w-6 text-green-600" />
+                      <h3 className="text-2xl font-serif text-gray-800">Your Sustainable Journey</h3>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      <div className="bg-white/80 rounded-xl p-6 border border-green-100">
+                        <h4 className="text-xl font-serif text-green-800 mb-4">{narrativeStory.title}</h4>
+                        <p className="text-lg text-gray-700 leading-relaxed mb-6">{narrativeStory.content}</p>
+                        <div className="flex items-center gap-2 text-sm text-green-700 font-medium">
+                          <Sparkles className="h-4 w-4" />
+                          <span>Emotional Trigger: {narrativeStory.emotionalTrigger}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-green-50 rounded-xl p-6 border border-green-200">
+                        <p className="text-lg text-green-800 font-medium text-center">{narrativeStory.callToAction}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1060,6 +1154,12 @@ Your next opportunity for growth lies in ${nextSteps[weakestCategory as keyof ty
           </div>
         </CardContent>
       </Card>
+
+      {showStory && wrappedSlides.length > 0 && (
+        <div className="my-12">
+          <WrappedStoryCarousel storySlides={wrappedSlides} />
+        </div>
+      )}
     </div>
   );
 };
