@@ -5,6 +5,7 @@ export interface StoryCard {
   content: string;
   emoji?: string;
   stats?: string;
+  isNarrative?: boolean;
 }
 
 interface StoryInput {
@@ -30,6 +31,25 @@ export interface NarrativeStory {
   content: string;
   emotionalTrigger: string;
   callToAction: string;
+}
+
+interface Achievement {
+  title: string;
+  description: string;
+  emoji: string;
+  level: 'bronze' | 'silver' | 'gold';
+}
+
+interface CategoryAchievement extends Achievement {
+  threshold: number;
+}
+
+interface Recommendation {
+  title: string;
+  description: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  impact: 'low' | 'medium' | 'high';
+  emoji: string;
 }
 
 const getPersonalityTone = (personality: string): string => {
@@ -131,10 +151,229 @@ const getEmotionalTrigger = (personality: string): string => {
   }
 };
 
+const getImpactComparison = (co2Saved: number): string => {
+  const comparisons = [
+    { threshold: 1, text: (co2) => `taking ${Math.round(co2 * 217)} cars off the road for a day` },
+    { threshold: 2, text: (co2) => `saving ${Math.round(co2 * 165)} trees worth of CO2 absorption` },
+    { threshold: 5, text: (co2) => `offsetting ${Math.round(co2 * 48)} round-trip flights` },
+    { threshold: 10, text: (co2) => `powering ${Math.round(co2 * 121)} homes with clean energy for a month` },
+    { threshold: 20, text: (co2) => `planting a forest of ${Math.round(co2 * 240)} trees` }
+  ];
+
+  const comparison = comparisons.find(c => co2Saved <= c.threshold) || comparisons[comparisons.length - 1];
+  return comparison.text(co2Saved);
+};
+
+const generateAchievements = (input: StoryInput): Achievement[] => {
+  const achievements: Achievement[] = [];
+
+  // Category-specific achievements
+  const categoryAchievements: Record<string, CategoryAchievement[]> = {
+    home: [
+      { threshold: 2, title: "Home Hero", description: "Mastering sustainable living at home", emoji: "🏠", level: "bronze" },
+      { threshold: 4, title: "Eco Home Master", description: "Creating an eco-friendly sanctuary", emoji: "🏡", level: "silver" },
+      { threshold: 6, title: "Sustainable Living Legend", description: "Your home is a beacon of sustainability", emoji: "⭐", level: "gold" }
+    ],
+    transport: [
+      { threshold: 2, title: "Green Commuter", description: "Choosing planet-friendly transport", emoji: "🚲", level: "bronze" },
+      { threshold: 4, title: "Transport Transformer", description: "Leading the way in eco-travel", emoji: "🚊", level: "silver" },
+      { threshold: 6, title: "Mobility Master", description: "A champion of sustainable transport", emoji: "🌟", level: "gold" }
+    ],
+    food: [
+      { threshold: 2, title: "Conscious Consumer", description: "Making sustainable food choices", emoji: "🥗", level: "bronze" },
+      { threshold: 4, title: "Food Footprint Fighter", description: "Minimizing food-related emissions", emoji: "🌱", level: "silver" },
+      { threshold: 6, title: "Sustainable Food Sage", description: "Mastering eco-friendly eating", emoji: "👨‍🌾", level: "gold" }
+    ],
+    waste: [
+      { threshold: 2, title: "Waste Warrior", description: "Taking steps to reduce waste", emoji: "♻️", level: "bronze" },
+      { threshold: 4, title: "Zero Waste Hero", description: "Championing waste reduction", emoji: "🗑️", level: "silver" },
+      { threshold: 6, title: "Waste-Free Wonder", description: "Leading the zero-waste movement", emoji: "✨", level: "gold" }
+    ]
+  };
+
+  // Award achievements based on category emissions reductions
+  Object.entries(input.categoryEmissions).forEach(([category, emission]) => {
+    const categoryAchievs = categoryAchievements[category];
+    if (categoryAchievs) {
+      const achievement = [...categoryAchievs].reverse().find(a => emission >= a.threshold);
+      if (achievement) {
+        achievements.push({
+          title: achievement.title,
+          description: achievement.description,
+          emoji: achievement.emoji,
+          level: achievement.level
+        });
+      }
+    }
+  });
+
+  // Overall impact achievements
+  if (input.co2Saved >= 10) {
+    achievements.push({
+      title: "Climate Champion",
+      description: "Making a significant impact on CO2 reduction",
+      emoji: "🌍",
+      level: "gold"
+    });
+  } else if (input.co2Saved >= 5) {
+    achievements.push({
+      title: "Carbon Crusher",
+      description: "Successfully reducing your carbon footprint",
+      emoji: "👣",
+      level: "silver"
+    });
+  } else if (input.co2Saved >= 2) {
+    achievements.push({
+      title: "Green Beginner",
+      description: "Starting your journey to sustainability",
+      emoji: "🌱",
+      level: "bronze"
+    });
+  }
+
+  return achievements;
+};
+
+const generatePersonalizedRecommendations = (input: StoryInput): Recommendation[] => {
+  const recommendations: Recommendation[] = [];
+  
+  // Find the category with the highest emissions
+  const sortedCategories = Object.entries(input.categoryEmissions)
+    .sort(([,a], [,b]) => b - a);
+  
+  const categoryRecommendations: Record<string, Recommendation[]> = {
+    home: [
+      {
+        title: "Energy-Efficient Lighting",
+        description: "Switch to LED bulbs throughout your home",
+        difficulty: "easy",
+        impact: "medium",
+        emoji: "💡"
+      },
+      {
+        title: "Smart Thermostat",
+        description: "Install a smart thermostat to optimize heating and cooling",
+        difficulty: "medium",
+        impact: "high",
+        emoji: "🌡️"
+      },
+      {
+        title: "Home Solar Installation",
+        description: "Consider installing solar panels for renewable energy",
+        difficulty: "hard",
+        impact: "high",
+        emoji: "☀️"
+      }
+    ],
+    transport: [
+      {
+        title: "Public Transit Trial",
+        description: "Try using public transportation for your daily commute",
+        difficulty: "easy",
+        impact: "medium",
+        emoji: "🚌"
+      },
+      {
+        title: "Bike Commuting",
+        description: "Start biking for short-distance trips",
+        difficulty: "medium",
+        impact: "high",
+        emoji: "🚲"
+      },
+      {
+        title: "Electric Vehicle Switch",
+        description: "Consider switching to an electric vehicle",
+        difficulty: "hard",
+        impact: "high",
+        emoji: "🔌"
+      }
+    ],
+    food: [
+      {
+        title: "Meatless Mondays",
+        description: "Start with one meat-free day per week",
+        difficulty: "easy",
+        impact: "medium",
+        emoji: "🥗"
+      },
+      {
+        title: "Local Food Challenge",
+        description: "Source 50% of your food from local producers",
+        difficulty: "medium",
+        impact: "high",
+        emoji: "🌾"
+      },
+      {
+        title: "Plant-Based Diet",
+        description: "Transition to a fully plant-based diet",
+        difficulty: "hard",
+        impact: "high",
+        emoji: "🌱"
+      }
+    ],
+    waste: [
+      {
+        title: "Zero-Waste Starter",
+        description: "Begin using reusable bags and water bottles",
+        difficulty: "easy",
+        impact: "medium",
+        emoji: "🛍️"
+      },
+      {
+        title: "Composting Journey",
+        description: "Start composting your organic waste",
+        difficulty: "medium",
+        impact: "high",
+        emoji: "🌱"
+      },
+      {
+        title: "Zero-Waste Home",
+        description: "Eliminate single-use plastics from your life",
+        difficulty: "hard",
+        impact: "high",
+        emoji: "♻️"
+      }
+    ]
+  };
+
+  // Add recommendations for the highest-emission categories
+  sortedCategories.slice(0, 2).forEach(([category]) => {
+    const categoryRecs = categoryRecommendations[category];
+    if (categoryRecs) {
+      // Choose recommendations based on user's eco-personality level
+      let difficultyPreference: 'easy' | 'medium' | 'hard';
+      switch (input.ecoPersonality) {
+        case "Sustainability Slayer":
+        case "Planet's Main Character":
+          difficultyPreference = "hard";
+          break;
+        case "Sustainability Soft Launch":
+        case "Kind of Conscious, Kind of Confused":
+          difficultyPreference = "medium";
+          break;
+        default:
+          difficultyPreference = "easy";
+      }
+
+      const matchingRecs = categoryRecs.filter(rec => 
+        rec.difficulty === difficultyPreference || 
+        (difficultyPreference === "hard" && rec.difficulty === "medium")
+      );
+      
+      recommendations.push(...matchingRecs.slice(0, 2));
+    }
+  });
+
+  return recommendations;
+};
+
 export const generateEcoStory = (input: StoryInput): StoryCard[] => {
   const personalityDetails = PersonalityDetails[input.ecoPersonality];
   const tone = getPersonalityTone(input.ecoPersonality);
   const narrative = getPersonalityNarrative(input.ecoPersonality);
+  const impactComparison = getImpactComparison(input.co2Saved);
+  const achievements = generateAchievements(input);
+  const recommendations = generatePersonalizedRecommendations(input);
   
   const cards: StoryCard[] = [
     {
@@ -163,7 +402,7 @@ export const generateEcoStory = (input: StoryInput): StoryCard[] => {
     },
     {
       title: "🌱 Your Impact in Numbers",
-      content: `You've prevented **${input.co2Saved} tons** of CO₂ emissions!\nThat's like ${input.impactEquivalent}.\n\nYour choices are literally changing the world.`,
+      content: `You've prevented **${input.co2Saved} tons** of CO₂ emissions!\nThat's like ${impactComparison}.\n\nYour choices are literally changing the world.`,
       emoji: "🌱",
       stats: `${input.co2Saved} tons CO₂ saved`
     },
@@ -178,6 +417,22 @@ export const generateEcoStory = (input: StoryInput): StoryCard[] => {
       content: `@${input.name.replace(/\s+/g, '')} saved **${input.co2Saved} tons CO₂** this year 🌍\n🏆 Top Habit: ${input.newHabits[0]}\n🌀 Personality: ${input.ecoPersonality}\n🏅 Badge: ${input.badge}\n\n#EcoWrapped #MyImpactStory #${input.topCategory}Champion`,
       emoji: "🌟",
       stats: "Share your story!"
+    },
+    {
+      title: "🏆 Achievements Unlocked",
+      content: achievements.map(achievement => 
+        `**${achievement.emoji} ${achievement.title}** (${achievement.level})\n${achievement.description}`
+      ).join('\n\n'),
+      emoji: "🏆",
+      stats: `${achievements.length} achievements earned`
+    },
+    {
+      title: "🎯 Your Next Steps",
+      content: recommendations.map(rec => 
+        `**${rec.emoji} ${rec.title}** (Impact: ${rec.impact})\n${rec.description}`
+      ).join('\n\n'),
+      emoji: "🎯",
+      stats: `${recommendations.length} personalized recommendations`
     }
   ];
 

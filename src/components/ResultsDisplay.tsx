@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
   Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2, Check, BookOpen,
   Book, Star, Sparkles, Trophy, Heart, 
-  Lightbulb, Users, Target, ArrowRight, ShoppingBag, Droplet, Shirt 
+  Lightbulb, Users, Target, ArrowRight, ShoppingBag, Droplet, Shirt, X, Quote 
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
@@ -22,6 +22,11 @@ import { generateEcoStory, formatStoryForDisplay, StoryCard, generateNarrativeSt
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { WrappedStoryCarousel } from './WrappedStoryCarousel';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Separator } from "@/components/ui/separator";
+import WrappedStoryCard from './WrappedStoryCard';
+import html2canvas from 'html2canvas';
+import EcoWrappedCard from './EcoWrappedCard';
 
 interface CategoryEmissions {
   home: number;
@@ -181,6 +186,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [showStory, setShowStory] = useState(false);
   const [storyCards, setStoryCards] = useState<StoryCard[]>([]);
   const [narrativeStory, setNarrativeStory] = useState<NarrativeStory | null>(null);
+  const [wrappedImage, setWrappedImage] = useState<string | null>(null);
+  const [showWrapped, setShowWrapped] = useState(false);
+  const [showWrappedModal, setShowWrappedModal] = useState(false);
+  const wrappedCardRef = useRef<HTMLDivElement>(null);
+  const [wrappedTheme, setWrappedTheme] = useState<'light' | 'dark' | 'pop'>('light');
 
   // Debug logging for state changes
   useEffect(() => {
@@ -337,13 +347,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       // Generate story using the new engine
       const storyCards = generateEcoStory({
         name: state.name || 'Eco Hero',
-        ecoPersonality: personality.title,
+        ecoPersonality: dynamicPersonality.personality,
         co2Saved: parseFloat(carbonReduced),
         topCategory: dominantCategory,
         newHabits,
         impactEquivalent: `planting ${treesPlanted} trees`,
-        nextStep: nextSteps[weakestCategory as keyof typeof nextSteps],
-        badge: personality.badge,
+        nextStep: dynamicPersonality.nextAction,
+        badge: dynamicPersonality.badge,
         score,
         categoryEmissions
       });
@@ -351,13 +361,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       // Generate narrative story
       const narrativeStory = generateNarrativeStory({
         name: state.name || 'Eco Hero',
-        ecoPersonality: personality.title,
+        ecoPersonality: dynamicPersonality.personality,
         co2Saved: parseFloat(carbonReduced),
         topCategory: dominantCategory,
         newHabits,
         impactEquivalent: `planting ${treesPlanted} trees`,
-        nextStep: nextSteps[weakestCategory as keyof typeof nextSteps],
-        badge: personality.badge,
+        nextStep: dynamicPersonality.nextAction,
+        badge: dynamicPersonality.badge,
         score,
         categoryEmissions
       });
@@ -639,6 +649,43 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     },
     // Add more slides for each story section if desired
   ] : [];
+
+  useEffect(() => {
+    if (showWrapped) {
+      setTimeout(async () => {
+        const card = document.getElementById('story-card-' + dynamicPersonality.personality.replace(/\s+/g, '-'));
+        if (card) {
+          const canvas = await html2canvas(card, {
+            useCORS: true,
+            scale: 2,
+            backgroundColor: null,
+          });
+          setWrappedImage(canvas.toDataURL('image/png'));
+        }
+      }, 300);
+    }
+  }, [showWrapped, dynamicPersonality]);
+
+  // Combine narrative and segment cards for the carousel
+  const combinedStoryCards = narrativeStory
+    ? [
+        {
+          title: narrativeStory.title,
+          content: narrativeStory.content,
+          emoji: '📖',
+          stats: undefined,
+          isNarrative: true,
+        },
+        ...storyCards.map(card => ({ ...card, isNarrative: false })),
+        {
+          title: '🌟 Your Next Chapter',
+          content: narrativeStory.callToAction,
+          emoji: '🎯',
+          stats: narrativeStory.emotionalTrigger,
+          isNarrative: true,
+        },
+      ]
+    : storyCards;
 
   return (
     <div 
@@ -1010,121 +1057,220 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             </div>
           </div>
 
-          {/* Story Generation Section */}
+          {/* Story Generation Section - Updated UI */}
           <div className="space-y-8">
-            <div className="flex items-center gap-3">
-              <BookOpen className="h-8 w-8 text-green-600" />
-              <h2 className="text-3xl font-serif text-gray-800">Your Climate Journey Story</h2>
-            </div>
-            
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-8 border border-green-100">
-              <div className="space-y-6">
-                <p className="text-lg text-gray-700">
-                  Every choice you make writes a new chapter in our planet's story. Let's craft your unique journey of sustainable living.
-                </p>
-                
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <BookOpen className="h-8 w-8 text-green-600" />
+                <h2 className="text-3xl font-serif text-gray-800">Your Climate Journey Story</h2>
+              </div>
+              <div className="flex gap-2 justify-end mb-4">
                 <Button
-                  onClick={generateStory}
+                  variant="outline"
+                  onClick={() => setShowWrapped(true)}
                   className={cn(
-                    "w-full text-white py-6 rounded-xl flex items-center justify-center gap-3 text-lg transition-all duration-300",
-                    isGeneratingStory 
-                      ? "bg-purple-500 cursor-not-allowed"
-                      : "bg-purple-600 hover:bg-purple-700 hover:shadow-lg"
+                    "text-green-700 border-green-200",
+                    !showStory && "opacity-50 cursor-not-allowed"
                   )}
-                  disabled={isGeneratingStory}
+                  disabled={!showStory}
                 >
-                  {isGeneratingStory ? (
-                    <>
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                      Crafting Your Story...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-6 w-6" />
-                      Generate Your Climate Journey
-                    </>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    {!showStory ? "Generate Story First" : "Generate Wrapped"}
+                  </div>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowStory(false);
+                    setShowWrapped(false);
+                    setWrappedImage(null);
+                    onReset();
+                  }}
+                  className="text-green-700 border-green-200"
+                >
+                  Reset Story
                 </Button>
               </div>
             </div>
-
-            {/* Generated Story Display */}
-            {showStory && storyCards.length > 0 && narrativeStory && (
-              <div className="space-y-8">
-                <div className="story-cards bg-white/50 backdrop-blur-sm rounded-xl p-8 border border-purple-100 animate-fadeIn">
-                  <div className="story-card space-y-6">
-                    <div className="flex items-center gap-3">
-                      <Star className="h-6 w-6 text-yellow-500" />
-                      <h3 className="text-2xl font-serif text-gray-800">{storyCards[currentCardIndex].title}</h3>
+            
+            {!showStory ? (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gradient-to-br from-purple-50 to-green-50 rounded-xl p-8 border border-purple-100 shadow-lg"
+              >
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-purple-100 rounded-xl">
+                      <Sparkles className="h-6 w-6 text-purple-600" />
                     </div>
-                    <p className="text-lg text-gray-700 leading-relaxed">
-                      {storyCards[currentCardIndex].content}
-                    </p>
-                    {storyCards[currentCardIndex].stats && (
-                      <div className="text-sm text-gray-600">
-                        {storyCards[currentCardIndex].stats}
+                    <div>
+                      <h3 className="text-xl font-semibold text-purple-900 mb-2">
+                        Generate Your Unique Climate Story
+                      </h3>
+                      <p className="text-gray-600">
+                        Let's transform your sustainable choices into an inspiring narrative. Your story could motivate others to join the climate action movement.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-6">
+                    <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Star className="h-5 w-5 text-yellow-500" />
+                        <span className="font-medium text-purple-900">Personalized</span>
                       </div>
+                      <p className="text-sm text-gray-600">
+                        Story tailored to your unique eco-personality and achievements
+                      </p>
+                    </div>
+                    <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Heart className="h-5 w-5 text-red-500" />
+                        <span className="font-medium text-purple-900">Engaging</span>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        Interactive storytelling with visual elements and animations
+                      </p>
+                    </div>
+                    <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Share2 className="h-5 w-5 text-blue-500" />
+                        <span className="font-medium text-purple-900">Shareable</span>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        Easy to share your journey with friends and family
+                      </p>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={async () => {
+                      await generateStory();
+                      setShowStory(true);
+                    }}
+                    className={cn(
+                      "w-full text-white py-6 rounded-xl flex items-center justify-center gap-3 text-lg transition-all duration-300",
+                      isGeneratingStory 
+                        ? "bg-purple-500 cursor-not-allowed"
+                        : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:shadow-lg"
                     )}
-                    <div className="card-navigation flex items-center justify-between pt-4">
-                      <button 
-                        onClick={handlePreviousCard}
-                        disabled={currentCardIndex === 0}
-                        className="nav-button px-4 py-2 rounded-lg bg-purple-100 text-purple-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-200 transition-colors"
-                      >
-                        ← Previous
-                      </button>
-                      <span className="card-counter text-gray-600">
-                        {currentCardIndex + 1} / {storyCards.length}
-                      </span>
-                      <button 
-                        onClick={handleNextCard}
-                        disabled={currentCardIndex === storyCards.length - 1}
-                        className="nav-button px-4 py-2 rounded-lg bg-purple-100 text-purple-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-200 transition-colors"
-                      >
-                        Next →
-                      </button>
-                    </div>
-                  </div>
+                    disabled={isGeneratingStory}
+                  >
+                    {isGeneratingStory ? (
+                      <>
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                        Crafting Your Story...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-6 w-6" />
+                        Generate Your Climate Journey
+                      </>
+                    )}
+                  </Button>
                 </div>
-
-                {/* New Narrative Story Section */}
-                <div className="bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl p-8 border border-green-100">
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3">
-                      <BookOpen className="h-6 w-6 text-green-600" />
-                      <h3 className="text-2xl font-serif text-gray-800">Your Sustainable Journey</h3>
+              </motion.div>
+            ) : (
+              <AnimatePresence>
+                <motion.div 
+                  key={currentCardIndex}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -40 }}
+                  transition={{ duration: 0.5, type: 'spring' }}
+                  className={cn(
+                    'story-card space-y-6 rounded-3xl shadow-2xl border p-10 md:p-14',
+                    combinedStoryCards[currentCardIndex]?.isNarrative
+                      ? 'bg-gradient-to-br from-blue-50 via-white to-green-50 border-blue-100'
+                      : 'bg-gradient-to-br from-green-50 via-white to-purple-50 border-green-100'
+                  )}
+                >
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="p-3 bg-gradient-to-br from-green-200 to-green-400 rounded-xl shadow-lg">
+                      {combinedStoryCards[currentCardIndex].emoji && (
+                        <span className="text-3xl drop-shadow-lg">{combinedStoryCards[currentCardIndex].emoji}</span>
+                      )}
                     </div>
-                    
-                    <div className="space-y-6">
-                      <div className="bg-white/80 rounded-xl p-6 border border-green-100">
-                        <h4 className="text-xl font-serif text-green-800 mb-4">{narrativeStory.title}</h4>
-                        <p className="text-lg text-gray-700 leading-relaxed mb-6">{narrativeStory.content}</p>
-                        <div className="flex items-center gap-2 text-sm text-green-700 font-medium">
-                          <Sparkles className="h-4 w-4" />
-                          <span>Emotional Trigger: {narrativeStory.emotionalTrigger}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-green-50 rounded-xl p-6 border border-green-200">
-                        <p className="text-lg text-green-800 font-medium text-center">{narrativeStory.callToAction}</p>
-                      </div>
-                    </div>
+                    <h3 className={cn(
+                      'font-serif tracking-tight flex-1',
+                      combinedStoryCards[currentCardIndex]?.isNarrative
+                        ? 'text-3xl md:text-4xl font-extrabold text-blue-900'
+                        : 'text-3xl md:text-4xl font-extrabold text-green-900'
+                    )}>
+                      {combinedStoryCards[currentCardIndex].title}
+                    </h3>
                   </div>
-                </div>
-              </div>
+                  <div className={cn(
+                    'rounded-2xl shadow-md',
+                    combinedStoryCards[currentCardIndex]?.isNarrative
+                      ? 'bg-white/95 p-10 border-l-4 border-blue-300'
+                      : 'bg-white/90 p-8 border-l-4 border-green-300'
+                  )}>
+                    <p className={cn(
+                      'leading-relaxed whitespace-pre-line',
+                      combinedStoryCards[currentCardIndex]?.isNarrative
+                        ? 'text-xl text-blue-900 font-medium italic'
+                        : 'text-lg md:text-xl text-gray-800 font-medium'
+                    )}>
+                      {combinedStoryCards[currentCardIndex].content}
+                    </p>
+                  </div>
+                  {combinedStoryCards[currentCardIndex].stats && (
+                    <div className={cn(
+                      'flex items-center gap-2 font-semibold mt-2',
+                      combinedStoryCards[currentCardIndex]?.isNarrative
+                        ? 'text-blue-700 text-base'
+                        : 'text-green-700 text-base'
+                    )}>
+                      <Info className="h-5 w-5" />
+                      {combinedStoryCards[currentCardIndex].stats}
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between pt-6">
+                    <Button
+                      variant="outline"
+                      onClick={handlePreviousCard}
+                      disabled={currentCardIndex === 0}
+                      className="flex items-center gap-2 text-green-700 border-green-200"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+                    <div className="flex items-center gap-2">
+                      {combinedStoryCards.map((_, index) => (
+                        <motion.div
+                          key={index}
+                          className={cn(
+                            'h-3 w-3 rounded-full border-2',
+                            currentCardIndex === index
+                              ? combinedStoryCards[index]?.isNarrative
+                                ? 'bg-blue-600 border-blue-600 shadow-lg'
+                                : 'bg-green-600 border-green-600 shadow-lg'
+                              : combinedStoryCards[index]?.isNarrative
+                                ? 'bg-blue-100 border-blue-200'
+                                : 'bg-green-100 border-green-200'
+                          )}
+                          whileHover={{ scale: 1.2 }}
+                          onClick={() => setCurrentCardIndex(index)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                      ))}
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={handleNextCard}
+                      disabled={currentCardIndex === combinedStoryCards.length - 1}
+                      className="flex items-center gap-2 text-green-700 border-green-200"
+                    >
+                      Next
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-4 pt-6">
-            <Button onClick={sharePDF} className="gap-2 bg-green-600 hover:bg-green-700 text-white">
-              <Download className="h-5 w-5" />
-              Download Report
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <Share2 className="h-5 w-5" />
-              Share Journey
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -1155,10 +1301,107 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         </CardContent>
       </Card>
 
-      {showStory && wrappedSlides.length > 0 && (
-        <div className="my-12">
-          <WrappedStoryCarousel storySlides={wrappedSlides} />
-        </div>
+      {showWrapped && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="relative bg-gradient-to-br from-purple-900 to-blue-900 rounded-[40px] p-8 shadow-2xl"
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowWrapped(false)}
+              className="absolute -top-4 -right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
+            >
+              <X className="h-6 w-6 text-gray-900" />
+            </button>
+
+            {/* Theme switcher */}
+            <div className="flex justify-center gap-4 mb-6">
+              {(['light', 'dark', 'pop'] as const).map((theme) => (
+                <button
+                  key={theme}
+                  onClick={() => setWrappedTheme(theme)}
+                  className={cn(
+                    'px-4 py-2 rounded-full font-semibold border transition-all',
+                    wrappedTheme === theme
+                      ? theme === 'dark'
+                        ? 'bg-[#23213a] text-yellow-300 border-yellow-400 scale-105 shadow-lg'
+                        : theme === 'pop'
+                          ? 'bg-[#ff2d55] text-white border-[#ff2d55] scale-105 shadow-lg'
+                          : 'bg-white text-green-700 border-green-400 scale-105 shadow-lg'
+                      : 'bg-transparent text-gray-400 border-gray-200 hover:scale-105 hover:shadow'
+                  )}
+                  style={{ minWidth: 80 }}
+                >
+                  {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {/* Hidden card for generation */}
+            <div style={{ position: 'absolute', left: '-9999px', top: 0, pointerEvents: 'none' }}>
+              <EcoWrappedCard
+                theme={wrappedTheme as 'light' | 'dark' | 'pop'}
+                savedCO2={`${(16 - emissions).toFixed(1)}`}
+                topCategory={dominantCategory.charAt(0).toUpperCase() + dominantCategory.slice(1)}
+                badge={dynamicPersonality.badge}
+                personality={dynamicPersonality.personality}
+              />
+            </div>
+
+            {/* Show the generated image or fallback to EcoWrappedCard */}
+            {wrappedImage ? (
+              <motion.img
+                src={wrappedImage}
+                alt="Your Eco Wrapped"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="rounded-[32px] shadow-2xl"
+                style={{ maxWidth: 600 }}
+              />
+            ) : (
+              <EcoWrappedCard
+                theme={wrappedTheme as 'light' | 'dark' | 'pop'}
+                savedCO2={`${(16 - emissions).toFixed(1)}`}
+                topCategory={dominantCategory.charAt(0).toUpperCase() + dominantCategory.slice(1)}
+                badge={dynamicPersonality.badge}
+                personality={dynamicPersonality.personality}
+              />
+            )}
+
+            {/* Share buttons */}
+            <div className="flex justify-center gap-4 mt-8">
+              <Button
+                onClick={handleShare}
+                className="bg-green-600 hover:bg-green-700 text-white px-8"
+              >
+                Share
+              </Button>
+              <Button
+                onClick={() => {
+                  if (wrappedImage) {
+                    const link = document.createElement('a');
+                    link.download = 'eco-wrapped.png';
+                    link.href = wrappedImage;
+                    link.click();
+                  }
+                }}
+                variant="outline"
+                className="px-8"
+              >
+                Download
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );
