@@ -58,6 +58,7 @@ import ResultsDisplay from './ResultsDisplay';
 import { Label } from '@/components/ui/label';
 import { QuestionTiles } from './QuestionTiles';
 import { AgeTiles } from '@/components/AgeTiles';
+import { Country, State, City } from 'country-state-city';
 
 interface BaseCalculatorState {
   // Demographics
@@ -67,6 +68,7 @@ interface BaseCalculatorState {
   gender: string;
   profession: string;
   location: string;
+  country: string;
   householdSize: string;
   
   // Home Energy
@@ -645,45 +647,80 @@ const Calculator = ({
             Where do you call home? This helps us connect you with local sustainability initiatives.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm text-muted-foreground mb-2">City</Label>
-              <Select
-                value={state.location}
-                onValueChange={(value) => onUpdate({ location: value })}
-              >
-                <SelectTrigger className="h-12 text-lg">
-                  <SelectValue placeholder="Select your city" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="new-york">New York City, USA</SelectItem>
-                  <SelectItem value="los-angeles">Los Angeles, USA</SelectItem>
-                  <SelectItem value="chicago">Chicago, USA</SelectItem>
-                  <SelectItem value="houston">Houston, USA</SelectItem>
-                  <SelectItem value="phoenix">Phoenix, USA</SelectItem>
-                  <SelectItem value="philadelphia">Philadelphia, USA</SelectItem>
-                  <SelectItem value="san-antonio">San Antonio, USA</SelectItem>
-                  <SelectItem value="san-diego">San Diego, USA</SelectItem>
-                  <SelectItem value="dallas">Dallas, USA</SelectItem>
-                  <SelectItem value="san-jose">San Jose, USA</SelectItem>
-                  <SelectItem value="other">Other City</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
+            <div className="space-y-2">
               <Label className="text-sm text-muted-foreground mb-2">Country</Label>
               <Select
                 value={state.country}
-                onValueChange={(value) => onUpdate({ country: value })}
+                onValueChange={(value) => {
+                  onUpdate({ country: value, location: '' }); // Reset city when country changes
+                }}
               >
                 <SelectTrigger className="h-12 text-lg">
                   <SelectValue placeholder="Select your country" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="us">United States</SelectItem>
-                  <SelectItem value="ca">Canada</SelectItem>
-                  <SelectItem value="uk">United Kingdom</SelectItem>
-                  <SelectItem value="au">Australia</SelectItem>
-                  <SelectItem value="other">Other Country</SelectItem>
+                  <div className="p-2">
+                    <Input
+                      type="search"
+                      placeholder="Search countries..."
+                      className="h-9 mb-2"
+                      onChange={(e) => {
+                        const searchTerm = e.target.value.toLowerCase();
+                        const items = document.querySelectorAll('[role="option"]');
+                        items.forEach(item => {
+                          const text = item.textContent?.toLowerCase() || '';
+                          if (text.includes(searchTerm)) {
+                            item.removeAttribute('hidden');
+                          } else {
+                            item.setAttribute('hidden', '');
+                          }
+                        });
+                      }}
+                    />
+                  </div>
+                  {Country.getAllCountries().map((country) => (
+                    <SelectItem key={country.isoCode} value={country.isoCode}>
+                      {country.flag} {country.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground mb-2">City</Label>
+              <Select
+                value={state.location}
+                onValueChange={(value) => onUpdate({ location: value })}
+                disabled={!state.country}
+              >
+                <SelectTrigger className="h-12 text-lg">
+                  <SelectValue placeholder={state.country ? "Select your city" : "Select a country first"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <Input
+                      type="search"
+                      placeholder="Search cities..."
+                      className="h-9 mb-2"
+                      onChange={(e) => {
+                        const searchTerm = e.target.value.toLowerCase();
+                        const items = document.querySelectorAll('[role="option"]');
+                        items.forEach(item => {
+                          const text = item.textContent?.toLowerCase() || '';
+                          if (text.includes(searchTerm)) {
+                            item.removeAttribute('hidden');
+                          } else {
+                            item.setAttribute('hidden', '');
+                          }
+                        });
+                      }}
+                    />
+                  </div>
+                  {state.country && City.getCitiesOfCountry(state.country)?.map((city) => (
+                    <SelectItem key={`${city.name}-${city.stateCode}`} value={city.name}>
+                      {city.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
