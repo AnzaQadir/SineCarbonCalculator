@@ -587,28 +587,107 @@ const Calculator = ({
           <p className="text-sm text-muted-foreground">
             What's your profession or what field are you studying? Your daily activities help us tailor our insights for you.
           </p>
-          <Input
-            type="text"
-            placeholder="Enter your profession or field of study"
+          <Select
             value={state.profession}
-            onChange={(e) => onUpdate({ profession: e.target.value })}
-            className="h-12 text-lg"
-          />
-                  </div>
+            onValueChange={(value) => onUpdate({ profession: value })}
+          >
+            <SelectTrigger className="h-12 text-lg">
+              <SelectValue placeholder="Select your profession" />
+            </SelectTrigger>
+            <SelectContent>
+              <div className="p-2">
+                <Input
+                  type="search"
+                  placeholder="Search professions..."
+                  className="h-9 mb-2"
+                  onChange={(e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const items = document.querySelectorAll('[role="option"]');
+                    items.forEach(item => {
+                      const text = item.textContent?.toLowerCase() || '';
+                      if (text.includes(searchTerm)) {
+                        item.removeAttribute('hidden');
+                      } else {
+                        item.setAttribute('hidden', '');
+                      }
+                    });
+                  }}
+                />
+              </div>
+              <SelectItem value="student">Student (School / College / University)</SelectItem>
+              <SelectItem value="education">Education (Teacher, Lecturer, Academic)</SelectItem>
+              <SelectItem value="business">Business & Management</SelectItem>
+              <SelectItem value="engineering">Engineering & Technology</SelectItem>
+              <SelectItem value="health">Health & Medicine</SelectItem>
+              <SelectItem value="science">Science & Research</SelectItem>
+              <SelectItem value="law">Law & Policy</SelectItem>
+              <SelectItem value="environment">Environment & Sustainability</SelectItem>
+              <SelectItem value="arts">Arts, Design & Creative Fields</SelectItem>
+              <SelectItem value="media">Media & Communications</SelectItem>
+              <SelectItem value="social">Social Sciences & Humanities</SelectItem>
+              <SelectItem value="it">IT & Software Development</SelectItem>
+              <SelectItem value="government">Government & Public Sector</SelectItem>
+              <SelectItem value="hospitality">Hospitality, Travel & Tourism</SelectItem>
+              <SelectItem value="trades">Skilled Trades (e.g., Electrician, Plumber, Mechanic)</SelectItem>
+              <SelectItem value="retail">Retail, Sales & Customer Service</SelectItem>
+              <SelectItem value="logistics">Logistics, Transport & Delivery</SelectItem>
+              <SelectItem value="caregiving">Home & Caregiving (e.g., Stay-at-home parent, Care worker)</SelectItem>
+              <SelectItem value="unemployed">Currently Unemployed or Exploring Options</SelectItem>
+              <SelectItem value="prefer-not-to-say">Prefer Not to Say</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Location */}
         <div className="space-y-2">
           <Label className="text-lg">Your Neighborhood</Label>
           <p className="text-sm text-muted-foreground">
-            Where do you call home? (City, Country) – This helps us see local trends in our eco-community.
+            Where do you call home? This helps us connect you with local sustainability initiatives.
           </p>
-          <Input
-            type="text"
-            placeholder="Enter your location"
-            value={state.location}
-            onChange={(e) => onUpdate({ location: e.target.value })}
-            className="h-12 text-lg"
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm text-muted-foreground mb-2">City</Label>
+              <Select
+                value={state.location}
+                onValueChange={(value) => onUpdate({ location: value })}
+              >
+                <SelectTrigger className="h-12 text-lg">
+                  <SelectValue placeholder="Select your city" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new-york">New York City, USA</SelectItem>
+                  <SelectItem value="los-angeles">Los Angeles, USA</SelectItem>
+                  <SelectItem value="chicago">Chicago, USA</SelectItem>
+                  <SelectItem value="houston">Houston, USA</SelectItem>
+                  <SelectItem value="phoenix">Phoenix, USA</SelectItem>
+                  <SelectItem value="philadelphia">Philadelphia, USA</SelectItem>
+                  <SelectItem value="san-antonio">San Antonio, USA</SelectItem>
+                  <SelectItem value="san-diego">San Diego, USA</SelectItem>
+                  <SelectItem value="dallas">Dallas, USA</SelectItem>
+                  <SelectItem value="san-jose">San Jose, USA</SelectItem>
+                  <SelectItem value="other">Other City</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm text-muted-foreground mb-2">Country</Label>
+              <Select
+                value={state.country}
+                onValueChange={(value) => onUpdate({ country: value })}
+              >
+                <SelectTrigger className="h-12 text-lg">
+                  <SelectValue placeholder="Select your country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="us">United States</SelectItem>
+                  <SelectItem value="ca">Canada</SelectItem>
+                  <SelectItem value="uk">United Kingdom</SelectItem>
+                  <SelectItem value="au">Australia</SelectItem>
+                  <SelectItem value="other">Other Country</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
         {/* Household Size */}

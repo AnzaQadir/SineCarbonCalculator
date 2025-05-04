@@ -76,9 +76,14 @@ export const AgeTiles: React.FC<AgeTilesProps> = ({
       description: 'Young adult making sustainable choices'
     },
     {
-      value: 'OVER_30',
-      title: 'Over 30',
+      value: '30_TO_40',
+      title: '30-40 years',
       description: 'Experienced sustainability practitioner'
+    },
+    {
+      value: 'OVER_40',
+      title: 'Over 40',
+      description: 'Seasoned environmental steward'
     }
   ];
 
