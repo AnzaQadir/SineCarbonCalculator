@@ -55,7 +55,7 @@ const QuestionTile: React.FC<QuestionTileProps> = ({
 
 interface QuestionTilesProps {
   category: 'homeEnergy' | 'transport' | 'food' | 'waste' | 'airQuality' | 'clothing';
-  subCategory: 'efficiency' | 'management' | 'primary' | 'carProfile' | 'diet' | 'plateProfile' | 'prevention' | 'monitoring' | 'impact' | 'shopping' | 'wasteManagement' | 'outdoorQuality' | 'indoorQuality' | 'commuting' | 'wardrobeImpact' | 'mindfulUpgrades' | 'durability' | 'wasteComposition';
+  subCategory: 'efficiency' | 'management' | 'primary' | 'carProfile' | 'diet' | 'plateProfile' | 'prevention' | 'monitoring' | 'impact' | 'shopping' | 'wasteManagement' | 'outdoorQuality' | 'indoorQuality' | 'commuting' | 'wardrobeImpact' | 'mindfulUpgrades' | 'durability' | 'wasteComposition' | 'localvsseasonal';
   value: string;
   onChange: (value: string) => void;
 }
@@ -184,6 +184,48 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               icon: <Beef className="h-6 w-6" />,
               title: 'Moderate Meat',
               description: 'Regular meat consumption'
+            }
+          ];
+        } else if (subCategory === 'localvsseasonal') {
+          return [
+            {
+              value: 'A',
+              icon: <Utensils className="h-6 w-6" />,
+              title: 'Mostly Home-Cooked',
+              description: 'I rarely eat out—I love preparing home-cooked meals and controlling ingredients.'
+            },
+            {
+              value: 'B',
+              icon: <Utensils className="h-6 w-6" />,
+              title: 'Balanced',
+              description: 'I enjoy a balance; I cook most days but treat myself to a restaurant occasionally.'
+            },
+            {
+              value: 'C',
+              icon: <ShoppingBag className="h-6 w-6" />,
+              title: 'Frequently Dine Out',
+              description: "I frequently dine out, as it's more convenient, even if I'm not always aware of its impact."
+            }
+          ];
+        } else if (subCategory === 'plateProfile') {
+          return [
+            {
+              value: 'A',
+              icon: <Leaf className="h-6 w-6" />,
+              title: 'Local & Seasonal',
+              description: 'Primarily local, seasonal, and organic foods'
+            },
+            {
+              value: 'B',
+              icon: <Utensils className="h-6 w-6" />,
+              title: 'Mixed Sources',
+              description: 'Combination of local and imported foods'
+            },
+            {
+              value: 'C',
+              icon: <PackageCheck className="h-6 w-6" />,
+              title: 'Conventional',
+              description: 'Primarily conventional and imported foods'
             }
           ];
         } else {

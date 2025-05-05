@@ -146,6 +146,15 @@ const personalityMappings = {
       B: ["SUSTAINABILITY_SOFT_LAUNCH"],
       C: ["ECO_IN_PROGRESS", "DOING_NOTHING"],
       "": ["CLIMATE_SNOOZER"]
+    },
+    homeScale: {
+      "1": ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      "2": ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      "3": ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      "4": ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"],
+      "5": ["ECO_IN_PROGRESS", "DOING_NOTHING"],
+      "6": ["DOING_NOTHING", "CLIMATE_SNOOZER"],
+      "7+": ["DOING_NOTHING", "CLIMATE_SNOOZER"]
     }
   },
   transport: {
@@ -163,21 +172,26 @@ const personalityMappings = {
       D: ["KIND_OF_CONSCIOUS"],
       E: ["ECO_IN_PROGRESS", "DOING_NOTHING"],
       "": ["CLIMATE_SNOOZER"]
+    },
+    longDistance: {
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH"],
+      C: ["KIND_OF_CONSCIOUS"],
+      D: ["DOING_NOTHING", "CLIMATE_SNOOZER"],
+      E: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"]
     }
   },
   food: {
-    diet: {
-      VEGAN: ["SUSTAINABILITY_SLAYER"],
-      VEGETARIAN: ["PLANETS_MAIN_CHARACTER"],
-      FLEXITARIAN: ["SUSTAINABILITY_SOFT_LAUNCH"],
-      MEAT_MODERATE: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"],
-      MEAT_HEAVY: ["DOING_NOTHING", "CLIMATE_SNOOZER"]
+    dietType: {
+      PLANT_BASED: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      VEGETARIAN: ["PLANETS_MAIN_CHARACTER", "SUSTAINABILITY_SOFT_LAUNCH"],
+      FLEXITARIAN: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      MODERATE_MEAT: ["ECO_IN_PROGRESS", "DOING_NOTHING", "CLIMATE_SNOOZER"]
     },
-    plateProfile: {
-      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
-      B: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
-      C: ["ECO_IN_PROGRESS", "DOING_NOTHING"],
-      "": ["CLIMATE_SNOOZER"]
+    foodSource: {
+      LOCAL_SEASONAL: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      MIXED: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      CONVENTIONAL: ["ECO_IN_PROGRESS", "DOING_NOTHING", "CLIMATE_SNOOZER"]
     }
   },
   waste: {
@@ -193,6 +207,27 @@ const personalityMappings = {
       B: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
       C: ["ECO_IN_PROGRESS", "DOING_NOTHING"],
       "": ["CLIMATE_SNOOZER"]
+    },
+    smartShopping: {
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      C: ["ECO_IN_PROGRESS", "DOING_NOTHING"]
+    },
+    dailyWaste: {
+      A: ["SUSTAINABILITY_SLAYER"],
+      B: ["PLANETS_MAIN_CHARACTER", "SUSTAINABILITY_SOFT_LAUNCH"],
+      C: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"],
+      D: ["DOING_NOTHING", "CLIMATE_SNOOZER"]
+    },
+    wastePrevention: {
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      C: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"],
+      D: ["DOING_NOTHING", "CLIMATE_SNOOZER"]
+    },
+    repairOrReplace: {
+      true: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      false: ["DOING_NOTHING", "CLIMATE_SNOOZER"]
     }
   },
   airQuality: {
@@ -224,11 +259,17 @@ const personalityMappings = {
       C: ["ECO_IN_PROGRESS", "DOING_NOTHING", "CLIMATE_SNOOZER"],
       "": ["CLIMATE_SNOOZER"]
     },
-    durability: {
-      forever: ["SUSTAINABILITY_SLAYER"],
-      years: ["PLANETS_MAIN_CHARACTER", "SUSTAINABILITY_SOFT_LAUNCH"],
-      months: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS", "DOING_NOTHING", "CLIMATE_SNOOZER"],
-      "": ["CLIMATE_SNOOZER"]
+    consumptionFrequency: {
+      A: ["DOING_NOTHING", "CLIMATE_SNOOZER"],
+      B: ["KIND_OF_CONSCIOUS", "ECO_IN_PROGRESS"],
+      C: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      D: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"]
+    },
+    brandLoyalty: {
+      A: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"],
+      B: ["SUSTAINABILITY_SOFT_LAUNCH", "KIND_OF_CONSCIOUS"],
+      C: ["ECO_IN_PROGRESS", "DOING_NOTHING"],
+      D: ["SUSTAINABILITY_SLAYER", "PLANETS_MAIN_CHARACTER"]
     }
   }
 };
@@ -268,10 +309,10 @@ export const determineEcoPersonality = (state: any) => {
 
   // Process food responses
   if (state.dietType) {
-    personalityMappings.food.diet[state.dietType]?.forEach(p => tally[p]++);
+    personalityMappings.food.dietType[state.dietType]?.forEach(p => tally[p]++);
   }
-  if (state.plateProfile) {
-    personalityMappings.food.plateProfile[state.plateProfile]?.forEach(p => tally[p]++);
+  if (state.foodSource) {
+    personalityMappings.food.foodSource[state.foodSource]?.forEach(p => tally[p]++);
   }
 
   // Process waste responses
@@ -297,8 +338,11 @@ export const determineEcoPersonality = (state: any) => {
   if (state.clothing?.mindfulUpgrades) {
     personalityMappings.clothing.mindfulUpgrades[state.clothing.mindfulUpgrades]?.forEach(p => tally[p]++);
   }
-  if (state.clothing?.durability) {
-    personalityMappings.clothing.durability[state.clothing.durability]?.forEach(p => tally[p]++);
+  if (state.clothing?.consumptionFrequency) {
+    personalityMappings.clothing.consumptionFrequency[state.clothing.consumptionFrequency]?.forEach(p => tally[p]++);
+  }
+  if (state.clothing?.brandLoyalty) {
+    personalityMappings.clothing.brandLoyalty[state.clothing.brandLoyalty]?.forEach(p => tally[p]++);
   }
 
   // Find personality with highest count
@@ -327,8 +371,8 @@ export const determineEcoPersonality = (state: any) => {
           (state.energyManagement === 'A' ? 3 : state.energyManagement === 'B' ? 2 : 1),
     transport: (state.primaryTransportMode === 'A' ? 3 : state.primaryTransportMode === 'B' ? 2 : 1) +
                (state.carProfile === 'A' ? 3 : state.carProfile === 'B' ? 2 : 1),
-    food: (state.dietType === 'VEGAN' ? 3 : state.dietType === 'VEGETARIAN' ? 2 : 1) +
-          (state.plateProfile === 'A' ? 3 : state.plateProfile === 'B' ? 2 : 1),
+    food: (state.dietType === 'PLANT_BASED' ? 3 : state.dietType === 'VEGETARIAN' ? 2 : state.dietType === 'FLEXITARIAN' ? 1 : 0) +
+          (state.foodSource === 'LOCAL_SEASONAL' ? 3 : state.foodSource === 'MIXED' ? 2 : state.foodSource === 'CONVENTIONAL' ? 1 : 0),
     waste: (state.waste?.wastePrevention === 'A' ? 3 : state.waste?.wastePrevention === 'B' ? 2 : 1) +
            (state.waste?.wasteManagement === 'A' ? 3 : state.waste?.wasteManagement === 'B' ? 2 : 1)
   };
