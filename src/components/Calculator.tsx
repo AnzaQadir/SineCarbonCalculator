@@ -1059,6 +1059,29 @@ const Calculator = ({
             onChange={(value) => onUpdate({ plateProfile: value as "" | "A" | "B" | "C" })}
           />
         </div>
+
+        {/* Dining Style Question (NEW) */}
+        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="flex items-start gap-4 mb-5">
+            <div className="p-2 bg-primary/10 rounded-lg mt-1">
+              <Utensils className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <label className="text-lg font-medium text-foreground block mb-2">
+                How do you usually choose between cooking at home and dining out?
+              </label>
+              <p className="text-muted-foreground text-sm">
+                Tell us about your typical meal preparation and dining habits.
+              </p>
+            </div>
+          </div>
+          <QuestionTiles
+            category="food"
+            subCategory="localvsseasonal"
+            value={state.diningStyle}
+            onChange={(value) => onUpdate({ diningStyle: value as "" | "A" | "B" | "C" })}
+          />
+        </div>
       </CardContent>
     </div>
   );
