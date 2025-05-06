@@ -1,69 +1,84 @@
-# Welcome to your Lovable project
+# Carbon Calculator Simplifier
 
-## Project info
+A web application that helps users calculate their carbon footprint and provides personalized sustainability recommendations.
 
-**URL**: https://lovable.dev/projects/7899097f-112b-4309-9d66-53622a1b3766
+## Project Structure
 
-## How can I edit this code?
+The project is split into two main services:
 
-There are several ways of editing your application.
+- `frontend/`: React-based web application
+- `backend/`: Express.js API server
 
-**Use Lovable**
+## Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7899097f-112b-4309-9d66-53622a1b3766) and start prompting.
+- Node.js (v18 or higher)
+- npm (v9 or higher)
 
-Changes made via Lovable will be committed automatically to this repo.
+## Installation
 
-**Use your preferred IDE**
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd carbon-calc-simplifier
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. Install dependencies for all services:
+```bash
+npm run install:all
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Development
 
-Follow these steps:
+To run both frontend and backend services in development mode:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+This will start:
+- Frontend on http://localhost:3000
+- Backend on http://localhost:3001
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Building for Production
 
-**Use GitHub Codespaces**
+To build both services for production:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```bash
+npm run build
+```
 
-## What technologies are used for this project?
+## Features
 
-This project is built with .
+- Carbon footprint calculation
+- Personalized sustainability recommendations
+- Interactive UI with progress tracking
+- Detailed category breakdown
+- Eco-personality assessment
 
-- Vite
-- TypeScript
+## Tech Stack
+
+### Frontend
 - React
-- shadcn-ui
+- TypeScript
+- Vite
 - Tailwind CSS
+- shadcn/ui components
 
-## How can I deploy this project?
+### Backend
+- Express.js
+- TypeScript
+- Node.js
 
-Simply open [Lovable](https://lovable.dev/projects/7899097f-112b-4309-9d66-53622a1b3766) and click on Share -> Publish.
+## API Endpoints
 
-## I want to use a custom domain - is that possible?
+- `GET /api/health`: Health check endpoint
+- `POST /api/calculate-personality`: Calculate personality based on user input
+- `GET /api/personality-details/:type`: Get detailed personality information
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
