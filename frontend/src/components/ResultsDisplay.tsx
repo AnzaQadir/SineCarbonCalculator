@@ -626,76 +626,75 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const transformStateToApiFormat = (state: State): UserResponses => {
     return {
       homeEnergy: {
-        efficiency: state.homeEfficiency || '',
-        management: state.energyManagement || '',
-        homeScale: state.homeScale || '',
+        efficiency: (state.homeEfficiency || '') as 'A' | 'B' | 'C' | '',
+        management: (state.energyManagement || '') as 'A' | 'B' | 'C' | '',
+        homeScale: (state.homeScale || '') as '1' | '2' | '3' | '4' | '5' | '6' | '7+',
       },
       transport: {
-        primary: state.primaryTransportMode || '',
-        carProfile: state.carProfile || '',
-        longDistance: state.longDistance || '',
+        primary: (state.primaryTransportMode || '') as 'A' | 'B' | 'C' | 'D' | '',
+        carProfile: (state.carProfile || '') as 'A' | 'B' | 'C' | 'D' | 'E' | '',
+        longDistance: (state.longDistance || '') as 'A' | 'B' | 'C' | 'D' | 'E',
       },
       food: {
         dietType: (
           state.dietType === "VEGAN" ? "PLANT_BASED" :
           state.dietType === "MEAT_MODERATE" ? "MODERATE_MEAT" :
-          state.dietType || ''
-        ) as "VEGETARIAN" | "FLEXITARIAN" | "PLANT_BASED" | "MODERATE_MEAT" | '',
-        foodSource: ["LOCAL_SEASONAL", "MIXED", "CONVENTIONAL"].includes(state.foodSource)
-          ? state.foodSource as "LOCAL_SEASONAL" | "MIXED" | "CONVENTIONAL"
-          : '',
+          state.dietType || undefined
+        ) as 'PLANT_BASED' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MODERATE_MEAT' | undefined,
+        foodSource: ["LOCAL_SEASONAL", "MIXED", "CONVENTIONAL"].includes(state.foodSource || '')
+          ? state.foodSource as 'LOCAL_SEASONAL' | 'MIXED' | 'CONVENTIONAL'
+          : undefined,
       },
       waste: {
-        prevention: state.waste?.wastePrevention || '',
-        management: state.waste?.wasteManagement || '',
-        smartShopping: state.waste?.smartShopping || '',
-        dailyWaste: state.waste?.dailyWaste || '',
-        repairOrReplace: state.waste?.repairOrReplace ?? false,
+        prevention: (state.waste?.wastePrevention || '') as 'A' | 'B' | 'C' | 'D' | '',
+        management: (state.waste?.wasteManagement || '') as 'A' | 'B' | 'C' | '',
+        smartShopping: (state.waste?.smartShopping || '') as 'A' | 'B' | 'C',
+        dailyWaste: (state.waste?.dailyWaste || '') as 'A' | 'B' | 'C' | 'D',
+        repairOrReplace: Boolean(state.waste?.repairOrReplace),
       },
       airQuality: {
-        monitoring: state.airQuality?.monitoring || '',
-        impact: state.airQuality?.impact || '',
+        monitoring: (state.airQuality?.monitoring || '') as 'A' | 'B' | 'C' | 'D' | '',
+        impact: (state.airQuality?.impact || '') as 'A' | 'B' | 'C' | 'D' | '',
       },
       clothing: {
-        wardrobeImpact: state.clothing?.wardrobeImpact || '',
-        mindfulUpgrades: state.clothing?.mindfulUpgrades || '',
-        consumptionFrequency: state.clothing?.consumptionFrequency || '',
-        brandLoyalty: state.clothing?.brandLoyalty || '',
+        wardrobeImpact: (state.clothing?.wardrobeImpact || '') as 'A' | 'B' | 'C' | '',
+        mindfulUpgrades: (state.clothing?.mindfulUpgrades || '') as 'A' | 'B' | 'C' | '',
+        consumptionFrequency: (state.clothing?.consumptionFrequency || '') as 'A' | 'B' | 'C' | 'D',
+        brandLoyalty: (state.clothing?.brandLoyalty || '') as 'A' | 'B' | 'C' | 'D',
       },
     };
   };
 
-  // Add useEffect to calculate personality when component mounts or state changes
+  const calculateInitialPersonality = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const apiResponses = transformStateToApiFormat(state);
+      const result = await calculatePersonality(apiResponses);
+
+      setDynamicPersonality({
+        ...result,
+        emoji: result.emoji || '🌱',
+        story: result.story || 'Your sustainability journey begins!',
+        avatar: result.avatar || '/default-avatar.png',
+        nextAction: result.nextAction || 'Start your journey',
+        badge: result.badge || 'Eco Explorer',
+        champion: result.champion || 'Climate Champion',
+        powerMoves: result.powerMoves || []
+      });
+      setIsPersonalityLoading(false);
+    } catch (error: any) {
+      setError('Failed to calculate personality. Please try again.');
+      setIsPersonalityLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const calculateInitialPersonality = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const apiResponses = transformStateToApiFormat(state);
-        const result = await calculatePersonality(apiResponses);
-
-        setDynamicPersonality({
-          ...result,
-          emoji: result.emoji || '🌱',
-          story: result.story || 'Your sustainability journey begins!',
-          avatar: result.avatar || '/default-avatar.png',
-          nextAction: result.nextAction || 'Start your journey',
-          badge: result.badge || 'Eco Explorer',
-          champion: result.champion || 'Climate Champion',
-          powerMoves: result.powerMoves || []
-        });
-        setIsPersonalityLoading(false);
-      } catch (error: any) {
-        setError('Failed to calculate personality. Please try again.');
-        setIsPersonalityLoading(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     calculateInitialPersonality();
-  }, [state]); // Re-run when state changes
+  }, [state]);
 
   if (error) {
     return (
@@ -803,7 +802,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
               {/* New: Motivational Quote/Tip */}
               <div className="text-xs italic text-green-600 text-center mb-4">
-                "Every small step you take creates a ripple of positive change.”
+                "Every small step you take creates a ripple of positive change."
               </div>
               {/* Share Button */}
               <button
