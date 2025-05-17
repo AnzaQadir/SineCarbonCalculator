@@ -665,33 +665,37 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     };
   };
 
-  // Function to call the API and set dynamicPersonality
-  const calculatePersonalityWithApi = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  // Add useEffect to calculate personality when component mounts or state changes
+  useEffect(() => {
+    const calculateInitialPersonality = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      const apiResponses = transformStateToApiFormat(state);
-      const result = await calculatePersonality(apiResponses);
+        const apiResponses = transformStateToApiFormat(state);
+        const result = await calculatePersonality(apiResponses);
 
-      setDynamicPersonality({
-        ...result,
-        emoji: result.emoji || '🌱',
-        story: result.story || 'Your sustainability journey begins!',
-        avatar: result.avatar || '/default-avatar.png',
-        nextAction: result.nextAction || 'Start your journey',
-        badge: result.badge || 'Eco Explorer',
-        champion: result.champion || 'Climate Champion',
-        powerMoves: result.powerMoves || []
-      });
-      setIsPersonalityLoading(false);
-    } catch (error: any) {
-      setError('Failed to calculate personality. Please try again.');
-      setIsPersonalityLoading(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        setDynamicPersonality({
+          ...result,
+          emoji: result.emoji || '🌱',
+          story: result.story || 'Your sustainability journey begins!',
+          avatar: result.avatar || '/default-avatar.png',
+          nextAction: result.nextAction || 'Start your journey',
+          badge: result.badge || 'Eco Explorer',
+          champion: result.champion || 'Climate Champion',
+          powerMoves: result.powerMoves || []
+        });
+        setIsPersonalityLoading(false);
+      } catch (error: any) {
+        setError('Failed to calculate personality. Please try again.');
+        setIsPersonalityLoading(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    calculateInitialPersonality();
+  }, [state]); // Re-run when state changes
 
   if (error) {
     return (
@@ -702,7 +706,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <p>{error}</p>
           </div>
           <button
-            onClick={calculatePersonalityWithApi}
+            onClick={calculateInitialPersonality}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
             Try Again
