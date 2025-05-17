@@ -9,7 +9,7 @@ import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Pl
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { determineEcoPersonality, assignEcoPersonality, PersonalityDetails } from '@/utils/ecoPersonality';
+import { determineEcoPersonality, PersonalityDetails } from '@/utils/ecoPersonality';
 import useSound from 'use-sound';
 import { EcoAvatar } from '@/components/EcoAvatar';
 import { getOutfitForPersonality, getAccessoryForPersonality, getBackgroundForCategory } from '@/utils/ecoPersonality';
@@ -27,6 +27,7 @@ import { Separator } from "@/components/ui/separator";
 import WrappedStoryCard from './WrappedStoryCard';
 import html2canvas from 'html2canvas';
 import EcoWrappedCard from './EcoWrappedCard';
+import { calculatePersonality, UserResponses } from '@/services/api';
 
 interface CategoryEmissions {
   home: number;
@@ -51,6 +52,40 @@ interface Achievement {
   description?: string;
 }
 
+interface State {
+  homeEfficiency: string;
+  energyManagement: string;
+  homeScale: string;
+  primaryTransportMode: string;
+  carProfile: string;
+  longDistance: string;
+  dietType: string;
+  foodSource: string;
+  waste?: {
+    wastePrevention: string;
+    wasteManagement: string;
+    smartShopping: string;
+    dailyWaste: string;
+    repairOrReplace: string;
+  };
+  airQuality?: {
+    monitoring: string;
+    impact: string;
+  };
+  clothing?: {
+    wardrobeImpact: string;
+    mindfulUpgrades: string;
+    consumptionFrequency: string;
+    brandLoyalty: string;
+  };
+}
+
+interface ImpactMapping {
+  category: string;
+  value: string;
+  impact: string;
+}
+
 interface ResultsDisplayProps {
   score: number;
   emissions: number;
@@ -59,6 +94,31 @@ interface ResultsDisplayProps {
   isVisible: boolean;
   onReset: () => void;
   state: any;
+}
+
+// Update PersonalityResponse type to match the API response
+interface PersonalityResponse {
+  personality: string;
+  dominantCategory: string;
+  subCategory: string;
+  tally: Record<string, number>;
+  categoryScores: Record<string, number>;
+  impactMetrics: {
+    treesPlanted: number;
+    carbonReduced: number;
+    communityImpact: number;
+  };
+  title: string;
+  description: string;
+  strengths: string[];
+  nextSteps: string[];
+  emoji: string;
+  story: string;
+  avatar: string;
+  nextAction: string;
+  badge: string;
+  champion: string;
+  powerMoves: string[];
 }
 
 const getAchievements = (state: any, categoryEmissions: CategoryEmissions): Achievement[] => {
@@ -162,6 +222,32 @@ const getPersonalityRole = (personalityTitle: string): 'pioneer' | 'guardian' | 
   }
 };
 
+// Local error boundary for debugging render errors
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: Error, info: any) {
+    // You can log error info here if needed
+    console.error('ErrorBoundary caught an error:', error, info);
+  }
+  render() {
+    if (this.state.hasError && this.state.error) {
+      return (
+        <div className="p-8 bg-red-100 text-red-800 rounded-xl">
+          <h2 className="text-2xl font-bold mb-2">An error occurred in ResultsDisplay</h2>
+          <pre>{this.state.error.message}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   score,
   emissions,
@@ -171,17 +257,16 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   onReset,
   state
 }) => {
+  // Debug: Log all props and key state
+  console.log('ResultsDisplay props:', { score, emissions, categoryEmissions, recommendations, isVisible, state });
+
   const [activeTab, setActiveTab] = useState('overview');
   const [isPersonalityLoading, setIsPersonalityLoading] = useState(true);
   const [isGeneratingStory, setIsGeneratingStory] = useState(false);
   const [generatedStory, setGeneratedStory] = useState<string>('');
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-  const [playRevealSound] = useSound('/sounds/reveal.mp3', { 
-    onError: (e) => console.error('Error playing reveal sound:', e) 
-  });
-  const [playSuccessSound] = useSound('/sounds/success.mp3', { 
-    onError: (e) => console.error('Error playing success sound:', e) 
-  });
+ 
+
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showStory, setShowStory] = useState(false);
   const [storyCards, setStoryCards] = useState<StoryCard[]>([]);
@@ -191,6 +276,24 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [showWrappedModal, setShowWrappedModal] = useState(false);
   const wrappedCardRef = useRef<HTMLDivElement>(null);
   const [wrappedTheme, setWrappedTheme] = useState<'light' | 'dark' | 'pop'>('light');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [dynamicPersonality, setDynamicPersonality] = useState<PersonalityResponse | null>(null);
+
+  // Update error handling with proper typing
+  const handleError = (error: unknown) => {
+    console.warn('Error:', error);
+  };
+
+  // Update the component to use optional chaining
+  const personalityType = dynamicPersonality?.personality;
+  const emoji = dynamicPersonality?.emoji;
+  const story = dynamicPersonality?.story;
+  const avatar = dynamicPersonality?.avatar;
+  const nextAction = dynamicPersonality?.nextAction;
+  const badge = dynamicPersonality?.badge;
+  const champion = dynamicPersonality?.champion;
+  const powerMoves = dynamicPersonality?.powerMoves;
 
   // Debug logging for state changes
   useEffect(() => {
@@ -275,8 +378,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   const generateStory = async () => {
     console.log('Starting story generation...');
-    if (!state) {
-      console.error('State is undefined');
+    if (!state || !dynamicPersonality) {
+      console.error('State or personality is undefined');
       return;
     }
 
@@ -284,17 +387,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       setIsGeneratingStory(true);
       console.log('Set loading state to true');
       
-      try {
-        await playRevealSound();
-      } catch (e) {
-        console.warn('Could not play reveal sound:', e);
-      }
-      
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      const personality = determineEcoPersonality(state);
-      console.log('Generated personality:', personality);
-
       // Generate personalized achievements
       const newHabits = [];
       
@@ -333,23 +427,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       const carbonReduced = (16 - emissions).toFixed(1);
       const communityImpact = Math.round(score / 2);
 
-      // Determine next challenge area
-      const weakestCategory = Object.entries(categoryScores)
-        .sort(([,a], [,b]) => a - b)[0][0];
-      
-      const nextSteps = {
-        home: 'Go car-free one day a week',
-        transport: 'Switch to a renewable energy provider',
-        food: 'Try a plant-based meal once a week',
-        waste: 'Start composting at home'
-      };
-
       // Generate story using the new engine
       const storyCards = generateEcoStory({
         name: state.name || 'Eco Hero',
         ecoPersonality: dynamicPersonality.personality,
         co2Saved: parseFloat(carbonReduced),
-        topCategory: dominantCategory,
+        topCategory: dynamicPersonality.dominantCategory,
         newHabits,
         impactEquivalent: `planting ${treesPlanted} trees`,
         nextStep: dynamicPersonality.nextAction,
@@ -363,7 +446,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         name: state.name || 'Eco Hero',
         ecoPersonality: dynamicPersonality.personality,
         co2Saved: parseFloat(carbonReduced),
-        topCategory: dominantCategory,
+        topCategory: dynamicPersonality.dominantCategory,
         newHabits,
         impactEquivalent: `planting ${treesPlanted} trees`,
         nextStep: dynamicPersonality.nextAction,
@@ -376,12 +459,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       setNarrativeStory(narrativeStory);
       setShowStory(true);
       setCurrentCardIndex(0);
-      
-      try {
-        await playSuccessSound();
-      } catch (e) {
-        console.warn('Could not play success sound:', e);
-      }
+    
     } catch (error) {
       console.error('Error in story generation:', error);
       setGeneratedStory("Your journey in sustainable living is making a positive impact on our planet. Every small change you make contributes to a greener future.");
@@ -391,161 +469,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     }
   };
 
-  const sharePDF = async () => {
-    try {
-      // Create a temporary element to hold the content
-      const content = document.createElement('div');
-      content.className = 'p-8 bg-white';
-      
-      // Add the content to the temporary element
-      content.innerHTML = `
-        <div class="text-center mb-8">
-          <h1 class="text-3xl font-bold mb-4">Your Carbon Footprint Report</h1>
-          <p class="text-gray-600">Generated on ${new Date().toLocaleDateString()}</p>
-        </div>
-        
-        <div class="mb-8">
-          <h2 class="text-2xl font-semibold mb-4">Summary</h2>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-gray-600">Total Emissions</p>
-              <p class="text-2xl font-bold">${emissions.toFixed(2)} tons CO₂e/year</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-gray-600">Sustainability Score</p>
-              <p class="text-2xl font-bold">${score.toFixed(0)}/100</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="mb-8">
-          <h2 class="text-2xl font-semibold mb-4">Emissions by Category</h2>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-gray-600">Home Energy</p>
-              <p class="text-xl font-bold">${categoryEmissions.home.toFixed(2)} tons</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-gray-600">Transport</p>
-              <p class="text-xl font-bold">${categoryEmissions.transport.toFixed(2)} tons</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-gray-600">Food</p>
-              <p class="text-xl font-bold">${categoryEmissions.food.toFixed(2)} tons</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-gray-600">Waste</p>
-              <p class="text-xl font-bold">${categoryEmissions.waste.toFixed(2)} tons</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="mb-8">
-          <h2 class="text-2xl font-semibold mb-4">Recommendations</h2>
-          <div class="space-y-4">
-            ${recommendations.map(rec => `
-              <div class="bg-gray-50 p-4 rounded-lg">
-                <div class="flex justify-between items-center mb-2">
-                  <span class="text-sm font-medium">${rec.category}</span>
-                  <span class="text-sm px-2 py-1 rounded-full ${
-                    rec.difficulty === 'Easy' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }">${rec.difficulty}</span>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">${rec.title}</h3>
-                <p class="text-gray-600 mb-2">${rec.description}</p>
-                <p class="text-sm text-green-700">${rec.impact}</p>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        
-        <div class="text-center text-gray-500 text-sm">
-          <p>Generated by Carbon Footprint Calculator</p>
-          <p>www.carbonfootprintcalculator.com</p>
-        </div>
-      `;
-
-      // Use html2pdf library to generate PDF
-      const opt = {
-        margin: 1,
-        filename: 'carbon-footprint-report.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
-
-      // Import html2pdf dynamically
-      const html2pdf = (await import('html2pdf.js')).default;
-      await html2pdf().set(opt).from(content).save();
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('There was an error generating the PDF. Please try again.');
-    }
-  };
-
-  // Map state to scored responses (0-2 per answer, grouped by category)
-  function mapStateToScoredResponses(state: any) {
-    // This mapping should be adapted to your actual state structure and scoring logic
-    return {
-      "Transportation": {
-        commute: state.primaryTransportMode === 'WALK_BIKE' ? 2 : state.primaryTransportMode === 'PUBLIC' ? 1 : 0,
-        electric_vehicle: state.carProfile === 'A' ? 2 : state.carProfile === 'B' ? 1 : 0,
-        annual_miles: state.annualMiles < 5000 ? 2 : state.annualMiles < 10000 ? 1 : 0
-      },
-      "Home Energy": {
-        energy_monitoring: state.energyManagement === 'A' ? 2 : state.energyManagement === 'B' ? 1 : 0,
-        renewable_energy: state.usesRenewableEnergy ? 2 : 0,
-        appliances: state.hasEnergyEfficiencyUpgrades ? 2 : 0
-      },
-      "Food & Diet": {
-        meat_frequency: state.dietType === 'VEGAN' ? 2 : state.dietType === 'VEGETARIAN' ? 1 : 0,
-        local_food: state.buysLocalFood ? 2 : 0,
-        composting: state.composting ? 2 : 0
-      },
-      "Waste": {
-        recycling: state.waste?.recyclingPercentage > 75 ? 2 : state.waste?.recyclingPercentage > 50 ? 1 : 0,
-        plastic_avoidance: state.waste?.avoidsPlastic ? 2 : 0,
-        reusing_items: state.waste?.minimizesWaste ? 2 : 0
-      },
-      "Clothing": {
-        buying_frequency: state.clothing?.buyingFrequency === 'RARELY' ? 2 : state.clothing?.buyingFrequency === 'SOMETIMES' ? 1 : 0,
-        eco_consideration: state.clothing?.ecoConsideration ? 2 : 0
-      },
-      "Air Quality": {
-        outdoor_check: state.airQuality?.outdoorCheck ? 2 : 0,
-        indoor_monitoring: state.airQuality?.indoorMonitoring ? 2 : 0
-      },
-      "Purchasing Habits": {
-        lifecycle_eval: state.purchasing?.lifecycleEval ? 2 : 0,
-        sustainable_brands: state.purchasing?.sustainableBrands ? 2 : 0
-      }
-    };
-  }
-
-  const scoredResponses = mapStateToScoredResponses(state);
-  const dynamicPersonality = assignEcoPersonality(scoredResponses);
-  console.log('Your dynamic personality object:', dynamicPersonality);
-  // You can now use dynamicPersonality.personality, .emoji, .story, .avatarSuggestion, .nextAction, .badge, .champion
-  // For now, use this for the main personality display and story
-  const personality = dynamicPersonality;
-  // Get display fields from PersonalityDetails
-  const personalityDisplay = PersonalityDetails[personality.personality];
-  console.log('Personality object:', personality);
-
-  useEffect(() => {
-    // Simulate loading time for personality determination
-    const timer = setTimeout(() => {
-      setIsPersonalityLoading(false);
-      try {
-        playRevealSound();
-        setTimeout(() => playSuccessSound(), 1000);
-      } catch (error) {
-        console.error('Error playing sounds:', error);
-      }
-    }, 1500); // Reduced from 2000 to 1500 for better UX
-
-    return () => clearTimeout(timer);
-  }, [playRevealSound, playSuccessSound]);
 
   // Get achievements based on state
   const achievements = getAchievements(state, categoryEmissions);
@@ -573,8 +496,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     return 'Getting Started';
   };
 
-  // Before split hero layout, define currentMilestone
-  // Define the order of personalities as milestones
+  // Update the milestone calculation to use dynamicPersonality
   const milestoneOrder = [
     "Certified Climate Snoozer",
     "Doing Nothing for the Planet",
@@ -584,7 +506,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     "Planet's Main Character",
     "Sustainability Slayer"
   ];
-  const currentMilestone = milestoneOrder.indexOf(personality.personality);
+
+  const currentMilestone = dynamicPersonality ? milestoneOrder.indexOf(dynamicPersonality.personality) : 0;
   const nextMilestone = currentMilestone < milestoneOrder.length - 1 
     ? milestoneOrder[currentMilestone + 1] 
     : milestoneOrder[currentMilestone];
@@ -592,7 +515,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const totalMilestones = 7;
   const progressPercent = Math.max(0, Math.round((currentMilestone / totalMilestones) * 100));
   const userName = state?.name || 'Eco Hero';
-  const shareText = `I'm a ${personality.personality} on my sustainability journey! 🌱 What's your eco-personality?`;
+  // Update the share text to use dynamicPersonality
+  const shareText = dynamicPersonality 
+    ? `I'm a ${dynamicPersonality.personality} on my sustainability journey! 🌱 What's your eco-personality?`
+    : '';
 
   const handleShare = () => {
     if (navigator.share) {
@@ -607,22 +533,32 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     }
   };
 
-  function generateImpactHighlights(state, impactMappings) {
-    const highlights = [];
-    Object.keys(impactMappings).forEach((key) => {
+  function generateImpactHighlights(state: State, impactMappings: ImpactMapping[]): string[] {
+    const highlights: string[] = [];
+    (Object.keys(state) as Array<keyof State>).forEach((key) => {
       const userResponse = state[key];
-      const mapping = impactMappings[key]?.[userResponse];
+      const mapping = impactMappings.find(m => m.category === key && m.value === userResponse);
       if (mapping) {
-        highlights.push({
-          key,
-          ...mapping,
-        });
+        highlights.push(mapping.impact);
       }
     });
     return highlights;
   }
 
-  const highlights = generateImpactHighlights(state, impactMappings);
+  const homeEnergyMappings = Object.entries(impactMappings.homeEnergy).map(([value, obj]) => ({
+    ...obj,
+    category: 'homeEnergy',
+    value
+  }));
+  const wasteMappings = Object.entries(impactMappings.waste).map(([value, obj]) => ({
+    ...obj,
+    category: 'waste',
+    value
+  }));
+  const highlights = generateImpactHighlights(
+    state,
+    [...homeEnergyMappings, ...wasteMappings]
+  );
 
   const handleNextCard = () => {
     if (currentCardIndex < storyCards.length - 1) {
@@ -636,24 +572,23 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     }
   };
 
-  // Map the story to the carousel format (add more slides as needed)
-  const wrappedSlides = storyCards.length > 0 ? [
+  // Update the wrappedSlides to use optional chaining
+  const wrappedSlides = storyCards.length > 0 && dynamicPersonality ? [
     {
-      personality: personality.personality,
+      personality: dynamicPersonality.personality,
       name: userName,
       co2Saved: `${(16 - emissions).toFixed(1)} tons`,
-      topCategory: dominantCategory.charAt(0).toUpperCase() + dominantCategory.slice(1),
+      topCategory: dynamicPersonality.dominantCategory.charAt(0).toUpperCase() + dynamicPersonality.dominantCategory.slice(1),
       nextStep: recommendations[0]?.title || '',
-      badge: personality.badge,
-      shareText: `@${userName.replace(/\s+/g, '')} saved ${(16 - emissions).toFixed(1)} tons CO₂ this year! 🌍 Top Habit: ${recommendations[0]?.title || ''} 🌿 Role: ${personality.personality} 🏅 Badge: ${personality.badge} #EcoWrapped #ImpactInAction`,
+      badge: dynamicPersonality.badge,
+      shareText: `@${userName.replace(/\s+/g, '')} saved ${(16 - emissions).toFixed(1)} tons CO₂ this year! 🌍 Top Habit: ${recommendations[0]?.title || ''} 🌿 Role: ${dynamicPersonality.personality} 🏅 Badge: ${dynamicPersonality.badge} #EcoWrapped #ImpactInAction`,
     },
-    // Add more slides for each story section if desired
   ] : [];
 
   useEffect(() => {
     if (showWrapped) {
       setTimeout(async () => {
-        const card = document.getElementById('story-card-' + dynamicPersonality.personality.replace(/\s+/g, '-'));
+        const card = document.getElementById('story-card-' + dynamicPersonality?.personality.replace(/\s+/g, '-'));
         if (card) {
           const canvas = await html2canvas(card, {
             useCORS: true,
@@ -687,591 +622,679 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       ]
     : storyCards;
 
+  // Function to transform state to API format
+  const transformStateToApiFormat = (state: State): UserResponses => {
+    return {
+      homeEnergy: {
+        efficiency: state.homeEfficiency || '',
+        management: state.energyManagement || '',
+        homeScale: state.homeScale || '',
+      },
+      transport: {
+        primary: state.primaryTransportMode || '',
+        carProfile: state.carProfile || '',
+        longDistance: state.longDistance || '',
+      },
+      food: {
+        dietType: (
+          state.dietType === "VEGAN" ? "PLANT_BASED" :
+          state.dietType === "MEAT_MODERATE" ? "MODERATE_MEAT" :
+          state.dietType || ''
+        ) as "VEGETARIAN" | "FLEXITARIAN" | "PLANT_BASED" | "MODERATE_MEAT" | '',
+        foodSource: ["LOCAL_SEASONAL", "MIXED", "CONVENTIONAL"].includes(state.foodSource)
+          ? state.foodSource as "LOCAL_SEASONAL" | "MIXED" | "CONVENTIONAL"
+          : '',
+      },
+      waste: {
+        prevention: state.waste?.wastePrevention || '',
+        management: state.waste?.wasteManagement || '',
+        smartShopping: state.waste?.smartShopping || '',
+        dailyWaste: state.waste?.dailyWaste || '',
+        repairOrReplace: state.waste?.repairOrReplace ?? false,
+      },
+      airQuality: {
+        monitoring: state.airQuality?.monitoring || '',
+        impact: state.airQuality?.impact || '',
+      },
+      clothing: {
+        wardrobeImpact: state.clothing?.wardrobeImpact || '',
+        mindfulUpgrades: state.clothing?.mindfulUpgrades || '',
+        consumptionFrequency: state.clothing?.consumptionFrequency || '',
+        brandLoyalty: state.clothing?.brandLoyalty || '',
+      },
+    };
+  };
+
+  // Function to call the API and set dynamicPersonality
+  const calculatePersonalityWithApi = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const apiResponses = transformStateToApiFormat(state);
+      const result = await calculatePersonality(apiResponses);
+
+      setDynamicPersonality({
+        ...result,
+        emoji: result.emoji || '🌱',
+        story: result.story || 'Your sustainability journey begins!',
+        avatar: result.avatar || '/default-avatar.png',
+        nextAction: result.nextAction || 'Start your journey',
+        badge: result.badge || 'Eco Explorer',
+        champion: result.champion || 'Climate Champion',
+        powerMoves: result.powerMoves || []
+      });
+      setIsPersonalityLoading(false);
+    } catch (error: any) {
+      setError('Failed to calculate personality. Please try again.');
+      setIsPersonalityLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="max-w-[1400px] mx-auto px-8 py-12">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center gap-2 text-red-700">
+            <AlertCircle className="h-5 w-5" />
+            <p>{error}</p>
+          </div>
+          <button
+            onClick={calculatePersonalityWithApi}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div 
-      className={cn(
+    <ErrorBoundary>
+      <div className={cn(
         "max-w-[1400px] mx-auto px-8 py-12 space-y-12 transition-opacity duration-500",
         isVisible ? "opacity-100" : "opacity-0"
-      )}
-    >
-      {/* Header */}
-      <div className="space-y-6">
-        <div className="inline-block">
-          <div className="relative">
-            <Book className="h-12 w-12 text-green-600" />
-            <Sparkles className="h-6 w-6 text-yellow-500 absolute -top-2 -right-2" />
+      )}>
+        {/* Header */}
+        <div className="space-y-6">
+          <div className="inline-block">
+            <div className="relative">
+              <Book className="h-12 w-12 text-green-600" />
+              <Sparkles className="h-6 w-6 text-yellow-500 absolute -top-2 -right-2" />
+            </div>
           </div>
-        </div>
-        <h1 className="text-5xl font-serif text-green-700">Your Planet, Your Impact: Let's Begin!</h1>
-        <p className="text-xl text-gray-600 max-w-2xl">
-          Every step you take shapes our planet's future. Let's discover your unique path to sustainability.
-        </p>
-      </div>
-
-      {/* Split Hero Layout */}
-      <div className="space-y-8">
-        {/* Fancy Heading for Top Section */}
-        <div className="w-full flex flex-col items-center mb-8">
-          <div className="flex items-center gap-4">
-            <Sparkles className="h-10 w-10 text-yellow-400 animate-pulse" />
-            <h2 className="text-4xl md:text-5xl font-extrabold font-serif bg-gradient-to-r from-green-700 via-emerald-500 to-green-400 bg-clip-text text-transparent drop-shadow-lg">
-              Your Story So Far & The Next Chapter
-            </h2>
-            <Sparkles className="h-10 w-10 text-green-400 animate-pulse" />
-          </div>
-          <p className="text-lg text-gray-600 mt-2 text-center max-w-2xl">
-            Every choice shapes your journey. See your unique path and discover the next move in your story.
+          <h1 className="text-5xl font-serif text-green-700">Your Planet, Your Impact: Let's Begin!</h1>
+          <p className="text-xl text-gray-600 max-w-2xl">
+            Every step you take shapes our planet's future. Let's discover your unique path to sustainability.
           </p>
         </div>
-        {/* New: Personality Visual Card */}
-        <div className="flex justify-center w-full mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-0 flex flex-col items-center max-w-2xl w-full border border-green-100 overflow-hidden">
-            {/* Personality Image */}
-            <img
-              src="/profile.jpg"
-              alt="Personality Illustration"
-              className="w-full object-contain bg-green-50 border-b-4 border-green-100 p-4"
-              style={{ maxHeight: 320 }}
-            />
-            <div className="w-full p-8 flex flex-col items-center">
-              {/* Personality Description */}
+
+        {/* Split Hero Layout */}
+        <div className="space-y-8">
+          {/* Fancy Heading for Top Section */}
+          <div className="w-full flex flex-col items-center mb-8">
+            <div className="flex items-center gap-4">
+              <Sparkles className="h-10 w-10 text-yellow-400 animate-pulse" />
+              <h2 className="text-4xl md:text-5xl font-extrabold font-serif bg-gradient-to-r from-green-700 via-emerald-500 to-green-400 bg-clip-text text-transparent drop-shadow-lg">
+                Your Story So Far & The Next Chapter
+              </h2>
+              <Sparkles className="h-10 w-10 text-green-400 animate-pulse" />
+            </div>
+            <p className="text-lg text-gray-600 mt-2 text-center max-w-2xl">
+              Every choice shapes your journey. See your unique path and discover the next move in your story.
+            </p>
+          </div>
+          {/* New: Personality Visual Card */}
+          <div className="flex justify-center w-full mb-8">
+            <div className="bg-white rounded-2xl shadow-lg p-0 flex flex-col items-center max-w-2xl w-full border border-green-100 overflow-hidden">
+              {/* Personality Image */}
+              <img
+                src="/profile.jpg"
+                alt="Personality Illustration"
+                className="w-full object-contain bg-green-50 border-b-4 border-green-100 p-4"
+                style={{ maxHeight: 320 }}
+              />
+              <div className="w-full p-8 flex flex-col items-center">
+                {/* Personality Description */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-3xl">{dynamicPersonality?.emoji}</span>
+                  <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personality}</h2>
+                </div>
+                <Badge className="mb-2">{dynamicPersonality?.badge}</Badge>
+                <p className="text-gray-700 text-center mb-2">{story?.split('.')[0]}.</p>
+                <div className="text-green-700 font-medium mb-2">{nextAction}</div>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col lg:flex-row gap-8 items-stretch w-full mt-8 justify-center">
+            {/* Profile Card */}
+            <div className="flex-1 max-w-xl mx-auto bg-gradient-to-br from-green-100 to-green-50 rounded-2xl shadow-2xl p-10 flex flex-col items-center min-h-[460px]">
+              {/* Remove Animated Avatar (without progress ring) */}
+              {/* Personalized Greeting */}
+              <div className="text-lg font-semibold text-green-900 mb-2 text-center">
+                Hi {userName}, you're a {dynamicPersonality?.personality}!
+              </div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-3xl">{personality.emoji}</span>
-                <h2 className="text-2xl font-bold text-green-700 font-serif">{personality.personality}</h2>
+                <span className="text-3xl">{emoji}</span>
+                <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personality}</h2>
               </div>
-              <Badge className="mb-2">{personality.badge}</Badge>
-              <p className="text-gray-700 text-center mb-2">{personality.story.split('.')[0]}.</p>
-              <div className="text-green-700 font-medium mb-2">{personality.nextAction}</div>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col lg:flex-row gap-8 items-stretch w-full mt-8 justify-center">
-          {/* Profile Card */}
-          <div className="flex-1 max-w-xl mx-auto bg-gradient-to-br from-green-100 to-green-50 rounded-2xl shadow-2xl p-10 flex flex-col items-center min-h-[460px]">
-            {/* Remove Animated Avatar (without progress ring) */}
-            {/* Personalized Greeting */}
-            <div className="text-lg font-semibold text-green-900 mb-2 text-center">
-              Hi {userName}, you're a {personality.personality}!
-            </div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-3xl">{personality.emoji}</span>
-              <h2 className="text-2xl font-bold text-green-700 font-serif">{personality.personality}</h2>
-            </div>
-            <Badge className="mb-2">{personality.badge}</Badge>
-            <p className="text-gray-700 text-center mb-2">{personality.story.split('.')[0]}.</p>
-            <div className="text-green-700 font-medium mb-4">{personality.nextAction}</div>
-            {/* New: Strengths/Highlights */}
-            <div className="bg-green-50 rounded-lg p-3 mb-3 w-full text-center">
-              <div className="text-sm font-semibold text-green-700 mb-1">Your Strengths</div>
-              <div className="text-sm text-gray-700">
-                You excel at making conscious choices and inspiring others to start their journey.
-              </div>
-            </div>
-            {/* New: Fun Fact/Stat */}
-            <div className="bg-green-50 rounded-lg p-3 mb-3 w-full text-center">
-              <div className="text-sm font-semibold text-green-700 mb-1">Did you know?</div>
-              <div className="text-sm text-gray-700">
-                People with your profile are likely to influence at least 3 friends to take action!
-              </div>
-            </div>
-            {/* New: Motivational Quote/Tip */}
-            <div className="text-xs italic text-green-600 text-center mb-4">
-              "Every small step you take creates a ripple of positive change.”
-            </div>
-            {/* Share Button */}
-            <button
-              onClick={handleShare}
-              className="mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition text-base font-semibold"
-            >
-              Share Your Eco-Personality
-            </button>
-          </div>
-          {/* Recommendation Engine Card */}
-          <div className="flex-1 max-w-xl mx-auto bg-gradient-to-br from-green-100 to-green-50 rounded-2xl shadow-2xl p-10 flex flex-col items-center min-h-[460px]">
-            <div className="flex items-center gap-2 mb-4">
-              <Lightbulb className="h-7 w-7 text-green-500" />
-              <h2 className="text-2xl font-bold text-green-700 font-serif">Recommendation Engine</h2>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-5 w-5 text-green-500 cursor-pointer ml-1" />
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  <span>Why this matters: This recommendation is chosen based on your answers and has the biggest impact for you right now.</span>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            {recommendations && recommendations.length > 0 ? (
-              <>
-                <div className="w-full mb-4">
-                  <div className="text-lg font-semibold text-green-700 mb-1 flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-green-500" />
-                    {recommendations[0].title}
-                  </div>
-                  <div className="text-sm text-gray-600 mb-2">{recommendations[0].description}</div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge className={recommendations[0].difficulty === 'Easy' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                      {recommendations[0].difficulty}
-                    </Badge>
-                    <span className="text-xs text-green-700 font-medium">{recommendations[0].impact}</span>
-                  </div>
-                  {/* Why this is recommended */}
-                  <div className="mt-4 bg-green-50 rounded-lg p-3 flex items-start gap-2">
-                    <Info className="h-5 w-5 text-green-500 mt-0.5" />
-                    <div>
-                      <div className="text-sm font-semibold text-green-700 mb-1">Why this is recommended</div>
-                      <div className="text-sm text-gray-700">Switching to renewable energy is one of the most effective ways to reduce your carbon footprint and support a cleaner future.</div>
-                    </div>
-                  </div>
-                  {/* How to get started */}
-                  <div className="mt-4 bg-green-50 rounded-lg p-3 flex items-start gap-2">
-                    <Lightbulb className="h-5 w-5 text-green-500 mt-0.5" />
-                    <div>
-                      <div className="text-sm font-semibold text-green-700 mb-1">How to get started</div>
-                      <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                        <li>Contact your local utility to ask about green energy options.</li>
-                        <li>Research solar panel providers in your area.</li>
-                        <li>Start with small steps, like using energy-efficient appliances.</li>
-                      </ul>
-                    </div>
-                  </div>
-                  {/* Inspirational tip */}
-                  <div className="mt-4 text-xs italic text-green-600 text-center">
-                    "Every small switch adds up to a brighter, cleaner tomorrow."
-                  </div>
-                </div>
-                <Button
-                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition text-lg py-3 font-semibold"
-                  onClick={() => alert('Simulate recommendation: ' + recommendations[0].title)}
-                >
-                  Simulate Recommendation
-                </Button>
-              </>
-            ) : (
-              <div className="text-gray-500">No recommendations available.</div>
-            )}
-          </div>
-        </div>
-
-        {/* Sustainability Journey */}
-        <div className="w-full flex flex-col justify-center bg-white/60 rounded-3xl shadow-2xl p-12 mt-8">
-          <h2 className="text-3xl font-serif text-green-700 mb-8 flex items-center gap-3">
-            <Leaf className="h-8 w-8 text-green-500" /> Your Sustainability Journey
-          </h2>
-          <SustainabilityJourney currentMilestone={currentMilestone} score={score} />
-        </div>
-      </div>
-
-      {/* Eco Story Card */}
-      <Card className="bg-gradient-to-br from-green-50 to-green-100/50 overflow-hidden rounded-2xl shadow-lg">
-        <CardContent className="p-8 lg:p-12 space-y-12">
-          {/* Hero Section with Personality */}
-          <div className="relative">
-            <div className="flex flex-col lg:flex-row items-start gap-8">
-              {/* Personality Info (keep only this, remove avatar on right) */}
-              {/* Avatar Display removed */}
-            </div>
-          </div>
-
-          {/* Impact Highlights Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Impact Stats */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <Trophy className="h-7 w-7 text-yellow-500" />
-                <h3 className="text-2xl font-serif text-gray-800">Your Impact Highlights</h3>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Heart className="h-5 w-5 text-red-500" />
-                    <span className="text-sm font-medium text-gray-500">Planet Saved</span>
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900">
-                    {(16 - emissions).toFixed(1)}
-                    <span className="text-sm font-normal text-gray-500 ml-1">tons CO₂</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Equivalent to planting {Math.round((16 - emissions) * 10)} trees
-                  </p>
-                </div>
-                <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Star className="h-5 w-5 text-yellow-500" />
-                    <span className="text-sm font-medium text-gray-500">Top Category</span>
-                  </div>
-                  <div className="text-xl font-bold text-gray-900 capitalize">
-                    {dominantCategory}
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Leading by example
-                  </p>
+              <Badge className="mb-2">{badge}</Badge>
+              <div className="text-green-700 font-medium mb-4">{nextAction}</div>
+              {/* New: Strengths/Highlights */}
+              <div className="bg-green-50 rounded-lg p-3 mb-3 w-full text-center">
+                <div className="text-sm font-semibold text-green-700 mb-1">Your Strengths</div>
+                <div className="text-sm text-gray-700">
+                  You excel at making conscious choices and inspiring others to start their journey.
                 </div>
               </div>
-
-              {/* Progress Bar */}
-        
+              {/* New: Fun Fact/Stat */}
+              <div className="bg-green-50 rounded-lg p-3 mb-3 w-full text-center">
+                <div className="text-sm font-semibold text-green-700 mb-1">Did you know?</div>
+                <div className="text-sm text-gray-700">
+                  People with your profile are likely to influence at least 3 friends to take action!
+                </div>
+              </div>
+              {/* New: Motivational Quote/Tip */}
+              <div className="text-xs italic text-green-600 text-center mb-4">
+                "Every small step you take creates a ripple of positive change.”
+              </div>
+              {/* Share Button */}
+              <button
+                onClick={handleShare}
+                className="mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition text-base font-semibold"
+              >
+                Share Your Eco-Personality
+              </button>
             </div>
-
-            {/* Story Preview */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <Lightbulb className="h-7 w-7 text-blue-500" />
-                <h3 className="text-2xl font-serif text-gray-800">Your Story Highlights</h3>
+            {/* Recommendation Engine Card */}
+            <div className="flex-1 max-w-xl mx-auto bg-gradient-to-br from-green-100 to-green-50 rounded-2xl shadow-2xl p-10 flex flex-col items-center min-h-[460px]">
+              <div className="flex items-center gap-2 mb-4">
+                <Lightbulb className="h-7 w-7 text-green-500" />
+                <h2 className="text-2xl font-bold text-green-700 font-serif">Recommendation Engine</h2>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-5 w-5 text-green-500 cursor-pointer ml-1" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <span>Why this matters: This recommendation is chosen based on your answers and has the biggest impact for you right now.</span>
+                  </TooltipContent>
+                </Tooltip>
               </div>
-              <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <Star className="h-5 w-5 text-green-600" />
+              {recommendations && recommendations.length > 0 ? (
+                <>
+                  <div className="w-full mb-4">
+                    <div className="text-lg font-semibold text-green-700 mb-1 flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-green-500" />
+                      {recommendations[0].title}
                     </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Keep it up!</h4>
-                      <p className="text-base text-green-700 font-semibold">
-                        You are part of the <span className="text-green-900 font-bold">5%</span> that does XYZ.
-                      </p>
+                    <div className="text-sm text-gray-600 mb-2">{recommendations[0].description}</div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge className={recommendations[0].difficulty === 'Easy' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                        {recommendations[0].difficulty}
+                      </Badge>
+                      <span className="text-xs text-green-700 font-medium">{recommendations[0].impact}</span>
+                    </div>
+                    {/* Why this is recommended */}
+                    <div className="mt-4 bg-green-50 rounded-lg p-3 flex items-start gap-2">
+                      <Info className="h-5 w-5 text-green-500 mt-0.5" />
+                      <div>
+                        <div className="text-sm font-semibold text-green-700 mb-1">Why this is recommended</div>
+                        <div className="text-sm text-gray-700">Switching to renewable energy is one of the most effective ways to reduce your carbon footprint and support a cleaner future.</div>
+                      </div>
+                    </div>
+                    {/* How to get started */}
+                    <div className="mt-4 bg-green-50 rounded-lg p-3 flex items-start gap-2">
+                      <Lightbulb className="h-5 w-5 text-green-500 mt-0.5" />
+                      <div>
+                        <div className="text-sm font-semibold text-green-700 mb-1">How to get started</div>
+                        <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                          <li>Contact your local utility to ask about green energy options.</li>
+                          <li>Research solar panel providers in your area.</li>
+                          <li>Start with small steps, like using energy-efficient appliances.</li>
+                        </ul>
+                      </div>
+                    </div>
+                    {/* Inspirational tip */}
+                    <div className="mt-4 text-xs italic text-green-600 text-center">
+                      "Every small switch adds up to a brighter, cleaner tomorrow."
                     </div>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Target className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Next Chapter Goal</h4>
-                      <p className="text-sm text-gray-600">
-                        {score >= 75 
-                          ? "Lead your community in sustainable innovation" 
-                          : "Level up your impact in " + Object.entries(categoryScores)
-                              .sort(([,a], [,b]) => a - b)[0][0]}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {personalityDisplay.powerMoves && (
-                <div className="bg-white/80 rounded-xl border border-green-100 shadow p-6 mt-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Star className="h-6 w-6 text-yellow-400 drop-shadow" />
-                    <span className="text-xl font-serif font-semibold text-green-800 tracking-tight">Power Moves</span>
-                  </div>
-                  <hr className="border-green-100 mb-4" />
-                  <ul className="list-none pl-0 space-y-3">
-                    {personalityDisplay.powerMoves.map((move, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-start gap-3 text-green-900 text-base font-medium"
-                      >
-                        <span className="inline-block mt-1">
-                          <Star className="h-5 w-5 text-green-400" />
-                        </span>
-                        <span>{move}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                  <Button
+                    className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition text-lg py-3 font-semibold"
+                    onClick={() => alert('Simulate recommendation: ' + recommendations[0].title)}
+                  >
+                    Simulate Recommendation
+                  </Button>
+                </>
+              ) : (
+                <div className="text-gray-500">No recommendations available.</div>
               )}
             </div>
           </div>
 
-          {/* Categories Impact Grid */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <Leaf className="h-7 w-7 text-green-500" />
-              <h2 className="text-2xl font-serif text-gray-800">Your impact across categories</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
-              {/* Home Category */}
-              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                <div className="mb-4">
-                  <Home className="h-7 w-7 text-green-600" />
-                </div>
-                <div className="text-lg font-semibold mb-1">Home</div>
-                <div className="text-gray-500 text-sm mb-2">
-                  {state?.usesRenewableEnergy ? "Using renewable energy sources" : "Traditional energy consumption"}
-                  {state?.hasEnergyEfficiencyUpgrades ? " with efficiency upgrades" : ""}
-                </div>
-                <div className="mt-auto text-green-700 font-medium">Top 50% for Home</div>
-              </div>
-              {/* Transport Category */}
-              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                <div className="mb-4">
-                  <Car className="h-7 w-7 text-blue-600" />
-                </div>
-                <div className="text-lg font-semibold mb-1">Transport</div>
-                <div className="text-gray-500 text-sm mb-2">
-                  {state?.primaryTransportMode === 'WALK_BIKE' ? "Primarily using active transport" :
-                    state?.primaryTransportMode === 'PUBLIC' ? "Regular public transit user" : "Car-based transportation"}
-                </div>
-                <div className="mt-auto text-green-700 font-medium">Top 40% for Transport</div>
-              </div>
-              {/* Food Category */}
-              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                <div className="mb-4">
-                  <Utensils className="h-7 w-7 text-amber-600" />
-                </div>
-                <div className="text-lg font-semibold mb-1">Food</div>
-                <div className="text-gray-500 text-sm mb-2">
-                  {state?.dietType === 'VEGAN' ? "Plant-based diet champion" :
-                    state?.dietType === 'VEGETARIAN' ? "Vegetarian diet follower" : "Mixed diet consumer"}
-                </div>
-                <div className="mt-auto text-green-700 font-medium">Top 30% for Food</div>
-              </div>
-              {/* Clothes Category */}
-              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                <div className="mb-4">
-                  <ShoppingBag className="h-7 w-7 text-pink-600" />
-                </div>
-                <div className="text-lg font-semibold mb-1">Clothes</div>
-                <div className="text-gray-500 text-sm mb-2">
-                  {state?.clothing?.wardrobeImpact === 'A' ? "Sustainable shopper" :
-                    state?.clothing?.wardrobeImpact === 'B' ? "Mix & match" :
-                    state?.clothing?.wardrobeImpact === 'C' ? "Trend follower" : "Fashion choices"}
-                </div>
-                <div className="mt-auto text-green-700 font-medium">Top 35% for Clothes</div>
-              </div>
-              {/* Waste Category */}
-              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                <div className="mb-4">
-                  <Recycle className="h-7 w-7 text-purple-600" />
-                </div>
-                <div className="text-lg font-semibold mb-1">Waste</div>
-                <div className="text-gray-500 text-sm mb-2">
-                  {state?.waste?.recyclingPercentage > 75 ? "High recycling achiever" :
-                    state?.waste?.recyclingPercentage > 50 ? "Active recycler" : "Starting recycling journey"}
-                </div>
-                <div className="mt-auto text-green-700 font-medium">Top 30% for Waste</div>
-              </div>
-              {/* Air Quality Category */}
-              <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                <div className="mb-4">
-                  <Wind className="h-7 w-7 text-cyan-600" />
-                </div>
-                <div className="text-lg font-semibold mb-1">Air Quality</div>
-                <div className="text-gray-500 text-sm mb-2">
-                  {state?.airQuality?.outdoorAirQuality === 'A' ? "Fresh and clean" :
-                    state?.airQuality?.outdoorAirQuality === 'B' ? "Generally clear" :
-                    state?.airQuality?.outdoorAirQuality === 'C' ? "Sometimes polluted" :
-                    state?.airQuality?.outdoorAirQuality === 'D' ? "Not sure" : "Air quality awareness"}
-                </div>
-                <div className="mt-auto text-green-700 font-medium">Top 45% for Air Quality</div>
-              </div>
-            </div>
+          {/* Sustainability Journey */}
+          <div className="w-full flex flex-col justify-center bg-white/60 rounded-3xl shadow-2xl p-12 mt-8">
+            <h2 className="text-3xl font-serif text-green-700 mb-8 flex items-center gap-3">
+              <Leaf className="h-8 w-8 text-green-500" /> Your Sustainability Journey
+            </h2>
+            <SustainabilityJourney currentMilestone={currentMilestone} score={score} />
           </div>
+        </div>
 
-          {/* Story Generation Section - Updated UI */}
-          <div className="space-y-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <BookOpen className="h-8 w-8 text-green-600" />
-                <h2 className="text-3xl font-serif text-gray-800">Your Climate Journey Story</h2>
-              </div>
-              <div className="flex gap-2 justify-end mb-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowWrapped(true)}
-                  className={cn(
-                    "text-green-700 border-green-200",
-                    !showStory && "opacity-50 cursor-not-allowed"
-                  )}
-                  disabled={!showStory}
-                >
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4" />
-                    {!showStory ? "Generate Story First" : "Generate Wrapped"}
-                  </div>
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setShowStory(false);
-                    setShowWrapped(false);
-                    setWrappedImage(null);
-                    onReset();
-                  }}
-                  className="text-green-700 border-green-200"
-                >
-                  Reset Story
-                </Button>
+        {/* Eco Story Card */}
+        <Card className="bg-gradient-to-br from-green-50 to-green-100/50 overflow-hidden rounded-2xl shadow-lg">
+          <CardContent className="p-8 lg:p-12 space-y-12">
+            {/* Hero Section with Personality */}
+            <div className="relative">
+              <div className="flex flex-col lg:flex-row items-start gap-8">
+                {/* Personality Info (keep only this, remove avatar on right) */}
+                {/* Avatar Display removed */}
               </div>
             </div>
-            
-            {!showStory ? (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-br from-purple-50 to-green-50 rounded-xl p-8 border border-purple-100 shadow-lg"
-              >
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-purple-100 rounded-xl">
-                      <Sparkles className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-purple-900 mb-2">
-                        Generate Your Unique Climate Story
-                      </h3>
-                      <p className="text-gray-600">
-                        Let's transform your sustainable choices into an inspiring narrative. Your story could motivate others to join the climate action movement.
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-6">
-                    <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Star className="h-5 w-5 text-yellow-500" />
-                        <span className="font-medium text-purple-900">Personalized</span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Story tailored to your unique eco-personality and achievements
-                      </p>
-                    </div>
-                    <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Heart className="h-5 w-5 text-red-500" />
-                        <span className="font-medium text-purple-900">Engaging</span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Interactive storytelling with visual elements and animations
-                      </p>
-                    </div>
-                    <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Share2 className="h-5 w-5 text-blue-500" />
-                        <span className="font-medium text-purple-900">Shareable</span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Easy to share your journey with friends and family
-                      </p>
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={async () => {
-                      await generateStory();
-                      setShowStory(true);
-                    }}
-                    className={cn(
-                      "w-full text-white py-6 rounded-xl flex items-center justify-center gap-3 text-lg transition-all duration-300",
-                      isGeneratingStory 
-                        ? "bg-purple-500 cursor-not-allowed"
-                        : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:shadow-lg"
-                    )}
-                    disabled={isGeneratingStory}
-                  >
-                    {isGeneratingStory ? (
-                      <>
-                        <Loader2 className="h-6 w-6 animate-spin" />
-                        Crafting Your Story...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-6 w-6" />
-                        Generate Your Climate Journey
-                      </>
-                    )}
-                  </Button>
+            {/* Impact Highlights Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Impact Stats */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <Trophy className="h-7 w-7 text-yellow-500" />
+                  <h3 className="text-2xl font-serif text-gray-800">Your Impact Highlights</h3>
                 </div>
-              </motion.div>
-            ) : (
-              <AnimatePresence>
-                <motion.div 
-                  key={currentCardIndex}
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -40 }}
-                  transition={{ duration: 0.5, type: 'spring' }}
-                  className={cn(
-                    'story-card space-y-6 rounded-3xl shadow-2xl border p-10 md:p-14',
-                    combinedStoryCards[currentCardIndex]?.isNarrative
-                      ? 'bg-gradient-to-br from-blue-50 via-white to-green-50 border-blue-100'
-                      : 'bg-gradient-to-br from-green-50 via-white to-purple-50 border-green-100'
-                  )}
-                >
-                  <div className="flex items-center gap-4 mb-2">
-                    <div className="p-3 bg-gradient-to-br from-green-200 to-green-400 rounded-xl shadow-lg">
-                      {combinedStoryCards[currentCardIndex].emoji && (
-                        <span className="text-3xl drop-shadow-lg">{combinedStoryCards[currentCardIndex].emoji}</span>
-                      )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Heart className="h-5 w-5 text-red-500" />
+                      <span className="text-sm font-medium text-gray-500">Planet Saved</span>
                     </div>
-                    <h3 className={cn(
-                      'font-serif tracking-tight flex-1',
-                      combinedStoryCards[currentCardIndex]?.isNarrative
-                        ? 'text-3xl md:text-4xl font-extrabold text-blue-900'
-                        : 'text-3xl md:text-4xl font-extrabold text-green-900'
-                    )}>
-                      {combinedStoryCards[currentCardIndex].title}
-                    </h3>
-                  </div>
-                  <div className={cn(
-                    'rounded-2xl shadow-md',
-                    combinedStoryCards[currentCardIndex]?.isNarrative
-                      ? 'bg-white/95 p-10 border-l-4 border-blue-300'
-                      : 'bg-white/90 p-8 border-l-4 border-green-300'
-                  )}>
-                    <p className={cn(
-                      'leading-relaxed whitespace-pre-line',
-                      combinedStoryCards[currentCardIndex]?.isNarrative
-                        ? 'text-xl text-blue-900 font-medium italic'
-                        : 'text-lg md:text-xl text-gray-800 font-medium'
-                    )}>
-                      {combinedStoryCards[currentCardIndex].content}
+                    <div className="text-3xl font-bold text-gray-900">
+                      {(16 - emissions).toFixed(1)}
+                      <span className="text-sm font-normal text-gray-500 ml-1">tons CO₂</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Equivalent to planting {Math.round((16 - emissions) * 10)} trees
                     </p>
                   </div>
-                  {combinedStoryCards[currentCardIndex].stats && (
-                    <div className={cn(
-                      'flex items-center gap-2 font-semibold mt-2',
-                      combinedStoryCards[currentCardIndex]?.isNarrative
-                        ? 'text-blue-700 text-base'
-                        : 'text-green-700 text-base'
-                    )}>
-                      <Info className="h-5 w-5" />
-                      {combinedStoryCards[currentCardIndex].stats}
+                  <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Star className="h-5 w-5 text-yellow-500" />
+                      <span className="text-sm font-medium text-gray-500">Top Category</span>
                     </div>
-                  )}
-                  <div className="flex items-center justify-between pt-6">
-                    <Button
-                      variant="outline"
-                      onClick={handlePreviousCard}
-                      disabled={currentCardIndex === 0}
-                      className="flex items-center gap-2 text-green-700 border-green-200"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Previous
-                    </Button>
-                    <div className="flex items-center gap-2">
-                      {combinedStoryCards.map((_, index) => (
-                        <motion.div
-                          key={index}
-                          className={cn(
-                            'h-3 w-3 rounded-full border-2',
-                            currentCardIndex === index
-                              ? combinedStoryCards[index]?.isNarrative
-                                ? 'bg-blue-600 border-blue-600 shadow-lg'
-                                : 'bg-green-600 border-green-600 shadow-lg'
-                              : combinedStoryCards[index]?.isNarrative
-                                ? 'bg-blue-100 border-blue-200'
-                                : 'bg-green-100 border-green-200'
-                          )}
-                          whileHover={{ scale: 1.2 }}
-                          onClick={() => setCurrentCardIndex(index)}
-                          style={{ cursor: 'pointer' }}
-                        />
+                    <div className="text-xl font-bold text-gray-900 capitalize">
+                      {dominantCategory}
+                    </div>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Leading by example
+                    </p>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+            
+              </div>
+
+              {/* Story Preview */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <Lightbulb className="h-7 w-7 text-blue-500" />
+                  <h3 className="text-2xl font-serif text-gray-800">Your Story Highlights</h3>
+                </div>
+                <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <Star className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900">Keep it up!</h4>
+                        <p className="text-base text-green-700 font-semibold">
+                          You are part of the <span className="text-green-900 font-bold">5%</span> that does XYZ.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Target className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900">Next Chapter Goal</h4>
+                        <p className="text-sm text-gray-600">
+                          {score >= 75 
+                            ? "Lead your community in sustainable innovation" 
+                            : "Level up your impact in " + Object.entries(categoryScores)
+                                .sort(([,a], [,b]) => a - b)[0][0]}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {powerMoves && (
+                  <div className="bg-white/80 rounded-xl border border-green-100 shadow p-6 mt-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Star className="h-6 w-6 text-yellow-400 drop-shadow" />
+                      <span className="text-xl font-serif font-semibold text-green-800 tracking-tight">Power Moves</span>
+                    </div>
+                    <hr className="border-green-100 mb-4" />
+                    <ul className="list-none pl-0 space-y-3">
+                      {powerMoves.map((move, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-start gap-3 text-green-900 text-base font-medium"
+                        >
+                          <span className="inline-block mt-1">
+                            <Star className="h-5 w-5 text-green-400" />
+                          </span>
+                          <span>{move}</span>
+                        </li>
                       ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Categories Impact Grid */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <Leaf className="h-7 w-7 text-green-500" />
+                <h2 className="text-2xl font-serif text-gray-800">Your impact across categories</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+                {/* Home Category */}
+                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                  <div className="mb-4">
+                    <Home className="h-7 w-7 text-green-600" />
+                  </div>
+                  <div className="text-lg font-semibold mb-1">Home</div>
+                  <div className="text-gray-500 text-sm mb-2">
+                    {state?.usesRenewableEnergy ? "Using renewable energy sources" : "Traditional energy consumption"}
+                    {state?.hasEnergyEfficiencyUpgrades ? " with efficiency upgrades" : ""}
+                  </div>
+                  <div className="mt-auto text-green-700 font-medium">Top 50% for Home</div>
+                </div>
+                {/* Transport Category */}
+                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                  <div className="mb-4">
+                    <Car className="h-7 w-7 text-blue-600" />
+                  </div>
+                  <div className="text-lg font-semibold mb-1">Transport</div>
+                  <div className="text-gray-500 text-sm mb-2">
+                    {state?.primaryTransportMode === 'WALK_BIKE' ? "Primarily using active transport" :
+                      state?.primaryTransportMode === 'PUBLIC' ? "Regular public transit user" : "Car-based transportation"}
+                  </div>
+                  <div className="mt-auto text-green-700 font-medium">Top 40% for Transport</div>
+                </div>
+                {/* Food Category */}
+                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                  <div className="mb-4">
+                    <Utensils className="h-7 w-7 text-amber-600" />
+                  </div>
+                  <div className="text-lg font-semibold mb-1">Food</div>
+                  <div className="text-gray-500 text-sm mb-2">
+                    {state?.dietType === 'VEGAN' ? "Plant-based diet champion" :
+                      state?.dietType === 'VEGETARIAN' ? "Vegetarian diet follower" : "Mixed diet consumer"}
+                  </div>
+                  <div className="mt-auto text-green-700 font-medium">Top 30% for Food</div>
+                </div>
+                {/* Clothes Category */}
+                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                  <div className="mb-4">
+                    <ShoppingBag className="h-7 w-7 text-pink-600" />
+                  </div>
+                  <div className="text-lg font-semibold mb-1">Clothes</div>
+                  <div className="text-gray-500 text-sm mb-2">
+                    {state?.clothing?.wardrobeImpact === 'A' ? "Sustainable shopper" :
+                      state?.clothing?.wardrobeImpact === 'B' ? "Mix & match" :
+                      state?.clothing?.wardrobeImpact === 'C' ? "Trend follower" : "Fashion choices"}
+                  </div>
+                  <div className="mt-auto text-green-700 font-medium">Top 35% for Clothes</div>
+                </div>
+                {/* Waste Category */}
+                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                  <div className="mb-4">
+                    <Recycle className="h-7 w-7 text-purple-600" />
+                  </div>
+                  <div className="text-lg font-semibold mb-1">Waste</div>
+                  <div className="text-gray-500 text-sm mb-2">
+                    {state?.waste?.recyclingPercentage > 75 ? "High recycling achiever" :
+                      state?.waste?.recyclingPercentage > 50 ? "Active recycler" : "Starting recycling journey"}
+                  </div>
+                  <div className="mt-auto text-green-700 font-medium">Top 30% for Waste</div>
+                </div>
+                {/* Air Quality Category */}
+                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
+                  <div className="mb-4">
+                    <Wind className="h-7 w-7 text-cyan-600" />
+                  </div>
+                  <div className="text-lg font-semibold mb-1">Air Quality</div>
+                  <div className="text-gray-500 text-sm mb-2">
+                    {state?.airQuality?.outdoorAirQuality === 'A' ? "Fresh and clean" :
+                      state?.airQuality?.outdoorAirQuality === 'B' ? "Generally clear" :
+                      state?.airQuality?.outdoorAirQuality === 'C' ? "Sometimes polluted" :
+                      state?.airQuality?.outdoorAirQuality === 'D' ? "Not sure" : "Air quality awareness"}
+                  </div>
+                  <div className="mt-auto text-green-700 font-medium">Top 45% for Air Quality</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Story Generation Section - Updated UI */}
+            <div className="space-y-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <BookOpen className="h-8 w-8 text-green-600" />
+                  <h2 className="text-3xl font-serif text-gray-800">Your Climate Journey Story</h2>
+                </div>
+                <div className="flex gap-2 justify-end mb-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowWrapped(true)}
+                    className={cn(
+                      "text-green-700 border-green-200",
+                      !showStory && "opacity-50 cursor-not-allowed"
+                    )}
+                    disabled={!showStory}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4" />
+                      {!showStory ? "Generate Story First" : "Generate Wrapped"}
                     </div>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowStory(false);
+                      setShowWrapped(false);
+                      setWrappedImage(null);
+                      onReset();
+                    }}
+                    className="text-green-700 border-green-200"
+                  >
+                    Reset Story
+                  </Button>
+                </div>
+              </div>
+              
+              {!showStory ? (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-gradient-to-br from-purple-50 to-green-50 rounded-xl p-8 border border-purple-100 shadow-lg"
+                >
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-purple-100 rounded-xl">
+                        <Sparkles className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-purple-900 mb-2">
+                          Generate Your Unique Climate Story
+                        </h3>
+                        <p className="text-gray-600">
+                          Let's transform your sustainable choices into an inspiring narrative. Your story could motivate others to join the climate action movement.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-6">
+                      <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Star className="h-5 w-5 text-yellow-500" />
+                          <span className="font-medium text-purple-900">Personalized</span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          Story tailored to your unique eco-personality and achievements
+                        </p>
+                      </div>
+                      <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Heart className="h-5 w-5 text-red-500" />
+                          <span className="font-medium text-purple-900">Engaging</span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          Interactive storytelling with visual elements and animations
+                        </p>
+                      </div>
+                      <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Share2 className="h-5 w-5 text-blue-500" />
+                          <span className="font-medium text-purple-900">Shareable</span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          Easy to share your journey with friends and family
+                        </p>
+                      </div>
+                    </div>
+
                     <Button
-                      variant="outline"
-                      onClick={handleNextCard}
-                      disabled={currentCardIndex === combinedStoryCards.length - 1}
-                      className="flex items-center gap-2 text-green-700 border-green-200"
+                      onClick={async () => {
+                        await generateStory();
+                        setShowStory(true);
+                      }}
+                      className={cn(
+                        "w-full text-white py-6 rounded-xl flex items-center justify-center gap-3 text-lg transition-all duration-300",
+                        isGeneratingStory 
+                          ? "bg-purple-500 cursor-not-allowed"
+                          : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:shadow-lg"
+                      )}
+                      disabled={isGeneratingStory}
                     >
-                      Next
-                      <ArrowRight className="h-4 w-4" />
+                      {isGeneratingStory ? (
+                        <>
+                          <Loader2 className="h-6 w-6 animate-spin" />
+                          Crafting Your Story...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-6 w-6" />
+                          Generate Your Climate Journey
+                        </>
+                      )}
                     </Button>
                   </div>
                 </motion.div>
-              </AnimatePresence>
-            )}
-          </div>
+              ) : (
+                <AnimatePresence>
+                  <motion.div 
+                    key={currentCardIndex}
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -40 }}
+                    transition={{ duration: 0.5, type: 'spring' }}
+                    className={cn(
+                      'story-card space-y-6 rounded-3xl shadow-2xl border p-10 md:p-14',
+                      combinedStoryCards[currentCardIndex]?.isNarrative
+                        ? 'bg-gradient-to-br from-blue-50 via-white to-green-50 border-blue-100'
+                        : 'bg-gradient-to-br from-green-50 via-white to-purple-50 border-green-100'
+                    )}
+                  >
+                    <div className="flex items-center gap-4 mb-2">
+                      <div className="p-3 bg-gradient-to-br from-green-200 to-green-400 rounded-xl shadow-lg">
+                        {combinedStoryCards[currentCardIndex].emoji && (
+                          <span className="text-3xl drop-shadow-lg">{combinedStoryCards[currentCardIndex].emoji}</span>
+                        )}
+                      </div>
+                      <h3 className={cn(
+                        'font-serif tracking-tight flex-1',
+                        combinedStoryCards[currentCardIndex]?.isNarrative
+                          ? 'text-3xl md:text-4xl font-extrabold text-blue-900'
+                          : 'text-3xl md:text-4xl font-extrabold text-green-900'
+                      )}>
+                        {combinedStoryCards[currentCardIndex].title}
+                      </h3>
+                    </div>
+                    <div className={cn(
+                      'rounded-2xl shadow-md',
+                      combinedStoryCards[currentCardIndex]?.isNarrative
+                        ? 'bg-white/95 p-10 border-l-4 border-blue-300'
+                        : 'bg-white/90 p-8 border-l-4 border-green-300'
+                    )}>
+                      <p className={cn(
+                        'leading-relaxed whitespace-pre-line',
+                        combinedStoryCards[currentCardIndex]?.isNarrative
+                          ? 'text-xl text-blue-900 font-medium italic'
+                          : 'text-lg md:text-xl text-gray-800 font-medium'
+                      )}>
+                        {combinedStoryCards[currentCardIndex].content}
+                      </p>
+                    </div>
+                    {combinedStoryCards[currentCardIndex].stats && (
+                      <div className={cn(
+                        'flex items-center gap-2 font-semibold mt-2',
+                        combinedStoryCards[currentCardIndex]?.isNarrative
+                          ? 'text-blue-700 text-base'
+                          : 'text-green-700 text-base'
+                      )}>
+                        <Info className="h-5 w-5" />
+                        {combinedStoryCards[currentCardIndex].stats}
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between pt-6">
+                      <Button
+                        variant="outline"
+                        onClick={handlePreviousCard}
+                        disabled={currentCardIndex === 0}
+                        className="flex items-center gap-2 text-green-700 border-green-200"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Previous
+                      </Button>
+                      <div className="flex items-center gap-2">
+                        {combinedStoryCards.map((_, index) => (
+                          <motion.div
+                            key={index}
+                            className={cn(
+                              'h-3 w-3 rounded-full border-2',
+                              currentCardIndex === index
+                                ? combinedStoryCards[index]?.isNarrative
+                                  ? 'bg-blue-600 border-blue-600 shadow-lg'
+                                  : 'bg-green-600 border-green-600 shadow-lg'
+                                : combinedStoryCards[index]?.isNarrative
+                                  ? 'bg-blue-100 border-blue-200'
+                                  : 'bg-green-100 border-green-200'
+                            )}
+                            whileHover={{ scale: 1.2 }}
+                            onClick={() => setCurrentCardIndex(index)}
+                            style={{ cursor: 'pointer' }}
+                          />
+                        ))}
+                      </div>
+                      <Button
+                        variant="outline"
+                        onClick={handleNextCard}
+                        disabled={currentCardIndex === combinedStoryCards.length - 1}
+                        className="flex items-center gap-2 text-green-700 border-green-200"
+                      >
+                        Next
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              )}
+            </div>
         </CardContent>
       </Card>
 
@@ -1351,8 +1374,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 theme={wrappedTheme as 'light' | 'dark' | 'pop'}
                 savedCO2={`${(16 - emissions).toFixed(1)}`}
                 topCategory={dominantCategory.charAt(0).toUpperCase() + dominantCategory.slice(1)}
-                badge={dynamicPersonality.badge}
-                personality={dynamicPersonality.personality}
+                badge={dynamicPersonality?.badge}
+                personality={dynamicPersonality?.personality}
               />
             </div>
 
@@ -1372,8 +1395,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 theme={wrappedTheme as 'light' | 'dark' | 'pop'}
                 savedCO2={`${(16 - emissions).toFixed(1)}`}
                 topCategory={dominantCategory.charAt(0).toUpperCase() + dominantCategory.slice(1)}
-                badge={dynamicPersonality.badge}
-                personality={dynamicPersonality.personality}
+                badge={dynamicPersonality?.badge}
+                personality={dynamicPersonality?.personality}
               />
             )}
 
@@ -1403,8 +1426,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </motion.div>
         </motion.div>
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
-};
+}
 
 export default ResultsDisplay;

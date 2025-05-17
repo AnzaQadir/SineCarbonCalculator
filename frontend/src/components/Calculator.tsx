@@ -198,6 +198,33 @@ const Calculator = ({
   const [calculationResults, setCalculationResults] = useState<CalculationResults | null>(null);
   const [isVisible, setIsVisible] = useState(true);
 
+  // 1. Define default objects for nested state
+  const defaultWaste = {
+    wastePrevention: '' as '' | 'A' | 'B' | 'C' | 'D',
+    wasteComposition: '' as '' | 'A' | 'B' | 'C' | 'D' | 'E',
+    shoppingApproach: '' as '' | 'A' | 'B' | 'C',
+    wasteManagement: '' as '' | 'A' | 'B' | 'C',
+    repairsItems: false,
+    wasteLbs: '',
+    recyclingPercentage: '',
+    minimizesWaste: false,
+    avoidsPlastic: false,
+    evaluatesLifecycle: false,
+    consciousPurchasing: ''
+  };
+  const defaultAirQuality = {
+    outdoorAirQuality: '' as '' | 'A' | 'B' | 'C' | 'D',
+    aqiMonitoring: '' as '' | 'A' | 'B' | 'C' | 'D',
+    indoorAirQuality: '' as '' | 'A' | 'B' | 'C' | 'D',
+    airQualityCommuting: '' as '' | 'A' | 'B' | 'C' | 'D',
+    airQualityImpact: '' as '' | 'A' | 'B' | 'C' | 'D',
+  };
+  const defaultClothing = {
+    wardrobeImpact: '',
+    mindfulUpgrades: '',
+    durability: ''
+  };
+
   const handleCalculate = () => {
     const totalEmissions = calculateTotalEmissions();
     const score = calculateScore();
@@ -210,14 +237,19 @@ const Calculator = ({
     
     const recommendations = generateRecommendations();
     
-    onUpdate({
+    const payload = {
       calculationResults: {
         score,
         emissions: totalEmissions,
         categoryEmissions,
-        recommendations
+        recommendations: recommendations.map(r => ({
+          ...r,
+          difficulty: r.difficulty === 'Easy' || r.difficulty === 'Medium' ? r.difficulty : 'Medium'
+        }))
       }
-    });
+    };
+    console.log('Payload sent to onUpdate in handleCalculate:', payload);
+    onUpdate(payload);
   };
 
   const handleReset = () => {
@@ -254,27 +286,10 @@ const Calculator = ({
       compostsFood: false,
       usesMealPlanning: false,
       plantBasedMealsPerWeek: '',
-      waste: {
-        wastePrevention: '',
-        wasteComposition: '',
-        shoppingApproach: '',
-        wasteManagement: '',
-        repairsItems: false,
-        wasteLbs: '',
-        recyclingPercentage: '',
-        minimizesWaste: false,
-        avoidsPlastic: false,
-        evaluatesLifecycle: false,
-        consciousPurchasing: ''
-      },
-      airQuality: {
-        outdoorAirQuality: 'A',
-        aqiMonitoring: 'A',
-        indoorAirQuality: 'A',
-        airQualityCommuting: 'A',
-        airQualityImpact: 'A'
-      },
-      clothing: undefined
+      waste: { ...defaultWaste },
+      airQuality: { ...defaultAirQuality },
+      clothing: { ...defaultClothing },
+      calculationResults: undefined
     });
   };
 
@@ -1119,7 +1134,13 @@ const Calculator = ({
             category="clothing"
             subCategory="wardrobeImpact"
             value={state.clothing?.wardrobeImpact || ''}
-            onChange={(value) => onUpdate({ clothing: { ...state.clothing, wardrobeImpact: value } })}
+            onChange={(value) => onUpdate({
+              clothing: {
+                ...defaultClothing,
+                ...(state.clothing ?? {}),
+                wardrobeImpact: value,
+              },
+            })}
           />
         </div>
         {/* Mindful Upgrades */}
@@ -1139,7 +1160,13 @@ const Calculator = ({
             category="clothing"
             subCategory="mindfulUpgrades"
             value={state.clothing?.mindfulUpgrades || ''}
-            onChange={(value) => onUpdate({ clothing: { ...state.clothing, mindfulUpgrades: value } })}
+            onChange={(value) => onUpdate({
+              clothing: {
+                wardrobeImpact: state.clothing?.wardrobeImpact ?? '',
+                mindfulUpgrades: value,
+                durability: state.clothing?.durability ?? '',
+              },
+            })}
           />
         </div>
         {/* Durability */}
@@ -1159,7 +1186,13 @@ const Calculator = ({
             category="clothing"
             subCategory="durability"
             value={state.clothing?.durability || ''}
-            onChange={(value) => onUpdate({ clothing: { ...state.clothing, durability: value } })}
+            onChange={(value) => onUpdate({
+              clothing: {
+                wardrobeImpact: state.clothing?.wardrobeImpact ?? '',
+                mindfulUpgrades: state.clothing?.mindfulUpgrades ?? '',
+                durability: value,
+              },
+            })}
           />
         </div>
       </CardContent>
