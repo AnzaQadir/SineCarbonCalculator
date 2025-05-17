@@ -8,7 +8,6 @@ import {
   Star, Calendar, Users, Target, ArrowRight, Medal,
   MapPin, Book, Heart, Lightbulb, ArrowUpRight
 } from 'lucide-react';
-import championImages from '../data/champion-images.json';
 
 interface Achievement {
   title: string;
@@ -62,10 +61,36 @@ interface Champion {
 }
 
 interface ChampionImage {
+  id: number;
   name: string;
   image: string;
+  description: string;
   fallback: string;
 }
+
+const championImages: Record<string, ChampionImage> = {
+  "eco-warrior": {
+    id: 1,
+    name: "Eco Warrior",
+    image: "/champions/eco-warrior.jpg",
+    description: "Leading the charge in environmental protection",
+    fallback: "🌍"
+  },
+  "green-innovator": {
+    id: 2,
+    name: "Green Innovator",
+    image: "/champions/green-innovator.jpg",
+    description: "Pioneering sustainable solutions",
+    fallback: "💡"
+  },
+  "climate-guardian": {
+    id: 3,
+    name: "Climate Guardian",
+    image: "/champions/climate-guardian.jpg",
+    description: "Protecting our planet's future",
+    fallback: "🛡️"
+  }
+};
 
 const getScoreMessage = (score: number): string => {
   if (score >= 90) return "Outstanding! You're already performing at champion level.";
@@ -86,7 +111,7 @@ const getDifficultyColor = (difficulty: string): string => {
 
 const getChampionImage = (name: string): { src: string; fallback: string } => {
   const key = name.toLowerCase().replace(/[^a-z]/g, '-');
-  const championImage = (championImages as Record<string, ChampionImage>)[key];
+  const championImage = championImages[key];
   
   // Default to local paths if external URLs are not available
   const defaultImage = '/images/champions/default-champion.png';

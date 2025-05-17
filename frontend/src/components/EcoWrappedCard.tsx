@@ -1,5 +1,5 @@
-import React from 'react';
-import profileImg from '/public/profile.jpg';
+import React, { useState } from 'react';
+import profileImg from '../assets/profile.jpg';
 import { cn } from '@/lib/utils';
 
 interface EcoWrappedCardProps {
@@ -66,15 +66,26 @@ const EcoWrappedCard: React.FC<EcoWrappedCardProps> = ({
   personality = "Planet's Main Character",
 }) => {
   const t = themes[theme];
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <div className={`w-[400px] mx-auto rounded-3xl overflow-hidden bg-gradient-to-br ${t.bg} p-8 ${t.shadow} ${t.font} relative`}>
       {/* Large Avatar Background */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src={profileImg} 
-          alt="avatar background" 
-          className="w-full h-full object-cover opacity-20 scale-110 blur-sm"
-        />
+        {!imageError ? (
+          <img 
+            src={profileImg} 
+            alt="avatar background" 
+            className="w-full h-full object-cover opacity-20 scale-110 blur-sm"
+            onError={handleImageError}
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 opacity-20" />
+        )}
         <div className={`absolute inset-0 ${t.overlay}`} />
       </div>
 
@@ -89,11 +100,18 @@ const EcoWrappedCard: React.FC<EcoWrappedCardProps> = ({
 
         {/* Main Avatar */}
         <div className="relative mb-6">
-          <img 
-            src={profileImg} 
-            alt="avatar" 
-            className={`w-32 h-32 object-cover rounded-2xl mx-auto ${t.avatarRing}`}
-          />
+          {!imageError ? (
+            <img 
+              src={profileImg} 
+              alt="avatar" 
+              className={`w-32 h-32 object-cover rounded-2xl mx-auto ${t.avatarRing}`}
+              onError={handleImageError}
+            />
+          ) : (
+            <div className={`w-32 h-32 rounded-2xl mx-auto ${t.avatarRing} bg-gray-200 flex items-center justify-center text-4xl`}>
+              👤
+            </div>
+          )}
           <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 ${t.card} px-3 py-1 rounded-full text-sm font-semibold ${t.text}`}>
             {personality}
           </div>
