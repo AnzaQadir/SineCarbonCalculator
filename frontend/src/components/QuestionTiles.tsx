@@ -55,7 +55,7 @@ const QuestionTile: React.FC<QuestionTileProps> = ({
 
 interface QuestionTilesProps {
   category: 'homeEnergy' | 'transport' | 'food' | 'waste' | 'airQuality' | 'clothing';
-  subCategory: 'efficiency' | 'management' | 'primary' | 'carProfile' | 'diet' | 'plateProfile' | 'prevention' | 'monitoring' | 'impact' | 'shopping' | 'wasteManagement' | 'outdoorQuality' | 'indoorQuality' | 'commuting' | 'wardrobeImpact' | 'mindfulUpgrades' | 'durability' | 'wasteComposition' | 'localvsseasonal';
+  subCategory: 'efficiency' | 'management' | 'primary' | 'carProfile' | 'diet' | 'plateProfile' | 'prevention' | 'monitoring' | 'impact' | 'shopping' | 'wasteManagement' | 'outdoorQuality' | 'indoorQuality' | 'commuting' | 'wardrobeImpact' | 'mindfulUpgrades' | 'durability' | 'wasteComposition' | 'localvsseasonal' | 'consumptionFrequency' | 'brandLoyalty';
   value: string;
   onChange: (value: string) => void;
 }
@@ -488,67 +488,109 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
           return [
             {
               value: 'A',
-              icon: <ShoppingBag className="h-6 w-6" />,
-              title: 'Sustainable Shopper',
-              description: 'I consciously choose sustainable, ethical, or second-hand fashion every time I shop.'
+              icon: <Shirt className="h-6 w-6" />,
+              title: 'Minimal Wardrobe',
+              description: 'Small, curated collection of essential items'
             },
             {
               value: 'B',
-              icon: <ShoppingCart className="h-6 w-6" />,
-              title: 'Mix & Match',
-              description: 'I mix sustainable choices with fast fashion—sometimes I plan my purchases, sometimes not.'
+              icon: <Shirt className="h-6 w-6" />,
+              title: 'Balanced Collection',
+              description: 'Moderate number of items with regular rotation'
             },
             {
               value: 'C',
-              icon: <Store className="h-6 w-6" />,
-              title: 'Trend Follower',
-              description: 'I tend to follow fast fashion trends and update my wardrobe regularly without much thought for impact.'
+              icon: <Shirt className="h-6 w-6" />,
+              title: 'Extensive Wardrobe',
+              description: 'Large collection with many rarely worn items'
             }
           ];
         } else if (subCategory === 'mindfulUpgrades') {
           return [
             {
               value: 'A',
-              icon: <PackageCheck className="h-6 w-6" />,
-              title: 'Mindful Upgrader',
-              description: 'I always consider the garment\'s durability and environmental footprint before buying.'
+              icon: <Leaf className="h-6 w-6" />,
+              title: 'Sustainable Brands',
+              description: 'Primarily shop from eco-friendly and ethical brands'
             },
             {
               value: 'B',
-              icon: <PackageCheck className="h-6 w-6" />,
-              title: 'Quality Sometimes',
-              description: 'I try to think about quality over quantity, but convenience sometimes wins.'
+              icon: <ShoppingBag className="h-6 w-6" />,
+              title: 'Mixed Approach',
+              description: 'Mix of sustainable and conventional brands'
             },
             {
               value: 'C',
               icon: <Store className="h-6 w-6" />,
-              title: 'Style & Price',
-              description: 'Style and price are my top priorities, and sustainability isn\'t usually a factor.'
+              title: 'Conventional Shopping',
+              description: 'Mainly shop from conventional retail stores'
             }
           ];
         } else if (subCategory === 'durability') {
           return [
             {
-              value: 'months',
-              icon: <Timer className="h-6 w-6" />,
-              title: 'A few months',
-              description: 'My clothes last a few months.'
-            },
-            {
-              value: 'years',
-              icon: <Timer className="h-6 w-6" />,
-              title: 'A few years',
-              description: 'My clothes last a few years.'
-            },
-            {
-              value: 'forever',
+              value: 'A',
               icon: <PackageCheck className="h-6 w-6" />,
-              title: 'Forever',
-              description: 'My clothes last forever!'
+              title: 'Long-lasting Items',
+              description: 'Focus on quality and durability when purchasing'
+            },
+            {
+              value: 'B',
+              icon: <ShoppingCart className="h-6 w-6" />,
+              title: 'Mixed Quality',
+              description: 'Mix of durable and regular quality items'
+            },
+            {
+              value: 'C',
+              icon: <PackageX className="h-6 w-6" />,
+              title: 'Fast Fashion',
+              description: 'Regular purchases of trend-based items'
+            }
+          ];
+        } else if (subCategory === 'consumptionFrequency') {
+          return [
+            {
+              value: 'A',
+              icon: <Timer className="h-6 w-6" />,
+              title: 'Infrequent Shopper',
+              description: 'Shop for clothes only when necessary'
+            },
+            {
+              value: 'B',
+              icon: <Timer className="h-6 w-6" />,
+              title: 'Seasonal Shopper',
+              description: 'Shop a few times per season'
+            },
+            {
+              value: 'C',
+              icon: <Timer className="h-6 w-6" />,
+              title: 'Frequent Shopper',
+              description: 'Regular shopping trips for new items'
+            }
+          ];
+        } else if (subCategory === 'brandLoyalty') {
+          return [
+            {
+              value: 'A',
+              icon: <FileText className="h-6 w-6" />,
+              title: 'Brand Conscious',
+              description: 'Stick to trusted sustainable brands'
+            },
+            {
+              value: 'B',
+              icon: <FileText className="h-6 w-6" />,
+              title: 'Flexible Shopper',
+              description: 'Mix of favorite brands and new options'
+            },
+            {
+              value: 'C',
+              icon: <FileText className="h-6 w-6" />,
+              title: 'Variety Seeker',
+              description: 'Try many different brands and styles'
             }
           ];
         }
-        break;
+        return [];
 
       default:
         return [];

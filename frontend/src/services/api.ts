@@ -16,6 +16,13 @@ export interface UserResponses {
   food?: {
     dietType?: 'PLANT_BASED' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MODERATE_MEAT';
     foodSource?: 'LOCAL_SEASONAL' | 'MIXED' | 'CONVENTIONAL';
+    diningStyle?: 'HOME_COOKED' | 'BALANCED' | 'FREQUENT_DINE_OUT';
+    buysLocalFood?: boolean;
+    followsSustainableDiet?: boolean;
+    growsOwnFood?: boolean;
+    compostsFood?: boolean;
+    usesMealPlanning?: boolean;
+    plantBasedMealsPerWeek?: number;
   };
   waste?: {
     prevention?: 'A' | 'B' | 'C' | 'D' | '';
@@ -32,6 +39,7 @@ export interface UserResponses {
   clothing?: {
     wardrobeImpact?: 'A' | 'B' | 'C' | '';
     mindfulUpgrades?: 'A' | 'B' | 'C' | '';
+    durability?: 'A' | 'B' | 'C' | '';
     consumptionFrequency?: 'A' | 'B' | 'C' | 'D';
     brandLoyalty?: 'A' | 'B' | 'C' | 'D';
   };
