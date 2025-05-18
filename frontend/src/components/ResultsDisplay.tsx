@@ -288,6 +288,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [dynamicPersonality, setDynamicPersonality] = useState<PersonalityResponse | null>(null);
 
+  // Add a ref to track if calculation has been attempted
+  const hasAttemptedCalculation = useRef(false);
+
   // Update error handling with proper typing
   const handleError = (error: unknown) => {
     console.warn('Error:', error);
@@ -692,7 +695,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   };
 
   const calculateInitialPersonality = async () => {
+    // Prevent duplicate calls
+    if (isLoading || dynamicPersonality || hasAttemptedCalculation.current) return;
+    
     try {
+      hasAttemptedCalculation.current = true;
       setIsLoading(true);
       setError(null);
 
@@ -709,20 +716,24 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         champion: result.champion || 'Climate Champion',
         powerMoves: result.powerMoves || []
       });
-      setIsPersonalityLoading(false);
     } catch (error: any) {
       setError('Failed to calculate personality. Please try again.');
-      setIsPersonalityLoading(false);
-    } finally {
+      // Reset loading state on error
       setIsLoading(false);
+    } finally {
+      // Only reset loading state if there was no error
+      if (!error) {
+        setIsLoading(false);
+      }
     }
   };
 
+  // Update useEffect to only run once when component mounts
   useEffect(() => {
-    if (state && !dynamicPersonality) {
+    if (state && !hasAttemptedCalculation.current) {
       calculateInitialPersonality();
     }
-  }, [state]);
+  }, []); // Empty dependency array ensures it only runs once
 
   if (error) {
     return (
@@ -733,7 +744,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <p>{error}</p>
           </div>
           <button
-            onClick={calculateInitialPersonality}
+            onClick={() => {
+              hasAttemptedCalculation.current = false; // Reset the ref
+              setError(null);
+              calculateInitialPersonality();
+            }}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
             Try Again
