@@ -35,165 +35,271 @@ interface UserResponses {
   };
 }
 
+interface CategoryScore {
+  score: number;
+  weight: number;
+  subScores: Record<string, number>;
+  totalQuestions: number;
+  percentage: number;
+  maxPossibleScore: number;
+}
+
+interface PersonalityScore {
+  type: string;
+  score: number;
+  confidence: number;
+  traits: string[];
+}
+
+type CategoryKey = 'homeEnergy' | 'transport' | 'food' | 'waste' | 'clothing';
+
+type CategoryWeights = {
+  [K in CategoryKey]: number;
+};
+
+type PersonalityMappings = {
+  [category: string]: {
+    [metric: string]: {
+      [value: string]: string[];
+    };
+  };
+};
+
 export class PersonalityService {
-  private calculateCategoryScores(responses: UserResponses) {
+  private readonly CATEGORY_WEIGHTS: CategoryWeights = {
+    homeEnergy: 0.2, // 20%
+    transport: 0.2,  // 20%
+    food: 0.2,       // 20%
+    waste: 0.2,      // 20%
+    clothing: 0.2    // 20%
+  };
+
+  private readonly QUESTION_OPTIONS = {
+    A: 10,
+    B: 6.66,
+    C: 3.33,
+    D: 0,
+    E: 0
+  };
+
+  private readonly DIET_SCORES = {
+    PLANT_BASED: 10,
+    VEGETARIAN: 6.66,
+    FLEXITARIAN: 3.33,
+    MODERATE_MEAT: 0
+  };
+
+  private readonly FOOD_SOURCE_SCORES = {
+    LOCAL_SEASONAL: 10,
+    MIXED: 6.66,
+    CONVENTIONAL: 3.33
+  };
+
+  private calculateQuestionScore(value: string, totalOptions: number): number {
+    if (!value) return 0;
+
+    // Handle special cases for diet and food source
+    if (value in this.DIET_SCORES) {
+      return this.DIET_SCORES[value as keyof typeof this.DIET_SCORES];
+    }
+    if (value in this.FOOD_SOURCE_SCORES) {
+      return this.FOOD_SOURCE_SCORES[value as keyof typeof this.FOOD_SOURCE_SCORES];
+    }
+
+    // Handle standard A, B, C, D options
+    const optionIndex = Object.keys(this.QUESTION_OPTIONS).indexOf(value);
+    if (optionIndex === -1) return 0;
+
+    return this.QUESTION_OPTIONS[value as keyof typeof this.QUESTION_OPTIONS];
+  }
+
+  private calculateCategoryScore(category: CategoryKey, responses: any): CategoryScore {
+    const subScores: Record<string, number> = {};
+    let totalScore = 0;
+    const questions = Object.keys(responses).filter(key => responses[key] !== undefined);
+    const totalQuestions = questions.length;
+
+    // Calculate sub-scores for each metric in the category
+    questions.forEach(metric => {
+      const value = responses[metric];
+      if (!value) return;
+
+      const score = this.calculateQuestionScore(value, 4); // Assuming 4 options as default
+      subScores[metric] = score;
+      totalScore += score;
+    });
+
+    // Calculate maximum possible score (all A options)
+    const maxPossibleScore = totalQuestions * 10; // Each question can score up to 10 points
+    const percentage = (totalScore / maxPossibleScore) * 100;
+
+    // Calculate weighted percentage for the category
+    const weightedScore = percentage * this.CATEGORY_WEIGHTS[category];
+
     return {
-      home: (responses.homeEnergy?.efficiency === 'A' ? 3 : responses.homeEnergy?.efficiency === 'B' ? 2 : 1) +
-            (responses.homeEnergy?.management === 'A' ? 3 : responses.homeEnergy?.management === 'B' ? 2 : 1),
-      transport: (responses.transport?.primary === 'A' ? 3 : responses.transport?.primary === 'B' ? 2 : 1) +
-                 (responses.transport?.carProfile === 'A' ? 3 : responses.transport?.carProfile === 'B' ? 2 : 1),
-      food: (responses.food?.dietType === 'PLANT_BASED' ? 3 : responses.food?.dietType === 'VEGETARIAN' ? 2 : 1) +
-            (responses.food?.foodSource === 'LOCAL_SEASONAL' ? 3 : responses.food?.foodSource === 'MIXED' ? 2 : 1),
-      waste: (responses.waste?.prevention === 'A' ? 3 : responses.waste?.prevention === 'B' ? 2 : 1) +
-             (responses.waste?.management === 'A' ? 3 : responses.waste?.management === 'B' ? 2 : 1)
+      score: weightedScore,
+      weight: this.CATEGORY_WEIGHTS[category],
+      subScores,
+      totalQuestions,
+      percentage,
+      maxPossibleScore
     };
   }
 
-  private determineDominantCategory(categoryScores: Record<string, number>): string {
-    return Object.entries(categoryScores)
-      .reduce((a, b) => a[1] > b[1] ? a : b)[0];
+  private determinePersonalityType(finalScore: number): string {
+    if (finalScore >= 85) return 'Sustainability Slayer';
+    if (finalScore >= 70) return "Planet's Main Character";
+    if (finalScore >= 55) return 'Sustainability Soft Launch';
+    if (finalScore >= 40) return 'Kind of Conscious, Kind of Confused';
+    if (finalScore >= 25) return 'Eco in Progress';
+    if (finalScore >= 10) return 'Doing Nothing for the Planet';
+    return 'Certified Climate Snoozer';
   }
 
-  private calculateSubCategory(dominantCategory: string, categoryScores: Record<string, number>): string {
-    switch (dominantCategory) {
-      case 'home':
-        return categoryScores.home > 4 ? 'Energy Efficiency Expert' : 'Eco Homebody';
-      case 'transport':
-        return categoryScores.transport > 4 ? 'Green Mobility Champion' : 'Green Traveler';
-      case 'food':
-        return categoryScores.food > 4 ? 'Sustainable Food Pioneer' : 'Conscious Consumer';
-      case 'waste':
-        return categoryScores.waste > 4 ? 'Zero Waste Champion' : 'Zero Waste Warrior';
-      default:
-        return '';
-    }
+  private calculatePersonalityScores(responses: UserResponses): PersonalityScore[] {
+    const personalityScores: Record<string, PersonalityScore> = {};
+    let finalScore = 0;
+    
+    // Initialize personality scores
+    personalityHierarchy.forEach(type => {
+      personalityScores[type] = {
+        type,
+        score: 0,
+        confidence: 0,
+        traits: []
+      };
+    });
+
+    // Process each category's impact on personality types
+    Object.entries(responses).forEach(([category, categoryResponses]) => {
+      if (!categoryResponses) return;
+
+      const categoryScore = this.calculateCategoryScore(category as CategoryKey, categoryResponses);
+      finalScore += categoryScore.score;
+      
+      // Map category scores to personality traits
+      const categoryMappings = (personalityMappings as PersonalityMappings)[category];
+      if (categoryMappings) {
+        Object.entries(categoryMappings).forEach(([metric, mappings]) => {
+          const value = categoryResponses[metric];
+          if (!value || !mappings[value]) return;
+
+          mappings[value].forEach(personalityType => {
+            const score = personalityScores[personalityType];
+            if (score) {
+              score.score += categoryScore.score;
+              score.confidence += 1;
+              score.traits.push(`${category}_${metric}`);
+            }
+          });
+        });
+      }
+    });
+
+    // Determine final personality type
+    const personalityType = this.determinePersonalityType(finalScore);
+    
+    // Update scores based on final personality
+    return Object.values(personalityScores)
+      .map(score => ({
+        ...score,
+        score: score.type === personalityType ? finalScore : 0,
+        confidence: score.confidence / Object.keys(responses).length
+      }))
+      .sort((a, b) => b.score - a.score);
   }
 
   private calculateImpactMetrics(responses: UserResponses) {
     const baseEmissions = 16;
-    let reducedEmissions = 0;
+    let totalScore = 0;
+    let maxPossibleScore = 0;
 
-    // Home energy impact
-    if (responses.homeEnergy?.efficiency === 'A') reducedEmissions += 2;
-    if (responses.homeEnergy?.management === 'A') reducedEmissions += 1.5;
+    // Calculate actual and potential impact for each category
+    Object.entries(responses).forEach(([category, categoryResponses]) => {
+      if (!categoryResponses) return;
 
-    // Transport impact
-    if (responses.transport?.primary === 'A') reducedEmissions += 3;
-    if (responses.transport?.carProfile === 'A') reducedEmissions += 2;
+      const categoryScore = this.calculateCategoryScore(category as CategoryKey, categoryResponses);
+      totalScore += categoryScore.score;
+      maxPossibleScore += 20; // Each category can contribute up to 20%
+    });
 
-    // Food impact
-    if (responses.food?.dietType === 'PLANT_BASED') reducedEmissions += 2.5;
-    if (responses.food?.foodSource === 'LOCAL_SEASONAL') reducedEmissions += 1;
-
-    // Waste impact
-    if (responses.waste?.prevention === 'A') reducedEmissions += 1.5;
-    if (responses.waste?.management === 'A') reducedEmissions += 1;
-
-    const carbonReduced = reducedEmissions;
+    const impactPercentage = (totalScore / maxPossibleScore) * 100;
+    const carbonReduced = (impactPercentage / 100) * baseEmissions;
     const treesPlanted = Math.round(carbonReduced * 10);
-    const communityImpact = Math.round((carbonReduced / baseEmissions) * 100);
+    const communityImpact = Math.round(impactPercentage);
 
     return {
       treesPlanted,
       carbonReduced,
-      communityImpact
+      communityImpact,
+      potentialImpact: 100
     };
   }
 
   public calculatePersonality(responses: UserResponses) {
-    const tally: Record<string, number> = {};
-    
-    // Initialize tally
-    personalityHierarchy.forEach(p => tally[p] = 0);
+    // Calculate personality scores
+    const personalityScores = this.calculatePersonalityScores(responses);
+    const topPersonality = personalityScores[0];
 
-    // Process responses and update tally
-    if (responses.homeEnergy?.efficiency) {
-      personalityMappings.homeEnergy.efficiency[responses.homeEnergy.efficiency]?.forEach(p => tally[p]++);
-    }
-    if (responses.homeEnergy?.management) {
-      personalityMappings.homeEnergy.management[responses.homeEnergy.management]?.forEach(p => tally[p]++);
-    }
+    // Calculate category scores
+    const categoryScores = Object.entries(responses).reduce((acc, [category, categoryResponses]) => {
+      if (!categoryResponses) return acc;
+      acc[category] = this.calculateCategoryScore(category as CategoryKey, categoryResponses);
+      return acc;
+    }, {} as Record<string, CategoryScore>);
 
-    // Process transport responses
-    if (responses.transport?.primary) {
-      personalityMappings.transport.primary[responses.transport.primary]?.forEach(p => tally[p]++);
-    }
-    if (responses.transport?.carProfile) {
-      personalityMappings.transport.carProfile[responses.transport.carProfile]?.forEach(p => tally[p]++);
-    }
+    // Determine dominant category
+    const dominantCategory = Object.entries(categoryScores)
+      .reduce((a, b) => (a[1].score > b[1].score) ? a : b)[0];
 
-    // Process food responses
-    if (responses.food?.dietType) {
-      personalityMappings.food.dietType[responses.food.dietType]?.forEach(p => tally[p]++);
-    }
-    if (responses.food?.foodSource) {
-      personalityMappings.food.foodSource[responses.food.foodSource]?.forEach(p => tally[p]++);
-    }
-
-    // Process waste responses
-    if (responses.waste?.prevention) {
-      personalityMappings.waste.prevention[responses.waste.prevention]?.forEach(p => tally[p]++);
-    }
-    if (responses.waste?.management) {
-      personalityMappings.waste.management[responses.waste.management]?.forEach(p => tally[p]++);
-    }
-
-    // Process air quality responses
-    if (responses.airQuality?.monitoring) {
-      personalityMappings.airQuality.monitoring[responses.airQuality.monitoring]?.forEach(p => tally[p]++);
-    }
-    if (responses.airQuality?.impact) {
-      personalityMappings.airQuality.impact[responses.airQuality.impact]?.forEach(p => tally[p]++);
-    }
-
-    // Process clothing responses
-    if (responses.clothing?.wardrobeImpact) {
-      personalityMappings.clothing.wardrobeImpact[responses.clothing.wardrobeImpact]?.forEach(p => tally[p]++);
-    }
-    if (responses.clothing?.mindfulUpgrades) {
-      personalityMappings.clothing.mindfulUpgrades[responses.clothing.mindfulUpgrades]?.forEach(p => tally[p]++);
-    }
-    if (responses.clothing?.consumptionFrequency) {
-      personalityMappings.clothing.consumptionFrequency[responses.clothing.consumptionFrequency]?.forEach(p => tally[p]++);
-    }
-    if (responses.clothing?.brandLoyalty) {
-      personalityMappings.clothing.brandLoyalty[responses.clothing.brandLoyalty]?.forEach(p => tally[p]++);
-    }
-
-    // Find personality with highest count
-    let maxCount = 0;
-    let topPersonalities: string[] = [];
-    
-    Object.entries(tally).forEach(([personality, count]) => {
-      if (count > maxCount) {
-        maxCount = count;
-        topPersonalities = [personality];
-      } else if (count === maxCount) {
-        topPersonalities.push(personality);
-      }
-    });
-
-    // Resolve ties using hierarchy
-    const finalPersonality = topPersonalities.reduce((prev, current) => {
-      const prevIndex = personalityHierarchy.indexOf(prev);
-      const currentIndex = personalityHierarchy.indexOf(current);
-      return prevIndex < currentIndex ? prev : current;
-    });
-
-    // Calculate additional metrics
-    const categoryScores = this.calculateCategoryScores(responses);
-    const dominantCategory = this.determineDominantCategory(categoryScores);
-    const subCategory = this.calculateSubCategory(dominantCategory, categoryScores);
+    // Calculate impact metrics
     const impactMetrics = this.calculateImpactMetrics(responses);
 
-    return {
-      personality: finalPersonality,
-      dominantCategory,
-      subCategory,
-      tally,
-      categoryScores,
-      impactMetrics,
-      ...EcoPersonalityTypes[finalPersonality as keyof typeof EcoPersonalityTypes]
+    // Generate personality insights
+    const insights = {
+      strengths: topPersonality.traits.slice(0, 3),
+      opportunities: Object.entries(categoryScores)
+        .filter(([_, score]) => score.score < 40) // Below 40% is considered an opportunity
+        .map(([category]) => category),
+      confidence: Math.round(topPersonality.confidence * 100)
     };
+
+    return {
+      personality: topPersonality.type,
+      dominantCategory,
+      subCategory: this.calculateSubCategory(dominantCategory, categoryScores),
+      tally: personalityScores.reduce((acc, score) => {
+        acc[score.type] = Math.round(score.score);
+        return acc;
+      }, {} as Record<string, number>),
+      categoryScores: Object.entries(categoryScores).reduce((acc, [category, score]) => {
+        acc[category] = {
+          score: Math.round(score.score),
+          percentage: Math.round(score.percentage),
+          maxPossibleScore: score.maxPossibleScore
+        };
+        return acc;
+      }, {} as Record<string, { score: number; percentage: number; maxPossibleScore: number }>),
+      impactMetrics,
+      insights,
+      ...EcoPersonalityTypes[topPersonality.type as keyof typeof EcoPersonalityTypes]
+    };
+  }
+
+  private calculateSubCategory(dominantCategory: string, categoryScores: Record<string, CategoryScore>): string {
+    const score = categoryScores[dominantCategory]?.score || 0;
+    
+    switch (dominantCategory) {
+      case 'homeEnergy':
+        return score >= 70 ? 'Energy Efficiency Expert' : 'Eco Homebody';
+      case 'transport':
+        return score >= 70 ? 'Green Mobility Champion' : 'Green Traveler';
+      case 'food':
+        return score >= 70 ? 'Sustainable Food Pioneer' : 'Conscious Consumer';
+      case 'waste':
+        return score >= 70 ? 'Zero Waste Champion' : 'Zero Waste Warrior';
+      default:
+        return 'Eco Explorer';
+    }
   }
 } 
