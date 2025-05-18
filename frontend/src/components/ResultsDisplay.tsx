@@ -719,7 +719,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   };
 
   useEffect(() => {
-    calculateInitialPersonality();
+    if (state && !dynamicPersonality) {
+      calculateInitialPersonality();
+    }
   }, [state]);
 
   if (error) {
