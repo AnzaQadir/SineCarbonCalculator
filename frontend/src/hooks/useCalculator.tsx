@@ -45,7 +45,7 @@ export interface CalculatorState {
   // Demographics
   name: string;
   email: string;
-  age: 'UNDER_10' | '10_TO_15' | '15_TO_20' | '20_TO_30' | '30_TO_40' | 'OVER_40' | '';
+  age: string;
   gender: string;
   profession: string;
   location: string;
@@ -53,7 +53,7 @@ export interface CalculatorState {
   householdSize: number;
 
   // Home Energy
-  homeSize: "" | "1" | "2" | "3" | "4" | "5" | "6" | "7+";
+  homeSize: string;
   homeEfficiency: "" | "A" | "B" | "C";
   energyManagement: "" | "A" | "B" | "C";
   electricityKwh: number;
@@ -67,24 +67,13 @@ export interface CalculatorState {
 
   // Transportation
   primaryTransportMode: "" | "A" | "B" | "C" | "D";
-  longDistanceTravel: "" | "A" | "B" | "C";
   carProfile: "" | "A" | "B" | "C" | "D" | "E";
   annualMileage: number;
   costPerMile: number;
-  weeklyCommuteDistance: number;
-  vehicleEfficiency: number;
-  flightType: 'NONE' | 'RARE' | 'OCCASIONAL' | 'FREQUENT';
-  offsetsTravelEmissions: boolean;
-  carType: string;
-  carMiles: number;
-  usesActiveTransport: boolean;
-  hasElectricVehicle: boolean;
-  flightMiles: number;
-  transitType: string;
-  transitMiles: number;
+  longDistanceTravel: "" | "A" | "B" | "C";
 
   // Food & Diet
-  dietType: 'VEGAN' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MEAT_MODERATE' | 'MEAT_HEAVY';
+  dietType: "VEGAN" | "VEGETARIAN" | "FLEXITARIAN" | "MEAT_MODERATE" | "MEAT_HEAVY";
   plateProfile: "" | "A" | "B" | "C";
   diningStyle: "" | "A" | "B" | "C";
   plantBasedMealsPerWeek: number;
@@ -96,38 +85,13 @@ export interface CalculatorState {
   diningOutFrequency: 'RARELY' | 'SOMETIMES' | 'FREQUENTLY';
   usesReusableContainers: boolean;
 
-  // Waste & Consumption
-  recyclingPercentage: number;
-  wasteLbs: number;
-  minimizesWaste: boolean;
-  avoidsPlastic: boolean;
-  repairsItems: boolean;
-  buysSecondHand: boolean;
-  usesRecycledProducts: boolean;
-  wasteAuditFrequency: 'NEVER' | 'SOMETIMES' | 'REGULARLY';
-
-  // Fashion & Clothing
-  fashionConsumption: 'MINIMAL' | 'MODERATE' | 'FREQUENT';
-  buysEthicalFashion: boolean;
-  buysSecondHandClothing: boolean;
-  avoidsFastFashion: boolean;
-  investsInQuality: boolean;
-  clothingLifespan: 'SHORT' | 'MEDIUM' | 'LONG';
-
-  // New waste and consumption properties
+  // Waste
   waste: {
-    wasteLbs: number;
-    recyclingPercentage: number;
-    minimizesWaste: boolean;
-    avoidsPlastic: boolean;
-    productLifespan: 'FREQUENT' | 'MODERATE' | 'LONG';
-    consciousPurchasing: number;
-    evaluatesLifecycle: boolean;
-    shoppingApproach: "" | "A" | "B" | "C";
-    wasteManagement: "" | "A" | "B" | "C";
-    repairsItems: boolean;
-    wastePrevention: "" | "A" | "B" | "C" | "D";
-    wasteComposition: "" | "A" | "B" | "C" | "D" | "E";
+    prevention: "" | "A" | "B" | "C" | "D";
+    smartShopping: "" | "A" | "B" | "C";
+    dailyWaste: "" | "A" | "B" | "C" | "D";
+    management: "" | "A" | "B" | "C";
+    repairOrReplace: boolean;
   };
 
   // Air Quality
@@ -137,6 +101,15 @@ export interface CalculatorState {
     indoorAirQuality: "" | "A" | "B" | "C" | "D";
     airQualityCommuting: "" | "A" | "B" | "C" | "D";
     airQualityImpact: "" | "A" | "B" | "C" | "D";
+  };
+
+  // Clothing
+  clothing?: {
+    wardrobeImpact: string;
+    mindfulUpgrades: string;
+    durability: string;
+    consumptionFrequency: string;
+    brandLoyalty: string;
   };
 
   // Calculation Results
@@ -187,21 +160,10 @@ export const useCalculator = () => {
 
     // Transportation defaults
     primaryTransportMode: '',
-    longDistanceTravel: '',
     carProfile: '',
     annualMileage: 0,
     costPerMile: 0,
-    weeklyCommuteDistance: 0,
-    vehicleEfficiency: 0,
-    flightType: 'NONE',
-    offsetsTravelEmissions: false,
-    carType: 'MEDIUM',
-    carMiles: 0,
-    usesActiveTransport: false,
-    hasElectricVehicle: false,
-    flightMiles: 0,
-    transitType: 'BUS',
-    transitMiles: 0,
+    longDistanceTravel: '',
 
     // Food & Diet defaults
     dietType: 'MEAT_MODERATE',
@@ -217,47 +179,22 @@ export const useCalculator = () => {
     usesReusableContainers: false,
 
     // Waste defaults
-    recyclingPercentage: 0,
-    wasteLbs: 0,
-    minimizesWaste: false,
-    avoidsPlastic: false,
-    repairsItems: false,
-    buysSecondHand: false,
-    usesRecycledProducts: false,
-    wasteAuditFrequency: 'NEVER',
-
-    // Fashion defaults
-    fashionConsumption: 'MODERATE',
-    buysEthicalFashion: false,
-    buysSecondHandClothing: false,
-    avoidsFastFashion: false,
-    investsInQuality: false,
-    clothingLifespan: 'MEDIUM',
-
-    // New waste and consumption properties
     waste: {
-      wasteLbs: 0,
-      recyclingPercentage: 0,
-      minimizesWaste: false,
-      avoidsPlastic: false,
-      productLifespan: 'MODERATE',
-      consciousPurchasing: 3,
-      evaluatesLifecycle: false,
-      shoppingApproach: "",
-      wasteManagement: "",
-      repairsItems: false,
-      wastePrevention: "",
-      wasteComposition: ""
+      prevention: '',
+      smartShopping: '',
+      dailyWaste: '',
+      management: '',
+      repairOrReplace: false
     },
 
     // Air Quality defaults
     airQuality: {
-      outdoorAirQuality: "",
-      aqiMonitoring: "",
-      indoorAirQuality: "",
-      airQualityCommuting: "",
-      airQualityImpact: ""
-    },
+      outdoorAirQuality: '',
+      aqiMonitoring: '',
+      indoorAirQuality: '',
+      airQualityCommuting: '',
+      airQualityImpact: ''
+    }
   });
 
   const calculateHomeEmissions = () => {
@@ -265,7 +202,7 @@ export const useCalculator = () => {
     let emissions = 7.5; // Average annual home emissions in tons CO2e
     
     // Apply home size factor
-    const homeSizeFactor = state.homeSize ? {
+    const homeSizeFactors = {
       '1': 0.6,  // Studio/1 bedroom
       '2': 0.8,  // 2 bedrooms
       '3': 1.0,  // 3 bedrooms (baseline)
@@ -273,7 +210,8 @@ export const useCalculator = () => {
       '5': 1.4,  // 5 bedrooms
       '6': 1.6,  // 6 bedrooms
       '7+': 1.8  // 7+ bedrooms
-    }[state.homeSize] : 1.0;  // Default to baseline if not selected
+    };
+    const homeSizeFactor = state.homeSize ? homeSizeFactors[state.homeSize as keyof typeof homeSizeFactors] || 1.0 : 1.0;
     emissions *= homeSizeFactor;
 
     // Apply home efficiency factor
@@ -331,11 +269,6 @@ export const useCalculator = () => {
         emissions *= 1.0; // No modification
     }
     
-    // Apply modifiers
-    if (state.offsetsTravelEmissions) {
-      emissions *= 0.8; // 20% reduction for offsetting
-    }
-    
     return emissions;
   };
 
@@ -367,16 +300,58 @@ export const useCalculator = () => {
   };
 
   const calculateWasteEmissions = () => {
-    let emissions = state.wasteLbs * EMISSION_FACTORS.waste.MEDIUM;
+    let emissions = 0;
     
-    // Apply recycling reduction
-    emissions *= (1 - (state.recyclingPercentage / 100) * 0.5);
+    // Base waste emissions
+    if (state.waste.dailyWaste) {
+      const dailyWasteFactor = {
+        'A': 0.5,  // Minimal waste
+        'B': 0.75, // Moderate waste
+        'C': 1.0,  // Average waste
+        'D': 1.25  // High waste
+      }[state.waste.dailyWaste] || 1.0;
+      
+      emissions += dailyWasteFactor * 365; // Daily emissions * days
+    }
     
-    // Apply modifiers
-    if (state.minimizesWaste) emissions *= 0.8;
-    if (state.avoidsPlastic) emissions *= 0.9;
-    if (state.repairsItems) emissions *= 0.95;
-    if (state.buysSecondHand) emissions *= 0.9;
+    // Apply shopping reduction
+    if (state.waste.smartShopping) {
+      const shoppingFactor = {
+        'A': 0.7,  // Conscious consumer
+        'B': 0.85, // Balanced shopper
+        'C': 1.0   // Convenience shopper
+      }[state.waste.smartShopping] || 1.0;
+      
+      emissions *= shoppingFactor;
+    }
+    
+    // Apply prevention factors
+    if (state.waste.prevention) {
+      const preventionFactor = {
+        'A': 0.7,  // Zero waste champion
+        'B': 0.85, // Consistent reuser
+        'C': 1.0,  // Occasional reuser
+        'D': 1.2   // Basic disposer
+      }[state.waste.prevention] || 1.0;
+      
+      emissions *= preventionFactor;
+    }
+    
+    // Apply management factors
+    if (state.waste.management) {
+      const managementFactor = {
+        'A': 0.8,  // Advanced management
+        'B': 0.9,  // Basic management
+        'C': 1.0   // Limited management
+      }[state.waste.management] || 1.0;
+      
+      emissions *= managementFactor;
+    }
+    
+    // Apply repair factor
+    if (state.waste.repairOrReplace) {
+      emissions *= 0.95; // 5% reduction for repair preference
+    }
     
     return emissions;
   };
@@ -432,21 +407,10 @@ export const useCalculator = () => {
 
       // Transportation defaults
       primaryTransportMode: '',
-      longDistanceTravel: '',
       carProfile: '',
       annualMileage: 0,
       costPerMile: 0,
-      weeklyCommuteDistance: 0,
-      vehicleEfficiency: 0,
-      flightType: 'NONE',
-      offsetsTravelEmissions: false,
-      carType: 'MEDIUM',
-      carMiles: 0,
-      usesActiveTransport: false,
-      hasElectricVehicle: false,
-      flightMiles: 0,
-      transitType: 'BUS',
-      transitMiles: 0,
+      longDistanceTravel: '',
 
       // Food & Diet defaults
       dietType: 'MEAT_MODERATE',
@@ -462,47 +426,22 @@ export const useCalculator = () => {
       usesReusableContainers: false,
 
       // Waste defaults
-      recyclingPercentage: 0,
-      wasteLbs: 0,
-      minimizesWaste: false,
-      avoidsPlastic: false,
-      repairsItems: false,
-      buysSecondHand: false,
-      usesRecycledProducts: false,
-      wasteAuditFrequency: 'NEVER',
-
-      // Fashion defaults
-      fashionConsumption: 'MODERATE',
-      buysEthicalFashion: false,
-      buysSecondHandClothing: false,
-      avoidsFastFashion: false,
-      investsInQuality: false,
-      clothingLifespan: 'MEDIUM',
-
-      // New waste and consumption properties
       waste: {
-        wasteLbs: 0,
-        recyclingPercentage: 0,
-        minimizesWaste: false,
-        avoidsPlastic: false,
-        productLifespan: 'MODERATE',
-        consciousPurchasing: 3,
-        evaluatesLifecycle: false,
-        shoppingApproach: "",
-        wasteManagement: "",
-        repairsItems: false,
-        wastePrevention: "",
-        wasteComposition: ""
+        prevention: '',
+        smartShopping: '',
+        dailyWaste: '',
+        management: '',
+        repairOrReplace: false
       },
 
       // Air Quality defaults
       airQuality: {
-        outdoorAirQuality: "",
-        aqiMonitoring: "",
-        indoorAirQuality: "",
-        airQualityCommuting: "",
-        airQualityImpact: ""
-      },
+        outdoorAirQuality: '',
+        aqiMonitoring: '',
+        indoorAirQuality: '',
+        airQualityCommuting: '',
+        airQualityImpact: ''
+      }
     });
   };
 

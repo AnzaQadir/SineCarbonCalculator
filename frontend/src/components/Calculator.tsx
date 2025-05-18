@@ -95,26 +95,15 @@ interface BaseCalculatorState {
   dietType: "VEGAN" | "VEGETARIAN" | "FLEXITARIAN" | "MEAT_MODERATE" | "MEAT_HEAVY";
   plateProfile: "" | "A" | "B" | "C";
   diningStyle: "" | "A" | "B" | "C";
-  buysLocalFood: boolean;
-  followsSustainableDiet: boolean;
-  growsOwnFood: boolean;
-  compostsFood: boolean;
-  usesMealPlanning: boolean;
   plantBasedMealsPerWeek: string;
   
   // Waste
   waste: {
-    wastePrevention: "" | "A" | "B" | "C" | "D";
-    wasteComposition: "" | "A" | "B" | "C" | "D" | "E";
-    shoppingApproach: "" | "A" | "B" | "C";
-    wasteManagement: "" | "A" | "B" | "C";
-    repairsItems: boolean;
-    wasteLbs: string;
-    recyclingPercentage: string;
-    minimizesWaste: boolean;
-    avoidsPlastic: boolean;
-    evaluatesLifecycle: boolean;
-    consciousPurchasing: string;
+    prevention: "" | "A" | "B" | "C" | "D";
+    smartShopping: "" | "A" | "B" | "C";
+    dailyWaste: "" | "A" | "B" | "C" | "D";
+    management: "" | "A" | "B" | "C";
+    repairOrReplace: boolean;
   };
 
   // Air Quality
@@ -202,17 +191,11 @@ const Calculator = ({
 
   // 1. Define default objects for nested state
   const defaultWaste = {
-    wastePrevention: '' as '' | 'A' | 'B' | 'C' | 'D',
-    wasteComposition: '' as '' | 'A' | 'B' | 'C' | 'D' | 'E',
-    shoppingApproach: '' as '' | 'A' | 'B' | 'C',
-    wasteManagement: '' as '' | 'A' | 'B' | 'C',
-    repairsItems: false,
-    wasteLbs: '',
-    recyclingPercentage: '',
-    minimizesWaste: false,
-    avoidsPlastic: false,
-    evaluatesLifecycle: false,
-    consciousPurchasing: ''
+    prevention: '' as '' | 'A' | 'B' | 'C' | 'D',
+    smartShopping: '' as '' | 'A' | 'B' | 'C',
+    dailyWaste: '' as '' | 'A' | 'B' | 'C' | 'D',
+    management: '' as '' | 'A' | 'B' | 'C',
+    repairOrReplace: false,
   };
   const defaultAirQuality = {
     outdoorAirQuality: '' as '' | 'A' | 'B' | 'C' | 'D',
@@ -248,7 +231,7 @@ const Calculator = ({
         categoryEmissions,
         recommendations: recommendations.map(r => ({
           ...r,
-          difficulty: r.difficulty === 'Easy' || r.difficulty === 'Medium' ? r.difficulty : 'Medium'
+          difficulty: r.difficulty === 'Easy' || r.difficulty === 'Medium' ? r.difficulty : 'Medium' as 'Easy' | 'Medium'
         }))
       }
     };
@@ -284,11 +267,6 @@ const Calculator = ({
       dietType: 'MEAT_MODERATE',
       plateProfile: '',
       diningStyle: '',
-      buysLocalFood: false,
-      followsSustainableDiet: false,
-      growsOwnFood: false,
-      compostsFood: false,
-      usesMealPlanning: false,
       plantBasedMealsPerWeek: '',
       waste: { ...defaultWaste },
       airQuality: { ...defaultAirQuality },
@@ -409,12 +387,6 @@ const Calculator = ({
       }
     }
     
-    // Apply modifiers
-    if (state.buysLocalFood) emissions *= 0.9;
-    if (state.growsOwnFood) emissions *= 0.95;
-    if (state.compostsFood) emissions *= 0.95;
-    if (state.usesMealPlanning) emissions *= 0.9;
-    
     return emissions;
   };
 
@@ -422,23 +394,23 @@ const Calculator = ({
     let emissions = 0;
     
     // Base waste emissions
-    if (state.waste.wasteLbs) {
-      const wasteLbs = parseFloat(state.waste.wasteLbs);
-      if (!isNaN(wasteLbs)) {
-        emissions += wasteLbs * 0.5; // 0.5 kg CO2e per pound
+    if (state.waste.dailyWaste) {
+      const dailyWaste = parseFloat(state.waste.dailyWaste);
+      if (!isNaN(dailyWaste)) {
+        emissions += dailyWaste * 0.5; // 0.5 kg CO2e per pound
       }
     }
     
     // Apply recycling reduction
-    if (state.waste.recyclingPercentage) {
-      const recyclingRate = parseFloat(state.waste.recyclingPercentage);
-      if (!isNaN(recyclingRate)) {
-        emissions *= (1 - (recyclingRate / 100) * 0.5); // 50% reduction for recycled materials
+    if (state.waste.smartShopping) {
+      const shoppingRate = parseFloat(state.waste.smartShopping);
+      if (!isNaN(shoppingRate)) {
+        emissions *= (1 - (shoppingRate / 100) * 0.5); // 50% reduction for recycled materials
       }
     }
     
     // Apply waste prevention factors
-    switch (state.waste.wastePrevention) {
+    switch (state.waste.prevention) {
       case "A":
         emissions *= 0.7;
         break;
@@ -454,9 +426,7 @@ const Calculator = ({
     }
     
     // Apply additional modifiers
-    if (state.waste.minimizesWaste) emissions *= 0.8;
-    if (state.waste.avoidsPlastic) emissions *= 0.9;
-    if (state.waste.repairsItems) emissions *= 0.95;
+    if (state.waste.repairOrReplace) emissions *= 0.95;
     
     return emissions;
   };
@@ -1261,151 +1231,194 @@ const Calculator = ({
     </div>
   );
 
-  const renderWaste = () => (
-    <div className="animate-fade-in">
-      <CardHeader className="pb-8">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="p-2 bg-primary/10 rounded-full">
-            <Recycle className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <CardTitle className="text-2xl">Your Waste Impact</CardTitle>
-            <CardDescription className="text-base mt-1">
-              Tell us about your waste management and consumption habits.
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-8">
-        {/* Waste Prevention Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
-          <div className="flex items-start gap-4 mb-5">
-            <div className="p-2 bg-primary/10 rounded-lg mt-1">
-              <PackageX className="h-5 w-5 text-primary" />
+  const renderWaste = (): JSX.Element => {
+    // Ensure waste state is initialized
+    const wasteState = state.waste || defaultWaste;
+
+    // Log initial state
+    console.log('Rendering waste section with state:', {
+      waste: wasteState,
+      defaultWaste,
+      hasWasteState: !!state.waste,
+      wasteKeys: Object.keys(wasteState)
+    });
+
+    // Log values before rendering
+    console.log('QuestionTiles values:', {
+      prevention: wasteState.prevention,
+      shopping: wasteState.smartShopping,
+      wasteManagement: wasteState.dailyWaste,
+      management: wasteState.management,
+      repairOrReplace: wasteState.repairOrReplace
+    });
+
+    return (
+      <div className="animate-fade-in">
+        <CardHeader className="pb-8">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="p-2 bg-primary/10 rounded-full">
+              <Recycle className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <label className="text-lg font-medium text-foreground block mb-2">
-                Imagine a typical day—how do you stop waste from ever reaching your bin?
-              </label>
-              <p className="text-muted-foreground text-sm">Preventing waste before it starts is the most effective way to reduce your environmental impact.</p>
+              <CardTitle className="text-2xl">Your Waste Impact</CardTitle>
+              <CardDescription className="text-base mt-1">
+                Tell us about your waste management and consumption habits.
+              </CardDescription>
             </div>
           </div>
-          <QuestionTiles
-            category="waste"
-            subCategory="prevention"
-            value={state.waste.wastePrevention}
-            onChange={(value) => onUpdate({ waste: { ...state.waste, wastePrevention: value as "" | "A" | "B" | "C" | "D" } })}
-          />
-        </div>
-        {/* Waste Composition Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
-          <div className="flex items-start gap-4 mb-5">
-            <div className="p-2 bg-primary/10 rounded-lg mt-1">
-              <Trash2 className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <label className="text-lg font-medium text-foreground block mb-2">
-                We all have items that seem to appear in our trash most often—what tends to fill your bin the most?
-              </label>
-              <p className="text-muted-foreground text-sm">Understanding your waste composition helps identify reduction opportunities.</p>
-            </div>
-          </div>
-          <QuestionTiles
-            category="waste"
-            subCategory="wasteComposition"
-            value={state.waste.wasteComposition}
-            onChange={(value) => onUpdate({ waste: { ...state.waste, wasteComposition: value as "" | "A" | "B" | "C" | "D" | "E" } })}
-          />
-        </div>
-        {/* Shopping Approach Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
-          <div className="flex items-start gap-4 mb-5">
-            <div className="p-2 bg-primary/10 rounded-lg mt-1">
-              <ShoppingBag className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <label className="text-lg font-medium text-foreground block mb-2">
-                Every purchase and disposal shapes the waste we create. Which option best describes your everyday approach?
-              </label>
-              <p className="text-muted-foreground text-sm">Your shopping choices significantly impact waste generation.</p>
-            </div>
-          </div>
-          <QuestionTiles
-            category="waste"
-            subCategory="shopping"
-            value={state.waste.shoppingApproach}
-            onChange={(value) => onUpdate({ waste: { ...state.waste, shoppingApproach: value as "" | "A" | "B" | "C" } })}
-          />
-        </div>
-        {/* Waste Management Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
-          <div className="flex items-start gap-4 mb-5">
-            <div className="p-2 bg-primary/10 rounded-lg mt-1">
-              <Recycle className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <label className="text-lg font-medium text-foreground block mb-2">
-                Think about how you manage your everyday waste—what best reflects your habits?
-              </label>
-              <p className="text-muted-foreground text-sm">Proper waste management can significantly reduce your environmental impact.</p>
-            </div>
-          </div>
-          <QuestionTiles
-            category="waste"
-            subCategory="wasteManagement"
-            value={state.waste.wasteManagement}
-            onChange={(value) => onUpdate({ waste: { ...state.waste, wasteManagement: value as "" | "A" | "B" | "C" } })}
-          />
-        </div>
-        {/* Repairs Items Question */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 flex flex-col gap-4 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="bg-green-50 rounded-full p-3 flex items-center justify-center">
-              <Wrench className="h-6 w-6 text-green-600" />
-            </div>
-            <div>
-              <div className="text-lg md:text-xl font-semibold text-gray-900">
-                When something breaks, do you try to repair it instead of replacing it right away?
+        </CardHeader>
+        <CardContent className="space-y-8">
+          {/* Waste Prevention Question */}
+          <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+            <div className="flex items-start gap-4 mb-5">
+              <div className="p-2 bg-primary/10 rounded-lg mt-1">
+                <PackageX className="h-5 w-5 text-primary" />
               </div>
-              <div className="text-gray-500 text-sm mt-1">
-                Repairing items can significantly reduce waste and resource consumption.
+              <div>
+                <label className="text-lg font-medium text-foreground block mb-2">
+                  Imagine a typical day—how do you stop waste from ever reaching your bin?
+                </label>
+                <p className="text-muted-foreground text-sm">Preventing waste before it starts is the most effective way to reduce your environmental impact.</p>
               </div>
             </div>
-          </div>
-          <div className="flex justify-center gap-4 mt-2">
-            <YesNoToggle
-              value={state.waste.repairsItems}
-              onChange={(value) => onUpdate({ waste: { ...state.waste, repairsItems: value } })}
-              className="w-full max-w-md"
+            <QuestionTiles
+              category="waste"
+              subCategory="prevention"
+              value={wasteState.prevention}
+              onChange={(value) => {
+                console.log('Prevention onChange called with value:', value);
+                onUpdate({ 
+                  waste: { 
+                    ...wasteState,
+                    prevention: value as "" | "A" | "B" | "C" | "D" 
+                  } 
+                });
+              }}
             />
           </div>
-        </div>
-        {/* Evaluates Lifecycle Question */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 flex flex-col gap-4 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="bg-green-50 rounded-full p-3 flex items-center justify-center">
-              <Info className="h-6 w-6 text-green-600" />
-            </div>
-            <div>
-              <div className="text-lg md:text-xl font-semibold text-gray-900">
-                Do you consider the lifecycle of products before buying?
+
+          {/* Smart Shopping Question */}
+          <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+            <div className="flex items-start gap-4 mb-5">
+              <div className="p-2 bg-primary/10 rounded-lg mt-1">
+                <ShoppingBag className="h-5 w-5 text-primary" />
               </div>
-              <div className="text-gray-500 text-sm mt-1">
-                Thinking about what happens to an item after use is key to sustainability.
+              <div>
+                <label className="text-lg font-medium text-foreground block mb-2">
+                  Every purchase and disposal shapes the waste we create. Which option best describes your everyday approach?
+                </label>
+                <p className="text-muted-foreground text-sm">Your shopping choices significantly impact waste generation.</p>
               </div>
             </div>
-          </div>
-          <div className="flex justify-center gap-4 mt-2">
-            <YesNoToggle
-              value={state.waste.evaluatesLifecycle}
-              onChange={(value) => onUpdate({ waste: { ...state.waste, evaluatesLifecycle: value } })}
-              className="w-full max-w-md"
+            <QuestionTiles
+              category="waste"
+              subCategory="shopping"
+              value={wasteState.smartShopping}
+              onChange={(value) => {
+                console.log('Shopping onChange called with value:', value);
+                onUpdate({ 
+                  waste: { 
+                    ...wasteState,
+                    smartShopping: value as "" | "A" | "B" | "C" 
+                  } 
+                });
+              }}
             />
           </div>
-        </div>
-      </CardContent>
-    </div>
-  );
+
+          {/* Daily Waste Question */}
+          <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+            <div className="flex items-start gap-4 mb-5">
+              <div className="p-2 bg-primary/10 rounded-lg mt-1">
+                <Trash2 className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <label className="text-lg font-medium text-foreground block mb-2">
+                  How much waste do you typically generate in a day?
+                </label>
+                <p className="text-muted-foreground text-sm">Understanding your daily waste generation helps identify reduction opportunities.</p>
+              </div>
+            </div>
+            <QuestionTiles
+              category="waste"
+              subCategory="wasteManagement"
+              value={wasteState.dailyWaste}
+              onChange={(value) => {
+                console.log('WasteManagement onChange called with value:', value);
+                onUpdate({ 
+                  waste: { 
+                    ...wasteState,
+                    dailyWaste: value as "" | "A" | "B" | "C" | "D" 
+                  } 
+                });
+              }}
+            />
+          </div>
+
+          {/* Waste Management Question */}
+          <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+            <div className="flex items-start gap-4 mb-5">
+              <div className="p-2 bg-primary/10 rounded-lg mt-1">
+                <Recycle className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <label className="text-lg font-medium text-foreground block mb-2">
+                  Think about how you manage your everyday waste—what best reflects your habits?
+                </label>
+                <p className="text-muted-foreground text-sm">Proper waste management can significantly reduce your environmental impact.</p>
+              </div>
+            </div>
+            <QuestionTiles
+              category="waste"
+              subCategory="management"
+              value={wasteState.management}
+              onChange={(value) => {
+                console.log('Management onChange called with value:', value);
+                onUpdate({ 
+                  waste: { 
+                    ...wasteState,
+                    management: value as "" | "A" | "B" | "C" 
+                  } 
+                });
+              }}
+            />
+          </div>
+
+          {/* Repair or Replace Question */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 flex flex-col gap-4 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="bg-green-50 rounded-full p-3 flex items-center justify-center">
+                <Wrench className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <div className="text-lg md:text-xl font-semibold text-gray-900">
+                  When something breaks, do you try to repair it instead of replacing it right away?
+                </div>
+                <div className="text-gray-500 text-sm mt-1">
+                  Repairing items can significantly reduce waste and resource consumption.
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-center gap-4 mt-2">
+              <YesNoToggle
+                value={wasteState.repairOrReplace}
+                onChange={(value) => {
+                  console.log('RepairOrReplace onChange called with value:', value);
+                  onUpdate({ 
+                    waste: { 
+                      ...wasteState,
+                      repairOrReplace: value 
+                    } 
+                  });
+                }}
+                className="w-full max-w-md"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </div>
+    );
+  };
 
   const renderAirQuality = () => (
     <div className="animate-fade-in">

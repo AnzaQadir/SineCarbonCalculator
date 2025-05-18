@@ -69,11 +69,11 @@ interface State {
   usesMealPlanning: boolean;
   plantBasedMealsPerWeek: string;
   waste?: {
-    wastePrevention: string;
-    wasteManagement: string;
-    smartShopping: string;
-    dailyWaste: string;
-    repairOrReplace: string;
+    prevention: "" | "A" | "B" | "C" | "D";
+    management: "" | "A" | "B" | "C";
+    smartShopping: "" | "A" | "B" | "C";
+    dailyWaste: "" | "A" | "B" | "C" | "D";
+    repairOrReplace: boolean;
   };
   airQuality?: {
     monitoring: string;
@@ -319,8 +319,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                (state?.carProfile === 'A' ? 3 : state?.carProfile === 'B' ? 2 : 1),
     food: (state?.dietType === 'VEGAN' ? 3 : state?.dietType === 'VEGETARIAN' ? 2 : 1) +
           (state?.plateProfile === 'A' ? 3 : state?.plateProfile === 'B' ? 2 : 1),
-    waste: (state?.waste?.wastePrevention === 'A' ? 3 : state?.waste?.wastePrevention === 'B' ? 2 : 1) +
-           (state?.waste?.wasteManagement === 'A' ? 3 : state?.waste?.wasteManagement === 'B' ? 2 : 1)
+    waste: (state?.waste?.prevention === 'A' ? 3 : state?.waste?.prevention === 'B' ? 2 : 1) +
+           (state?.waste?.management === 'A' ? 3 : state?.waste?.management === 'B' ? 2 : 1)
   };
 
   const dominantCategory = Object.entries(categoryScores)
@@ -666,16 +666,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           state.diningStyle === "C" ? "FREQUENT_DINE_OUT" :
           undefined
         ) as 'HOME_COOKED' | 'BALANCED' | 'FREQUENT_DINE_OUT' | undefined,
-        buysLocalFood: state.buysLocalFood,
-        followsSustainableDiet: state.followsSustainableDiet,
-        growsOwnFood: state.growsOwnFood,
-        compostsFood: state.compostsFood,
-        usesMealPlanning: state.usesMealPlanning,
         plantBasedMealsPerWeek: state.plantBasedMealsPerWeek ? parseInt(state.plantBasedMealsPerWeek) : undefined
       },
       waste: {
-        prevention: (state.waste?.wastePrevention || '') as 'A' | 'B' | 'C' | 'D' | '',
-        management: (state.waste?.wasteManagement || '') as 'A' | 'B' | 'C' | '',
+        prevention: (state.waste?.prevention || '') as 'A' | 'B' | 'C' | 'D' | '',
+        management: (state.waste?.management || '') as 'A' | 'B' | 'C' | '',
         smartShopping: (state.waste?.smartShopping || '') as 'A' | 'B' | 'C',
         dailyWaste: (state.waste?.dailyWaste || '') as 'A' | 'B' | 'C' | 'D',
         repairOrReplace: Boolean(state.waste?.repairOrReplace),
