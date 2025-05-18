@@ -279,27 +279,6 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               description: 'I rarely think about reusables until I see the trash piling up'
             }
           ];
-        } else if (subCategory === 'wasteManagement') {
-          return [
-            {
-              value: 'A',
-              icon: <Recycle className="h-6 w-6" />,
-              title: 'Dedicated Recycler',
-              description: 'I carefully sort, recycle, and even repurpose items to keep waste to a minimum'
-            },
-            {
-              value: 'B',
-              icon: <PackageCheck className="h-6 w-6" />,
-              title: 'Casual Recycler',
-              description: 'I recycle when possible, but I might not always sort everything correctly'
-            },
-            {
-              value: 'C',
-              icon: <Trash2 className="h-6 w-6" />,
-              title: 'Basic Disposer',
-              description: 'I typically dispose of everything in the same bin, without much thought for separation'
-            }
-          ];
         } else if (subCategory === 'shopping') {
           return [
             {
@@ -321,37 +300,46 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               description: 'I rarely consider the waste factor—I usually buy what is readily available'
             }
           ];
-        } else if (subCategory === 'wasteComposition') {
+        } else if (subCategory === 'wasteManagement') {
           return [
             {
               value: 'A',
-              icon: <Apple className="h-6 w-6" />,
-              title: 'Food Scraps',
-              description: 'Kitchen leftovers and organic waste'
+              icon: <Recycle className="h-6 w-6" />,
+              title: 'Dedicated Recycler',
+              description: 'I carefully sort, recycle, and even repurpose items to keep waste to a minimum'
             },
             {
               value: 'B',
-              icon: <PackageX className="h-6 w-6" />,
-              title: 'Single-Use Packaging',
-              description: 'Plastic wrappers and takeout containers'
+              icon: <PackageCheck className="h-6 w-6" />,
+              title: 'Casual Recycler',
+              description: 'I recycle when possible, but I might not always sort everything correctly'
             },
             {
               value: 'C',
-              icon: <FileText className="h-6 w-6" />,
-              title: 'Paper & Cardboard',
-              description: 'Mail, boxes, and receipts'
+              icon: <Trash2 className="h-6 w-6" />,
+              title: 'Basic Disposer',
+              description: 'I typically dispose of everything in the same bin, without much thought for separation'
+            }
+          ];
+        } else if (subCategory === 'management') {
+          return [
+            {
+              value: 'A',
+              icon: <Recycle className="h-6 w-6" />,
+              title: 'Advanced Management',
+              description: 'I have a comprehensive waste management system with composting and recycling'
             },
             {
-              value: 'D',
-              icon: <Battery className="h-6 w-6" />,
-              title: 'Electronics',
-              description: 'Broken devices and batteries'
+              value: 'B',
+              icon: <PackageCheck className="h-6 w-6" />,
+              title: 'Basic Management',
+              description: 'I separate recyclables and try to minimize waste'
             },
             {
-              value: 'E',
-              icon: <Shirt className="h-6 w-6" />,
-              title: 'Textiles',
-              description: 'Old garments and linens'
+              value: 'C',
+              icon: <Trash2 className="h-6 w-6" />,
+              title: 'Limited Management',
+              description: 'I dispose of waste without much separation or management'
             }
           ];
         }
