@@ -151,6 +151,8 @@ interface BaseCalculatorState {
     wardrobeImpact: string;
     mindfulUpgrades: string;
     durability: string;
+    consumptionFrequency: string;
+    brandLoyalty: string;
   };
 }
 
@@ -222,7 +224,9 @@ const Calculator = ({
   const defaultClothing = {
     wardrobeImpact: '',
     mindfulUpgrades: '',
-    durability: ''
+    durability: '',
+    consumptionFrequency: '',
+    brandLoyalty: '',
   };
 
   const handleCalculate = () => {
@@ -1139,6 +1143,8 @@ const Calculator = ({
                 ...defaultClothing,
                 ...(state.clothing ?? {}),
                 wardrobeImpact: value,
+                consumptionFrequency: state.clothing?.consumptionFrequency ?? '',
+                brandLoyalty: state.clothing?.brandLoyalty ?? '',
               },
             })}
           />
@@ -1162,9 +1168,11 @@ const Calculator = ({
             value={state.clothing?.mindfulUpgrades || ''}
             onChange={(value) => onUpdate({
               clothing: {
-                wardrobeImpact: state.clothing?.wardrobeImpact ?? '',
+                ...defaultClothing,
+                ...(state.clothing ?? {}),
                 mindfulUpgrades: value,
-                durability: state.clothing?.durability ?? '',
+                consumptionFrequency: state.clothing?.consumptionFrequency ?? '',
+                brandLoyalty: state.clothing?.brandLoyalty ?? '',
               },
             })}
           />
@@ -1188,9 +1196,63 @@ const Calculator = ({
             value={state.clothing?.durability || ''}
             onChange={(value) => onUpdate({
               clothing: {
-                wardrobeImpact: state.clothing?.wardrobeImpact ?? '',
-                mindfulUpgrades: state.clothing?.mindfulUpgrades ?? '',
+                ...defaultClothing,
+                ...(state.clothing ?? {}),
                 durability: value,
+                consumptionFrequency: state.clothing?.consumptionFrequency ?? '',
+                brandLoyalty: state.clothing?.brandLoyalty ?? '',
+              },
+            })}
+          />
+        </div>
+        {/* Consumption Frequency */}
+        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="flex items-start gap-4 mb-5">
+            <div className="p-2 bg-primary/10 rounded-lg mt-1">
+              <ShoppingCart className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <label className="text-lg font-medium text-foreground block mb-2">
+                How often do you buy new clothes?
+              </label>
+              <p className="text-muted-foreground text-sm">Your shopping frequency impacts sustainability.</p>
+            </div>
+          </div>
+          <QuestionTiles
+            category="clothing"
+            subCategory="consumptionFrequency"
+            value={state.clothing?.consumptionFrequency || ''}
+            onChange={(value) => onUpdate({
+              clothing: {
+                ...defaultClothing,
+                ...(state.clothing ?? {}),
+                consumptionFrequency: value,
+              },
+            })}
+          />
+        </div>
+        {/* Brand Loyalty */}
+        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="flex items-start gap-4 mb-5">
+            <div className="p-2 bg-primary/10 rounded-lg mt-1">
+              <Store className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <label className="text-lg font-medium text-foreground block mb-2">
+                How do you choose your clothing brands?
+              </label>
+              <p className="text-muted-foreground text-sm">Brand choices reflect your values and impact.</p>
+            </div>
+          </div>
+          <QuestionTiles
+            category="clothing"
+            subCategory="brandLoyalty"
+            value={state.clothing?.brandLoyalty || ''}
+            onChange={(value) => onUpdate({
+              clothing: {
+                ...defaultClothing,
+                ...(state.clothing ?? {}),
+                brandLoyalty: value,
               },
             })}
           />

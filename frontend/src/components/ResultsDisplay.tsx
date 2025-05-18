@@ -60,7 +60,14 @@ interface State {
   carProfile: string;
   longDistance: string;
   dietType: string;
-  foodSource: string;
+  plateProfile: string;
+  diningStyle: string;
+  buysLocalFood: boolean;
+  followsSustainableDiet: boolean;
+  growsOwnFood: boolean;
+  compostsFood: boolean;
+  usesMealPlanning: boolean;
+  plantBasedMealsPerWeek: string;
   waste?: {
     wastePrevention: string;
     wasteManagement: string;
@@ -73,10 +80,11 @@ interface State {
     impact: string;
   };
   clothing?: {
-    wardrobeImpact: string;
-    mindfulUpgrades: string;
-    consumptionFrequency: string;
-    brandLoyalty: string;
+    wardrobeImpact: 'A' | 'B' | 'C' | '';
+    mindfulUpgrades: 'A' | 'B' | 'C' | '';
+    durability: 'A' | 'B' | 'C' | '';
+    consumptionFrequency: 'A' | 'B' | 'C' | 'D' | '';
+    brandLoyalty: 'A' | 'B' | 'C' | 'D' | '';
   };
 }
 
@@ -638,12 +646,29 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       food: {
         dietType: (
           state.dietType === "VEGAN" ? "PLANT_BASED" :
+          state.dietType === "VEGETARIAN" ? "VEGETARIAN" :
+          state.dietType === "FLEXITARIAN" ? "FLEXITARIAN" :
           state.dietType === "MEAT_MODERATE" ? "MODERATE_MEAT" :
-          state.dietType || undefined
+          undefined
         ) as 'PLANT_BASED' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MODERATE_MEAT' | undefined,
-        foodSource: ["LOCAL_SEASONAL", "MIXED", "CONVENTIONAL"].includes(state.foodSource || '')
-          ? state.foodSource as 'LOCAL_SEASONAL' | 'MIXED' | 'CONVENTIONAL'
-          : undefined,
+        foodSource: (
+          state.plateProfile === "A" ? "LOCAL_SEASONAL" :
+          state.plateProfile === "B" ? "MIXED" :
+          state.plateProfile === "C" ? "CONVENTIONAL" :
+          undefined
+        ) as 'LOCAL_SEASONAL' | 'MIXED' | 'CONVENTIONAL' | undefined,
+        diningStyle: (
+          state.diningStyle === "A" ? "HOME_COOKED" :
+          state.diningStyle === "B" ? "BALANCED" :
+          state.diningStyle === "C" ? "FREQUENT_DINE_OUT" :
+          undefined
+        ) as 'HOME_COOKED' | 'BALANCED' | 'FREQUENT_DINE_OUT' | undefined,
+        buysLocalFood: state.buysLocalFood,
+        followsSustainableDiet: state.followsSustainableDiet,
+        growsOwnFood: state.growsOwnFood,
+        compostsFood: state.compostsFood,
+        usesMealPlanning: state.usesMealPlanning,
+        plantBasedMealsPerWeek: state.plantBasedMealsPerWeek ? parseInt(state.plantBasedMealsPerWeek) : undefined
       },
       waste: {
         prevention: (state.waste?.wastePrevention || '') as 'A' | 'B' | 'C' | 'D' | '',
@@ -657,10 +682,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         impact: (state.airQuality?.impact || '') as 'A' | 'B' | 'C' | 'D' | '',
       },
       clothing: {
-        wardrobeImpact: (state.clothing?.wardrobeImpact || '') as 'A' | 'B' | 'C' | '',
-        mindfulUpgrades: (state.clothing?.mindfulUpgrades || '') as 'A' | 'B' | 'C' | '',
-        consumptionFrequency: (state.clothing?.consumptionFrequency || '') as 'A' | 'B' | 'C' | 'D',
-        brandLoyalty: (state.clothing?.brandLoyalty || '') as 'A' | 'B' | 'C' | 'D',
+        wardrobeImpact: state.clothing?.wardrobeImpact || undefined,
+        mindfulUpgrades: state.clothing?.mindfulUpgrades || undefined,
+        durability: state.clothing?.durability || undefined,
+        consumptionFrequency: state.clothing?.consumptionFrequency || undefined,
+        brandLoyalty: state.clothing?.brandLoyalty || undefined
       },
     };
   };
