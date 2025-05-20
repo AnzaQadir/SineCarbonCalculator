@@ -389,8 +389,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   const generateStory = async () => {
     console.log('Starting story generation...');
+    console.log('State:', state);
+    console.log('Dynamic Personality:', dynamicPersonality);
+    
     if (!state || !dynamicPersonality) {
       console.error('State or personality is undefined');
+      console.error('State:', state);
+      console.error('Dynamic Personality:', dynamicPersonality);
+      return;
+    }
+
+    // Validate required data
+    if (!dynamicPersonality.personality || !dynamicPersonality.dominantCategory) {
+      console.error('Missing required personality data:', dynamicPersonality);
       return;
     }
 
@@ -433,43 +444,80 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         newHabits.push('reducing waste production');
       }
 
-      // Calculate impact metrics
-      const treesPlanted = Math.round((16 - emissions) * 10);
-      const carbonReduced = (16 - emissions).toFixed(1);
-      const communityImpact = Math.round(score / 2);
+      // If no habits were generated, add some default ones based on personality
+      if (newHabits.length === 0) {
+        newHabits.push('starting your sustainability journey');
+        newHabits.push('learning about eco-friendly practices');
+        newHabits.push('exploring sustainable options');
+      }
+
+      // Calculate impact metrics - ensure positive values
+      const baseEmissions = 16; // Base emissions to compare against
+      const actualEmissions = Math.max(0, emissions); // Ensure emissions is not negative
+      const co2Saved = Math.max(0, baseEmissions - actualEmissions); // Ensure positive value
+      const treesPlanted = Math.round(co2Saved * 10);
+      const carbonReduced = co2Saved.toFixed(1);
+      const communityImpact = Math.max(1, Math.round(score / 2)); // Ensure at least 1
+
+      console.log('Generated metrics:', {
+        treesPlanted,
+        carbonReduced,
+        communityImpact,
+        newHabits,
+        co2Saved,
+        baseEmissions,
+        actualEmissions
+      });
+
+      // Prepare story input
+      const storyInput = {
+        name: state.name || 'Eco Hero',
+        ecoPersonality: dynamicPersonality.personality,
+        co2Saved: parseFloat(carbonReduced),
+        topCategory: dynamicPersonality.dominantCategory,
+        newHabits,
+        impactEquivalent: `planting ${treesPlanted} trees`,
+        nextStep: dynamicPersonality.nextAction || 'Start your journey',
+        badge: dynamicPersonality.badge || 'Eco Explorer',
+        score: Math.max(1, score), // Ensure score is at least 1
+        categoryEmissions: {
+          home: categoryEmissions.home || 0,
+          transport: categoryEmissions.transport || 0,
+          food: categoryEmissions.food || 0,
+          waste: categoryEmissions.waste || 0
+        }
+      };
+
+      console.log('Story input:', storyInput);
 
       // Generate story using the new engine
-      const storyCards = generateEcoStory({
-        name: state.name || 'Eco Hero',
-        ecoPersonality: dynamicPersonality.personality,
-        co2Saved: parseFloat(carbonReduced),
-        topCategory: dynamicPersonality.dominantCategory,
-        newHabits,
-        impactEquivalent: `planting ${treesPlanted} trees`,
-        nextStep: dynamicPersonality.nextAction,
-        badge: dynamicPersonality.badge,
-        score,
-        categoryEmissions
-      });
+      const storyCards = generateEcoStory(storyInput);
+      console.log('Generated story cards:', storyCards);
 
       // Generate narrative story
-      const narrativeStory = generateNarrativeStory({
-        name: state.name || 'Eco Hero',
-        ecoPersonality: dynamicPersonality.personality,
-        co2Saved: parseFloat(carbonReduced),
-        topCategory: dynamicPersonality.dominantCategory,
-        newHabits,
-        impactEquivalent: `planting ${treesPlanted} trees`,
-        nextStep: dynamicPersonality.nextAction,
-        badge: dynamicPersonality.badge,
-        score,
-        categoryEmissions
-      });
+      const narrativeStory = generateNarrativeStory(storyInput);
+      console.log('Generated narrative story:', narrativeStory);
 
+      if (!storyCards || storyCards.length === 0) {
+        console.error('No story cards were generated');
+        return;
+      }
+
+      // Set the stories and show them
       setStoryCards(storyCards);
       setNarrativeStory(narrativeStory);
       setShowStory(true);
       setCurrentCardIndex(0);
+
+      // Force a re-render
+      setTimeout(() => {
+        console.log('Current story state:', {
+          showStory,
+          storyCardsLength: storyCards.length,
+          hasNarrativeStory: !!narrativeStory,
+          currentCardIndex: 0
+        });
+      }, 100);
     
     } catch (error) {
       console.error('Error in story generation:', error);
@@ -480,6 +528,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     }
   };
 
+  // Add a useEffect to monitor story state changes
+  useEffect(() => {
+    console.log('Story state changed:', {
+      showStory,
+      storyCardsLength: storyCards.length,
+      hasNarrativeStory: !!narrativeStory,
+      currentCardIndex
+    });
+  }, [showStory, storyCards, narrativeStory, currentCardIndex]);
 
   // Get achievements based on state
   const achievements = getAchievements(state, categoryEmissions);
@@ -1236,7 +1293,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </Button>
                   </div>
                 </motion.div>
-              ) : (
+              ) : storyCards.length > 0 ? (
                 <AnimatePresence>
                   <motion.div 
                     key={currentCardIndex}
@@ -1334,6 +1391,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </div>
                   </motion.div>
                 </AnimatePresence>
+              ) : (
+                <div className="text-center p-8">
+                  <p className="text-gray-600">Generating your story...</p>
+                </div>
               )}
             </div>
         </CardContent>

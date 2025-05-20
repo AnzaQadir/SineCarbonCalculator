@@ -104,6 +104,8 @@ const getCategoryEmoji = (category: string): string => {
       return '🍽️';
     case 'waste':
       return '♻️';
+    case 'clothing':
+      return '👕';
     default:
       return '🌍';
   }
@@ -151,17 +153,12 @@ const getEmotionalTrigger = (personality: string): string => {
   }
 };
 
-const getImpactComparison = (co2Saved: number): string => {
-  const comparisons = [
-    { threshold: 1, text: (co2) => `taking ${Math.round(co2 * 217)} cars off the road for a day` },
-    { threshold: 2, text: (co2) => `saving ${Math.round(co2 * 165)} trees worth of CO2 absorption` },
-    { threshold: 5, text: (co2) => `offsetting ${Math.round(co2 * 48)} round-trip flights` },
-    { threshold: 10, text: (co2) => `powering ${Math.round(co2 * 121)} homes with clean energy for a month` },
-    { threshold: 20, text: (co2) => `planting a forest of ${Math.round(co2 * 240)} trees` }
-  ];
-
-  const comparison = comparisons.find(c => co2Saved <= c.threshold) || comparisons[comparisons.length - 1];
-  return comparison.text(co2Saved);
+const getImpactComparison = (co2: number): string => {
+  if (co2 >= 10) return "planting a small forest";
+  if (co2 >= 5) return "taking 100 cars off the road for a day";
+  if (co2 >= 2) return "saving enough energy to power 10 homes for a month";
+  if (co2 >= 1) return "planting 50 trees";
+  return "taking the first step towards a greener future";
 };
 
 const generateAchievements = (input: StoryInput): Achievement[] => {
@@ -368,7 +365,7 @@ const generatePersonalizedRecommendations = (input: StoryInput): Recommendation[
 };
 
 export const generateEcoStory = (input: StoryInput): StoryCard[] => {
-  const personalityDetails = PersonalityDetails[input.ecoPersonality];
+  const personalityDetails = PersonalityDetails[input.ecoPersonality as keyof typeof PersonalityDetails];
   const tone = getPersonalityTone(input.ecoPersonality);
   const narrative = getPersonalityNarrative(input.ecoPersonality);
   const impactComparison = getImpactComparison(input.co2Saved);
@@ -384,13 +381,13 @@ export const generateEcoStory = (input: StoryInput): StoryCard[] => {
     },
     {
       title: "🌟 Your Eco-Personality Revealed",
-      content: `${narrative}\n\nYou're a ${input.ecoPersonality}! ${personalityDetails.story.split('.')[0]}.`,
-      emoji: personalityDetails.emoji,
+      content: `${narrative}\n\nYou're a ${input.ecoPersonality}! ${personalityDetails?.story?.split('.')[0] || 'Your sustainability journey is just beginning.'}.`,
+      emoji: personalityDetails?.emoji || '🌱',
       stats: `Score: ${input.score}/100 • ${input.badge}`
     },
     {
       title: "🏆 Top Category Champion",
-      content: `You're crushing it in ${input.topCategory}!\nYour sustainable choices in this area are making waves.\nYou've saved **${input.categoryEmissions[input.topCategory as keyof typeof input.categoryEmissions].toFixed(1)} tons CO₂** in this category alone.`,
+      content: `You're crushing it in ${input.topCategory}!\nYour sustainable choices in this area are making waves.\nYou've saved **${input.categoryEmissions[input.topCategory as keyof typeof input.categoryEmissions]?.toFixed(1) || '0'} tons CO₂** in this category alone.`,
       emoji: getCategoryEmoji(input.topCategory),
       stats: `Top Category: ${input.topCategory}`
     },
@@ -417,24 +414,32 @@ export const generateEcoStory = (input: StoryInput): StoryCard[] => {
       content: `@${input.name.replace(/\s+/g, '')} saved **${input.co2Saved} tons CO₂** this year 🌍\n🏆 Top Habit: ${input.newHabits[0]}\n🌀 Personality: ${input.ecoPersonality}\n🏅 Badge: ${input.badge}\n\n#EcoWrapped #MyImpactStory #${input.topCategory}Champion`,
       emoji: "🌟",
       stats: "Share your story!"
-    },
-    {
+    }
+  ];
+
+  // Only add achievements card if there are achievements
+  if (achievements.length > 0) {
+    cards.push({
       title: "🏆 Achievements Unlocked",
       content: achievements.map(achievement => 
         `**${achievement.emoji} ${achievement.title}** (${achievement.level})\n${achievement.description}`
       ).join('\n\n'),
       emoji: "🏆",
       stats: `${achievements.length} achievements earned`
-    },
-    {
+    });
+  }
+
+  // Only add recommendations card if there are recommendations
+  if (recommendations.length > 0) {
+    cards.push({
       title: "🎯 Your Next Steps",
       content: recommendations.map(rec => 
         `**${rec.emoji} ${rec.title}** (Impact: ${rec.impact})\n${rec.description}`
       ).join('\n\n'),
       emoji: "🎯",
       stats: `${recommendations.length} personalized recommendations`
-    }
-  ];
+    });
+  }
 
   return cards;
 };
