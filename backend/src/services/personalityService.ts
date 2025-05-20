@@ -133,11 +133,8 @@ export class PersonalityService {
     const maxPossibleScore = totalQuestions * 10; // Each question can score up to 10 points
     const percentage = (totalScore / maxPossibleScore) * 100;
 
-    // Calculate weighted percentage for the category
-    const weightedScore = percentage * this.CATEGORY_WEIGHTS[category];
-
     return {
-      score: weightedScore,
+      score: totalScore, // Return raw total score instead of weighted
       weight: this.CATEGORY_WEIGHTS[category],
       subScores,
       totalQuestions,
