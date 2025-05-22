@@ -106,27 +106,46 @@ interface ResultsDisplayProps {
 
 // Update PersonalityResponse type to match the API response
 interface PersonalityResponse {
-  personality: string;
-  dominantCategory: string;
-  subCategory: string;
-  tally: Record<string, number>;
-  categoryScores: Record<string, number>;
-  impactMetrics: {
-    treesPlanted: number;
-    carbonReduced: number;
-    communityImpact: number;
+  personality?: string;
+  dominantCategory?: string;
+  subCategory?: string;
+  tally?: Record<string, number>;
+  categoryScores?: {
+    [key: string]: {
+      score: number;
+      percentage: number;
+      maxPossible?: number;
+      maxPossibleScore?: number;
+    };
   };
-  title: string;
-  description: string;
-  strengths: string[];
-  nextSteps: string[];
-  emoji: string;
-  story: string;
-  avatar: string;
-  nextAction: string;
-  badge: string;
-  champion: string;
-  powerMoves: string[];
+  impactMetrics?: {
+    carbonReduced?: string;
+    treesPlanted?: number;
+    communityImpact?: number;
+  };
+  insights?: {
+    strengths?: string[];
+    opportunities?: string[];
+    confidence?: number;
+    dominantCategory?: string;
+    recommendations?: string[];
+    impactHighlights?: string;
+    storyHighlights?: string;
+    powerMoves?: string[];
+  };
+  impactHighlights?: string;
+  storyHighlights?: string;
+  powerMoves?: string[];
+  badge?: string;
+  champion?: string;
+  emoji?: string;
+  story?: string;
+  avatar?: string;
+  nextAction?: string;
+  title?: string;
+  description?: string;
+  strengths?: string[];
+  nextSteps?: string[];
 }
 
 const getAchievements = (state: any, categoryEmissions: CategoryEmissions): Achievement[] => {
@@ -297,7 +316,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   };
 
   // Update the component to use optional chaining
-  const personalityType = dynamicPersonality?.personality;
+  const personalityType = dynamicPersonality?.personality || '';
   const emoji = dynamicPersonality?.emoji;
   const story = dynamicPersonality?.story;
   const avatar = dynamicPersonality?.avatar;
@@ -472,9 +491,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       // Prepare story input
       const storyInput = {
         name: state.name || 'Eco Hero',
-        ecoPersonality: dynamicPersonality.personality,
+        ecoPersonality: dynamicPersonality.personality || '',
         co2Saved: parseFloat(carbonReduced),
-        topCategory: dynamicPersonality.dominantCategory,
+        topCategory: (dynamicPersonality.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality.dominantCategory || '').slice(1),
         newHabits,
         impactEquivalent: `planting ${treesPlanted} trees`,
         nextStep: dynamicPersonality.nextAction || 'Start your journey',
@@ -575,7 +594,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     "Sustainability Slayer"
   ];
 
-  const currentMilestone = dynamicPersonality ? milestoneOrder.indexOf(dynamicPersonality.personality) : 0;
+  const currentMilestone = dynamicPersonality ? milestoneOrder.indexOf(dynamicPersonality.personality || '') : 0;
   const nextMilestone = currentMilestone < milestoneOrder.length - 1 
     ? milestoneOrder[currentMilestone + 1] 
     : milestoneOrder[currentMilestone];
@@ -585,7 +604,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const userName = state?.name || 'Eco Hero';
   // Update the share text to use dynamicPersonality
   const shareText = dynamicPersonality 
-    ? `I'm a ${dynamicPersonality.personality} on my sustainability journey! 🌱 What's your eco-personality?`
+    ? `I'm a ${dynamicPersonality.personality || ''} on my sustainability journey! 🌱 What's your eco-personality?`
     : '';
 
   const handleShare = () => {
@@ -643,20 +662,21 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // Update the wrappedSlides to use optional chaining
   const wrappedSlides = storyCards.length > 0 && dynamicPersonality ? [
     {
-      personality: dynamicPersonality.personality,
+      personality: dynamicPersonality.personality || '',
       name: userName,
       co2Saved: `${(16 - emissions).toFixed(1)} tons`,
-      topCategory: dynamicPersonality.dominantCategory.charAt(0).toUpperCase() + dynamicPersonality.dominantCategory.slice(1),
+      topCategory: (dynamicPersonality.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality.dominantCategory || '').slice(1),
       nextStep: recommendations[0]?.title || '',
       badge: dynamicPersonality.badge,
-      shareText: `@${userName.replace(/\s+/g, '')} saved ${(16 - emissions).toFixed(1)} tons CO₂ this year! 🌍 Top Habit: ${recommendations[0]?.title || ''} 🌿 Role: ${dynamicPersonality.personality} 🏅 Badge: ${dynamicPersonality.badge} #EcoWrapped #ImpactInAction`,
+      shareText: `@${userName.replace(/\s+/g, '')} saved ${(16 - emissions).toFixed(1)} tons CO₂ this year! 🌍 Top Habit: ${recommendations[0]?.title || ''} 🌿 Role: ${dynamicPersonality.personality || ''} 🏅 Badge: ${dynamicPersonality.badge} #EcoWrapped #ImpactInAction`,
     },
   ] : [];
 
   useEffect(() => {
     if (showWrapped) {
       setTimeout(async () => {
-        const card = document.getElementById('story-card-' + dynamicPersonality?.personality.replace(/\s+/g, '-'));
+        const cardId = 'story-card-' + ((dynamicPersonality?.personality || '').replace(/\s+/g, '-'));
+        const card = document.getElementById(cardId);
         if (card) {
           const canvas = await html2canvas(card, {
             useCORS: true,
@@ -759,14 +779,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       const result = await calculatePersonality(apiResponses);
 
       setDynamicPersonality({
-        ...result,
-        emoji: result.emoji || '🌱',
-        story: result.story || 'Your sustainability journey begins!',
-        avatar: result.avatar || '/default-avatar.png',
-        nextAction: result.nextAction || 'Start your journey',
-        badge: result.badge || 'Eco Explorer',
-        champion: result.champion || 'Climate Champion',
-        powerMoves: result.powerMoves || []
+        ...result
       });
     } catch (error: any) {
       setError('Failed to calculate personality. Please try again.');
@@ -859,11 +872,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 {/* Personality Description */}
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-3xl">{dynamicPersonality?.emoji}</span>
-                  <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personality}</h2>
+                  <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personality || ''}</h2>
                 </div>
                 <Badge className="mb-2">{dynamicPersonality?.badge}</Badge>
                 <p className="text-gray-700 text-center mb-2">{story?.split('.')[0]}.</p>
-                <div className="text-green-700 font-medium mb-2">{nextAction}</div>
+                <div className="text-green-700 font-medium mb-2">{nextAction || ''}</div>
               </div>
             </div>
           </div>
@@ -873,14 +886,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               {/* Remove Animated Avatar (without progress ring) */}
               {/* Personalized Greeting */}
               <div className="text-lg font-semibold text-green-900 mb-2 text-center">
-                Hi {userName}, you're a {dynamicPersonality?.personality}!
+                Hi {userName}, you're a {dynamicPersonality?.personality || ''}!
               </div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-3xl">{emoji}</span>
-                <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personality}</h2>
+                <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personality || ''}</h2>
               </div>
               <Badge className="mb-2">{badge}</Badge>
-              <div className="text-green-700 font-medium mb-4">{nextAction}</div>
+              <div className="text-green-700 font-medium mb-4">{nextAction || ''}</div>
               {/* New: Strengths/Highlights */}
               <div className="bg-green-50 rounded-lg p-3 mb-3 w-full text-center">
                 <div className="text-sm font-semibold text-green-700 mb-1">Your Strengths</div>
@@ -993,541 +1006,255 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
             </div>
 
-            {/* Impact Highlights Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Impact Stats */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <Trophy className="h-7 w-7 text-yellow-500" />
-                  <h3 className="text-2xl font-serif text-gray-800">Your Impact Highlights</h3>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Heart className="h-5 w-5 text-red-500" />
-                      <span className="text-sm font-medium text-gray-500">Planet Saved</span>
-                    </div>
-                    <div className="text-3xl font-bold text-gray-900">
-                      {(16 - emissions).toFixed(1)}
-                      <span className="text-sm font-normal text-gray-500 ml-1">tons CO₂</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Equivalent to planting {Math.round((16 - emissions) * 10)} trees
-                    </p>
+            {/* Eco Wrapped 2024 Main Heading */}
+            <h2 className="text-3xl md:text-4xl font-extrabold text-green-900 mb-8 text-center font-sans tracking-tight">
+              Eco Wrapped 2024: Your Impact & Story
+            </h2>
+            {/* Refined Eco Wrapped Impact Highlights Card */}
+            <div className="bg-gradient-to-br from-green-100 via-mint-50 to-blue-100 rounded-2xl shadow-xl p-0 md:p-0 flex flex-col md:flex-row overflow-hidden relative mb-10">
+              {/* Radial shine */}
+              <div className="absolute inset-0 pointer-events-none" style={{background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18) 0%, transparent 70%)'}} />
+              {/* Left: CO2 stat, icon, trees, flights */}
+              <div className="flex flex-col items-center justify-center flex-shrink-0 w-full md:w-1/2 py-8 px-6 bg-white/40 backdrop-blur-md gap-2">
+                {/* Animated leaf icon */}
+                <div className="relative mb-2">
+                  <div className="bg-gradient-to-br from-green-400 to-green-600 rounded-full p-4 shadow-lg flex items-center justify-center">
+                    <Leaf className="h-10 w-10 text-white drop-shadow-lg animate-pulse" />
                   </div>
-                  <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Star className="h-5 w-5 text-yellow-500" />
-                      <span className="text-sm font-medium text-gray-500">Top Category</span>
-                    </div>
-                    <div className="text-xl font-bold text-gray-900 capitalize">
-                      {dominantCategory}
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Leading by example
-                    </p>
-                  </div>
+                  <span className="absolute -top-2 -right-2 text-yellow-300 animate-bounce select-none">✨</span>
                 </div>
-
-                {/* Progress Bar */}
-            
+                <div className="text-4xl md:text-5xl font-extrabold text-green-800 font-sans" style={{ fontFamily: 'Inter, Satoshi, Manrope, sans-serif' }}>
+                  {dynamicPersonality?.impactMetrics?.carbonReduced || '0.0'}
+                </div>
+                <span className="block text-lg font-bold text-green-700">tons of CO₂</span>
+                {/* Tree-line SVG or mini forest */}
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-2xl">🌳</span>
+                  <span className="text-green-800 font-semibold">= {dynamicPersonality?.impactMetrics?.treesPlanted || 0} trees</span>
+                  {/* Mini forest: SVG or emoji row */}
+                  <span className="ml-2 flex gap-0.5">
+                    {Array(Math.min(7, Math.floor((dynamicPersonality?.impactMetrics?.treesPlanted || 0) / 10))).fill(0).map((_, i) => (
+                      <span key={i} className="text-lg">🌲</span>
+                    ))}
+                  </span>
+                </div>
+                <div className="mt-1 text-xs text-green-500 font-medium">
+                  ≈ {Math.round(Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0) / 500)} flights avoided ✈️
+                </div>
               </div>
-
-              {/* Story Preview */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <Lightbulb className="h-7 w-7 text-blue-500" />
-                  <h3 className="text-2xl font-serif text-gray-800">Your Story Highlights</h3>
-                </div>
-                <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-green-100 hover:shadow-lg transition-all">
-                  <div className="space-y-6">
-                    <div className="flex items-start gap-4">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <Star className="h-5 w-5 text-green-600" />
+              {/* Right: Persona, category, story */}
+              <div className="flex-1 flex flex-col justify-center px-6 py-8 md:py-0 md:pl-0 md:pr-10 gap-4">
+                {/* Persona badge/title and top category pill */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-2">
+                  {/* Persona badge with sparkle */}
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <div className="bg-gradient-to-br from-emerald-400 to-blue-400 rounded-full p-3 shadow-lg flex items-center justify-center">
+                        <Leaf className="h-7 w-7 text-green-700" />
                       </div>
-                      <div>
-                        <h4 className="font-medium text-gray-900">Keep it up!</h4>
-                        <p className="text-base text-green-700 font-semibold">
-                          You are part of the <span className="text-green-900 font-bold">5%</span> that does XYZ.
-                        </p>
-                      </div>
+                      <Sparkles className="h-5 w-5 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
                     </div>
-                    <div className="flex items-start gap-4">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Target className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-gray-900">Next Chapter Goal</h4>
-                        <p className="text-sm text-gray-600">
-                          {score >= 75 
-                            ? "Lead your community in sustainable innovation" 
-                            : "Level up your impact in " + Object.entries(categoryScores)
-                                .sort(([,a], [,b]) => a - b)[0][0]}
-                        </p>
-                      </div>
-                    </div>
+                    <span className="text-base md:text-lg font-bold text-blue-700 font-serif" style={{ fontFamily: 'Inter, Satoshi, Manrope, sans-serif' }}>{dynamicPersonality?.personality || ''}</span>
                   </div>
+                  {/* Top category pill */}
+                  <span className="inline-flex items-center gap-2 bg-pink-100 text-pink-700 font-semibold rounded-full px-4 py-1 text-sm md:text-base shadow">
+                    {dynamicPersonality?.dominantCategory === 'clothing' && <Shirt className="h-5 w-5 text-pink-400" />}
+                    {dynamicPersonality?.dominantCategory === 'home' && <Home className="h-5 w-5 text-blue-400" />}
+                    {dynamicPersonality?.dominantCategory === 'food' && <Utensils className="h-5 w-5 text-amber-400" />}
+                    {dynamicPersonality?.dominantCategory === 'transport' && <Car className="h-5 w-5 text-cyan-400" />}
+                    {(dynamicPersonality?.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality?.dominantCategory || '').slice(1)}
+                    <span className="ml-1">• {dynamicPersonality?.categoryScores?.[dynamicPersonality?.dominantCategory || '']?.percentage || 0}%</span>
+                  </span>
                 </div>
-                {powerMoves && (
-                  <div className="bg-white/80 rounded-xl border border-green-100 shadow p-6 mt-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Star className="h-6 w-6 text-yellow-400 drop-shadow" />
-                      <span className="text-xl font-serif font-semibold text-green-800 tracking-tight">Power Moves</span>
-                    </div>
-                    <hr className="border-green-100 mb-4" />
-                    <ul className="list-none pl-0 space-y-3">
-                      {powerMoves.map((move, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-start gap-3 text-green-900 text-base font-medium"
-                        >
-                          <span className="inline-block mt-1">
-                            <Star className="h-5 w-5 text-green-400" />
-                          </span>
-                          <span>{move}</span>
-                        </li>
-                      ))}
-                    </ul>
+                {/* Story block as callout/speech bubble */}
+                <div className="max-w-prose">
+                  <div className="border-l-4 border-emerald-500 pl-4 bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-md py-4 px-4">
+                    <blockquote className="italic font-serif text-base md:text-lg text-gray-700 leading-relaxed" style={{ fontFamily: 'Lora, DM Serif, serif' }}>
+                      {dynamicPersonality?.storyHighlights}
+                    </blockquote>
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* Categories Impact Grid */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-6">
-                <Leaf className="h-7 w-7 text-green-500" />
-                <h2 className="text-2xl font-serif text-gray-800">Your impact across categories</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
-                {/* Home Category */}
-                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                  <div className="mb-4">
-                    <Home className="h-7 w-7 text-green-600" />
-                  </div>
-                  <div className="text-lg font-semibold mb-1">Home</div>
-                  <div className="text-gray-500 text-sm mb-2">
-                    {state?.usesRenewableEnergy ? "Using renewable energy sources" : "Traditional energy consumption"}
-                    {state?.hasEnergyEfficiencyUpgrades ? " with efficiency upgrades" : ""}
-                  </div>
-                  <div className="mt-auto text-green-700 font-medium">Top 50% for Home</div>
-                </div>
-                {/* Transport Category */}
-                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                  <div className="mb-4">
-                    <Car className="h-7 w-7 text-blue-600" />
-                  </div>
-                  <div className="text-lg font-semibold mb-1">Transport</div>
-                  <div className="text-gray-500 text-sm mb-2">
-                    {state?.primaryTransportMode === 'WALK_BIKE' ? "Primarily using active transport" :
-                      state?.primaryTransportMode === 'PUBLIC' ? "Regular public transit user" : "Car-based transportation"}
-                  </div>
-                  <div className="mt-auto text-green-700 font-medium">Top 40% for Transport</div>
-                </div>
-                {/* Food Category */}
-                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                  <div className="mb-4">
-                    <Utensils className="h-7 w-7 text-amber-600" />
-                  </div>
-                  <div className="text-lg font-semibold mb-1">Food</div>
-                  <div className="text-gray-500 text-sm mb-2">
-                    {state?.dietType === 'VEGAN' ? "Plant-based diet champion" :
-                      state?.dietType === 'VEGETARIAN' ? "Vegetarian diet follower" : "Mixed diet consumer"}
-                  </div>
-                  <div className="mt-auto text-green-700 font-medium">Top 30% for Food</div>
-                </div>
-                {/* Clothes Category */}
-                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                  <div className="mb-4">
-                    <ShoppingBag className="h-7 w-7 text-pink-600" />
-                  </div>
-                  <div className="text-lg font-semibold mb-1">Clothes</div>
-                  <div className="text-gray-500 text-sm mb-2">
-                    {state?.clothing?.wardrobeImpact === 'A' ? "Sustainable shopper" :
-                      state?.clothing?.wardrobeImpact === 'B' ? "Mix & match" :
-                      state?.clothing?.wardrobeImpact === 'C' ? "Trend follower" : "Fashion choices"}
-                  </div>
-                  <div className="mt-auto text-green-700 font-medium">Top 35% for Clothes</div>
-                </div>
-                {/* Waste Category */}
-                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                  <div className="mb-4">
-                    <Recycle className="h-7 w-7 text-purple-600" />
-                  </div>
-                  <div className="text-lg font-semibold mb-1">Waste</div>
-                  <div className="text-gray-500 text-sm mb-2">
-                    {state?.waste?.recyclingPercentage > 75 ? "High recycling achiever" :
-                      state?.waste?.recyclingPercentage > 50 ? "Active recycler" : "Starting recycling journey"}
-                  </div>
-                  <div className="mt-auto text-green-700 font-medium">Top 30% for Waste</div>
-                </div>
-                {/* Air Quality Category */}
-                <div className="bg-white border rounded-2xl p-6 flex flex-col items-start shadow-sm">
-                  <div className="mb-4">
-                    <Wind className="h-7 w-7 text-cyan-600" />
-                  </div>
-                  <div className="text-lg font-semibold mb-1">Air Quality</div>
-                  <div className="text-gray-500 text-sm mb-2">
-                    {state?.airQuality?.outdoorAirQuality === 'A' ? "Fresh and clean" :
-                      state?.airQuality?.outdoorAirQuality === 'B' ? "Generally clear" :
-                      state?.airQuality?.outdoorAirQuality === 'C' ? "Sometimes polluted" :
-                      state?.airQuality?.outdoorAirQuality === 'D' ? "Not sure" : "Air quality awareness"}
-                  </div>
-                  <div className="mt-auto text-green-700 font-medium">Top 45% for Air Quality</div>
                 </div>
               </div>
             </div>
 
-            {/* Story Generation Section - Updated UI */}
+            {/* Power Moves Grid */}
+            <div className="bg-gradient-to-br from-yellow-50 via-gold-50 to-yellow-100 rounded-3xl shadow-xl px-4 py-8 flex flex-col gap-6">
+              <h3 className="text-2xl md:text-3xl font-bold text-yellow-700 mb-2 font-sans flex items-center gap-2">
+                Power Moves
+                <Sparkles className="h-6 w-6 text-yellow-400 animate-pulse" />
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {(dynamicPersonality?.powerMoves || []).map((move, idx) => {
+                  let icon = '✅', title = '', description = move;
+                  const match = move.match(/^([\u{1F300}-\u{1F6FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}])\s*<b>(.*?)<\/b><br>(.*)$/u);
+                  if (match) {
+                    icon = match[1];
+                    title = match[2];
+                    description = match[3];
+                  }
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-4 bg-white/90 rounded-xl shadow-lg p-4 hover:scale-105 transition-transform"
+                    >
+                      <span className={`text-3xl flex items-center justify-center rounded-full p-3 ${idx === 0 ? 'bg-green-100 text-green-700' : idx === 1 ? 'bg-blue-100 text-blue-700' : idx === 2 ? 'bg-purple-100 text-purple-700' : 'bg-yellow-100 text-yellow-700'}`}>{icon}</span>
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-lg text-gray-900 font-sans">{title}</span>
+                        <span className="text-base text-gray-700 font-medium">{description}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Badge progress bar / unlock row */}
+              <div className="mt-6 flex items-center gap-3 justify-center">
+                <span className="text-lg font-semibold text-green-800">Unlock:</span>
+                <span className="bg-gradient-to-r from-green-200 to-green-400 text-green-900 font-bold rounded-full px-4 py-1 shadow">{dynamicPersonality?.badge || 'Carbon Strategist'}</span>
+                <Sparkles className="h-5 w-5 text-yellow-400 animate-pulse" />
+              </div>
+            </div>
+
+            {/* Share This Card Button (moved below Impact Highlights) */}
+            <div className="w-full flex justify-center mt-6">
+              <button
+                onClick={handleShare}
+                className="bg-gradient-to-r from-green-500 to-emerald-400 text-white font-bold px-8 py-4 rounded-full shadow-xl text-lg flex items-center gap-3 hover:scale-105 transition-transform"
+                style={{ fontFamily: 'Inter, Satoshi, Manrope, sans-serif' }}
+              >
+                <Share2 className="h-6 w-6" /> Share This Card
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Climate Champions Card */}
+        <Card className="bg-green-50 overflow-hidden rounded-2xl shadow-lg">
+          <CardContent className="p-8 lg:p-12">
             <div className="space-y-8">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <BookOpen className="h-8 w-8 text-green-600" />
-                  <h2 className="text-3xl font-serif text-gray-800">Your Climate Journey Story</h2>
-                </div>
-                <div className="flex gap-2 justify-end mb-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowWrapped(true)}
-                    className={cn(
-                      "text-green-700 border-green-200",
-                      !showStory && "opacity-50 cursor-not-allowed"
-                    )}
-                    disabled={!showStory}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="h-4 w-4" />
-                      {!showStory ? "Generate Story First" : "Generate Wrapped"}
-                    </div>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowStory(false);
-                      setShowWrapped(false);
-                      setWrappedImage(null);
-                      onReset();
-                    }}
-                    className="text-green-700 border-green-200"
-                  >
-                    Reset Story
-                  </Button>
-                </div>
+              <div className="flex items-center gap-3">
+                <Trophy className="h-8 w-8 text-yellow-500" />
+                <h2 className="text-3xl font-serif text-gray-800">Climate Champions</h2>
               </div>
               
-              {!showStory ? (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-gradient-to-br from-purple-50 to-green-50 rounded-xl p-8 border border-purple-100 shadow-lg"
-                >
-                  <div className="space-y-6">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-purple-100 rounded-xl">
-                        <Sparkles className="h-6 w-6 text-purple-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-purple-900 mb-2">
-                          Generate Your Unique Climate Story
-                        </h3>
-                        <p className="text-gray-600">
-                          Let's transform your sustainable choices into an inspiring narrative. Your story could motivate others to join the climate action movement.
-                        </p>
-                      </div>
-                    </div>
+              <p className="text-lg text-gray-600">
+                Connect with inspiring climate leaders who share your passion for {dominantCategory} sustainability.
+              </p>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-6">
-                      <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Star className="h-5 w-5 text-yellow-500" />
-                          <span className="font-medium text-purple-900">Personalized</span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Story tailored to your unique eco-personality and achievements
-                        </p>
-                      </div>
-                      <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Heart className="h-5 w-5 text-red-500" />
-                          <span className="font-medium text-purple-900">Engaging</span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Interactive storytelling with visual elements and animations
-                        </p>
-                      </div>
-                      <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Share2 className="h-5 w-5 text-blue-500" />
-                          <span className="font-medium text-purple-900">Shareable</span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Easy to share your journey with friends and family
-                        </p>
-                      </div>
-                    </div>
-
-                    <Button
-                      onClick={async () => {
-                        await generateStory();
-                        setShowStory(true);
-                      }}
-                      className={cn(
-                        "w-full text-white py-6 rounded-xl flex items-center justify-center gap-3 text-lg transition-all duration-300",
-                        isGeneratingStory 
-                          ? "bg-purple-500 cursor-not-allowed"
-                          : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:shadow-lg"
-                      )}
-                      disabled={isGeneratingStory}
-                    >
-                      {isGeneratingStory ? (
-                        <>
-                          <Loader2 className="h-6 w-6 animate-spin" />
-                          Crafting Your Story...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="h-6 w-6" />
-                          Generate Your Climate Journey
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </motion.div>
-              ) : storyCards.length > 0 ? (
-                <AnimatePresence>
-                  <motion.div 
-                    key={currentCardIndex}
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -40 }}
-                    transition={{ duration: 0.5, type: 'spring' }}
-                    className={cn(
-                      'story-card space-y-6 rounded-3xl shadow-2xl border p-10 md:p-14',
-                      combinedStoryCards[currentCardIndex]?.isNarrative
-                        ? 'bg-gradient-to-br from-blue-50 via-white to-green-50 border-blue-100'
-                        : 'bg-gradient-to-br from-green-50 via-white to-purple-50 border-green-100'
-                    )}
-                  >
-                    <div className="flex items-center gap-4 mb-2">
-                      <div className="p-3 bg-gradient-to-br from-green-200 to-green-400 rounded-xl shadow-lg">
-                        {combinedStoryCards[currentCardIndex].emoji && (
-                          <span className="text-3xl drop-shadow-lg">{combinedStoryCards[currentCardIndex].emoji}</span>
-                        )}
-                      </div>
-                      <h3 className={cn(
-                        'font-serif tracking-tight flex-1',
-                        combinedStoryCards[currentCardIndex]?.isNarrative
-                          ? 'text-3xl md:text-4xl font-extrabold text-blue-900'
-                          : 'text-3xl md:text-4xl font-extrabold text-green-900'
-                      )}>
-                        {combinedStoryCards[currentCardIndex].title}
-                      </h3>
-                    </div>
-                    <div className={cn(
-                      'rounded-2xl shadow-md',
-                      combinedStoryCards[currentCardIndex]?.isNarrative
-                        ? 'bg-white/95 p-10 border-l-4 border-blue-300'
-                        : 'bg-white/90 p-8 border-l-4 border-green-300'
-                    )}>
-                      <p className={cn(
-                        'leading-relaxed whitespace-pre-line',
-                        combinedStoryCards[currentCardIndex]?.isNarrative
-                          ? 'text-xl text-blue-900 font-medium italic'
-                          : 'text-lg md:text-xl text-gray-800 font-medium'
-                      )}>
-                        {combinedStoryCards[currentCardIndex].content}
-                      </p>
-                    </div>
-                    {combinedStoryCards[currentCardIndex].stats && (
-                      <div className={cn(
-                        'flex items-center gap-2 font-semibold mt-2',
-                        combinedStoryCards[currentCardIndex]?.isNarrative
-                          ? 'text-blue-700 text-base'
-                          : 'text-green-700 text-base'
-                      )}>
-                        <Info className="h-5 w-5" />
-                        {combinedStoryCards[currentCardIndex].stats}
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between pt-6">
-                      <Button
-                        variant="outline"
-                        onClick={handlePreviousCard}
-                        disabled={currentCardIndex === 0}
-                        className="flex items-center gap-2 text-green-700 border-green-200"
-                      >
-                        <ArrowLeft className="h-4 w-4" />
-                        Previous
-                      </Button>
-                      <div className="flex items-center gap-2">
-                        {combinedStoryCards.map((_, index) => (
-                          <motion.div
-                            key={index}
-                            className={cn(
-                              'h-3 w-3 rounded-full border-2',
-                              currentCardIndex === index
-                                ? combinedStoryCards[index]?.isNarrative
-                                  ? 'bg-blue-600 border-blue-600 shadow-lg'
-                                  : 'bg-green-600 border-green-600 shadow-lg'
-                                : combinedStoryCards[index]?.isNarrative
-                                  ? 'bg-blue-100 border-blue-200'
-                                  : 'bg-green-100 border-green-200'
-                            )}
-                            whileHover={{ scale: 1.2 }}
-                            onClick={() => setCurrentCardIndex(index)}
-                            style={{ cursor: 'pointer' }}
-                          />
-                        ))}
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={handleNextCard}
-                        disabled={currentCardIndex === combinedStoryCards.length - 1}
-                        className="flex items-center gap-2 text-green-700 border-green-200"
-                      >
-                        Next
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              ) : (
-                <div className="text-center p-8">
-                  <p className="text-gray-600">Generating your story...</p>
-                </div>
-              )}
+              <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6">
+                <ClimateChampions
+                  dominantCategory={dominantCategory}
+                  userScore={score}
+                  onActionSelect={(action) => {
+                    console.log('Selected action:', action);
+                  }}
+                />
+              </div>
             </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Climate Champions Card */}
-      <Card className="bg-green-50 overflow-hidden rounded-2xl shadow-lg">
-        <CardContent className="p-8 lg:p-12">
-          <div className="space-y-8">
-            <div className="flex items-center gap-3">
-              <Trophy className="h-8 w-8 text-yellow-500" />
-              <h2 className="text-3xl font-serif text-gray-800">Climate Champions</h2>
-            </div>
-            
-            <p className="text-lg text-gray-600">
-              Connect with inspiring climate leaders who share your passion for {dominantCategory} sustainability.
-            </p>
-
-            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6">
-              <ClimateChampions
-                dominantCategory={dominantCategory}
-                userScore={score}
-                onActionSelect={(action) => {
-                  console.log('Selected action:', action);
-                }}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {showWrapped && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        >
+        {showWrapped && (
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="relative bg-gradient-to-br from-purple-900 to-blue-900 rounded-[40px] p-8 shadow-2xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           >
-            {/* Close button */}
-            <button
-              onClick={() => setShowWrapped(false)}
-              className="absolute -top-4 -right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-gradient-to-br from-purple-900 to-blue-900 rounded-[40px] p-8 shadow-2xl"
             >
-              <X className="h-6 w-6 text-gray-900" />
-            </button>
+              {/* Close button */}
+              <button
+                onClick={() => setShowWrapped(false)}
+                className="absolute -top-4 -right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
+              >
+                <X className="h-6 w-6 text-gray-900" />
+              </button>
 
-            {/* Theme switcher */}
-            <div className="flex justify-center gap-4 mb-6">
-              {(['light', 'dark', 'pop'] as const).map((theme) => (
-                <button
-                  key={theme}
-                  onClick={() => setWrappedTheme(theme)}
-                  className={cn(
-                    'px-4 py-2 rounded-full font-semibold border transition-all',
-                    wrappedTheme === theme
-                      ? theme === 'dark'
-                        ? 'bg-[#23213a] text-yellow-300 border-yellow-400 scale-105 shadow-lg'
-                        : theme === 'pop'
-                          ? 'bg-[#ff2d55] text-white border-[#ff2d55] scale-105 shadow-lg'
-                          : 'bg-white text-green-700 border-green-400 scale-105 shadow-lg'
-                      : 'bg-transparent text-gray-400 border-gray-200 hover:scale-105 hover:shadow'
-                  )}
-                  style={{ minWidth: 80 }}
+              {/* Theme switcher */}
+              <div className="flex justify-center gap-4 mb-6">
+                {(['light', 'dark', 'pop'] as const).map((theme) => (
+                  <button
+                    key={theme}
+                    onClick={() => setWrappedTheme(theme)}
+                    className={cn(
+                      'px-4 py-2 rounded-full font-semibold border transition-all',
+                      wrappedTheme === theme
+                        ? theme === 'dark'
+                          ? 'bg-[#23213a] text-yellow-300 border-yellow-400 scale-105 shadow-lg'
+                          : theme === 'pop'
+                            ? 'bg-[#ff2d55] text-white border-[#ff2d55] scale-105 shadow-lg'
+                            : 'bg-white text-green-700 border-green-400 scale-105 shadow-lg'
+                        : 'bg-transparent text-gray-400 border-gray-200 hover:scale-105 hover:shadow'
+                    )}
+                    style={{ minWidth: 80 }}
+                  >
+                    {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              {/* Hidden card for generation */}
+              <div style={{ position: 'absolute', left: '-9999px', top: 0, pointerEvents: 'none' }}>
+                <EcoWrappedCard
+                  theme={wrappedTheme as 'light' | 'dark' | 'pop'}
+                  savedCO2={`${(16 - emissions).toFixed(1)}`}
+                  topCategory={(dynamicPersonality?.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality?.dominantCategory || '').slice(1)}
+                  badge={dynamicPersonality?.badge}
+                  personality={dynamicPersonality?.personality || ''}
+                />
+              </div>
+
+              {/* Show the generated image or fallback to EcoWrappedCard */}
+              {wrappedImage ? (
+                <motion.img
+                  src={wrappedImage}
+                  alt="Your Eco Wrapped"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1 }}
+                  className="rounded-[32px] shadow-2xl"
+                  style={{ maxWidth: 600 }}
+                />
+              ) : (
+                <EcoWrappedCard
+                  theme={wrappedTheme as 'light' | 'dark' | 'pop'}
+                  savedCO2={`${(16 - emissions).toFixed(1)}`}
+                  topCategory={(dynamicPersonality?.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality?.dominantCategory || '').slice(1)}
+                  badge={dynamicPersonality?.badge}
+                  personality={dynamicPersonality?.personality || ''}
+                />
+              )}
+
+              {/* Share buttons */}
+              <div className="flex justify-center gap-4 mt-8">
+                <Button
+                  onClick={handleShare}
+                  className="bg-green-600 hover:bg-green-700 text-white px-8"
                 >
-                  {theme.charAt(0).toUpperCase() + theme.slice(1)}
-                </button>
-              ))}
-            </div>
-
-            {/* Hidden card for generation */}
-            <div style={{ position: 'absolute', left: '-9999px', top: 0, pointerEvents: 'none' }}>
-              <EcoWrappedCard
-                theme={wrappedTheme as 'light' | 'dark' | 'pop'}
-                savedCO2={`${(16 - emissions).toFixed(1)}`}
-                topCategory={dominantCategory.charAt(0).toUpperCase() + dominantCategory.slice(1)}
-                badge={dynamicPersonality?.badge}
-                personality={dynamicPersonality?.personality}
-              />
-            </div>
-
-            {/* Show the generated image or fallback to EcoWrappedCard */}
-            {wrappedImage ? (
-              <motion.img
-                src={wrappedImage}
-                alt="Your Eco Wrapped"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1 }}
-                className="rounded-[32px] shadow-2xl"
-                style={{ maxWidth: 600 }}
-              />
-            ) : (
-              <EcoWrappedCard
-                theme={wrappedTheme as 'light' | 'dark' | 'pop'}
-                savedCO2={`${(16 - emissions).toFixed(1)}`}
-                topCategory={dominantCategory.charAt(0).toUpperCase() + dominantCategory.slice(1)}
-                badge={dynamicPersonality?.badge}
-                personality={dynamicPersonality?.personality}
-              />
-            )}
-
-            {/* Share buttons */}
-            <div className="flex justify-center gap-4 mt-8">
-              <Button
-                onClick={handleShare}
-                className="bg-green-600 hover:bg-green-700 text-white px-8"
-              >
-                Share
-              </Button>
-              <Button
-                onClick={() => {
-                  if (wrappedImage) {
-                    const link = document.createElement('a');
-                    link.download = 'eco-wrapped.png';
-                    link.href = wrappedImage;
-                    link.click();
-                  }
-                }}
-                variant="outline"
-                className="px-8"
-              >
-                Download
-              </Button>
-            </div>
+                  Share
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (wrappedImage) {
+                      const link = document.createElement('a');
+                      link.download = 'eco-wrapped.png';
+                      link.href = wrappedImage;
+                      link.click();
+                    }
+                  }}
+                  variant="outline"
+                  className="px-8"
+                >
+                  Download
+                </Button>
+              </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
+        )}
       </div>
     </ErrorBoundary>
   );
