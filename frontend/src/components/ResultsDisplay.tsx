@@ -28,6 +28,8 @@ import WrappedStoryCard from './WrappedStoryCard';
 import html2canvas from 'html2canvas';
 import EcoWrappedCard from './EcoWrappedCard';
 import { calculatePersonality, UserResponses } from '@/services/api';
+import { getPersonalityImage, preloadPersonalityImages } from '@/utils/personalityImages';
+import { PersonalityType } from '@/types/personality';
 
 interface CategoryEmissions {
   home: number;
@@ -102,6 +104,7 @@ interface ResultsDisplayProps {
   isVisible: boolean;
   onReset: () => void;
   state: any;
+  gender: 'boy' | 'girl';
 }
 
 // Update PersonalityResponse type to match the API response
@@ -282,7 +285,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   recommendations,
   isVisible,
   onReset,
-  state
+  state,
+  gender
 }) => {
   // Debug: Log all props and key state
   console.log('ResultsDisplay props:', { score, emissions, categoryEmissions, recommendations, isVisible, state });
@@ -861,13 +865,16 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           {/* New: Personality Visual Card */}
           <div className="flex justify-center w-full mb-8">
             <div className="bg-white rounded-2xl shadow-lg p-0 flex flex-col items-center max-w-2xl w-full border border-green-100 overflow-hidden">
-              {/* Personality Image */}
-              <img
-                src="/profile.jpg"
-                alt="Personality Illustration"
-                className="w-full object-contain bg-green-50 border-b-4 border-green-100 p-4"
-                style={{ maxHeight: 320 }}
-              />
+              {/* Personality Image - classy, well-formed */}
+              <div className="mx-auto my-4 w-64 h-80 rounded-2xl shadow-lg overflow-hidden bg-white border border-gray-200 flex items-center justify-center">
+                <img
+                  src={getPersonalityImage(dynamicPersonality?.personality as PersonalityType, gender)}
+                  alt={`${dynamicPersonality?.personality || 'Personality'} Illustration`}
+                  className="w-full h-full object-cover rounded-2xl transition-transform duration-300"
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
               <div className="w-full p-8 flex flex-col items-center">
                 {/* Personality Description */}
                 <div className="flex items-center gap-2 mb-2">
@@ -875,6 +882,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personality || ''}</h2>
                 </div>
                 <Badge className="mb-2">{dynamicPersonality?.badge}</Badge>
+                {/* Add description here */}
+                {dynamicPersonality?.description && (
+                  <p className="text-base text-gray-600 text-center mb-3 italic max-w-md">{dynamicPersonality.description}</p>
+                )}
                 <p className="text-gray-700 text-center mb-2">{story?.split('.')[0]}.</p>
                 <div className="text-green-700 font-medium mb-2">{nextAction || ''}</div>
               </div>
