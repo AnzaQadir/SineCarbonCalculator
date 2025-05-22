@@ -47,26 +47,28 @@ export interface UserResponses {
 
 export interface PersonalityResponse {
   personality: string;
-  dominantCategory: string;
-  subCategory: string;
-  tally: Record<string, number>;
-  categoryScores: Record<string, number>;
-  impactMetrics: {
-    treesPlanted: number;
-    carbonReduced: number;
-    communityImpact: number;
+  score: number;
+  categoryScores: {
+    [key: string]: {
+      score: number;
+      percentage: number;
+      maxPossible: number;
+    };
   };
-  title: string;
-  description: string;
-  strengths: string[];
-  nextSteps: string[];
-  emoji: string;
-  story: string;
-  avatar: string;
-  nextAction: string;
+  impactMetrics: {
+    carbonReduced: string;
+    treesPlanted: number;
+  };
+  insights: {
+    dominantCategory: string;
+    opportunities: string[];
+    recommendations: string[];
+    impactHighlights: string;
+    storyHighlights: string;
+    powerMoves: string[];
+  };
   badge: string;
   champion: string;
-  powerMoves: string[];
 }
 
 export const calculatePersonality = async (responses: UserResponses): Promise<PersonalityResponse> => {
