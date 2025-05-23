@@ -149,6 +149,7 @@ interface PersonalityResponse {
   description?: string;
   strengths?: string[];
   nextSteps?: string[];
+  finalScore?: number;
 }
 
 const getAchievements = (state: any, categoryEmissions: CategoryEmissions): Achievement[] => {
@@ -288,9 +289,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   state,
   gender
 }) => {
-  // Debug: Log all props and key state
-  console.log('ResultsDisplay props:', { score, emissions, categoryEmissions, recommendations, isVisible, state });
-
   const [activeTab, setActiveTab] = useState('overview');
   const [isPersonalityLoading, setIsPersonalityLoading] = useState(true);
   const [isGeneratingStory, setIsGeneratingStory] = useState(false);
@@ -310,6 +308,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dynamicPersonality, setDynamicPersonality] = useState<PersonalityResponse | null>(null);
+  // Debug: Log all props and key state
+  console.log('ResultsDisplay props:', { score, emissions, categoryEmissions, recommendations, isVisible, state });
+  console.log('DynamicPersonality at top of render:', dynamicPersonality);
 
   // Add a ref to track if calculation has been attempted
   const hasAttemptedCalculation = useRef(false);
@@ -782,18 +783,38 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       const apiResponses = transformStateToApiFormat(state);
       const result = await calculatePersonality(apiResponses);
 
+      // Map the API response to the expected format
       setDynamicPersonality({
-        ...result
+        personality: result.personalityType,
+        description: result.description,
+        strengths: result.strengths,
+        nextSteps: result.nextSteps,
+        categoryScores: result.categoryScores,
+        impactMetrics: result.impactMetrics,
+        finalScore: result.finalScore,
+        powerMoves: result.powerMoves,
+        dominantCategory: Object.entries(result.categoryScores)
+          .reduce((a, b) => (a[1].score > b[1].score ? a : b))[0],
+        emoji: '🌱', // Default emoji
+        badge: 'Eco Explorer', // Default badge
+        story: result.description,
+        nextAction: result.nextSteps[0] || 'Start your journey'
       });
-    } catch (error: any) {
+
+      console.log('Set dynamic personality:', {
+        personality: result.personalityType,
+        description: result.description,
+        strengths: result.strengths,
+        nextSteps: result.nextSteps,
+        categoryScores: result.categoryScores,
+        impactMetrics: result.impactMetrics,
+        finalScore: result.finalScore
+      });
+    } catch (err) {
+      console.error('Error calculating personality:', err);
       setError('Failed to calculate personality. Please try again.');
-      // Reset loading state on error
-      setIsLoading(false);
     } finally {
-      // Only reset loading state if there was no error
-      if (!error) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
   };
 
@@ -1006,6 +1027,226 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </div>
         </div>
 
+        {/* Story Generation Section - Updated UI */}
+        <div className="space-y-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <BookOpen className="h-8 w-8 text-green-600" />
+              <h2 className="text-3xl font-serif text-gray-800">Your Climate Journey Story</h2>
+            </div>
+            <div className="flex gap-2 justify-end mb-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowWrapped(true)}
+                className={cn(
+                  "text-green-700 border-green-200",
+                  !showStory && "opacity-50 cursor-not-allowed"
+                )}
+                disabled={!showStory}
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  {!showStory ? "Generate Story First" : "Generate Wrapped"}
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowStory(false);
+                  setShowWrapped(false);
+                  setWrappedImage(null);
+                  onReset();
+                }}
+                className="text-green-700 border-green-200"
+              >
+                Reset Story
+              </Button>
+            </div>
+          </div>
+          
+          {!showStory ? (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-br from-purple-50 to-green-50 rounded-xl p-8 border border-purple-100 shadow-lg"
+            >
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-purple-100 rounded-xl">
+                    <Sparkles className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-purple-900 mb-2">
+                      Generate Your Unique Climate Story
+                    </h3>
+                    <p className="text-gray-600">
+                      Let's transform your sustainable choices into an inspiring narrative. Your story could motivate others to join the climate action movement.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-6">
+                  <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Star className="h-5 w-5 text-yellow-500" />
+                      <span className="font-medium text-purple-900">Personalized</span>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Story tailored to your unique eco-personality and achievements
+                    </p>
+                  </div>
+                  <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Heart className="h-5 w-5 text-red-500" />
+                      <span className="font-medium text-purple-900">Engaging</span>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Interactive storytelling with visual elements and animations
+                    </p>
+                  </div>
+                  <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Share2 className="h-5 w-5 text-blue-500" />
+                      <span className="font-medium text-purple-900">Shareable</span>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Easy to share your journey with friends and family
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={async () => {
+                    await generateStory();
+                    setShowStory(true);
+                  }}
+                  className={cn(
+                    "w-full text-white py-6 rounded-xl flex items-center justify-center gap-3 text-lg transition-all duration-300",
+                    isGeneratingStory 
+                      ? "bg-purple-500 cursor-not-allowed"
+                      : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:shadow-lg"
+                  )}
+                  disabled={isGeneratingStory}
+                >
+                  {isGeneratingStory ? (
+                    <>
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                      Crafting Your Story...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-6 w-6" />
+                      Generate Your Climate Journey
+                    </>
+                  )}
+                </Button>
+              </div>
+            </motion.div>
+          ) : storyCards.length > 0 ? (
+            <AnimatePresence>
+              <motion.div 
+                key={currentCardIndex}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -40 }}
+                transition={{ duration: 0.5, type: 'spring' }}
+                className={cn(
+                  'story-card space-y-6 rounded-3xl shadow-2xl border p-10 md:p-14',
+                  combinedStoryCards[currentCardIndex]?.isNarrative
+                    ? 'bg-gradient-to-br from-blue-50 via-white to-green-50 border-blue-100'
+                    : 'bg-gradient-to-br from-green-50 via-white to-purple-50 border-green-100'
+                )}
+              >
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="p-3 bg-gradient-to-br from-green-200 to-green-400 rounded-xl shadow-lg">
+                    {combinedStoryCards[currentCardIndex].emoji && (
+                      <span className="text-3xl drop-shadow-lg">{combinedStoryCards[currentCardIndex].emoji}</span>
+                    )}
+                  </div>
+                  <h3 className={cn(
+                    'font-serif tracking-tight flex-1',
+                    combinedStoryCards[currentCardIndex]?.isNarrative
+                      ? 'text-3xl md:text-4xl font-extrabold text-blue-900'
+                      : 'text-3xl md:text-4xl font-extrabold text-green-900'
+                  )}>
+                    {combinedStoryCards[currentCardIndex].title}
+                  </h3>
+                </div>
+                <div className={cn(
+                  'rounded-2xl shadow-md',
+                  combinedStoryCards[currentCardIndex]?.isNarrative
+                    ? 'bg-white/95 p-10 border-l-4 border-blue-300'
+                    : 'bg-white/90 p-8 border-l-4 border-green-300'
+                )}>
+                  <p className={cn(
+                    'leading-relaxed whitespace-pre-line',
+                    combinedStoryCards[currentCardIndex]?.isNarrative
+                      ? 'text-xl text-blue-900 font-medium italic'
+                      : 'text-lg md:text-xl text-gray-800 font-medium'
+                  )}>
+                    {combinedStoryCards[currentCardIndex].content}
+                  </p>
+                </div>
+                {combinedStoryCards[currentCardIndex].stats && (
+                  <div className={cn(
+                    'flex items-center gap-2 font-semibold mt-2',
+                    combinedStoryCards[currentCardIndex]?.isNarrative
+                      ? 'text-blue-700 text-base'
+                      : 'text-green-700 text-base'
+                  )}>
+                    <Info className="h-5 w-5" />
+                    {combinedStoryCards[currentCardIndex].stats}
+                  </div>
+                )}
+                <div className="flex items-center justify-between pt-6">
+                  <Button
+                    variant="outline"
+                    onClick={handlePreviousCard}
+                    disabled={currentCardIndex === 0}
+                    className="flex items-center gap-2 text-green-700 border-green-200"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    {combinedStoryCards.map((_, index) => (
+                      <motion.div
+                        key={index}
+                        className={cn(
+                          'h-3 w-3 rounded-full border-2',
+                          currentCardIndex === index
+                            ? combinedStoryCards[index]?.isNarrative
+                              ? 'bg-blue-600 border-blue-600 shadow-lg'
+                              : 'bg-green-600 border-green-600 shadow-lg'
+                            : combinedStoryCards[index]?.isNarrative
+                              ? 'bg-blue-100 border-blue-200'
+                              : 'bg-green-100 border-green-200'
+                        )}
+                        whileHover={{ scale: 1.2 }}
+                        onClick={() => setCurrentCardIndex(index)}
+                        style={{ cursor: 'pointer' }}
+                      />
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={handleNextCard}
+                    disabled={currentCardIndex === combinedStoryCards.length - 1}
+                    className="flex items-center gap-2 text-green-700 border-green-200"
+                  >
+                    Next
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          ) : (
+            <div className="text-center p-8">
+              <p className="text-gray-600">Generating your story...</p>
+            </div>
+          )}
+        </div>
+
         {/* Eco Story Card */}
         <Card className="bg-gradient-to-br from-green-50 to-green-100/50 overflow-hidden rounded-2xl shadow-lg">
           <CardContent className="p-8 lg:p-12 space-y-12">
@@ -1089,33 +1330,24 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             </div>
 
             {/* Power Moves Grid */}
+            console.log("Power Moves in dynamicPersonality:", dynamicPersonality?.powerMoves);
             <div className="bg-gradient-to-br from-yellow-50 via-gold-50 to-yellow-100 rounded-3xl shadow-xl px-4 py-8 flex flex-col gap-6">
               <h3 className="text-2xl md:text-3xl font-bold text-yellow-700 mb-2 font-sans flex items-center gap-2">
                 Power Moves
                 <Sparkles className="h-6 w-6 text-yellow-400 animate-pulse" />
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {(dynamicPersonality?.powerMoves || []).map((move, idx) => {
-                  let icon = '✅', title = '', description = move;
-                  const match = move.match(/^([\u{1F300}-\u{1F6FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}])\s*<b>(.*?)<\/b><br>(.*)$/u);
-                  if (match) {
-                    icon = match[1];
-                    title = match[2];
-                    description = match[3];
-                  }
-                  return (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-4 bg-white/90 rounded-xl shadow-lg p-4 hover:scale-105 transition-transform"
-                    >
-                      <span className={`text-3xl flex items-center justify-center rounded-full p-3 ${idx === 0 ? 'bg-green-100 text-green-700' : idx === 1 ? 'bg-blue-100 text-blue-700' : idx === 2 ? 'bg-purple-100 text-purple-700' : 'bg-yellow-100 text-yellow-700'}`}>{icon}</span>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-lg text-gray-900 font-sans">{title}</span>
-                        <span className="text-base text-gray-700 font-medium">{description}</span>
-                      </div>
-                    </div>
-                  );
-                })}
+                {(dynamicPersonality?.powerMoves || []).map((move, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-4 bg-white/90 rounded-xl shadow-lg p-4 hover:scale-105 transition-transform"
+                  >
+                    <span
+                      className="text-base text-gray-700"
+                      dangerouslySetInnerHTML={{ __html: move }}
+                    />
+                  </div>
+                ))}
               </div>
               {/* Badge progress bar / unlock row */}
               <div className="mt-6 flex items-center gap-3 justify-center">
