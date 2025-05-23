@@ -11,7 +11,7 @@ export class PersonalityController {
   public calculatePersonality = async (req: Request, res: Response) => {
     try {
       const responses = req.body;
-      const result = this.personalityService.calculatePersonality(responses);
+      const result = await this.personalityService.calculatePersonality(responses);
       res.json(result);
     } catch (error) {
       console.error('Error calculating personality:', error);

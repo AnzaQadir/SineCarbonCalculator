@@ -1,19 +1,19 @@
 export type EcoPersonalityType = 
   | 'Sustainability Slayer'
-  | 'Eco Warrior'
-  | 'Green Guardian'
-  | 'Climate Conscious'
-  | 'Eco Explorer'
-  | 'Green Novice'
+  | "Planet's Main Character"
+  | 'Sustainability Soft Launch'
+  | 'Kind of Conscious, Kind of Confused'
+  | 'Eco in Progress'
+  | 'Doing Nothing for the Planet'
   | 'Certified Climate Snoozer';
 
 export const personalityHierarchy: EcoPersonalityType[] = [
   'Sustainability Slayer',
-  'Eco Warrior',
-  'Green Guardian',
-  'Climate Conscious',
-  'Eco Explorer',
-  'Green Novice',
+  "Planet's Main Character",
+  'Sustainability Soft Launch',
+  'Kind of Conscious, Kind of Confused',
+  'Eco in Progress',
+  'Doing Nothing for the Planet',
   'Certified Climate Snoozer'
 ];
 
@@ -32,8 +32,8 @@ export const EcoPersonalityTypes = {
       'Explore advanced sustainability certifications or courses'
     ]
   },
-  'Eco Warrior': {
-    title: 'Eco Warrior',
+  "Planet's Main Character": {
+    title: "Planet's Main Character",
     description: 'You\'re making significant strides in your sustainability journey! Your dedication to environmental causes is commendable.',
     strengths: [
       'Strong commitment to sustainable living',
@@ -46,74 +46,74 @@ export const EcoPersonalityTypes = {
       'Set more ambitious sustainability goals'
     ]
   },
-  'Green Guardian': {
-    title: 'Green Guardian',
-    description: 'You\'re a reliable steward of the environment! Your consistent efforts make a real difference.',
+  'Sustainability Soft Launch': {
+    title: 'Sustainability Soft Launch',
+    description: 'You\'re making conscious efforts to live more sustainably and building momentum for bigger changes.',
     strengths: [
-      'Solid foundation in sustainable practices',
-      'Regular implementation of eco-friendly habits',
-      'Growing awareness of environmental impact'
+      'Growing awareness of environmental impact',
+      'Implementing basic sustainable practices',
+      'Openness to eco-friendly alternatives'
     ],
     nextSteps: [
-      'Expand your sustainable practices to new areas',
-      'Connect with like-minded individuals',
-      'Set specific sustainability goals'
+      'Establish more consistent eco-habits',
+      'Learn about advanced sustainability practices',
+      'Connect with like-minded individuals'
     ]
   },
-  'Climate Conscious': {
-    title: 'Climate Conscious',
-    description: 'You\'re becoming more aware of your environmental impact! Your growing interest in sustainability is promising.',
+  'Kind of Conscious, Kind of Confused': {
+    title: 'Kind of Conscious, Kind of Confused',
+    description: 'You\'re aware of environmental issues and making some efforts, but could use more direction and consistency.',
     strengths: [
-      'Basic understanding of sustainability',
-      'Willingness to learn and improve',
-      'Some implementation of eco-friendly practices'
+      'Basic environmental awareness',
+      'Some sustainable practices in place',
+      'Interest in improvement'
     ],
     nextSteps: [
-      'Learn more about sustainable practices',
-      'Start implementing more eco-friendly habits',
-      'Track your environmental impact'
+      'Establish daily eco-friendly routines',
+      'Learn more about environmental impact',
+      'Start with simple sustainable swaps'
     ]
   },
-  'Eco Explorer': {
-    title: 'Eco Explorer',
-    description: 'You\'re beginning your journey into sustainability! Your curiosity about environmental practices is a great start.',
+  'Eco in Progress': {
+    title: 'Eco in Progress',
+    description: 'You\'re at the beginning of your sustainability journey with lots of potential for positive change.',
     strengths: [
-      'Interest in learning about sustainability',
-      'Openness to new eco-friendly practices',
-      'Basic awareness of environmental issues'
+      'Open to learning',
+      'Taking first steps',
+      'Recognizing need for change'
     ],
     nextSteps: [
-      'Research sustainable practices that interest you',
-      'Start with small, manageable changes',
-      'Connect with sustainability resources'
+      'Start with one sustainable habit',
+      'Learn about basic environmental issues',
+      'Find easy eco-friendly alternatives'
     ]
   },
-  'Green Novice': {
-    title: 'Green Novice',
-    description: 'You\'re taking your first steps toward sustainability! Every journey begins with awareness.',
+  'Doing Nothing for the Planet': {
+    title: 'Doing Nothing for the Planet',
+    description: 'Your current lifestyle has significant room for improvement in terms of environmental impact.',
     strengths: [
-      'Initial interest in environmental issues',
-      'Potential for growth in sustainable practices',
-      'Basic understanding of environmental impact'
+      'Potential for significant impact',
+      'Room for easy improvements',
+      'Opportunity for fresh start'
     ],
     nextSteps: [
-      'Learn about basic sustainable practices',
-      'Start with one eco-friendly habit',
-      'Explore environmental resources'
+      'Start with simple eco-friendly changes',
+      'Learn about environmental basics',
+      'Track your daily habits'
     ]
   },
   'Certified Climate Snoozer': {
     title: 'Certified Climate Snoozer',
-    description: 'You\'re at the beginning of your sustainability journey! There\'s plenty of room for growth and positive impact.',
+    description: 'It\'s time to wake up to environmental issues and start making positive changes.',
     strengths: [
-      'Recognition of the need for change',
-      'Potential for significant improvement',
-      'Opportunity to make a big difference'
+      'Opportunity for major improvement',
+      'Clean slate for new habits',
+      'Potential for immediate impact'
     ],
     nextSteps: [
-      'Learn about environmental impact',
-      'Start with basic sustainable practices',
-      'Set small, achievable sustainability goals'
+      'Begin with basic awareness',
+      'Make one eco-friendly change',
+      'Learn about environmental impact'
     ]
   }
 };

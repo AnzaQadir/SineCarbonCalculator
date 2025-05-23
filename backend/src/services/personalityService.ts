@@ -65,6 +65,23 @@ type PersonalityMappings = {
   };
 };
 
+interface ImpactMetrics {
+  treesPlanted: number;
+  carbonReduced: string;
+  communityImpact: number;
+}
+
+interface PersonalityResponse {
+  personalityType: EcoPersonalityType;
+  description: string;
+  strengths: string[];
+  nextSteps: string[];
+  categoryScores: Record<string, CategoryScore>;
+  impactMetrics: ImpactMetrics;
+  finalScore: number;
+  powerMoves: string[];
+}
+
 export class PersonalityService {
   private readonly CATEGORY_WEIGHTS: CategoryWeights = {
     homeEnergy: 0.2, // 20%
@@ -262,10 +279,23 @@ export class PersonalityService {
 
     // Calculate maximum possible score (all A options)
     const maxPossibleScore = totalQuestions * 10; // Each question can score up to 10 points
-    const percentage = (totalScore / maxPossibleScore) * 100;
+    const percentage = totalQuestions > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
+
+    // Apply category weight to the score
+    const weightedScore = (percentage * this.CATEGORY_WEIGHTS[category]);
+
+    // Debug log
+    console.log(`Category ${category} calculation:`, {
+      totalScore,
+      maxPossibleScore,
+      percentage,
+      weightedScore,
+      questions,
+      subScores
+    });
 
     return {
-      score: totalScore, // Return raw total score instead of weighted
+      score: weightedScore || 0, // Ensure we never return undefined
       weight: this.CATEGORY_WEIGHTS[category],
       subScores,
       totalQuestions,
@@ -274,67 +304,44 @@ export class PersonalityService {
     };
   }
 
-  private determinePersonalityType(finalScore: number): string {
-    if (finalScore >= 85) return 'Sustainability Slayer';
-    if (finalScore >= 70) return "Planet's Main Character";
-    if (finalScore >= 55) return 'Sustainability Soft Launch';
-    if (finalScore >= 40) return 'Kind of Conscious, Kind of Confused';
-    if (finalScore >= 25) return 'Eco in Progress';
-    if (finalScore >= 10) return 'Doing Nothing for the Planet';
-    return 'Certified Climate Snoozer';
-  }
+  private calculatePersonalityScores(responses: UserResponses): {
+    personalityType: EcoPersonalityType;
+    categoryScores: Record<string, CategoryScore>;
+    finalScore: number;
+  } {
+    // Calculate category scores
+    const categoryScores = Object.entries(responses).reduce((acc, [category, categoryResponses]) => {
+      if (!categoryResponses) return acc;
+      acc[category] = this.calculateCategoryScore(category as CategoryKey, categoryResponses);
+      return acc;
+    }, {} as Record<string, CategoryScore>);
 
-  private calculatePersonalityScores(responses: UserResponses): PersonalityScore[] {
-    const personalityScores: Record<string, PersonalityScore> = {};
+    // Calculate final score - sum up all category scores
     let finalScore = 0;
-    
-    // Initialize personality scores
-    personalityHierarchy.forEach(type => {
-      personalityScores[type] = {
-        type,
-        score: 0,
-        confidence: 0,
-        traits: []
-      };
-    });
-
-    // Process each category's impact on personality types
-    Object.entries(responses).forEach(([category, categoryResponses]) => {
-      if (!categoryResponses) return;
-
-      const categoryScore = this.calculateCategoryScore(category as CategoryKey, categoryResponses);
-      finalScore += categoryScore.score;
-      
-      // Map category scores to personality traits
-      const categoryMappings = (personalityMappings as PersonalityMappings)[category];
-      if (categoryMappings) {
-        Object.entries(categoryMappings).forEach(([metric, mappings]) => {
-          const value = categoryResponses[metric];
-          if (!value || !mappings[value]) return;
-
-          mappings[value].forEach(personalityType => {
-            const score = personalityScores[personalityType];
-            if (score) {
-              score.score += categoryScore.score;
-              score.confidence += 1;
-              score.traits.push(`${category}_${metric}`);
-            }
-          });
-        });
+    Object.entries(categoryScores).forEach(([category, score]) => {
+      if (score && typeof score.score === 'number') {
+        finalScore += score.score;
       }
     });
 
-    // Determine final personality type
+    // Determine personality type based on final score
     const personalityType = this.determinePersonalityType(finalScore);
-    
-    // Update scores based on final personality
-    return Object.values(personalityScores)
-      .map(score => ({
-        ...score,
-        score: score.type === personalityType ? finalScore : 0,
-        confidence: score.confidence / Object.keys(responses).length
-      }))
-      .sort((a, b) => b.score - a.score);
+
+    return {
+      personalityType,
+      categoryScores,
+      finalScore
+    };
+  }
+
+  private determinePersonalityType(score: number): EcoPersonalityType {
+    if (score >= 80) return 'Sustainability Slayer';
+    if (score >= 65) return "Planet's Main Character";
+    if (score >= 50) return 'Sustainability Soft Launch';
+    if (score >= 35) return 'Kind of Conscious, Kind of Confused';
+    if (score >= 20) return 'Eco in Progress';
+    if (score >= 5) return 'Doing Nothing for the Planet';
+    return 'Certified Climate Snoozer';
   }
 
   private calculateCarbonEmissions(responses: UserResponses): number {
@@ -485,7 +492,7 @@ export class PersonalityService {
       ],
       "Eco in Progress": [
         `✅ <b>Your Progress Move:</b><br>Small steps, big difference. <b>${trees} trees' worth of CO₂ saved?</b> Keep blooming.`,
-        `�� <b>Next Move:</b><br>Encourage a friend to join you for a recycling challenge.`,
+        `🔥 <b>Next Move:</b><br>Encourage a friend to join you for a recycling challenge.`,
         `🌐 <b>Amplify Your Impact:</b><br>With 3 friends, that's <b>${trees * 3} more trees planted</b> and <b>${(Number(co2) * 0.25).toFixed(1)} tons of CO₂</b> gone.`,
         `🏅 <b>Badge on Deck:</b><br>Complete your next eco action to unlock "${nextBadge}."`
       ],
@@ -505,62 +512,38 @@ export class PersonalityService {
     return templates[personality] || templates["Eco in Progress"];
   }
 
-  public calculatePersonality(responses: UserResponses) {
-    // Calculate personality scores
-    const personalityScores = this.calculatePersonalityScores(responses);
-    const topPersonality = personalityScores[0];
-
-    // Calculate category scores
-    const categoryScores = Object.entries(responses).reduce((acc, [category, categoryResponses]) => {
-      if (!categoryResponses) return acc;
-      acc[category] = this.calculateCategoryScore(category as CategoryKey, categoryResponses);
-      return acc;
-    }, {} as Record<string, CategoryScore>);
-
-    // Determine dominant category
-    const dominantCategory = Object.entries(categoryScores)
-      .reduce((a, b) => (a[1].score > b[1].score) ? a : b)[0];
-
-    // Calculate impact metrics
+  async calculatePersonality(responses: UserResponses): Promise<PersonalityResponse> {
+    console.log('Calculating personality for responses:', responses);
+    
+    const scores = this.calculatePersonalityScores(responses);
+    console.log('Calculated scores:', scores);
+    
     const impactMetrics = this.calculateImpactMetrics(responses);
+    console.log('Calculated impact metrics:', impactMetrics);
+    
+    const personalityType = scores.personalityType;
+    console.log('Determined personality type:', personalityType);
+    
+    const personalityInfo = EcoPersonalityTypes[personalityType];
+    console.log('Retrieved personality info:', personalityInfo);
 
-    // Generate personality insights
-    const insights = {
-      strengths: topPersonality.traits.slice(0, 3),
-      opportunities: Object.entries(categoryScores)
-        .filter(([_, score]) => score.score < 40) // Below 40% is considered an opportunity
-        .map(([category]) => category),
-      confidence: Math.round(topPersonality.confidence * 100)
-    };
+    // Generate power moves
+    const powerMoves = this.generatePowerMoves(personalityType, impactMetrics, 'Carbon Strategist');
+    console.log('Generated power moves:', powerMoves);
 
-    // Generate new story format
-    const impactHighlights = this.generateImpactHighlights(impactMetrics, dominantCategory, categoryScores);
-    const storyHighlights = this.generateStoryHighlights(topPersonality.type, dominantCategory, insights.opportunities);
-    const powerMoves = this.generatePowerMoves(topPersonality.type, impactMetrics, "Carbon Strategist");
-
-    return {
-      personality: topPersonality.type,
-      dominantCategory,
-      subCategory: this.calculateSubCategory(dominantCategory, categoryScores),
-      tally: personalityScores.reduce((acc, score) => {
-        acc[score.type] = Math.round(score.score);
-        return acc;
-      }, {} as Record<string, number>),
-      categoryScores: Object.entries(categoryScores).reduce((acc, [category, score]) => {
-        acc[category] = {
-          score: Math.round(score.score),
-          percentage: Math.round(score.percentage),
-          maxPossibleScore: score.maxPossibleScore
-        };
-        return acc;
-      }, {} as Record<string, { score: number; percentage: number; maxPossibleScore: number }>),
+    const response = {
+      personalityType,
+      description: personalityInfo.description,
+      strengths: personalityInfo.strengths,
+      nextSteps: personalityInfo.nextSteps,
+      categoryScores: scores.categoryScores,
       impactMetrics,
-      insights,
-      impactHighlights,
-      storyHighlights,
-      powerMoves,
-      ...EcoPersonalityTypes[topPersonality.type as keyof typeof EcoPersonalityTypes]
+      finalScore: scores.finalScore,
+      powerMoves
     };
+    
+    console.log('Final response:', response);
+    return response;
   }
 
   private calculateSubCategory(dominantCategory: string, categoryScores: Record<string, CategoryScore>): string {
