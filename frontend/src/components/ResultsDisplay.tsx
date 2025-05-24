@@ -413,143 +413,48 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     return impacts[step] || 'Medium Impact';
   };
 
+  // Update the profile image logic to use the mapped image for the personality name
+  const profileImage = dynamicPersonality ? getPersonalityImage(dynamicPersonality.personality as PersonalityType, gender) : '';
+
+  // Update generateStory to use backend data everywhere
   const generateStory = async () => {
-    console.log('Starting story generation...');
-    console.log('State:', state);
-    console.log('Dynamic Personality:', dynamicPersonality);
-    
     if (!state || !dynamicPersonality) {
       console.error('State or personality is undefined');
-      console.error('State:', state);
-      console.error('Dynamic Personality:', dynamicPersonality);
       return;
     }
 
-    // Validate required data
-    if (!dynamicPersonality.personality || !dynamicPersonality.dominantCategory) {
-      console.error('Missing required personality data:', dynamicPersonality);
-      return;
-    }
+    // Use backend data for story input
+    const storyInput = {
+      name: state.name || 'Eco Hero',
+      ecoPersonality: dynamicPersonality.personality || '', // from backend
+      co2Saved: parseFloat(dynamicPersonality.impactMetrics?.carbonReduced || '0'), // from backend
+      topCategory: (dynamicPersonality.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality.dominantCategory || '').slice(1),
+      newHabits: [], // You can keep your habit logic or use backend if available
+      impactEquivalent: `planting ${dynamicPersonality.impactMetrics?.treesPlanted || 0} trees`, // from backend
+      nextStep: dynamicPersonality.nextAction || 'Start your journey', // from backend
+      badge: dynamicPersonality.badge || 'Eco Explorer', // from backend
+      score: Math.max(1, score),
+      categoryEmissions: {
+        home: categoryEmissions.home || 0,
+        transport: categoryEmissions.transport || 0,
+        food: categoryEmissions.food || 0,
+        waste: categoryEmissions.waste || 0
+      }
+    };
 
     try {
       setIsGeneratingStory(true);
-      console.log('Set loading state to true');
-      
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Generate personalized achievements
-      const newHabits = [];
-      
-      // Transport habits
-      if (state.primaryTransportMode === 'WALK_BIKE') {
-        newHabits.push('biking to work');
-      } else if (state.primaryTransportMode === 'PUBLIC') {
-        newHabits.push('using public transit');
-      }
-
-      // Diet habits
-      if (state.dietType === 'VEGAN') {
-        newHabits.push('adopting a plant-based diet');
-      } else if (state.dietType === 'VEGETARIAN') {
-        newHabits.push('choosing vegetarian meals');
-      }
-
-      // Energy habits
-      if (state.usesRenewableEnergy) {
-        newHabits.push('switching to renewable energy');
-      }
-      if (state.hasEnergyEfficiencyUpgrades) {
-        newHabits.push('upgrading to energy-efficient appliances');
-      }
-
-      // Waste habits
-      if (state.waste?.recyclingPercentage > 75) {
-        newHabits.push('becoming a recycling pro');
-      }
-      if (state.waste?.minimizesWaste) {
-        newHabits.push('reducing waste production');
-      }
-
-      // If no habits were generated, add some default ones based on personality
-      if (newHabits.length === 0) {
-        newHabits.push('starting your sustainability journey');
-        newHabits.push('learning about eco-friendly practices');
-        newHabits.push('exploring sustainable options');
-      }
-
-      // Calculate impact metrics - ensure positive values
-      const baseEmissions = 16; // Base emissions to compare against
-      const actualEmissions = Math.max(0, emissions); // Ensure emissions is not negative
-      const co2Saved = Math.max(0, baseEmissions - actualEmissions); // Ensure positive value
-      const treesPlanted = Math.round(co2Saved * 10);
-      const carbonReduced = co2Saved.toFixed(1);
-      const communityImpact = Math.max(1, Math.round(score / 2)); // Ensure at least 1
-
-      console.log('Generated metrics:', {
-        treesPlanted,
-        carbonReduced,
-        communityImpact,
-        newHabits,
-        co2Saved,
-        baseEmissions,
-        actualEmissions
-      });
-
-      // Prepare story input
-      const storyInput = {
-        name: state.name || 'Eco Hero',
-        ecoPersonality: dynamicPersonality.personality || '',
-        co2Saved: parseFloat(carbonReduced),
-        topCategory: (dynamicPersonality.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality.dominantCategory || '').slice(1),
-        newHabits,
-        impactEquivalent: `planting ${treesPlanted} trees`,
-        nextStep: dynamicPersonality.nextAction || 'Start your journey',
-        badge: dynamicPersonality.badge || 'Eco Explorer',
-        score: Math.max(1, score), // Ensure score is at least 1
-        categoryEmissions: {
-          home: categoryEmissions.home || 0,
-          transport: categoryEmissions.transport || 0,
-          food: categoryEmissions.food || 0,
-          waste: categoryEmissions.waste || 0
-        }
-      };
-
-      console.log('Story input:', storyInput);
-
-      // Generate story using the new engine
+      // Generate story using backend data
       const storyCards = generateEcoStory(storyInput);
-      console.log('Generated story cards:', storyCards);
-
-      // Generate narrative story
       const narrativeStory = generateNarrativeStory(storyInput);
-      console.log('Generated narrative story:', narrativeStory);
-
-      if (!storyCards || storyCards.length === 0) {
-        console.error('No story cards were generated');
-        return;
-      }
-
-      // Set the stories and show them
       setStoryCards(storyCards);
       setNarrativeStory(narrativeStory);
       setShowStory(true);
       setCurrentCardIndex(0);
-
-      // Force a re-render
-      setTimeout(() => {
-        console.log('Current story state:', {
-          showStory,
-          storyCardsLength: storyCards.length,
-          hasNarrativeStory: !!narrativeStory,
-          currentCardIndex: 0
-        });
-      }, 100);
-    
     } catch (error) {
-      console.error('Error in story generation:', error);
       setGeneratedStory("Your journey in sustainable living is making a positive impact on our planet. Every small change you make contributes to a greener future.");
     } finally {
-      console.log('Resetting loading state...');
       setIsGeneratingStory(false);
     }
   };
@@ -890,13 +795,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <div className="bg-white rounded-2xl shadow-lg p-0 flex flex-col items-center max-w-2xl w-full border border-green-100 overflow-hidden">
               {/* Personality Image - classy, well-formed */}
               <div className="mx-auto my-4 w-64 h-80 rounded-2xl shadow-lg overflow-hidden bg-white border border-gray-200 flex items-center justify-center">
-                <img
-                  src={getPersonalityImage(dynamicPersonality?.personality as PersonalityType, gender)}
-                  alt={`${dynamicPersonality?.personality || 'Personality'} Illustration`}
-                  className="w-full h-full object-cover rounded-2xl transition-transform duration-300"
-                  loading="eager"
-                  decoding="async"
-                />
+                {profileImage && (
+                  <img
+                    src={profileImage}
+                    alt={`${dynamicPersonality?.personality || 'Personality'} Illustration`}
+                    className="w-full h-full object-cover rounded-2xl transition-transform duration-300"
+                    loading="eager"
+                    decoding="async"
+                  />
+                )}
               </div>
               <div className="w-full p-8 flex flex-col items-center">
                 {/* Personality Description */}
@@ -909,7 +816,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 {dynamicPersonality?.description && (
                   <p className="text-base text-gray-600 text-center mb-3 italic max-w-md">{dynamicPersonality.description}</p>
                 )}
-                <p className="text-gray-700 text-center mb-2">{story?.split('.')[0]}.</p>
+                <p className="text-gray-700 text-center mb-2">
+                  {dynamicPersonality?.impactHighlights ||
+                    `You saved ${dynamicPersonality?.impactMetrics?.carbonReduced || 0} tons of CO₂ — equal to planting ${dynamicPersonality?.impactMetrics?.treesPlanted || 0} trees.`}
+                </p>
                 <div className="text-green-700 font-medium mb-2">{nextAction || ''}</div>
               </div>
             </div>
@@ -1398,6 +1308,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   topCategory={(dynamicPersonality?.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality?.dominantCategory || '').slice(1)}
                   badge={dynamicPersonality?.badge}
                   personality={dynamicPersonality?.personality || ''}
+                  profileImage={dynamicPersonality ? getPersonalityImage(dynamicPersonality.personality as PersonalityType, gender) : ''}
                 />
               </div>
 
@@ -1419,6 +1330,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   topCategory={(dynamicPersonality?.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality?.dominantCategory || '').slice(1)}
                   badge={dynamicPersonality?.badge}
                   personality={dynamicPersonality?.personality || ''}
+                  profileImage={dynamicPersonality ? getPersonalityImage(dynamicPersonality.personality as PersonalityType, gender) : ''}
                 />
               )}
 

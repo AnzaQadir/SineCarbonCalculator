@@ -8,6 +8,7 @@ interface EcoWrappedCardProps {
   topCategory?: string;
   badge?: string;
   personality?: string;
+  profileImage?: string;
 }
 
 const themes = {
@@ -64,6 +65,7 @@ const EcoWrappedCard: React.FC<EcoWrappedCardProps> = ({
   topCategory = 'Waste',
   badge = 'First Green Step',
   personality = "Planet's Main Character",
+  profileImage,
 }) => {
   const t = themes[theme];
   const [imageError, setImageError] = useState(false);
@@ -72,13 +74,16 @@ const EcoWrappedCard: React.FC<EcoWrappedCardProps> = ({
     setImageError(true);
   };
 
+  const avatarSrc = !imageError && profileImage ? profileImage : profileImg;
+  const co2Value = Math.max(0, Number(savedCO2 || '0'));
+
   return (
     <div className={`w-[400px] mx-auto rounded-3xl overflow-hidden bg-gradient-to-br ${t.bg} p-8 ${t.shadow} ${t.font} relative`}>
       {/* Large Avatar Background */}
       <div className="absolute inset-0 z-0">
         {!imageError ? (
           <img 
-            src={profileImg} 
+            src={avatarSrc} 
             alt="avatar background" 
             className="w-full h-full object-cover opacity-20 scale-110 blur-sm"
             onError={handleImageError}
@@ -102,7 +107,7 @@ const EcoWrappedCard: React.FC<EcoWrappedCardProps> = ({
         <div className="relative mb-6">
           {!imageError ? (
             <img 
-              src={profileImg} 
+              src={avatarSrc} 
               alt="avatar" 
               className={`w-32 h-32 object-cover rounded-2xl mx-auto ${t.avatarRing}`}
               onError={handleImageError}
@@ -120,7 +125,7 @@ const EcoWrappedCard: React.FC<EcoWrappedCardProps> = ({
         <h1 className={`mb-2 ${t.heading} text-center`}>Your Climate Journey</h1>
         <div className={`mb-4 text-lg font-semibold ${t.text} text-center`}>You saved</div>
         <div className={`mb-2 text-6xl font-extrabold ${t.text} text-center`}>
-          {savedCO2} <span className="text-2xl">tons</span>
+          {co2Value} <span className="text-2xl">tons</span>
         </div>
         <div className={`mb-6 text-base ${t.text} text-center`}>of CO₂ this year</div>
 
