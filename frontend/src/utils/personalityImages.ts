@@ -17,8 +17,8 @@ const personalityImageMap: Record<PersonalityType, Record<Gender, string>> = {
     girl: '/images/Sustainability-Soft-Launch-Girl.png'
   },
   'Eco in Progress': {
-    boy: '/images/Eco-in-Progress-Boy.png',
-    girl: '/images/Eco-in-Progress-Girl.png'
+    boy: '/images/Eco-in-Progres-Boy.png',
+    girl: '/images/Eco-In-Progress-Girl.png'
   },
   'Kind of Conscious, Kind of Confused': {
     boy: '/images/Kind-of-Conscious-Boy.png',
@@ -29,15 +29,15 @@ const personalityImageMap: Record<PersonalityType, Record<Gender, string>> = {
     girl: '/images/Doing-Nothing-Girl.png'
   },
   'Certified Climate Snoozer': {
-    boy: '/images/Climate-Snoozer-Boy.png',
-    girl: '/images/Climate-Snoozer-Girl.png'
+    boy: '/images/Certified-Climate-Snoozer-Boy.png',
+    girl: '/images/Certified-Climate-Snoozer-Girl.png'
   }
 };
 
 // Fallback images for each gender
 const FALLBACK_IMAGES = {
-  boy: '/images/Default-Personality-Boy.png',
-  girl: '/images/Default-Personality-Girl.png'
+  boy: '/images/Certified-Climate-Snoozer-Boy.png',
+  girl: '/images/Certified-Climate-Snoozer-Girl.png'
 };
 
 // Cache for preloaded images
@@ -61,7 +61,15 @@ export const getPersonalityImage = (
     safeGender = Math.random() < 0.5 ? 'boy' : 'girl';
   }
   const imagePath = personalityImageMap[personalityType]?.[safeGender] || FALLBACK_IMAGES[safeGender];
-  console.log('Getting image path:', { personalityType, gender: safeGender, imagePath });
+  console.log('Getting image path:', { 
+    personalityType, 
+    gender: safeGender, 
+    imagePath,
+    hasPersonalityType: !!personalityType,
+    hasGender: !!safeGender,
+    mappedPath: personalityImageMap[personalityType]?.[safeGender],
+    fallbackPath: FALLBACK_IMAGES[safeGender]
+  });
   return imagePath;
 };
 
