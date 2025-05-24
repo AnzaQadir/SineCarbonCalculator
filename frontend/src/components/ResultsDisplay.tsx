@@ -308,6 +308,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dynamicPersonality, setDynamicPersonality] = useState<PersonalityResponse | null>(null);
+  const [showJourney, setShowJourney] = useState(false);
+  const journeyRef = useRef<HTMLDivElement>(null);
   // Debug: Log all props and key state
   console.log('ResultsDisplay props:', { score, emissions, categoryEmissions, recommendations, isVisible, state });
   console.log('DynamicPersonality at top of render:', dynamicPersonality);
@@ -951,6 +953,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               >
                 Share Your Eco-Personality
               </button>
+              <Button
+                onClick={() => {
+                  setShowJourney(true);
+                  setTimeout(() => journeyRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+                }}
+                className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition text-base font-semibold"
+              >
+                View Your Journey
+              </Button>
             </div>
             {/* Recommendation Engine Card */}
             <div className="flex-1 max-w-xl mx-auto bg-gradient-to-br from-green-100 to-green-50 rounded-2xl shadow-2xl p-10 flex flex-col items-center min-h-[460px]">
@@ -1019,12 +1030,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </div>
 
           {/* Sustainability Journey */}
-          <div className="w-full flex flex-col justify-center bg-white/60 rounded-3xl shadow-2xl p-12 mt-8">
-            <h2 className="text-3xl font-serif text-green-700 mb-8 flex items-center gap-3">
-              <Leaf className="h-8 w-8 text-green-500" /> Your Sustainability Journey
-            </h2>
-            <SustainabilityJourney currentMilestone={currentMilestone} score={score} />
-          </div>
+          {showJourney && (
+            <div ref={journeyRef} className="w-full flex flex-col justify-center bg-white/60 rounded-3xl shadow-2xl p-12 mt-8">
+              <h2 className="text-3xl font-serif text-green-700 mb-8 flex items-center gap-3">
+                <Leaf className="h-8 w-8 text-green-500" /> Your Sustainability Journey
+              </h2>
+              <SustainabilityJourney currentMilestone={currentMilestone} score={score} />
+            </div>
+          )}
         </div>
 
         {/* Story Generation Section - Updated UI */}
@@ -1247,91 +1260,39 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           )}
         </div>
 
-        {/* Eco Story Card */}
-        <Card className="bg-gradient-to-br from-green-50 to-green-100/50 overflow-hidden rounded-2xl shadow-lg">
-          <CardContent className="p-8 lg:p-12 space-y-12">
-            {/* Hero Section with Personality */}
-            <div className="relative">
-              <div className="flex flex-col lg:flex-row items-start gap-8">
-                {/* Personality Info (keep only this, remove avatar on right) */}
-                {/* Avatar Display removed */}
-              </div>
-            </div>
-
-            {/* Eco Wrapped 2024 Main Heading */}
+        {/* Eco Story Card - Combined Impact Summary and Power Moves */}
+        <Card className="bg-gradient-to-br from-green-50 to-yellow-50 overflow-hidden rounded-2xl shadow-lg">
+          <CardContent className="p-8 lg:p-12 space-y-8">
             <h2 className="text-3xl md:text-4xl font-extrabold text-green-900 mb-8 text-center font-sans tracking-tight">
-              Eco Wrapped 2024: Your Impact & Story
+              Your Impact & Power Moves
             </h2>
-            {/* Refined Eco Wrapped Impact Highlights Card */}
-            <div className="bg-gradient-to-br from-green-100 via-mint-50 to-blue-100 rounded-2xl shadow-xl p-0 md:p-0 flex flex-col md:flex-row overflow-hidden relative mb-10">
-              {/* Radial shine */}
-              <div className="absolute inset-0 pointer-events-none" style={{background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18) 0%, transparent 70%)'}} />
-              {/* Left: CO2 stat, icon, trees, flights */}
-              <div className="flex flex-col items-center justify-center flex-shrink-0 w-full md:w-1/2 py-8 px-6 bg-white/40 backdrop-blur-md gap-2">
-                {/* Animated leaf icon */}
-                <div className="relative mb-2">
-                  <div className="bg-gradient-to-br from-green-400 to-green-600 rounded-full p-4 shadow-lg flex items-center justify-center">
-                    <Leaf className="h-10 w-10 text-white drop-shadow-lg animate-pulse" />
-                  </div>
-                  <span className="absolute -top-2 -right-2 text-yellow-300 animate-bounce select-none">✨</span>
+            {/* Impact Summary */}
+            <div className="flex flex-col items-center justify-center gap-2 mb-8">
+              <div className="relative mb-2">
+                <div className="bg-gradient-to-br from-green-400 to-green-600 rounded-full p-4 shadow-lg flex items-center justify-center">
+                  <Leaf className="h-10 w-10 text-white drop-shadow-lg animate-pulse" />
                 </div>
-                <div className="text-4xl md:text-5xl font-extrabold text-green-800 font-sans" style={{ fontFamily: 'Inter, Satoshi, Manrope, sans-serif' }}>
-                  {dynamicPersonality?.impactMetrics?.carbonReduced || '0.0'}
-                </div>
-                <span className="block text-lg font-bold text-green-700">tons of CO₂</span>
-                {/* Tree-line SVG or mini forest */}
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-2xl">🌳</span>
-                  <span className="text-green-800 font-semibold">= {dynamicPersonality?.impactMetrics?.treesPlanted || 0} trees</span>
-                  {/* Mini forest: SVG or emoji row */}
-                  <span className="ml-2 flex gap-0.5">
-                    {Array(Math.min(7, Math.floor((dynamicPersonality?.impactMetrics?.treesPlanted || 0) / 10))).fill(0).map((_, i) => (
-                      <span key={i} className="text-lg">🌲</span>
-                    ))}
-                  </span>
-                </div>
-                <div className="mt-1 text-xs text-green-500 font-medium">
-                  ≈ {Math.round(Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0) / 500)} flights avoided ✈️
-                </div>
+                <span className="absolute -top-2 -right-2 text-yellow-300 animate-bounce select-none">✨</span>
               </div>
-              {/* Right: Persona, category, story */}
-              <div className="flex-1 flex flex-col justify-center px-6 py-8 md:py-0 md:pl-0 md:pr-10 gap-4">
-                {/* Persona badge/title and top category pill */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-2">
-                  {/* Persona badge with sparkle */}
-                  <div className="flex items-center gap-2">
-                    <div className="relative">
-                      <div className="bg-gradient-to-br from-emerald-400 to-blue-400 rounded-full p-3 shadow-lg flex items-center justify-center">
-                        <Leaf className="h-7 w-7 text-green-700" />
-                      </div>
-                      <Sparkles className="h-5 w-5 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
-                    </div>
-                    <span className="text-base md:text-lg font-bold text-blue-700 font-serif" style={{ fontFamily: 'Inter, Satoshi, Manrope, sans-serif' }}>{dynamicPersonality?.personality || ''}</span>
-                  </div>
-                  {/* Top category pill */}
-                  <span className="inline-flex items-center gap-2 bg-pink-100 text-pink-700 font-semibold rounded-full px-4 py-1 text-sm md:text-base shadow">
-                    {dynamicPersonality?.dominantCategory === 'clothing' && <Shirt className="h-5 w-5 text-pink-400" />}
-                    {dynamicPersonality?.dominantCategory === 'home' && <Home className="h-5 w-5 text-blue-400" />}
-                    {dynamicPersonality?.dominantCategory === 'food' && <Utensils className="h-5 w-5 text-amber-400" />}
-                    {dynamicPersonality?.dominantCategory === 'transport' && <Car className="h-5 w-5 text-cyan-400" />}
-                    {(dynamicPersonality?.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality?.dominantCategory || '').slice(1)}
-                    <span className="ml-1">• {dynamicPersonality?.categoryScores?.[dynamicPersonality?.dominantCategory || '']?.percentage || 0}%</span>
-                  </span>
-                </div>
-                {/* Story block as callout/speech bubble */}
-                <div className="max-w-prose">
-                  <div className="border-l-4 border-emerald-500 pl-4 bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-md py-4 px-4">
-                    <blockquote className="italic font-serif text-base md:text-lg text-gray-700 leading-relaxed" style={{ fontFamily: 'Lora, DM Serif, serif' }}>
-                      {dynamicPersonality?.storyHighlights}
-                    </blockquote>
-                  </div>
-                </div>
+              <div className="text-4xl md:text-5xl font-extrabold text-green-800 font-sans" style={{ fontFamily: 'Inter, Satoshi, Manrope, sans-serif' }}>
+                {dynamicPersonality?.impactMetrics?.carbonReduced || '0.0'}
+              </div>
+              <span className="block text-lg font-bold text-green-700">tons of CO₂</span>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-2xl">🌳</span>
+                <span className="text-green-800 font-semibold">= {dynamicPersonality?.impactMetrics?.treesPlanted || 0} trees</span>
+                <span className="ml-2 flex gap-0.5">
+                  {Array(Math.min(7, Math.floor((dynamicPersonality?.impactMetrics?.treesPlanted || 0) / 10))).fill(0).map((_, i) => (
+                    <span key={i} className="text-lg">🌲</span>
+                  ))}
+                </span>
+              </div>
+              <div className="mt-1 text-xs text-green-500 font-medium">
+                ≈ {Math.round(Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0) / 500)} flights avoided ✈️
               </div>
             </div>
-
-            {/* Power Moves Grid */}
-            console.log("Power Moves in dynamicPersonality:", dynamicPersonality?.powerMoves);
-            <div className="bg-gradient-to-br from-yellow-50 via-gold-50 to-yellow-100 rounded-3xl shadow-xl px-4 py-8 flex flex-col gap-6">
+            {/* Power Moves */}
+            <div className="bg-gradient-to-br from-yellow-50 via-gold-50 to-yellow-100 rounded-3xl shadow-xl px-4 py-8 flex flex-col gap-6 w-full">
               <h3 className="text-2xl md:text-3xl font-bold text-yellow-700 mb-2 font-sans flex items-center gap-2">
                 Power Moves
                 <Sparkles className="h-6 w-6 text-yellow-400 animate-pulse" />
@@ -1355,17 +1316,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 <span className="bg-gradient-to-r from-green-200 to-green-400 text-green-900 font-bold rounded-full px-4 py-1 shadow">{dynamicPersonality?.badge || 'Carbon Strategist'}</span>
                 <Sparkles className="h-5 w-5 text-yellow-400 animate-pulse" />
               </div>
-            </div>
-
-            {/* Share This Card Button (moved below Impact Highlights) */}
-            <div className="w-full flex justify-center mt-6">
-              <button
-                onClick={handleShare}
-                className="bg-gradient-to-r from-green-500 to-emerald-400 text-white font-bold px-8 py-4 rounded-full shadow-xl text-lg flex items-center gap-3 hover:scale-105 transition-transform"
-                style={{ fontFamily: 'Inter, Satoshi, Manrope, sans-serif' }}
-              >
-                <Share2 className="h-6 w-6" /> Share This Card
-              </button>
             </div>
           </CardContent>
         </Card>
