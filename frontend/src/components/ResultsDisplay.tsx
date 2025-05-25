@@ -30,6 +30,8 @@ import EcoWrappedCard from './EcoWrappedCard';
 import { calculatePersonality, UserResponses } from '@/services/api';
 import { getPersonalityImage, preloadPersonalityImages } from '@/utils/personalityImages';
 import { PersonalityType } from '@/types/personality';
+import { useNavigate } from 'react-router-dom';
+import { useQuizStore } from '@/stores/quizStore';
 
 interface CategoryEmissions {
   home: number;
@@ -310,6 +312,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [dynamicPersonality, setDynamicPersonality] = useState<PersonalityResponse | null>(null);
   const [showJourney, setShowJourney] = useState(false);
   const journeyRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const { setQuizResults } = useQuizStore();
   // Debug: Log all props and key state
   console.log('ResultsDisplay props:', { score, emissions, categoryEmissions, recommendations, isVisible, state });
   console.log('DynamicPersonality at top of render:', dynamicPersonality);
@@ -732,6 +736,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     }
   }, []); // Empty dependency array ensures it only runs once
 
+  // Update useEffect to store results
+  useEffect(() => {
+    if (dynamicPersonality) {
+      setQuizResults(dynamicPersonality);
+    }
+  }, [dynamicPersonality, setQuizResults]);
+
   if (error) {
     return (
       <div className="max-w-[1400px] mx-auto px-8 py-12">
@@ -754,6 +765,16 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       </div>
     );
   }
+
+  // Add this button in the appropriate section of your JSX
+  const renderRecommendationsButton = () => (
+    <Button
+      onClick={() => navigate('/recommendations')}
+      className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition text-lg py-3 font-semibold mt-4"
+    >
+      View Personalized Recommendations
+    </Button>
+  );
 
   return (
     <ErrorBoundary>
@@ -872,6 +893,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               >
                 View Your Journey
               </Button>
+              {renderRecommendationsButton()}
             </div>
             {/* Recommendation Engine Card */}
             <div className="flex-1 max-w-xl mx-auto bg-gradient-to-br from-green-100 to-green-50 rounded-2xl shadow-2xl p-10 flex flex-col items-center min-h-[460px]">
