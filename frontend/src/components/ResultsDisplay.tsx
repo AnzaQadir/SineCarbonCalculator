@@ -29,7 +29,7 @@ import html2canvas from 'html2canvas';
 import EcoWrappedCard from './EcoWrappedCard';
 import { calculatePersonality, UserResponses } from '@/services/api';
 import { getPersonalityImage, preloadPersonalityImages } from '@/utils/personalityImages';
-import { PersonalityType } from '@/types/personality';
+import { PersonalityType, PersonalityResponse } from '@/types/personality';
 import { useNavigate } from 'react-router-dom';
 import { useQuizStore } from '@/stores/quizStore';
 
@@ -107,51 +107,6 @@ interface ResultsDisplayProps {
   onReset: () => void;
   state: any;
   gender: 'boy' | 'girl';
-}
-
-// Update PersonalityResponse type to match the API response
-interface PersonalityResponse {
-  personality?: string;
-  dominantCategory?: string;
-  subCategory?: string;
-  tally?: Record<string, number>;
-  categoryScores?: {
-    [key: string]: {
-      score: number;
-      percentage: number;
-      maxPossible?: number;
-      maxPossibleScore?: number;
-    };
-  };
-  impactMetrics?: {
-    carbonReduced?: string;
-    treesPlanted?: number;
-    communityImpact?: number;
-  };
-  insights?: {
-    strengths?: string[];
-    opportunities?: string[];
-    confidence?: number;
-    dominantCategory?: string;
-    recommendations?: string[];
-    impactHighlights?: string;
-    storyHighlights?: string;
-    powerMoves?: string[];
-  };
-  impactHighlights?: string;
-  storyHighlights?: string;
-  powerMoves?: string[];
-  badge?: string;
-  champion?: string;
-  emoji?: string;
-  story?: string;
-  avatar?: string;
-  nextAction?: string;
-  title?: string;
-  description?: string;
-  strengths?: string[];
-  nextSteps?: string[];
-  finalScore?: number;
 }
 
 const getAchievements = (state: any, categoryEmissions: CategoryEmissions): Achievement[] => {
@@ -281,6 +236,19 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 }
 
+// Type guard for PersonalityType
+const isPersonalityType = (value: string): value is PersonalityType => {
+  return [
+    'Sustainability Slayer',
+    "Planet's Main Character",
+    'Sustainability Soft Launch',
+    'Kind of Conscious, Kind of Confused',
+    'Eco in Progress',
+    'Doing Nothing for the Planet',
+    'Certified Climate Snoozer',
+  ].includes(value);
+};
+
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   score,
   emissions,
@@ -327,13 +295,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   };
 
   // Update the component to use optional chaining
-  const personalityType = dynamicPersonality?.personality || '';
+  const personalityType: PersonalityType = isPersonalityType(dynamicPersonality?.personalityType ?? '')
+    ? dynamicPersonality!.personalityType as PersonalityType
+    : 'Eco in Progress';
   const emoji = dynamicPersonality?.emoji;
   const story = dynamicPersonality?.story;
-  const avatar = dynamicPersonality?.avatar;
+  const avatar = undefined; // Not in canonical type
   const nextAction = dynamicPersonality?.nextAction;
   const badge = dynamicPersonality?.badge;
-  const champion = dynamicPersonality?.champion;
+  const champion = undefined; // Not in canonical type
   const powerMoves = dynamicPersonality?.powerMoves;
 
   // Debug logging for state changes
@@ -418,7 +388,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   };
 
   // Update the profile image logic to use the mapped image for the personality name
-  const profileImage = dynamicPersonality ? getPersonalityImage(dynamicPersonality.personality as PersonalityType, gender) : '';
+  const profileImage = dynamicPersonality ? getPersonalityImage(personalityType, gender) : '';
 
   // Update generateStory to use backend data everywhere
   const generateStory = async () => {
@@ -430,7 +400,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     // Use backend data for story input
     const storyInput = {
       name: state.name || 'Eco Hero',
-      ecoPersonality: dynamicPersonality.personality || '', // from backend
+      ecoPersonality: dynamicPersonality.personalityType || '', // from backend
       co2Saved: parseFloat(dynamicPersonality.impactMetrics?.carbonReduced || '0'), // from backend
       topCategory: (dynamicPersonality.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality.dominantCategory || '').slice(1),
       newHabits: [], // You can keep your habit logic or use backend if available
@@ -510,7 +480,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     "Sustainability Slayer"
   ];
 
-  const currentMilestone = dynamicPersonality ? milestoneOrder.indexOf(dynamicPersonality.personality || '') : 0;
+  const currentMilestone = dynamicPersonality ? milestoneOrder.indexOf(dynamicPersonality.personalityType || '') : 0;
   const nextMilestone = currentMilestone < milestoneOrder.length - 1 
     ? milestoneOrder[currentMilestone + 1] 
     : milestoneOrder[currentMilestone];
@@ -520,7 +490,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const userName = state?.name || 'Eco Hero';
   // Update the share text to use dynamicPersonality
   const shareText = dynamicPersonality 
-    ? `I'm a ${dynamicPersonality.personality || ''} on my sustainability journey! 🌱 What's your eco-personality?`
+    ? `I'm a ${dynamicPersonality.personalityType || ''} on my sustainability journey! 🌱 What's your eco-personality?`
     : '';
 
   const handleShare = () => {
@@ -578,20 +548,20 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // Update the wrappedSlides to use optional chaining
   const wrappedSlides = storyCards.length > 0 && dynamicPersonality ? [
     {
-      personality: dynamicPersonality.personality || '',
+      personality: dynamicPersonality.personalityType || '',
       name: userName,
       co2Saved: `${(16 - emissions).toFixed(1)} tons`,
       topCategory: (dynamicPersonality.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality.dominantCategory || '').slice(1),
       nextStep: recommendations[0]?.title || '',
       badge: dynamicPersonality.badge,
-      shareText: `@${userName.replace(/\s+/g, '')} saved ${(16 - emissions).toFixed(1)} tons CO₂ this year! 🌍 Top Habit: ${recommendations[0]?.title || ''} 🌿 Role: ${dynamicPersonality.personality || ''} 🏅 Badge: ${dynamicPersonality.badge} #EcoWrapped #ImpactInAction`,
+      shareText: `@${userName.replace(/\s+/g, '')} saved ${(16 - emissions).toFixed(1)} tons CO₂ this year! 🌍 Top Habit: ${recommendations[0]?.title || ''} 🌿 Role: ${dynamicPersonality.personalityType || ''} 🏅 Badge: ${dynamicPersonality.badge} #EcoWrapped #ImpactInAction`,
     },
   ] : [];
 
   useEffect(() => {
     if (showWrapped) {
       setTimeout(async () => {
-        const cardId = 'story-card-' + ((dynamicPersonality?.personality || '').replace(/\s+/g, '-'));
+        const cardId = 'story-card-' + ((dynamicPersonality?.personalityType || '').replace(/\s+/g, '-'));
         const card = document.getElementById(cardId);
         if (card) {
           const canvas = await html2canvas(card, {
@@ -696,7 +666,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
       // Map the API response to the expected format
       setDynamicPersonality({
-        personality: result.personalityType,
+        personalityType: isPersonalityType(result.personalityType) ? result.personalityType : 'Eco in Progress',
         description: result.description,
         strengths: result.strengths,
         nextSteps: result.nextSteps,
@@ -713,7 +683,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       });
 
       console.log('Set dynamic personality:', {
-        personality: result.personalityType,
+        personalityType: result.personalityType,
         description: result.description,
         strengths: result.strengths,
         nextSteps: result.nextSteps,
@@ -819,7 +789,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 {profileImage && (
                   <img
                     src={profileImage}
-                    alt={`${dynamicPersonality?.personality || 'Personality'} Illustration`}
+                    alt={`${dynamicPersonality?.personalityType || 'Personality'} Illustration`}
                     className="w-full h-full object-cover rounded-2xl transition-transform duration-300"
                     loading="eager"
                     decoding="async"
@@ -830,7 +800,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 {/* Personality Description */}
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-3xl">{dynamicPersonality?.emoji}</span>
-                  <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personality || ''}</h2>
+                  <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personalityType || ''}</h2>
                 </div>
                 <Badge className="mb-2">{dynamicPersonality?.badge}</Badge>
                 {/* Add description here */}
@@ -838,8 +808,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   <p className="text-base text-gray-600 text-center mb-3 italic max-w-md">{dynamicPersonality.description}</p>
                 )}
                 <p className="text-gray-700 text-center mb-2">
-                  {dynamicPersonality?.impactHighlights ||
-                    `You saved ${dynamicPersonality?.impactMetrics?.carbonReduced || 0} tons of CO₂ — equal to planting ${dynamicPersonality?.impactMetrics?.treesPlanted || 0} trees.`}
+                  {`You saved ${dynamicPersonality?.impactMetrics?.carbonReduced || 0} tons of CO₂ — equal to planting ${dynamicPersonality?.impactMetrics?.treesPlanted || 0} trees.`}
                 </p>
                 <div className="text-green-700 font-medium mb-2">{nextAction || ''}</div>
               </div>
@@ -851,11 +820,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               {/* Remove Animated Avatar (without progress ring) */}
               {/* Personalized Greeting */}
               <div className="text-lg font-semibold text-green-900 mb-2 text-center">
-                Hi {userName}, you're a {dynamicPersonality?.personality || ''}!
+                Hi {userName}, you're a {dynamicPersonality?.personalityType || ''}!
               </div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-3xl">{emoji}</span>
-                <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personality || ''}</h2>
+                <h2 className="text-2xl font-bold text-green-700 font-serif">{dynamicPersonality?.personalityType || ''}</h2>
               </div>
               <Badge className="mb-2">{badge}</Badge>
               <div className="text-green-700 font-medium mb-4">{nextAction || ''}</div>
@@ -1329,8 +1298,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   savedCO2={`${(16 - emissions).toFixed(1)}`}
                   topCategory={(dynamicPersonality?.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality?.dominantCategory || '').slice(1)}
                   badge={dynamicPersonality?.badge}
-                  personality={dynamicPersonality?.personality || ''}
-                  profileImage={dynamicPersonality ? getPersonalityImage(dynamicPersonality.personality as PersonalityType, gender) : ''}
+                  personality={personalityType}
+                  profileImage={getPersonalityImage(personalityType, gender)}
                 />
               </div>
 
@@ -1351,8 +1320,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   savedCO2={`${(16 - emissions).toFixed(1)}`}
                   topCategory={(dynamicPersonality?.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality?.dominantCategory || '').slice(1)}
                   badge={dynamicPersonality?.badge}
-                  personality={dynamicPersonality?.personality || ''}
-                  profileImage={dynamicPersonality ? getPersonalityImage(dynamicPersonality.personality as PersonalityType, gender) : ''}
+                  personality={personalityType}
+                  profileImage={getPersonalityImage(personalityType, gender)}
                 />
               )}
 
