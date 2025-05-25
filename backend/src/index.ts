@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { personalityRoutes } from './routes/personalityRoutes';
+import { recommendationRoutes } from './routes/recommendationRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/personality', personalityRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
