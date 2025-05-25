@@ -6,25 +6,52 @@ import { ArrowLeft, Home } from 'lucide-react';
 import { useUserStore } from '@/stores/userStore'; // Assuming you have a user store
 import { useQuizStore } from '@/stores/quizStore'; // Assuming you have a quiz store
 
+// Map frontend types to backend canonical types
+const personalityTypeMap: Record<string, string> = {
+  'Sustainability Slayer': 'Sustainability Slayer',
+  "Planet's Main Character": "Planet's Main Character",
+  'Sustainability Soft Launch': 'Sustainability Soft Launch',
+  'Kind of Conscious': 'Kind of Conscious, Kind of Confused',
+  'Kind of Conscious, Kind of Confused': 'Kind of Conscious, Kind of Confused',
+  'Eco in Progress': 'Eco in Progress',
+  'Doing Nothing': 'Doing Nothing for the Planet',
+  'Doing Nothing for the Planet': 'Doing Nothing for the Planet',
+  'Certified Climate Snoozer': 'Certified Climate Snoozer',
+  // Add any other frontend aliases here
+  'Eco Explorer': 'Eco in Progress', // Example alias
+  'Green Guardian': 'Sustainability Soft Launch', // Example alias
+  'Climate Conscious': 'Kind of Conscious, Kind of Confused', // Example alias
+};
+
 const RecommendationScreen: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUserStore();
   const { quizResults } = useQuizStore();
   const [isLoading, setIsLoading] = useState(true);
 
+  console.log('RecommendationScreen - quizResults:', JSON.stringify(quizResults, null, 2));
+  console.log('RecommendationScreen - user:', user);
+
+  // Get the personality type from quizResults
+  const personalityType = quizResults?.personalityType || 'Eco in Progress';
+  console.log('RecommendationScreen - personalityType:', personalityType);
+
   // Extract only the relevant personality keys
   const personalityData = quizResults
     ? {
-        ecoPersonality: quizResults.personalityType,
-        personality: quizResults.personalityType,
-        personalityType: quizResults.personalityType,
+        ecoPersonality: personalityType,
+        personality: personalityType,
+        personalityType: personalityType,
       }
     : {};
 
-  // If no quiz results, redirect to quiz
+  console.log('RecommendationScreen - personalityData:', JSON.stringify(personalityData, null, 2));
+
+  // If no quiz results, redirect to /results
   useEffect(() => {
+    console.log('RecommendationScreen - useEffect - quizResults:', JSON.stringify(quizResults, null, 2));
     if (!quizResults) {
-      navigate('/quiz');
+      navigate('/results');
     }
     setIsLoading(false);
   }, [quizResults, navigate]);
@@ -57,7 +84,7 @@ const RecommendationScreen: React.FC = () => {
             </Button>
             <Button
               variant="ghost"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/results')}
               className="flex items-center gap-2 text-green-700"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -72,10 +99,10 @@ const RecommendationScreen: React.FC = () => {
         <RecommendationEngine
           personalityData={personalityData}
           profileImage={user?.profileImage || '/default-avatar.png'}
-          personality={quizResults.personalityType || 'Eco Explorer'}
+          personality={personalityType}
           userName={user?.name || 'Eco Hero'}
           autoSimulate={true}
-          onBack={() => navigate(-1)}
+          onBack={() => navigate('/results')}
         />
       </main>
 

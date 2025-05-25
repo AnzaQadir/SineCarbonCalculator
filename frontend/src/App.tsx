@@ -7,6 +7,8 @@ import { StrictMode } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import RecommendationScreen from '@/pages/RecommendationScreen';
+import ResultsScreen from '@/pages/ResultsScreen';
+import InviteScreen from '@/pages/InviteScreen';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="*" element={<NotFound />} />
               <Route path="/recommendations" element={<RecommendationScreen />} />
+              <Route path="/results" element={<ResultsScreen />} />
+              <Route path="/invite" element={<InviteScreen />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
