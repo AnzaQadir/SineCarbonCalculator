@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
@@ -13,18 +12,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <header className="border-b border-border/40">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center space-x-2 group">
-            <Leaf className="h-6 w-6 text-primary transition-transform duration-300 group-hover:rotate-12" />
-            <span className="font-medium text-xl">CarbonCalc</span>
+            <img src="/images/logo.png" alt="Zerrah Logo" className="h-7 w-7" />
+            <span className="font-serif text-2xl tracking-tight">Zerrah</span>
           </Link>
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-foreground/80 hover:text-primary transition-colors">
-              Calculator
+              Home
             </Link>
-            <Link to="/" className="text-foreground/80 hover:text-primary transition-colors">
-              About
+            <Link to="/quiz" className="text-foreground/80 hover:text-primary transition-colors">
+              Quiz
             </Link>
-            <Link to="/" className="text-foreground/80 hover:text-primary transition-colors">
-              Resources
+            <Link to="/reflections" className="text-foreground/80 hover:text-primary transition-colors">
+              Reflection
             </Link>
           </nav>
           <div className="hidden md:block">
@@ -46,11 +45,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <Leaf className="h-5 w-5 text-primary" />
-                <span className="font-medium text-lg">CarbonCalc</span>
+                <img src="/images/logo.png" alt="Zerrah Logo" className="h-5 w-5" />
+                <span className="font-serif text-xl">Zerrah</span>
               </div>
               <p className="text-muted-foreground">
-                Helping you understand and reduce your carbon footprint with precision and clarity.
+                Zerrah helps you understand and reduce your climate impact—joyfully, simply, and personally.
               </p>
             </div>
             <div>
@@ -95,7 +94,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-border/40 text-center text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} CarbonCalc. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Zerrah. All rights reserved.</p>
           </div>
         </div>
       </footer>
