@@ -4,7 +4,7 @@ import Layout from '@/components/Layout';
 import Calculator from '@/components/Calculator';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users, CheckCircle, Smile, Heart, Check, Globe, Hexagon, Star, Zap, Share2, PauseCircle } from 'lucide-react';
+import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users, CheckCircle, Smile, Heart, Check, Globe, Hexagon, Star, Zap, Share2, PauseCircle, Medal, Lightbulb, Leaf } from 'lucide-react';
 import { useCalculator } from '@/hooks/useCalculator';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from 'framer-motion';
@@ -337,80 +337,46 @@ const Index = () => {
       </main>
 
       {/* How It Works Section */}
-      <section className="w-full max-w-5xl mx-auto mt-24 mb-12 px-4 bg-gradient-to-b from-white to-foam rounded-3xl shadow-sm py-12">
+      <section className="w-full max-w-5xl mx-auto mt-24 mb-12 px-4 bg-white rounded-3xl shadow-sm py-16">
         <div className="flex flex-col items-center mb-10">
-          <span className="block w-10 h-1 bg-primary rounded-full mb-4"></span>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-navy mb-2">How It Works</h2>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 tracking-tight mb-8">How It Works</h2>
         </div>
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-10"
-          initial="hidden"
-          animate="visible"
-          variants={{}}
-        >
-          {/* Take the Quiz */}
-          <motion.div className="flex flex-col justify-center min-h-[220px]" variants={cardVariants} custom={0}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* Top-left: Step 1 text */}
+          <div className="flex flex-col justify-center">
             <h3 className="text-2xl font-extrabold mb-2">Take the Quiz</h3>
             <p className="text-gray-400 text-lg">Answer quick, vibes-based questions about daily habits.</p>
-          </motion.div>
-          <motion.div
-            className="flex items-center justify-center min-h-[220px]"
-            variants={cardVariants}
-            custom={1}
-            whileHover="hover"
-            initial="rest"
-            animate="rest"
-          >
-            <motion.div
-              className="bg-primary/10 border-t-4 border-primary rounded-2xl w-48 h-48 flex items-center justify-center shadow-lg transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl"
-              variants={iconVariants}
-            >
-              <motion.div className="bg-white rounded-full w-12 h-12 shadow-md transition-all duration-300" variants={iconVariants} />
-            </motion.div>
-          </motion.div>
-          {/* Discover Your Story */}
-          <motion.div
-            className="flex items-center justify-center min-h-[220px]"
-            variants={cardVariants}
-            custom={2}
-            whileHover="hover"
-            initial="rest"
-            animate="rest"
-          >
-            <motion.div
-              className="bg-primary/10 border-t-4 border-primary rounded-2xl w-48 h-48 flex items-center justify-center shadow-lg transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl"
-              variants={iconVariants}
-            >
-              <motion.div className="bg-white rounded w-10 h-10 shadow-md transition-all duration-300" variants={iconVariants} />
-            </motion.div>
-          </motion.div>
-          <motion.div className="flex flex-col justify-center min-h-[220px]" variants={cardVariants} custom={3}>
+          </div>
+          {/* Top-right: Visual block with image */}
+          <div className="flex items-center justify-center">
+            <div className="h-48 w-48 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+              <img src="/images/image.png" alt="Take the Quiz" className="h-32 w-32 object-contain" />
+            </div>
+          </div>
+          {/* Bottom-left: Visual block with Story image */}
+          <div className="flex items-center justify-center">
+            <div className="h-48 w-48 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+              <img src="/images/color_story.png" alt="Discover Your Story" className="h-32 w-32 object-contain" />
+            </div>
+          </div>
+          {/* Bottom-right: Step 2 text */}
+          <div className="flex flex-col justify-center">
             <h3 className="text-2xl font-extrabold mb-2">Discover Your Story</h3>
             <p className="text-gray-400 text-lg">Uncover your unique eco-persona and what makes you shine.</p>
-          </motion.div>
-          {/* Reflect & Reimagine */}
-          <motion.div className="flex flex-col justify-center min-h-[220px]" variants={cardVariants} custom={4}>
+          </div>
+        </div>
+        {/* Step 3: Reflect & Reimagine (below grid) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
+          <div className="flex flex-col justify-center">
             <h3 className="text-2xl font-extrabold mb-2">Reflect & Reimagine</h3>
             <p className="text-gray-400 text-lg">See gentle, clear tips for making a bigger impact.</p>
-          </motion.div>
-          <motion.div
-            className="flex items-center justify-center min-h-[220px]"
-            variants={cardVariants}
-            custom={5}
-            whileHover="hover"
-            initial="rest"
-            animate="rest"
-          >
-            <motion.div
-              className="bg-primary/10 border-t-4 border-primary rounded-2xl w-48 h-48 flex items-center justify-center shadow-lg transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl"
-              variants={iconVariants}
-            >
-              <motion.svg width="40" height="40" viewBox="0 0 40 40" className="transition-all duration-300" variants={iconVariants}>
-                <polygon points="20,8 32,32 8,32" fill="white" />
-              </motion.svg>
-            </motion.div>
-          </motion.div>
-        </motion.div>
+          </div>
+          <div className="flex items-center justify-center">
+            <div className="h-48 w-48 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+              <img src="/images/reflect.png" alt="Reflect & Reimagine" className="h-32 w-32 object-contain" />
+            </div>
+          </div>
+        </div>
       </section>
       
       {/* Impact at a Glance Section */}
