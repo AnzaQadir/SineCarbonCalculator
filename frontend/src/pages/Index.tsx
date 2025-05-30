@@ -1,14 +1,231 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import Hero from '@/components/sections/Hero';
 import Calculator from '@/components/Calculator';
 import { Card, CardContent } from '@/components/ui/card';
-import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users, CheckCircle, Smile, Heart, Check, Globe, Hexagon, Star, Zap, Share2, PauseCircle } from 'lucide-react';
 import { useCalculator } from '@/hooks/useCalculator';
+import { toast } from '@/components/ui/use-toast';
+import { motion } from 'framer-motion';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (i = 1) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.15,
+      duration: 0.6,
+      ease: 'easeOut',
+    },
+  }),
+};
+
+const iconVariants = {
+  rest: { scale: 1 },
+  hover: { scale: 1.08, transition: { type: 'spring', stiffness: 300 } },
+};
+
+const iconHoverVariants = {
+  rest: { scale: 1 },
+  hover: { scale: 1.18, rotate: -6, transition: { type: 'spring', stiffness: 300 } },
+};
+
+const values = [
+  {
+    icon: Zap,
+    label: 'Reflective',
+    tooltip: 'Pause and consider your impact—no rush, just reflection.'
+  },
+  {
+    icon: Star,
+    label: 'Guilt-Free',
+    tooltip: 'No shame, no blame. Just positive, actionable steps.'
+  },
+  {
+    icon: Hexagon,
+    label: 'Story-Driven',
+    tooltip: 'Your journey is a story—unique, evolving, and worth sharing.'
+  },
+  {
+    icon: Globe,
+    label: 'For Now',
+    tooltip: 'Focus on what you can do today, not perfection.'
+  },
+  {
+    icon: Smile,
+    label: 'Calm Mood',
+    tooltip: 'A gentle, welcoming vibe for every step.'
+  },
+  {
+    icon: Heart,
+    label: 'Gentle Icons',
+    tooltip: 'Soft, friendly visuals to make the journey enjoyable.'
+  },
+  {
+    icon: Share2,
+    label: 'Share Ripple',
+    tooltip: 'Your actions inspire others—spread the positive ripple.'
+  },
+  {
+    icon: PauseCircle,
+    label: 'Own Pace',
+    tooltip: 'Go at your speed—no pressure, just progress.'
+  },
+];
+
+const spotlightCards = [
+  {
+    title: 'Bike to work. Like skipping 1 car ride. Saves 8kg CO₂.',
+    effort: 'Low Effort',
+    sub: 'Quick Start',
+    border: 'border-l-4 border-primary',
+    tooltip: 'Biking is a fun, healthy way to cut emissions fast!'
+  },
+  {
+    title: 'Meatless Monday. Like planting 2 trees. Saves 20L water.',
+    effort: 'Medium Effort',
+    sub: 'Feel-Good',
+    border: 'border-l-4 border-yellow-400',
+    tooltip: 'Skipping meat once a week saves water and reduces your footprint.'
+  },
+  {
+    title: 'Home solar estimate. Like a year of LEDs. Saves 500kg CO₂.',
+    effort: 'High Effort',
+    sub: 'Long Haul',
+    border: 'border-l-4 border-pink-400',
+    tooltip: 'Solar is a big step, but pays off for you and the planet!'
+  },
+];
+
+const cardMotion = {
+  hidden: { opacity: 0, y: 40, scale: 0.96 },
+  visible: (i = 1) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      delay: i * 0.15,
+      duration: 0.6,
+      ease: 'easeOut',
+    },
+  }),
+  hover: {
+    scale: 1.04,
+    boxShadow: '0 8px 32px 0 rgba(0,0,0,0.10)',
+    transition: { type: 'spring', stiffness: 300 },
+  },
+};
+
+// --- ContactForm component ---
+const ContactForm = () => {
+  const [fields, setFields] = useState({ name: '', email: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFields({ ...fields, [e.target.name]: e.target.value });
+    setError('');
+  };
+
+  const validate = () => {
+    if (!fields.name.trim() || !fields.email.trim() || !fields.message.trim()) {
+      setError('Please fill in all fields.');
+      return false;
+    }
+    if (!fields.email.includes('@') || !fields.email.includes('.')) {
+      setError('Please enter a valid email address.');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuccess(false);
+    if (!validate()) return;
+    setSubmitting(true);
+    setError('');
+    // Simulate network request
+    setTimeout(() => {
+      setSubmitting(false);
+      setSuccess(true);
+      setFields({ name: '', email: '', message: '' });
+      if (toast) {
+        toast({ title: "Message sent!", description: "Thank you for reaching out. We'll be in touch soon." });
+      }
+    }, 1200);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center py-8 w-full">
+      <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-2">Contact Us</h2>
+      <h3 className="text-xl md:text-2xl font-bold text-gray-400 text-center mb-8">We'd love to hear from you.</h3>
+      <form className="w-full max-w-md mx-auto flex flex-col gap-4" onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            placeholder="Jane Smith"
+            className="w-full rounded-md bg-gray-100 px-4 py-2 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60"
+            value={fields.name}
+            onChange={handleChange}
+            disabled={submitting}
+          />
+        </div>
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="jane@framer.com"
+            className="w-full rounded-md bg-gray-100 px-4 py-2 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60"
+            value={fields.email}
+            onChange={handleChange}
+            disabled={submitting}
+          />
+        </div>
+        <div>
+          <label htmlFor="message" className="block text-sm font-medium mb-1">Message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows={4}
+            placeholder="Your message..."
+            className="w-full rounded-md bg-gray-100 px-4 py-2 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-60"
+            value={fields.message}
+            onChange={handleChange}
+            disabled={submitting}
+          />
+        </div>
+        {error && <div className="text-red-500 text-sm text-center -mt-2">{error}</div>}
+        <button
+          type="submit"
+          className="w-full bg-black text-white rounded-md py-2 font-semibold text-base mt-2 hover:bg-gray-800 transition disabled:opacity-60"
+          disabled={submitting}
+        >
+          {submitting ? 'Sending...' : 'Submit'}
+        </button>
+        {success && (
+          <div className="text-green-600 text-center mt-4">Message sent! Thank you for reaching out.</div>
+        )}
+      </form>
+    </div>
+  );
+};
 
 const Index = () => {
   const { state, updateCalculator } = useCalculator();
   const [currentStep, setCurrentStep] = useState(0);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isQuizRoute = location.pathname === '/quiz';
 
   const handleCalculate = () => {
     // Handle calculation completion
@@ -27,10 +244,13 @@ const Index = () => {
     setCurrentStep(step);
   };
 
+  const handleStartQuiz = () => {
+    navigate('/quiz');
+  };
+
+  if (isQuizRoute) {
   return (
     <Layout>
-      <Hero />
-      
       <section className="py-20 bg-white">
         <div className="container px-4">
           <div className="mx-auto">
@@ -45,8 +265,31 @@ const Index = () => {
             </div>
             
             <Calculator 
-              state={state}
-              onUpdate={updateCalculator}
+                state={{
+                  ...state,
+                  householdSize: state.householdSize.toString(),
+                  electricityKwh: state.electricityKwh.toString(),
+                  naturalGasTherm: state.naturalGasTherm.toString(),
+                  heatingOilGallons: state.heatingOilGallons.toString(),
+                  propaneGallons: state.propaneGallons.toString(),
+                  annualMileage: state.annualMileage.toString(),
+                  costPerMile: state.costPerMile.toString(),
+                  plantBasedMealsPerWeek: state.plantBasedMealsPerWeek.toString(),
+                }}
+                onUpdate={(updates) => {
+                  const processedUpdates = {
+                    ...updates,
+                    householdSize: updates.householdSize ? Number(updates.householdSize) : state.householdSize,
+                    electricityKwh: updates.electricityKwh ? Number(updates.electricityKwh) : state.electricityKwh,
+                    naturalGasTherm: updates.naturalGasTherm ? Number(updates.naturalGasTherm) : state.naturalGasTherm,
+                    heatingOilGallons: updates.heatingOilGallons ? Number(updates.heatingOilGallons) : state.heatingOilGallons,
+                    propaneGallons: updates.propaneGallons ? Number(updates.propaneGallons) : state.propaneGallons,
+                    annualMileage: updates.annualMileage ? Number(updates.annualMileage) : state.annualMileage,
+                    costPerMile: updates.costPerMile ? Number(updates.costPerMile) : state.costPerMile,
+                    plantBasedMealsPerWeek: updates.plantBasedMealsPerWeek ? Number(updates.plantBasedMealsPerWeek) : state.plantBasedMealsPerWeek,
+                  };
+                  updateCalculator(processedUpdates);
+                }}
               onCalculate={handleCalculate}
               onBack={handleBack}
               onNext={handleNext}
@@ -55,130 +298,367 @@ const Index = () => {
             />
           </div>
         </div>
+        </section>
+      </Layout>
+    );
+  }
+
+  // --- Minimalist Hero Section ---
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Custom Header */}
+      <header className="w-full flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center space-x-2">
+          <img src="/images/logo.png" alt="Zerrah Logo" className="h-6 w-6" />
+          <span className="font-bold text-lg tracking-tight">Zerrah</span>
+        </div>
+        <nav className="flex-1 flex justify-center gap-8">
+          <a href="/" className="text-gray-500 hover:text-black font-medium">Home</a>
+          <a href="/quiz" className="text-gray-500 hover:text-black font-medium">Quiz</a>
+          <a href="/reflections" className="text-gray-500 hover:text-black font-medium">Reflections</a>
+        </nav>
+        <a href="#contact" className="bg-black text-white rounded-full px-5 py-2 font-semibold text-sm shadow hover:bg-gray-800 transition">Contact</a>
+      </header>
+
+      {/* Hero Content */}
+      <main className="flex flex-col items-center justify-center flex-1 text-center px-4">
+        <h1 className="text-3xl md:text-5xl font-extrabold mt-24 mb-4" style={{ fontFamily: 'Inter, Arial, sans-serif' }}>
+          Small actions. Big climate impact.
+        </h1>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-400 mb-8" style={{ fontFamily: 'Inter, Arial, sans-serif' }}>
+          Discover your eco-story in 3 minutes.
+        </h2>
+        <button
+          onClick={handleStartQuiz}
+          className="bg-black text-white rounded-full px-6 py-2 font-semibold text-base shadow hover:bg-gray-800 transition"
+        >
+          Take the Quiz
+        </button>
+      </main>
+
+      {/* How It Works Section */}
+      <section className="w-full max-w-5xl mx-auto mt-24 mb-12 px-4 bg-gradient-to-b from-white to-foam rounded-3xl shadow-sm py-12">
+        <div className="flex flex-col items-center mb-10">
+          <span className="block w-10 h-1 bg-primary rounded-full mb-4"></span>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-navy mb-2">How It Works</h2>
+        </div>
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-10"
+          initial="hidden"
+          animate="visible"
+          variants={{}}
+        >
+          {/* Take the Quiz */}
+          <motion.div className="flex flex-col justify-center min-h-[220px]" variants={cardVariants} custom={0}>
+            <h3 className="text-2xl font-extrabold mb-2">Take the Quiz</h3>
+            <p className="text-gray-400 text-lg">Answer quick, vibes-based questions about daily habits.</p>
+          </motion.div>
+          <motion.div
+            className="flex items-center justify-center min-h-[220px]"
+            variants={cardVariants}
+            custom={1}
+            whileHover="hover"
+            initial="rest"
+            animate="rest"
+          >
+            <motion.div
+              className="bg-primary/10 border-t-4 border-primary rounded-2xl w-48 h-48 flex items-center justify-center shadow-lg transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl"
+              variants={iconVariants}
+            >
+              <motion.div className="bg-white rounded-full w-12 h-12 shadow-md transition-all duration-300" variants={iconVariants} />
+            </motion.div>
+          </motion.div>
+          {/* Discover Your Story */}
+          <motion.div
+            className="flex items-center justify-center min-h-[220px]"
+            variants={cardVariants}
+            custom={2}
+            whileHover="hover"
+            initial="rest"
+            animate="rest"
+          >
+            <motion.div
+              className="bg-primary/10 border-t-4 border-primary rounded-2xl w-48 h-48 flex items-center justify-center shadow-lg transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl"
+              variants={iconVariants}
+            >
+              <motion.div className="bg-white rounded w-10 h-10 shadow-md transition-all duration-300" variants={iconVariants} />
+            </motion.div>
+          </motion.div>
+          <motion.div className="flex flex-col justify-center min-h-[220px]" variants={cardVariants} custom={3}>
+            <h3 className="text-2xl font-extrabold mb-2">Discover Your Story</h3>
+            <p className="text-gray-400 text-lg">Uncover your unique eco-persona and what makes you shine.</p>
+          </motion.div>
+          {/* Reflect & Reimagine */}
+          <motion.div className="flex flex-col justify-center min-h-[220px]" variants={cardVariants} custom={4}>
+            <h3 className="text-2xl font-extrabold mb-2">Reflect & Reimagine</h3>
+            <p className="text-gray-400 text-lg">See gentle, clear tips for making a bigger impact.</p>
+          </motion.div>
+          <motion.div
+            className="flex items-center justify-center min-h-[220px]"
+            variants={cardVariants}
+            custom={5}
+            whileHover="hover"
+            initial="rest"
+            animate="rest"
+          >
+            <motion.div
+              className="bg-primary/10 border-t-4 border-primary rounded-2xl w-48 h-48 flex items-center justify-center shadow-lg transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl"
+              variants={iconVariants}
+            >
+              <motion.svg width="40" height="40" viewBox="0 0 40 40" className="transition-all duration-300" variants={iconVariants}>
+                <polygon points="20,8 32,32 8,32" fill="white" />
+              </motion.svg>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </section>
       
-      <section className="py-20 bg-gradient-to-b from-white to-secondary/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Calculate Your Carbon Footprint?</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Understanding your impact is the first step toward making positive changes.
-            </p>
+      {/* Impact at a Glance Section */}
+      <section className="w-full max-w-5xl mx-auto my-16 px-4">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-8">Your Impact at a Glance</h2>
+        <div className="border-2 border-blue-200 rounded-xl overflow-hidden mb-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 bg-white divide-x divide-blue-100">
+            <div className="flex flex-col items-center py-8">
+              <Zap className="h-8 w-8 text-gray-400 mb-2" />
+              <span className="font-bold">Reflective</span>
+            </div>
+            <div className="flex flex-col items-center py-8">
+              <Star className="h-8 w-8 text-gray-400 mb-2" />
+              <span className="font-bold">Guilt-Free</span>
+            </div>
+            <div className="flex flex-col items-center py-8">
+              <Hexagon className="h-8 w-8 text-pink-400 mb-2" />
+              <span className="font-bold">Story-Driven</span>
+            </div>
+            <div className="flex flex-col items-center py-8">
+              <Globe className="h-8 w-8 text-gray-400 mb-2" />
+              <span className="font-bold">For Now</span>
+            </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            <Card className="calculator-card">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <LeafyGreen className="h-6 w-6 text-primary" />
+          <div className="grid grid-cols-2 md:grid-cols-4 bg-blue-50 divide-x divide-blue-100 border-t border-blue-100">
+            <div className="flex flex-col items-center py-8">
+              <Smile className="h-8 w-8 text-blue-300 mb-2" />
+              <span className="font-bold">Calm Mood</span>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Awareness</h3>
-                <p className="text-muted-foreground">
-                  Gain a clear understanding of how your lifestyle affects the planet.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="calculator-card">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Droplets className="h-6 w-6 text-primary" />
+            <div className="flex flex-col items-center py-8">
+              <Heart className="h-8 w-8 text-blue-300 mb-2" />
+              <span className="font-bold">Gentle Icons</span>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Reduce Impact</h3>
-                <p className="text-muted-foreground">
-                  Identify areas where you can make changes to reduce your carbon emissions.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="calculator-card">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Wind className="h-6 w-6 text-primary" />
+            <div className="flex flex-col items-center py-8">
+              <Share2 className="h-8 w-8 text-blue-300 mb-2" />
+              <span className="font-bold">Share Ripple</span>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Track Progress</h3>
-                <p className="text-muted-foreground">
-                  Measure your progress over time as you adopt more sustainable habits.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="calculator-card">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Trees className="h-6 w-6 text-primary" />
+            <div className="flex flex-col items-center py-8">
+              <PauseCircle className="h-8 w-8 text-blue-300 mb-2" />
+              <span className="font-bold">Own Pace</span>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Take Action</h3>
-                <p className="text-muted-foreground">
-                  Learn about offset options and find ways to contribute to climate solutions.
-                </p>
-              </CardContent>
-            </Card>
           </div>
+        </div>
+        <div className="max-w-2xl mx-auto">
+          <table className="w-full text-sm">
+            <tbody>
+              <tr className="border-b border-gray-100">
+                <td className="py-3 text-gray-500">CO₂ Saved</td>
+                <td className="py-3 text-right font-semibold">82kg</td>
+              </tr>
+              <tr className="border-b border-gray-100">
+                <td className="py-3 text-gray-500">Water Used</td>
+                <td className="py-3 text-right font-semibold">34L</td>
+              </tr>
+              <tr className="border-b border-gray-100">
+                <td className="py-3 text-gray-500">Waste Reduced</td>
+                <td className="py-3 text-right font-semibold">7kg</td>
+              </tr>
+              <tr className="border-b border-gray-100">
+                <td className="py-3 text-gray-500">Light/Dark Mode</td>
+                <td className="py-3 text-right text-gray-400">Toggle</td>
+              </tr>
+              <tr className="border-b border-gray-100">
+                <td className="py-3 text-gray-500">Compare Impact</td>
+                <td className="py-3 text-right text-gray-400">vs Average</td>
+              </tr>
+              <tr>
+                <td className="py-3 text-gray-500">Your Impact</td>
+                <td className="py-3 text-right text-gray-400">Unique</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
       
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Approach</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              We've designed our calculator with these principles in mind.
+      {/* Action Spotlight & Reflections Archive Section */}
+      <section className="w-full max-w-5xl mx-auto my-24 px-4">
+        {/* Action Spotlight */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-extrabold mb-1">Action Spotlight</h2>
+          <h3 className="text-2xl font-bold text-gray-400">Impact made simple</h3>
+        </div>
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20"
+          initial="hidden"
+          animate="visible"
+          variants={{}}
+        >
+          {spotlightCards.map((card, i) => (
+            <Tooltip key={card.title}>
+              <TooltipTrigger asChild>
+                <motion.div
+                  className={`bg-gray-100 rounded-2xl p-6 flex flex-col justify-between min-h-[180px] cursor-pointer ${card.border}`}
+                  variants={cardMotion}
+                  custom={i}
+                  whileHover="hover"
+                  initial="hidden"
+                  animate="visible"
+                  onClick={() => alert(`Learn more about: ${card.effort}`)}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Learn more about ${card.effort}`}
+                >
+                  <div className="text-gray-700 mb-8">{card.title}</div>
+                  <div>
+                    <span className="font-bold">{card.effort}</span>
+                    <span className="block text-gray-400 text-sm">{card.sub}</span>
+                  </div>
+                </motion.div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-base">
+                {card.tooltip}
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </motion.div>
+        {/* Reflections Archive */}
+        <section className="py-16 max-w-3xl mx-auto bg-white">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 tracking-tight mb-6">Reflections Archive</h2>
+          <div className="text-center">
+            <p className="text-gray-600 mb-6 max-w-xl mx-auto tracking-normal">
+              Browse user stories, discover journeys, and get inspired by eco-persona reflections from our global community.
             </p>
+            <p className="text-gray-600 mb-6 max-w-xl mx-auto tracking-normal">
+              Filter by persona, topic, and region to see climate reflections relevant to you. Real voices drive real change.
+            </p>
+            <p className="text-gray-600 mb-10 max-w-xl mx-auto tracking-normal">
+              Share your eco-story to inspire others—each ripple builds a brighter world.
+            </p>
+            <div className="flex justify-center">
+              <div className="relative flex flex-col items-center">
+                <svg width="80" height="40" viewBox="0 0 60 32" fill="none" className="text-gray-300 mx-auto">
+                  <path d="M2 30c10-10 15-28 25-28s15 18 25 28" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-16 h-4 bg-gradient-to-t from-gray-200/40 to-transparent rounded-full blur-sm"></div>
+              </div>
+            </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            <Card className="calculator-card">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <FileText className="h-6 w-6 text-primary" />
+        </section>
+        <div className="border-t border-gray-100 my-8"></div>
+        {/* Ripple Effect Diagram */}
+        <div className="flex flex-col items-center my-12">
+          <svg viewBox="0 0 400 220" width="340" height="180" className="max-w-full" fill="none">
+            {/* Outer faded ring */}
+            <ellipse cx="200" cy="110" rx="170" ry="80" fill="none" stroke="#e5e7eb" strokeWidth="2" opacity="0.7" />
+            {/* Second ripple */}
+            <ellipse cx="200" cy="110" rx="120" ry="55" fill="none" stroke="#e5e7eb" strokeWidth="2" opacity="0.9" />
+            {/* First ripple */}
+            <ellipse cx="200" cy="110" rx="70" ry="30" fill="none" stroke="#6ee7b7" strokeWidth="2" opacity="1" />
+            {/* Central circle */}
+            <circle cx="200" cy="110" r="22" fill="#fff" stroke="#10b981" strokeWidth="3" />
+            <text x="200" y="115" textAnchor="middle" fontSize="15" fill="#059669" fontWeight="bold">You</text>
+            {/* First ripple: 3 circles */}
+            <circle cx="200" cy="60" r="14" fill="#fff" stroke="#a7f3d0" strokeWidth="2" />
+            <circle cx="160" cy="130" r="14" fill="#fff" stroke="#a7f3d0" strokeWidth="2" />
+            <circle cx="240" cy="130" r="14" fill="#fff" stroke="#a7f3d0" strokeWidth="2" />
+            <text x="200" y="50" textAnchor="middle" fontSize="12" fill="#10b981">Inspire</text>
+            {/* Lines from center to first ripple */}
+            <line x1="200" y1="110" x2="200" y2="74" stroke="#d1d5db" strokeWidth="1.5" />
+            <line x1="200" y1="110" x2="170" y2="124" stroke="#d1d5db" strokeWidth="1.5" />
+            <line x1="200" y1="110" x2="230" y2="124" stroke="#d1d5db" strokeWidth="1.5" />
+            {/* Second ripple: 5 circles */}
+            <circle cx="200" cy="30" r="10" fill="#fff" stroke="#a7f3d0" strokeWidth="1.5" />
+            <circle cx="130" cy="110" r="10" fill="#fff" stroke="#a7f3d0" strokeWidth="1.5" />
+            <circle cx="270" cy="110" r="10" fill="#fff" stroke="#a7f3d0" strokeWidth="1.5" />
+            <circle cx="170" cy="170" r="10" fill="#fff" stroke="#a7f3d0" strokeWidth="1.5" />
+            <circle cx="230" cy="170" r="10" fill="#fff" stroke="#a7f3d0" strokeWidth="1.5" />
+            {/* Lines from first ripple to second ripple */}
+            <line x1="200" y1="60" x2="200" y2="40" stroke="#d1d5db" strokeWidth="1" />
+            <line x1="200" y1="60" x2="130" y2="110" stroke="#d1d5db" strokeWidth="1" />
+            <line x1="200" y1="60" x2="270" y2="110" stroke="#d1d5db" strokeWidth="1" />
+            <line x1="160" y1="130" x2="170" y2="170" stroke="#d1d5db" strokeWidth="1" />
+            <line x1="160" y1="130" x2="130" y2="110" stroke="#d1d5db" strokeWidth="1" />
+            <line x1="160" y1="130" x2="200" y2="40" stroke="#d1d5db" strokeWidth="1" />
+            <line x1="240" y1="130" x2="230" y2="170" stroke="#d1d5db" strokeWidth="1" />
+            <line x1="240" y1="130" x2="270" y2="110" stroke="#d1d5db" strokeWidth="1" />
+            <line x1="240" y1="130" x2="200" y2="40" stroke="#d1d5db" strokeWidth="1" />
+            {/* Outer ring label */}
+            <text x="200" y="200" textAnchor="middle" fontSize="14" fill="#9ca3af" fontWeight="bold" opacity="0.8">Community</text>
+          </svg>
+          <div className="mt-6 text-center text-gray-500 text-base max-w-lg mx-auto tracking-normal">
+            Your story creates ripples.
+          </div>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Scientific Rigor</h3>
-                <p className="text-muted-foreground">
-                  Our calculations are based on peer-reviewed methodologies and data from respected sources like the EPA and IPCC.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="calculator-card">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <BarChart4 className="h-6 w-6 text-primary" />
+        <div className="border-t border-gray-100 my-8"></div>
+        <section className="py-16 max-w-3xl mx-auto bg-white">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 tracking-tight mb-6">Meet the Founders</h2>
+          <div className="text-center">
+            <p className="text-gray-600 mb-6 max-w-xl mx-auto tracking-normal">
+              Anza Qadir and Salma believe storytelling can turn climate worry into climate action. Each brings a love for gentle design, clear guidance, and true inclusivity.
+            </p>
+            <p className="text-gray-600 max-w-2xl mx-auto tracking-normal">
+              Reach out with feedback, connect on LinkedIn, or<br />
+              share your reflections. Your story shapes Zerrah.
+            </p>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Personalized Insights</h3>
-                <p className="text-muted-foreground">
-                  We provide tailored recommendations based on your unique footprint profile and lifestyle patterns.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="calculator-card">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Map className="h-6 w-6 text-primary" />
+        </section>
+        {/* Founders Profile Photos */}
+        <div className="flex flex-col items-center mt-10 mb-20">
+          <div className="flex flex-row gap-12 justify-center">
+            {/* Anza */}
+            <div className="flex flex-col items-center">
+              <img src="/profile.jpg" alt="Anza Qadir" className="h-28 w-28 rounded-full border-4 border-white shadow-md object-cover" />
+              <div className="mt-4 text-lg font-bold text-gray-900">Anza Qadir</div>
+              <div className="text-sm text-gray-400">Co-Founder</div>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Localized Data</h3>
-                <p className="text-muted-foreground">
-                  Our calculations consider regional factors like electricity grid mix and available transportation options.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="calculator-card">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Users className="h-6 w-6 text-primary" />
+            {/* Salma */}
+            <div className="flex flex-col items-center">
+              <img src="/images/Sustainability-Soft-Launch-Girl.png" alt="Salma" className="h-28 w-28 rounded-full border-4 border-white shadow-md object-cover" />
+              <div className="mt-4 text-lg font-bold text-gray-900">Salma</div>
+              <div className="text-sm text-gray-400">Co-Founder</div>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Ecosystem Integration</h3>
-                <p className="text-muted-foreground">
-                  We connect you with resources, partners, and tools to make sustainable living more accessible.
-                </p>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </section>
-    </Layout>
+
+      {/* Meet the Founders & Contact Us Section */}
+      <section className="w-full max-w-5xl mx-auto mt-24 px-4">
+        {/* Contact Us */}
+        <ContactForm />
+      </section>
+
+      <footer className="w-full border-t border-gray-100 py-12 bg-white mt-24">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-start justify-between px-4">
+          <div className="mb-8 md:mb-0">
+            <img src="/images/logo.png" alt="Zerrah Logo" className="h-6 w-auto opacity-30 grayscale" />
+          </div>
+          <div className="flex flex-row gap-16">
+            <div>
+              <h4 className="font-semibold mb-2">Navigation</h4>
+              <ul className="space-y-1 text-gray-400">
+                <li><a href="/" className="hover:text-black transition">Home</a></li>
+                <li><a href="/quiz" className="hover:text-black transition">Quiz</a></li>
+                <li><a href="/reflections" className="hover:text-black transition">Reflections</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-2">Connect</h4>
+              <ul className="space-y-1 text-gray-400">
+                <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-black transition">Instagram</a></li>
+                <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-black transition">LinkedIn</a></li>
+                <li><a href="#about" className="hover:text-black transition">About Zerrah</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 };
 
