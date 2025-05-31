@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import Calculator from '@/components/Calculator';
 import { Card, CardContent } from '@/components/ui/card';
@@ -307,17 +307,45 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Custom Header */}
-      <header className="w-full flex items-center justify-between px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center space-x-2">
-          <img src="/images/logo_without_bg.png" alt="Zerrah Logo" className="h-6 w-6" />
-          <span className="font-bold text-lg tracking-tight">Zerrah</span>
+      <header className="w-full bg-white shadow-sm border-b border-gray-100">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-6">
+          {/* Side-by-side layout (default) */}
+          <div className="flex items-center pl-8 mr-6">
+            <div className="flex items-center justify-center">
+              <img
+                src="/images/zerrah_logo_globe_bolder_5120px.png"
+                alt="Zerrah - Sustainability Platform"
+                className="h-32 w-auto drop-shadow-lg"
+                style={{ minWidth: 128 }}
+              />
+            </div>
+            <span
+              className="font-serif font-semibold text-6xl tracking-wide ml-1 flex items-center"
+              style={{ color: '#007C78', fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, lineHeight: 1, height: '128px' }}
+            >
+              Zerrah
+            </span>
+          </div>
+          {/*
+          // Stacked layout (uncomment to use)
+          <div className="flex flex-col items-center py-2">
+            <img
+              src="/images/logo_without_bg.png"
+              alt="Zerrah Logo"
+              className="h-12 w-12 rounded-full shadow-md mb-2"
+            />
+            <span className="font-extrabold text-3xl md:text-4xl text-gray-900 tracking-tight">
+              Zerrah
+            </span>
+          </div>
+          */}
+          <nav className="flex items-center space-x-8">
+            <a href="/" className="text-gray-600 hover:text-emerald-600 font-medium text-base md:text-lg transition">Home</a>
+            <a href="/quiz" className="text-gray-600 hover:text-emerald-600 font-medium text-base md:text-lg transition">Quiz</a>
+            <a href="/reflections" className="text-gray-600 hover:text-emerald-600 font-medium text-base md:text-lg transition">Reflections</a>
+          </nav>
+          <Link to="/signup" className="ml-8 bg-emerald-600 text-white rounded-full px-6 py-2 font-bold shadow hover:bg-emerald-700 transition text-base md:text-lg">Get Started</Link>
         </div>
-        <nav className="flex-1 flex justify-center gap-8">
-          <a href="/" className="text-gray-500 hover:text-black font-medium">Home</a>
-          <a href="/quiz" className="text-gray-500 hover:text-black font-medium">Quiz</a>
-          <a href="/reflections" className="text-gray-500 hover:text-black font-medium">Reflections</a>
-        </nav>
-        <a href="#contact" className="bg-black text-white rounded-full px-5 py-2 font-semibold text-sm shadow hover:bg-gray-800 transition">Contact</a>
       </header>
 
       {/* Hero Content */}
