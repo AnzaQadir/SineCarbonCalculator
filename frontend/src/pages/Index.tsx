@@ -8,6 +8,7 @@ import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users, Che
 import { toast } from '@/components/ui/use-toast';
 import { motion } from 'framer-motion';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -233,6 +234,7 @@ const Index = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+  const [contactOpen, setContactOpen] = useState(false);
 
   const handleCalculate = () => {
     // Handle calculation completion
@@ -277,6 +279,15 @@ const Index = () => {
     }
   ];
 
+  useEffect(() => {
+    if (!contactOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Backspace') setContactOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [contactOpen]);
+
   // --- Minimalist Hero Section ---
   return (
     <Layout>
@@ -312,85 +323,87 @@ const Index = () => {
       </main>
 
       {/* How It Works Section */}
-      <section className="w-full max-w-7xl mx-auto my-24 px-8 md:px-16 bg-white rounded-3xl shadow-sm">
+      <section className="w-full max-w-full mx-auto my-24 px-8 md:px-16 bg-white rounded-3xl shadow-sm min-h-[600px] py-24">
         <div className="flex flex-col items-center mb-10">
           <h2 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 tracking-tight mb-8">How It Works</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Row 1: Text left, Image right */}
-          <motion.div
-            className="flex flex-col justify-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.3 }}
-            custom={0}
-            variants={cardVariants}
-          >
-            <h3 className="text-2xl font-extrabold mb-2">Take the Quiz</h3>
-            <p className="text-gray-400 text-lg">Answer quick, vibes-based questions about daily habits.</p>
-          </motion.div>
-          <motion.div
-            className="flex items-center justify-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.3 }}
-            custom={1}
-            variants={cardVariants}
-          >
-            <div className="h-64 w-64 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-              <img src="/images/image.png" alt="Take the Quiz" className="h-44 w-44 object-contain" />
-            </div>
-          </motion.div>
-          {/* Row 2: Image left, Text right */}
-          <motion.div
-            className="flex items-center justify-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.3 }}
-            custom={2}
-            variants={cardVariants}
-          >
-            <div className="h-64 w-64 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-              <img src="/images/color_story.png" alt="Discover Your Story" className="h-44 w-44 object-contain" />
-            </div>
-          </motion.div>
-          <motion.div
-            className="flex flex-col justify-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.3 }}
-            custom={3}
-            variants={cardVariants}
-          >
-            <h3 className="text-2xl font-extrabold mb-2">Discover Your Story</h3>
-            <p className="text-gray-400 text-lg">Uncover your unique eco-persona and what makes you shine.</p>
-          </motion.div>
-        </div>
-        {/* Row 3: Text left, Image right */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
-          <motion.div
-            className="flex flex-col justify-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.3 }}
-            custom={4}
-            variants={cardVariants}
-          >
-            <h3 className="text-2xl font-extrabold mb-2">Reflect & Reimagine</h3>
-            <p className="text-gray-400 text-lg">See gentle, clear tips for making a bigger impact.</p>
-          </motion.div>
-          <motion.div
-            className="flex items-center justify-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.3 }}
-            custom={5}
-            variants={cardVariants}
-          >
-            <div className="h-64 w-64 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-              <img src="/images/reflect.png" alt="Reflect & Reimagine" className="h-44 w-44 object-contain" />
+        <div className="mx-auto max-w-3xl my-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+            {/* Row 1: Text left, Image right */}
+            <motion.div
+              className="flex flex-col justify-center"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              custom={0}
+              variants={cardVariants}
+            >
+              <h3 className="text-2xl font-extrabold mb-1">Take the Quiz</h3>
+              <p className="text-gray-400 text-lg">Answer quick, vibes-based questions about daily habits.</p>
+            </motion.div>
+            <motion.div
+              className="flex items-center justify-center"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              custom={1}
+              variants={cardVariants}
+            >
+              <div className="h-80 w-80 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+                <img src="/images/image.png" alt="Take the Quiz" className="h-64 w-64 object-contain" />
+              </div>
+            </motion.div>
+            {/* Row 2: Image left, Text right */}
+            <motion.div
+              className="flex items-center justify-center"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              custom={2}
+              variants={cardVariants}
+            >
+              <div className="h-80 w-80 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+                <img src="/images/color_story.png" alt="Discover Your Story" className="h-64 w-64 object-contain" />
+              </div>
+            </motion.div>
+            <motion.div
+              className="flex flex-col justify-center"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              custom={3}
+              variants={cardVariants}
+            >
+              <h3 className="text-2xl font-extrabold mb-2">Discover Your Story</h3>
+              <p className="text-gray-400 text-lg">Uncover your unique eco-persona and what makes you shine.</p>
+            </motion.div>
           </div>
-          </motion.div>
+          {/* Row 3: Text left, Image right */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
+            <motion.div
+              className="flex flex-col justify-center"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              custom={4}
+              variants={cardVariants}
+            >
+              <h3 className="text-2xl font-extrabold mb-2">Reflect & Reimagine</h3>
+              <p className="text-gray-400 text-lg">See gentle, clear tips for making a bigger impact.</p>
+            </motion.div>
+            <motion.div
+              className="flex items-center justify-center"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              custom={5}
+              variants={cardVariants}
+            >
+              <div className="h-80 w-80 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+                <img src="/images/reflect.png" alt="Reflect & Reimagine" className="h-64 w-64 object-contain" />
+            </div>
+            </motion.div>
+          </div>
         </div>
       </section>
       
@@ -419,10 +432,7 @@ const Index = () => {
             { icon: Zap, label: 'Reflective', desc: 'You pause and consider your impact.' },
             { icon: Star, label: 'Guilt-Free', desc: 'No shame, just positive steps.' },
             { icon: Hexagon, label: 'Story-Driven', desc: 'Your journey is a story.' },
-            { icon: Globe, label: 'For Now', desc: 'Focus on what you can do today.' },
             { icon: Smile, label: 'Calm Mood', desc: 'A gentle, welcoming vibe.' },
-            { icon: Heart, label: 'Gentle Icons', desc: 'Soft, friendly visuals.' },
-            { icon: Share2, label: 'Share Ripple', desc: 'Your actions inspire others.' },
             { icon: PauseCircle, label: 'Own Pace', desc: 'Go at your speed—no pressure.' },
           ].map((v, i) => (
             <motion.div
@@ -443,70 +453,13 @@ const Index = () => {
           ))}
         </motion.div>
         {/* Animated numbers for impact card */}
-        {(() => {
-          const [co2, setCo2] = useState(0);
-          const [water, setWater] = useState(0);
-          const [waste, setWaste] = useState(0);
-          useEffect(() => {
-            let co2Target = 82, waterTarget = 34, wasteTarget = 7;
-            let co2Start = 0, waterStart = 0, wasteStart = 0;
-            const duration = 900;
-            const start = performance.now();
-            function animate(now: number) {
-              const progress = Math.min((now - start) / duration, 1);
-              setCo2(Math.round(co2Start + (co2Target - co2Start) * progress));
-              setWater(Math.round(waterStart + (waterTarget - waterStart) * progress));
-              setWaste(Math.round(wasteStart + (wasteTarget - wasteStart) * progress));
-              if (progress < 1) requestAnimationFrame(animate);
-            }
-            requestAnimationFrame(animate);
-          }, []);
-          return (
-            <motion.div
-              className="mx-auto max-w-xl bg-white/70 backdrop-blur-lg rounded-3xl shadow-2xl border border-blue-100 p-10 flex flex-col md:flex-row items-center justify-between gap-10 relative z-10"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
-              viewport={{ once: false, amount: 0.3 }}
-              style={{ boxShadow: '0 8px 40px 0 rgba(16,185,129,0.10)' }}
-            >
-              <div className="flex-1 flex flex-col gap-6">
-                <div className="flex items-center gap-3">
-                  <Sun className="h-7 w-7 text-yellow-400" />
-                  <span className="text-gray-500">CO₂ Saved</span>
-                  <span className="ml-auto font-extrabold text-2xl text-emerald-700">{co2}kg</span>
-          </div>
-                <div className="flex items-center gap-3">
-                  <Droplets className="h-7 w-7 text-blue-400" />
-                  <span className="text-gray-500">Water Used</span>
-                  <span className="ml-auto font-extrabold text-2xl text-blue-700">{water}L</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Recycle className="h-7 w-7 text-green-400" />
-                  <span className="text-gray-500">Waste Reduced</span>
-                  <span className="ml-auto font-extrabold text-2xl text-green-700">{waste}kg</span>
-                </div>
-              </div>
-              <div className="flex-1 flex flex-col gap-6">
-                <div className="flex items-center gap-3">
-                  <BarChart4 className="h-7 w-7 text-gray-400" />
-                  <span className="text-gray-500">Compare Impact</span>
-                  <span className="ml-auto text-gray-400">vs Average</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <PauseCircle className="h-7 w-7 text-blue-300" />
-                  <span className="text-gray-500">Light/Dark Mode</span>
-                  <span className="ml-auto text-gray-400">Toggle</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Star className="h-7 w-7 text-pink-400" />
-                  <span className="text-gray-500">Your Impact</span>
-                  <span className="ml-auto text-emerald-600 font-extrabold text-2xl">Unique</span>
+        <div className="mx-auto max-w-xl bg-white/70 backdrop-blur-lg rounded-3xl shadow-2xl border border-blue-100 p-10 flex items-center gap-8 relative z-10" style={{ boxShadow: '0 8px 40px 0 rgba(16,185,129,0.10)' }}>
+          <img src="/images/color_story.png" alt="Impact Illustration" className="h-24 w-24 object-contain rounded-xl shadow" />
+          <div className="text-left">
+            <p className="text-xl md:text-2xl text-gray-700 font-semibold mb-2">Your unique impact so far:</p>
+            <p className="text-lg text-gray-500">You've already saved <span className="text-emerald-700 font-bold">82kg CO₂</span>, conserved <span className="text-blue-700 font-bold">34L water</span>, and reduced <span className="text-green-700 font-bold">7kg waste</span>. Every step you take makes a real difference—keep going!</p>
           </div>
         </div>
-            </motion.div>
-          );
-        })()}
       </section>
       
       {/* Action Spotlight & Reflections Archive Section */}
@@ -618,11 +571,17 @@ const Index = () => {
       </section>
 
       {/* Meet the Founders & Contact Us Section */}
-      <section className="w-full max-w-7xl mx-auto mt-0 mb-24 px-8 md:px-16">
-        {/* Contact Us */}
-        <div className="flex flex-col items-center justify-center w-full">
-          <ContactForm />
-        </div>
+      <section className="w-full max-w-7xl mx-auto mt-0 mb-24 px-8 md:px-16 flex flex-col items-center justify-center">
+        <Dialog open={contactOpen} onOpenChange={setContactOpen}>
+          <DialogTrigger asChild>
+            <button className="bg-emerald-600 text-white rounded-full px-6 py-2 font-bold shadow hover:bg-emerald-700 transition text-base md:text-lg">
+              Contact Us
+            </button>
+          </DialogTrigger>
+          <DialogContent>
+            <ContactForm />
+          </DialogContent>
+        </Dialog>
       </section>
     </Layout>
   );
