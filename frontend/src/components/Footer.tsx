@@ -11,7 +11,7 @@ const Footer = () => (
   <footer className="w-full border-t border-emerald-900/30 py-12 bg-gradient-to-r from-emerald-700 via-emerald-800 to-emerald-700 text-white shadow-lg mt-24">
     {/* Top-centered logo and tagline */}
     <div className="w-full flex flex-col items-center justify-center mb-8">
-      <img src="/images/zerrah_logo_white_transparent.png" alt="Zerrah Logo" className="h-14 w-auto opacity-90 mb-2" />
+      <img src="/images/zerrah_logo_white_transparent.png" alt="Zerrah Logo" className="h-28 w-auto opacity-90 mb-2" />
       <span className="text-emerald-100 text-base text-center max-w-xl">
         Zerrah helps you understand and reduce your climate impact—joyfully, simply, and personally.
       </span>
