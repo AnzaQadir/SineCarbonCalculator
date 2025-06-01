@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import Calculator from '@/components/Calculator';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users, CheckCircle, Smile, Heart, Check, Globe, Hexagon, Star, Zap, Share2, PauseCircle, Medal, Lightbulb, Leaf } from 'lucide-react';
-import { useCalculator } from '@/hooks/useCalculator';
+import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users, CheckCircle, Smile, Heart, Check, Globe, Hexagon, Star, Zap, Share2, PauseCircle, Medal, Lightbulb, Leaf, Sun, Recycle } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from 'framer-motion';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
@@ -162,8 +161,18 @@ const ContactForm = () => {
 
   return (
     <div className="flex flex-col items-center justify-center py-8 w-full">
-      <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-2">Contact Us</h2>
-      <h3 className="text-xl md:text-2xl font-bold text-gray-400 text-center mb-8">We'd love to hear from you.</h3>
+      <h2
+        className="text-5xl md:text-6xl font-extrabold text-center mb-4"
+        style={{ lineHeight: 1.1, letterSpacing: '-0.01em' }}
+      >
+        Contact Us
+      </h2>
+      <h3
+        className="text-2xl md:text-3xl font-semibold text-gray-400 text-center mb-12"
+        style={{ lineHeight: 1.4, letterSpacing: '0.01em' }}
+      >
+        We'd love to hear from you.
+      </h3>
       <form className="w-full max-w-md mx-auto flex flex-col gap-4" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
@@ -221,11 +230,9 @@ const ContactForm = () => {
 };
 
 const Index = () => {
-  const { state, updateCalculator } = useCalculator();
   const [currentStep, setCurrentStep] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
-  const isQuizRoute = location.pathname === '/quiz';
 
   const handleCalculate = () => {
     // Handle calculation completion
@@ -248,411 +255,376 @@ const Index = () => {
     navigate('/quiz');
   };
 
-  if (isQuizRoute) {
-  return (
-    <Layout>
-      <section className="py-20 bg-white">
-        <div className="container px-4">
-          <div className="mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Carbon Footprint Calculator
-              </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Complete all sections to get an accurate estimate of your annual carbon footprint.
-                We'll show you how your lifestyle impacts the environment and suggest personalized ways to reduce your carbon emissions.
-              </p>
-            </div>
-            
-            <Calculator 
-                state={{
-                  ...state,
-                  householdSize: state.householdSize.toString(),
-                  electricityKwh: state.electricityKwh.toString(),
-                  naturalGasTherm: state.naturalGasTherm.toString(),
-                  heatingOilGallons: state.heatingOilGallons.toString(),
-                  propaneGallons: state.propaneGallons.toString(),
-                  annualMileage: state.annualMileage.toString(),
-                  costPerMile: state.costPerMile.toString(),
-                  plantBasedMealsPerWeek: state.plantBasedMealsPerWeek.toString(),
-                }}
-                onUpdate={(updates) => {
-                  const processedUpdates = {
-                    ...updates,
-                    householdSize: updates.householdSize ? Number(updates.householdSize) : state.householdSize,
-                    electricityKwh: updates.electricityKwh ? Number(updates.electricityKwh) : state.electricityKwh,
-                    naturalGasTherm: updates.naturalGasTherm ? Number(updates.naturalGasTherm) : state.naturalGasTherm,
-                    heatingOilGallons: updates.heatingOilGallons ? Number(updates.heatingOilGallons) : state.heatingOilGallons,
-                    propaneGallons: updates.propaneGallons ? Number(updates.propaneGallons) : state.propaneGallons,
-                    annualMileage: updates.annualMileage ? Number(updates.annualMileage) : state.annualMileage,
-                    costPerMile: updates.costPerMile ? Number(updates.costPerMile) : state.costPerMile,
-                    plantBasedMealsPerWeek: updates.plantBasedMealsPerWeek ? Number(updates.plantBasedMealsPerWeek) : state.plantBasedMealsPerWeek,
-                  };
-                  updateCalculator(processedUpdates);
-                }}
-              onCalculate={handleCalculate}
-              onBack={handleBack}
-              onNext={handleNext}
-              onStepChange={handleStepChange}
-              currentStep={currentStep}
-            />
-          </div>
-        </div>
-        </section>
-      </Layout>
-    );
-  }
+  // How It Works Section
+  const howItWorksSteps = [
+    {
+      title: "Take the Quiz",
+      desc: "Answer quick, vibes-based questions about daily habits.",
+      img: "/images/image.png",
+      alt: "Take the Quiz"
+    },
+    {
+      title: "Discover Your Story",
+      desc: "Uncover your unique eco-persona and what makes you shine.",
+      img: "/images/color_story.png",
+      alt: "Discover Your Story"
+    },
+    {
+      title: "Reflect & Reimagine",
+      desc: "See gentle, clear tips for making a bigger impact.",
+      img: "/images/reflect.png",
+      alt: "Reflect & Reimagine"
+    }
+  ];
 
   // --- Minimalist Hero Section ---
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      {/* Custom Header */}
-      <header className="w-full bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-6">
-          {/* Side-by-side layout (default) */}
-          <div className="flex items-center pl-8 mr-6">
-            <div className="flex items-center justify-center">
-              <img
-                src="/images/zerrah_logo_globe_bolder_5120px.png"
-                alt="Zerrah - Sustainability Platform"
-                className="h-32 w-auto drop-shadow-lg"
-                style={{ minWidth: 128 }}
-              />
-            </div>
-            <span
-              className="font-serif font-semibold text-6xl tracking-wide ml-1 flex items-center"
-              style={{ color: '#007C78', fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, lineHeight: 1, height: '128px' }}
-            >
-              Zerrah
-            </span>
-          </div>
-          {/*
-          // Stacked layout (uncomment to use)
-          <div className="flex flex-col items-center py-2">
-            <img
-              src="/images/logo_without_bg.png"
-              alt="Zerrah Logo"
-              className="h-12 w-12 rounded-full shadow-md mb-2"
-            />
-            <span className="font-extrabold text-3xl md:text-4xl text-gray-900 tracking-tight">
-              Zerrah
-            </span>
-          </div>
-          */}
-          <nav className="flex items-center space-x-8">
-            <a href="/" className="text-gray-600 hover:text-emerald-600 font-medium text-base md:text-lg transition">Home</a>
-            <a href="/quiz" className="text-gray-600 hover:text-emerald-600 font-medium text-base md:text-lg transition">Quiz</a>
-            <a href="/reflections" className="text-gray-600 hover:text-emerald-600 font-medium text-base md:text-lg transition">Reflections</a>
-          </nav>
-          <Link to="/signup" className="ml-8 bg-emerald-600 text-white rounded-full px-6 py-2 font-bold shadow hover:bg-emerald-700 transition text-base md:text-lg">Get Started</Link>
-        </div>
-      </header>
-
-      {/* Hero Content */}
+    <Layout>
       <main className="flex flex-col items-center justify-center flex-1 text-center px-4">
-        <h1 className="text-3xl md:text-5xl font-extrabold mt-24 mb-4" style={{ fontFamily: 'Inter, Arial, sans-serif' }}>
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          className="text-5xl md:text-7xl font-extrabold mt-40 mb-8 leading-tight"
+          style={{ fontFamily: 'Inter, Arial, sans-serif' }}
+        >
           Small actions. Big climate impact.
-        </h1>
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-400 mb-8" style={{ fontFamily: 'Inter, Arial, sans-serif' }}>
-          Discover your eco-story in 3 minutes.
-        </h2>
-        <button
+        </motion.h1>
+        <motion.h2
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.2, ease: 'easeOut' }}
+          className="text-2xl md:text-4xl font-bold text-gray-400 mb-12 leading-snug"
+          style={{ fontFamily: 'Inter, Arial, sans-serif' }}
+        >
+          Discover your story in 3 minutes.
+        </motion.h2>
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
+          whileHover={{ scale: 1.08, boxShadow: '0 8px 32px 0 rgba(0,0,0,0.10)' }}
           onClick={handleStartQuiz}
           className="bg-black text-white rounded-full px-6 py-2 font-semibold text-base shadow hover:bg-gray-800 transition"
         >
           Take the Quiz
-        </button>
+        </motion.button>
       </main>
 
       {/* How It Works Section */}
-      <section className="w-full max-w-5xl mx-auto mt-24 mb-12 px-4 bg-white rounded-3xl shadow-sm py-16">
+      <section className="w-full max-w-7xl mx-auto my-24 px-8 md:px-16 bg-white rounded-3xl shadow-sm">
         <div className="flex flex-col items-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 tracking-tight mb-8">How It Works</h2>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 tracking-tight mb-8">How It Works</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Top-left: Step 1 text */}
-          <div className="flex flex-col justify-center">
+          {/* Row 1: Text left, Image right */}
+          <motion.div
+            className="flex flex-col justify-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+            custom={0}
+            variants={cardVariants}
+          >
             <h3 className="text-2xl font-extrabold mb-2">Take the Quiz</h3>
             <p className="text-gray-400 text-lg">Answer quick, vibes-based questions about daily habits.</p>
-          </div>
-          {/* Top-right: Visual block with image */}
-          <div className="flex items-center justify-center">
-            <div className="h-48 w-48 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-              <img src="/images/image.png" alt="Take the Quiz" className="h-32 w-32 object-contain" />
+          </motion.div>
+          <motion.div
+            className="flex items-center justify-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+            custom={1}
+            variants={cardVariants}
+          >
+            <div className="h-64 w-64 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+              <img src="/images/image.png" alt="Take the Quiz" className="h-44 w-44 object-contain" />
             </div>
-          </div>
-          {/* Bottom-left: Visual block with Story image */}
-          <div className="flex items-center justify-center">
-            <div className="h-48 w-48 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-              <img src="/images/color_story.png" alt="Discover Your Story" className="h-32 w-32 object-contain" />
+          </motion.div>
+          {/* Row 2: Image left, Text right */}
+          <motion.div
+            className="flex items-center justify-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+            custom={2}
+            variants={cardVariants}
+          >
+            <div className="h-64 w-64 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+              <img src="/images/color_story.png" alt="Discover Your Story" className="h-44 w-44 object-contain" />
             </div>
-          </div>
-          {/* Bottom-right: Step 2 text */}
-          <div className="flex flex-col justify-center">
+          </motion.div>
+          <motion.div
+            className="flex flex-col justify-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+            custom={3}
+            variants={cardVariants}
+          >
             <h3 className="text-2xl font-extrabold mb-2">Discover Your Story</h3>
             <p className="text-gray-400 text-lg">Uncover your unique eco-persona and what makes you shine.</p>
-          </div>
+          </motion.div>
         </div>
-        {/* Step 3: Reflect & Reimagine (below grid) */}
+        {/* Row 3: Text left, Image right */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
-          <div className="flex flex-col justify-center">
+          <motion.div
+            className="flex flex-col justify-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+            custom={4}
+            variants={cardVariants}
+          >
             <h3 className="text-2xl font-extrabold mb-2">Reflect & Reimagine</h3>
             <p className="text-gray-400 text-lg">See gentle, clear tips for making a bigger impact.</p>
+          </motion.div>
+          <motion.div
+            className="flex items-center justify-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+            custom={5}
+            variants={cardVariants}
+          >
+            <div className="h-64 w-64 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+              <img src="/images/reflect.png" alt="Reflect & Reimagine" className="h-44 w-44 object-contain" />
           </div>
-          <div className="flex items-center justify-center">
-            <div className="h-48 w-48 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-              <img src="/images/reflect.png" alt="Reflect & Reimagine" className="h-32 w-32 object-contain" />
-            </div>
-          </div>
+          </motion.div>
         </div>
       </section>
       
       {/* Impact at a Glance Section */}
-      <section className="w-full max-w-5xl mx-auto my-16 px-4">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-8">Your Impact at a Glance</h2>
-        <div className="border-2 border-blue-200 rounded-xl overflow-hidden mb-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 bg-white divide-x divide-blue-100">
-            <div className="flex flex-col items-center py-8">
-              <Zap className="h-8 w-8 text-gray-400 mb-2" />
-              <span className="font-bold">Reflective</span>
-            </div>
-            <div className="flex flex-col items-center py-8">
-              <Star className="h-8 w-8 text-gray-400 mb-2" />
-              <span className="font-bold">Guilt-Free</span>
-            </div>
-            <div className="flex flex-col items-center py-8">
-              <Hexagon className="h-8 w-8 text-pink-400 mb-2" />
-              <span className="font-bold">Story-Driven</span>
-            </div>
-            <div className="flex flex-col items-center py-8">
-              <Globe className="h-8 w-8 text-gray-400 mb-2" />
-              <span className="font-bold">For Now</span>
-            </div>
+      <section className="relative w-full max-w-7xl mx-auto my-24 px-8 md:px-16">
+        {/* Animated SVG background */}
+        <svg className="absolute left-0 right-0 top-0 mx-auto z-0" width="100%" height="220" viewBox="0 0 1200 220" fill="none" style={{ pointerEvents: 'none' }}>
+          <ellipse cx="600" cy="110" rx="550" ry="80" fill="url(#impactGradient)" opacity="0.12" />
+          <defs>
+            <linearGradient id="impactGradient" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#6ee7b7" />
+              <stop offset="1" stopColor="#38bdf8" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 relative z-10">Your Impact at a Glance</h2>
+        <div className="text-center text-lg text-gray-500 mb-10 max-w-2xl mx-auto relative z-10">See the values that shape your climate journey and your unique impact so far.</div>
+        {/* Value Ribbon */}
+        <motion.div
+          className="flex flex-wrap justify-center gap-6 mb-16 relative z-10"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
+        >
+          {[
+            { icon: Zap, label: 'Reflective', desc: 'You pause and consider your impact.' },
+            { icon: Star, label: 'Guilt-Free', desc: 'No shame, just positive steps.' },
+            { icon: Hexagon, label: 'Story-Driven', desc: 'Your journey is a story.' },
+            { icon: Globe, label: 'For Now', desc: 'Focus on what you can do today.' },
+            { icon: Smile, label: 'Calm Mood', desc: 'A gentle, welcoming vibe.' },
+            { icon: Heart, label: 'Gentle Icons', desc: 'Soft, friendly visuals.' },
+            { icon: Share2, label: 'Share Ripple', desc: 'Your actions inspire others.' },
+            { icon: PauseCircle, label: 'Own Pace', desc: 'Go at your speed—no pressure.' },
+          ].map((v, i) => (
+            <motion.div
+              key={v.label}
+              className="flex flex-col items-center bg-white/70 backdrop-blur-lg rounded-2xl px-8 py-6 shadow-md border border-blue-100 hover:shadow-xl transition group cursor-pointer relative"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, duration: 0.5, ease: 'easeOut' }}
+              viewport={{ once: false, amount: 0.3 }}
+              title={v.desc}
+              whileHover={{ scale: 1.07, boxShadow: '0 8px 32px 0 rgba(16,185,129,0.10)' }}
+            >
+              <v.icon className="h-8 w-8 mb-2 text-emerald-500 group-hover:scale-110 transition-transform" />
+              <span className="font-bold text-lg md:text-xl text-gray-900">{v.label}</span>
+              {/* Tooltip (simple) */}
+              <span className="absolute left-1/2 -bottom-2 -translate-x-1/2 mt-2 px-3 py-1 rounded bg-emerald-700 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20 whitespace-nowrap shadow-lg">{v.desc}</span>
+            </motion.div>
+          ))}
+        </motion.div>
+        {/* Animated numbers for impact card */}
+        {(() => {
+          const [co2, setCo2] = useState(0);
+          const [water, setWater] = useState(0);
+          const [waste, setWaste] = useState(0);
+          useEffect(() => {
+            let co2Target = 82, waterTarget = 34, wasteTarget = 7;
+            let co2Start = 0, waterStart = 0, wasteStart = 0;
+            const duration = 900;
+            const start = performance.now();
+            function animate(now: number) {
+              const progress = Math.min((now - start) / duration, 1);
+              setCo2(Math.round(co2Start + (co2Target - co2Start) * progress));
+              setWater(Math.round(waterStart + (waterTarget - waterStart) * progress));
+              setWaste(Math.round(wasteStart + (wasteTarget - wasteStart) * progress));
+              if (progress < 1) requestAnimationFrame(animate);
+            }
+            requestAnimationFrame(animate);
+          }, []);
+          return (
+            <motion.div
+              className="mx-auto max-w-xl bg-white/70 backdrop-blur-lg rounded-3xl shadow-2xl border border-blue-100 p-10 flex flex-col md:flex-row items-center justify-between gap-10 relative z-10"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              viewport={{ once: false, amount: 0.3 }}
+              style={{ boxShadow: '0 8px 40px 0 rgba(16,185,129,0.10)' }}
+            >
+              <div className="flex-1 flex flex-col gap-6">
+                <div className="flex items-center gap-3">
+                  <Sun className="h-7 w-7 text-yellow-400" />
+                  <span className="text-gray-500">CO₂ Saved</span>
+                  <span className="ml-auto font-extrabold text-2xl text-emerald-700">{co2}kg</span>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 bg-blue-50 divide-x divide-blue-100 border-t border-blue-100">
-            <div className="flex flex-col items-center py-8">
-              <Smile className="h-8 w-8 text-blue-300 mb-2" />
-              <span className="font-bold">Calm Mood</span>
+                <div className="flex items-center gap-3">
+                  <Droplets className="h-7 w-7 text-blue-400" />
+                  <span className="text-gray-500">Water Used</span>
+                  <span className="ml-auto font-extrabold text-2xl text-blue-700">{water}L</span>
                 </div>
-            <div className="flex flex-col items-center py-8">
-              <Heart className="h-8 w-8 text-blue-300 mb-2" />
-              <span className="font-bold">Gentle Icons</span>
+                <div className="flex items-center gap-3">
+                  <Recycle className="h-7 w-7 text-green-400" />
+                  <span className="text-gray-500">Waste Reduced</span>
+                  <span className="ml-auto font-extrabold text-2xl text-green-700">{waste}kg</span>
                 </div>
-            <div className="flex flex-col items-center py-8">
-              <Share2 className="h-8 w-8 text-blue-300 mb-2" />
-              <span className="font-bold">Share Ripple</span>
+              </div>
+              <div className="flex-1 flex flex-col gap-6">
+                <div className="flex items-center gap-3">
+                  <BarChart4 className="h-7 w-7 text-gray-400" />
+                  <span className="text-gray-500">Compare Impact</span>
+                  <span className="ml-auto text-gray-400">vs Average</span>
                 </div>
-            <div className="flex flex-col items-center py-8">
-              <PauseCircle className="h-8 w-8 text-blue-300 mb-2" />
-              <span className="font-bold">Own Pace</span>
+                <div className="flex items-center gap-3">
+                  <PauseCircle className="h-7 w-7 text-blue-300" />
+                  <span className="text-gray-500">Light/Dark Mode</span>
+                  <span className="ml-auto text-gray-400">Toggle</span>
                 </div>
+                <div className="flex items-center gap-3">
+                  <Star className="h-7 w-7 text-pink-400" />
+                  <span className="text-gray-500">Your Impact</span>
+                  <span className="ml-auto text-emerald-600 font-extrabold text-2xl">Unique</span>
           </div>
         </div>
-        <div className="max-w-2xl mx-auto">
-          <table className="w-full text-sm">
-            <tbody>
-              <tr className="border-b border-gray-100">
-                <td className="py-3 text-gray-500">CO₂ Saved</td>
-                <td className="py-3 text-right font-semibold">82kg</td>
-              </tr>
-              <tr className="border-b border-gray-100">
-                <td className="py-3 text-gray-500">Water Used</td>
-                <td className="py-3 text-right font-semibold">34L</td>
-              </tr>
-              <tr className="border-b border-gray-100">
-                <td className="py-3 text-gray-500">Waste Reduced</td>
-                <td className="py-3 text-right font-semibold">7kg</td>
-              </tr>
-              <tr className="border-b border-gray-100">
-                <td className="py-3 text-gray-500">Light/Dark Mode</td>
-                <td className="py-3 text-right text-gray-400">Toggle</td>
-              </tr>
-              <tr className="border-b border-gray-100">
-                <td className="py-3 text-gray-500">Compare Impact</td>
-                <td className="py-3 text-right text-gray-400">vs Average</td>
-              </tr>
-              <tr>
-                <td className="py-3 text-gray-500">Your Impact</td>
-                <td className="py-3 text-right text-gray-400">Unique</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            </motion.div>
+          );
+        })()}
       </section>
       
       {/* Action Spotlight & Reflections Archive Section */}
-      <section className="w-full max-w-5xl mx-auto my-24 px-4">
+      <section className="w-full max-w-7xl mx-auto my-24 px-8 md:px-16">
         {/* Action Spotlight */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-extrabold mb-1">Action Spotlight</h2>
-          <h3 className="text-2xl font-bold text-gray-400">Impact made simple</h3>
+        <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-10">Action Spotlight</h2>
+        <h3 className="text-2xl md:text-3xl font-bold text-gray-400 text-center mb-8 leading-relaxed">Impact made simple</h3>
+        <div className="flex justify-center mb-12">
+          <div className="bg-white/80 backdrop-blur px-6 py-3 rounded-full shadow text-lg text-emerald-700 font-medium">
+            Skipping meat once a week saves water and reduces your footprint.
+          </div>
         </div>
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20"
+          className="grid grid-cols-1 md:grid-cols-3 gap-10"
           initial="hidden"
-          animate="visible"
-          variants={{}}
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
         >
           {spotlightCards.map((card, i) => (
-            <Tooltip key={card.title}>
-              <TooltipTrigger asChild>
-                <motion.div
-                  className={`bg-gray-100 rounded-2xl p-6 flex flex-col justify-between min-h-[180px] cursor-pointer ${card.border}`}
-                  variants={cardMotion}
-                  custom={i}
-                  whileHover="hover"
-                  initial="hidden"
-                  animate="visible"
-                  onClick={() => alert(`Learn more about: ${card.effort}`)}
-                  tabIndex={0}
-                  role="button"
-                  aria-label={`Learn more about ${card.effort}`}
-                >
-                  <div className="text-gray-700 mb-8">{card.title}</div>
-                  <div>
-                    <span className="font-bold">{card.effort}</span>
-                    <span className="block text-gray-400 text-sm">{card.sub}</span>
-                  </div>
-                </motion.div>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="text-base">
-                {card.tooltip}
-              </TooltipContent>
-            </Tooltip>
+            <motion.div
+              key={card.title}
+              className={`bg-white/80 backdrop-blur rounded-3xl p-8 shadow-xl border-l-4 ${card.border} flex flex-col justify-between min-h-[200px] transition-all hover:scale-105 hover:shadow-2xl`}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.12, duration: 0.7, ease: 'easeOut' }}
+              viewport={{ once: false, amount: 0.3 }}
+            >
+              <div className="text-gray-700 text-lg font-medium leading-relaxed mb-6">{card.title}</div>
+              <div className="flex items-center gap-3 mt-auto">
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${card.effort === 'Low Effort' ? 'bg-emerald-100 text-emerald-700' : card.effort === 'Medium Effort' ? 'bg-yellow-100 text-yellow-700' : 'bg-pink-100 text-pink-700'}`}>{card.effort}</span>
+                <span className="text-gray-400 text-sm">{card.sub}</span>
+              </div>
+            </motion.div>
           ))}
         </motion.div>
         {/* Reflections Archive */}
-        <section className="py-16 max-w-3xl mx-auto bg-white">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 tracking-tight mb-6">Reflections Archive</h2>
-          <div className="text-center">
-            <p className="text-gray-600 mb-6 max-w-xl mx-auto tracking-normal">
-              Browse user stories, discover journeys, and get inspired by eco-persona reflections from our global community.
-            </p>
-            <p className="text-gray-600 mb-6 max-w-xl mx-auto tracking-normal">
-              Filter by persona, topic, and region to see climate reflections relevant to you. Real voices drive real change.
-            </p>
-            <p className="text-gray-600 mb-10 max-w-xl mx-auto tracking-normal">
-              Share your eco-story to inspire others—each ripple builds a brighter world.
-            </p>
-            <div className="flex justify-center">
-              <div className="relative flex flex-col items-center">
-                <svg width="80" height="40" viewBox="0 0 60 32" fill="none" className="text-gray-300 mx-auto">
-                  <path d="M2 30c10-10 15-28 25-28s15 18 25 28" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-16 h-4 bg-gradient-to-t from-gray-200/40 to-transparent rounded-full blur-sm"></div>
-              </div>
-            </div>
+        <section className="w-full max-w-7xl mx-auto my-24 px-8 md:px-16">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-10">Reflections Archive</h2>
+          <div className="text-xl md:text-2xl text-gray-500 text-center leading-relaxed mb-8">
+            Discover journeys, share your story, and see the ripple effect of climate action in our community.
+          </div>
+          <div className="text-base text-gray-400 text-center mb-8 max-w-2xl mx-auto">
+            Browse real eco-persona reflections, filter by topic or region, and inspire others with your unique perspective.
+          </div>
+          <div className="flex justify-center mb-12">
+            <svg width="400" height="200" viewBox="0 0 400 200" fill="none" className="mx-auto" style={{ filter: 'drop-shadow(0 4px 24px rgba(16,185,129,0.10))' }}>
+              <defs>
+                <radialGradient id="rippleGradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#6ee7b7" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity="0.2" />
+                </radialGradient>
+              </defs>
+              {/* Ripples */}
+              <ellipse cx="200" cy="100" rx="160" ry="60" stroke="url(#rippleGradient)" strokeWidth="3" opacity="0.25" />
+              <ellipse cx="200" cy="100" rx="110" ry="40" stroke="url(#rippleGradient)" strokeWidth="3" opacity="0.5" />
+              <ellipse cx="200" cy="100" rx="60" ry="22" stroke="#10b981" strokeWidth="3" opacity="0.8" />
+              {/* Central circle */}
+              <circle cx="200" cy="100" r="24" fill="#fff" stroke="#10b981" strokeWidth="5" />
+              <circle cx="200" cy="100" r="32" fill="none" stroke="#6ee7b7" strokeWidth="2" opacity="0.5">
+                <animate attributeName="r" values="32;50;32" dur="2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite" />
+              </circle>
+              <text x="200" y="107" textAnchor="middle" fontSize="20" fill="#10b981" fontWeight="bold" fontFamily="Inter, Arial, sans-serif">You</text>
+              <text x="200" y="170" textAnchor="middle" fontSize="28" fill="#94a3b8" fontWeight="bold" fontFamily="Inter, Arial, sans-serif" opacity="0.8">Community</text>
+            </svg>
+          </div>
+          <div className="text-center text-gray-500 text-lg mb-8">Your story creates ripples.</div>
+          <div className="flex justify-center">
+            <button className="bg-emerald-600 text-white rounded-full px-6 py-2 font-bold shadow hover:bg-emerald-700 transition text-base md:text-lg">
+              Share Your Story
+            </button>
           </div>
         </section>
         <div className="border-t border-gray-100 my-8"></div>
-        {/* Ripple Effect Diagram */}
-        <div className="flex flex-col items-center my-12">
-          <svg viewBox="0 0 400 220" width="340" height="180" className="max-w-full" fill="none">
-            {/* Outer faded ring */}
-            <ellipse cx="200" cy="110" rx="170" ry="80" fill="none" stroke="#e5e7eb" strokeWidth="2" opacity="0.7" />
-            {/* Second ripple */}
-            <ellipse cx="200" cy="110" rx="120" ry="55" fill="none" stroke="#e5e7eb" strokeWidth="2" opacity="0.9" />
-            {/* First ripple */}
-            <ellipse cx="200" cy="110" rx="70" ry="30" fill="none" stroke="#6ee7b7" strokeWidth="2" opacity="1" />
-            {/* Central circle */}
-            <circle cx="200" cy="110" r="22" fill="#fff" stroke="#10b981" strokeWidth="3" />
-            <text x="200" y="115" textAnchor="middle" fontSize="15" fill="#059669" fontWeight="bold">You</text>
-            {/* First ripple: 3 circles */}
-            <circle cx="200" cy="60" r="14" fill="#fff" stroke="#a7f3d0" strokeWidth="2" />
-            <circle cx="160" cy="130" r="14" fill="#fff" stroke="#a7f3d0" strokeWidth="2" />
-            <circle cx="240" cy="130" r="14" fill="#fff" stroke="#a7f3d0" strokeWidth="2" />
-            <text x="200" y="50" textAnchor="middle" fontSize="12" fill="#10b981">Inspire</text>
-            {/* Lines from center to first ripple */}
-            <line x1="200" y1="110" x2="200" y2="74" stroke="#d1d5db" strokeWidth="1.5" />
-            <line x1="200" y1="110" x2="170" y2="124" stroke="#d1d5db" strokeWidth="1.5" />
-            <line x1="200" y1="110" x2="230" y2="124" stroke="#d1d5db" strokeWidth="1.5" />
-            {/* Second ripple: 5 circles */}
-            <circle cx="200" cy="30" r="10" fill="#fff" stroke="#a7f3d0" strokeWidth="1.5" />
-            <circle cx="130" cy="110" r="10" fill="#fff" stroke="#a7f3d0" strokeWidth="1.5" />
-            <circle cx="270" cy="110" r="10" fill="#fff" stroke="#a7f3d0" strokeWidth="1.5" />
-            <circle cx="170" cy="170" r="10" fill="#fff" stroke="#a7f3d0" strokeWidth="1.5" />
-            <circle cx="230" cy="170" r="10" fill="#fff" stroke="#a7f3d0" strokeWidth="1.5" />
-            {/* Lines from first ripple to second ripple */}
-            <line x1="200" y1="60" x2="200" y2="40" stroke="#d1d5db" strokeWidth="1" />
-            <line x1="200" y1="60" x2="130" y2="110" stroke="#d1d5db" strokeWidth="1" />
-            <line x1="200" y1="60" x2="270" y2="110" stroke="#d1d5db" strokeWidth="1" />
-            <line x1="160" y1="130" x2="170" y2="170" stroke="#d1d5db" strokeWidth="1" />
-            <line x1="160" y1="130" x2="130" y2="110" stroke="#d1d5db" strokeWidth="1" />
-            <line x1="160" y1="130" x2="200" y2="40" stroke="#d1d5db" strokeWidth="1" />
-            <line x1="240" y1="130" x2="230" y2="170" stroke="#d1d5db" strokeWidth="1" />
-            <line x1="240" y1="130" x2="270" y2="110" stroke="#d1d5db" strokeWidth="1" />
-            <line x1="240" y1="130" x2="200" y2="40" stroke="#d1d5db" strokeWidth="1" />
-            {/* Outer ring label */}
-            <text x="200" y="200" textAnchor="middle" fontSize="14" fill="#9ca3af" fontWeight="bold" opacity="0.8">Community</text>
-          </svg>
-          <div className="mt-6 text-center text-gray-500 text-base max-w-lg mx-auto tracking-normal">
-            Your story creates ripples.
+        <section className="w-full max-w-7xl mx-auto mb-0 px-8 md:px-16">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-10">Meet the Founders</h2>
+          <div className="text-xl md:text-2xl text-gray-500 text-center leading-relaxed mb-6">
+            Anza and Salma believe storytelling can turn climate worry into climate action.
+                </div>
+          <div className="text-base text-gray-400 text-center mb-12 max-w-2xl mx-auto">
+            Each brings a love for gentle design, clear guidance, and true inclusivity.<br />
+            Reach out with feedback, connect on LinkedIn, or share your reflections. Your story shapes Zerrah.
+                </div>
+          <div className="flex flex-col md:flex-row gap-12 justify-center items-center">
+            {/* Founder 1 */}
+            <div className="flex flex-col items-center bg-white/80 backdrop-blur rounded-2xl p-6 shadow-lg hover:shadow-2xl transition">
+              <img src="/profile.jpg" alt="Anza Qadir" className="h-32 w-32 rounded-full border-4 border-white shadow-md object-cover mb-4" />
+              <div className="mt-2 text-xl font-bold text-gray-900">Anza Qadir</div>
+              <div className="text-sm text-gray-400 mb-2">Co-Founder</div>
+              <a href="https://www.linkedin.com/in/anza-qadir/" target="_blank" rel="noopener noreferrer"
+                 className="flex items-center gap-2 text-emerald-700 hover:text-emerald-900 font-medium mt-1">
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
+                LinkedIn
+              </a>
+                </div>
+            {/* Founder 2 */}
+            <div className="flex flex-col items-center bg-white/80 backdrop-blur rounded-2xl p-6 shadow-lg hover:shadow-2xl transition">
+              <img src="/images/Sustainability-Soft-Launch-Girl.png" alt="Salma" className="h-32 w-32 rounded-full border-4 border-white shadow-md object-cover mb-4" />
+              <div className="mt-2 text-xl font-bold text-gray-900">Salma Zahra</div>
+              <div className="text-sm text-gray-400 mb-2">Co-Founder</div>
+              <a href="https://www.linkedin.com/in/salma-zahra-05285112b/" target="_blank" rel="noopener noreferrer"
+                 className="flex items-center gap-2 text-emerald-700 hover:text-emerald-900 font-medium mt-1">
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
+                LinkedIn
+              </a>
+                </div>
           </div>
-                </div>
-        <div className="border-t border-gray-100 my-8"></div>
-        <section className="py-16 max-w-3xl mx-auto bg-white">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-900 tracking-tight mb-6">Meet the Founders</h2>
-          <div className="text-center">
-            <p className="text-gray-600 mb-6 max-w-xl mx-auto tracking-normal">
-              Anza Qadir and Salma believe storytelling can turn climate worry into climate action. Each brings a love for gentle design, clear guidance, and true inclusivity.
-            </p>
-            <p className="text-gray-600 max-w-2xl mx-auto tracking-normal">
-              Reach out with feedback, connect on LinkedIn, or<br />
-              share your reflections. Your story shapes Zerrah.
-            </p>
-                </div>
         </section>
-        {/* Founders Profile Photos */}
-        <div className="flex flex-col items-center mt-10 mb-20">
-          <div className="flex flex-row gap-12 justify-center">
-            {/* Anza */}
-            <div className="flex flex-col items-center">
-              <img src="/profile.jpg" alt="Anza Qadir" className="h-28 w-28 rounded-full border-4 border-white shadow-md object-cover" />
-              <div className="mt-4 text-lg font-bold text-gray-900">Anza Qadir</div>
-              <div className="text-sm text-gray-400">Co-Founder</div>
-                </div>
-            {/* Salma */}
-            <div className="flex flex-col items-center">
-              <img src="/images/Sustainability-Soft-Launch-Girl.png" alt="Salma" className="h-28 w-28 rounded-full border-4 border-white shadow-md object-cover" />
-              <div className="mt-4 text-lg font-bold text-gray-900">Salma</div>
-              <div className="text-sm text-gray-400">Co-Founder</div>
-                </div>
-          </div>
-        </div>
       </section>
 
       {/* Meet the Founders & Contact Us Section */}
-      <section className="w-full max-w-5xl mx-auto mt-24 px-4">
+      <section className="w-full max-w-7xl mx-auto mt-0 mb-24 px-8 md:px-16">
         {/* Contact Us */}
-        <ContactForm />
-      </section>
-
-      <footer className="w-full border-t border-gray-100 py-12 bg-white mt-24">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-start justify-between px-4">
-          <div className="mb-8 md:mb-0">
-            <img src="/images/logo.png" alt="Zerrah Logo" className="h-6 w-auto opacity-30 grayscale" />
-          </div>
-          <div className="flex flex-row gap-16">
-            <div>
-              <h4 className="font-semibold mb-2">Navigation</h4>
-              <ul className="space-y-1 text-gray-400">
-                <li><a href="/" className="hover:text-black transition">Home</a></li>
-                <li><a href="/quiz" className="hover:text-black transition">Quiz</a></li>
-                <li><a href="/reflections" className="hover:text-black transition">Reflections</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">Connect</h4>
-              <ul className="space-y-1 text-gray-400">
-                <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-black transition">Instagram</a></li>
-                <li><a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-black transition">LinkedIn</a></li>
-                <li><a href="#about" className="hover:text-black transition">About Zerrah</a></li>
-              </ul>
-            </div>
-          </div>
+        <div className="flex flex-col items-center justify-center w-full">
+          <ContactForm />
         </div>
-      </footer>
-    </div>
+      </section>
+    </Layout>
   );
 };
 

@@ -9,8 +9,9 @@ import NotFound from "./pages/NotFound";
 import RecommendationScreen from '@/pages/RecommendationScreen';
 import ResultsScreen from '@/pages/ResultsScreen';
 import InviteScreen from '@/pages/InviteScreen';
-import ReflectionScreen from '@/pages/ReflectionScreen';
+import ReflectionScreen from './pages/ReflectionScreen';
 import Signup from './pages/Signup';
+import Quiz from './pages/Quiz';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -30,7 +31,7 @@ function App() {
               <Route path="/results" element={<ResultsScreen />} />
               <Route path="/invite" element={<InviteScreen />} />
               <Route path="/reflections" element={<ReflectionScreen />} />
-              <Route path="/quiz" element={<Index />} />
+              <Route path="/quiz" element={<Quiz />} />
               <Route path="/signup" element={<Signup />} />
             </Routes>
           </BrowserRouter>
