@@ -28,7 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </nav>
           {/* CTA */}
           <Link to="/signup" className="ml-8 bg-gradient-to-r from-emerald-500 to-teal-400 text-white rounded-full px-6 py-2 font-bold shadow hover:from-emerald-600 hover:to-teal-500 transition text-base md:text-lg">
-            Get Started
+            Join The Community
           </Link>
           {/* Hamburger for mobile */}
           <button
@@ -54,7 +54,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link to="/" className="text-gray-700 hover:text-emerald-600 text-lg font-semibold" onClick={() => setMobileNavOpen(false)}>Home</Link>
                 <Link to="/quiz" className="text-gray-700 hover:text-emerald-600 text-lg font-semibold" onClick={() => setMobileNavOpen(false)}>Quiz</Link>
                 <Link to="/reflections" className="text-gray-700 hover:text-emerald-600 text-lg font-semibold" onClick={() => setMobileNavOpen(false)}>Reflections</Link>
-                <Link to="/signup" className="mt-4 bg-emerald-600 text-white rounded-full px-6 py-2 font-bold shadow hover:bg-emerald-700 transition text-lg text-center" onClick={() => setMobileNavOpen(false)}>Get Started</Link>
+                <Link to="/signup" className="mt-4 bg-emerald-600 text-white rounded-full px-6 py-2 font-bold shadow hover:bg-emerald-700 transition text-lg text-center" onClick={() => setMobileNavOpen(false)}>Join the community</Link>
               </nav>
             </div>
             <div className="flex-1" onClick={() => setMobileNavOpen(false)} />
