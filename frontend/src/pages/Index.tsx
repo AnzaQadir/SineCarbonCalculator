@@ -291,12 +291,12 @@ const Index = () => {
   // --- Minimalist Hero Section ---
   return (
     <Layout>
-      <main className="flex flex-col items-center justify-center flex-1 text-center px-4">
+      <main className="w-screen min-h-[140vh] flex flex-col items-center text-center px-0 relative bg-white" style={{ backgroundImage: 'url(/images/zerrah_bg.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <motion.h1
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="text-5xl md:text-7xl font-extrabold mt-40 mb-8 leading-tight"
+          className="text-5xl md:text-7xl font-extrabold mt-12 mb-8 leading-tight"
           style={{ fontFamily: 'Inter, Arial, sans-serif' }}
         >
           Small actions. Big climate impact.
@@ -316,14 +316,14 @@ const Index = () => {
           transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
           whileHover={{ scale: 1.08, boxShadow: '0 8px 32px 0 rgba(0,0,0,0.10)' }}
           onClick={handleStartQuiz}
-          className="bg-black text-white rounded-full px-6 py-2 font-semibold text-base shadow hover:bg-gray-800 transition"
+          className="bg-black text-white rounded-full px-10 py-4 font-bold text-lg md:text-2xl shadow-lg hover:bg-gray-800 transition mt-8"
         >
           Take the Quiz
         </motion.button>
       </main>
 
       {/* How It Works Section */}
-      <section className="w-full max-w-full mx-auto my-24 px-8 md:px-16 bg-white rounded-3xl shadow-sm min-h-[600px] py-24">
+      <section className="w-full max-w-full mx-auto px-8 md:px-16 bg-white min-h-[600px] mt-16">
         <div className="flex flex-col items-center mb-10">
           <h2 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 tracking-tight mb-8">How It Works</h2>
         </div>
