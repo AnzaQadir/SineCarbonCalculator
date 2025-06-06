@@ -291,12 +291,13 @@ const Index = () => {
   // --- Minimalist Hero Section ---
   return (
     <Layout>
-      <main className="w-screen min-h-[140vh] flex flex-col items-center text-center px-0 relative bg-white" style={{ backgroundImage: 'url(/images/zerrah_bg.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <main className="w-screen aspect-[1536/1024] flex flex-col items-center text-center px-0 relative bg-white" style={{ backgroundImage: 'url(/images/bg_green_1.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: 'white' }}>
+        <div className="mt-32">
         <motion.h1
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="text-5xl md:text-7xl font-extrabold mt-12 mb-8 leading-tight"
+          className="text-6xl md:text-7xl font-extrabold mb-6 leading-tight font-serif"
           style={{ fontFamily: 'Inter, Arial, sans-serif' }}
         >
           Small actions. Big climate impact.
@@ -305,7 +306,7 @@ const Index = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.2, ease: 'easeOut' }}
-          className="text-2xl md:text-4xl font-bold text-gray-400 mb-12 leading-snug"
+          className="text-xl md:text-2xl font-medium text-gray-500 mb-10 leading-snug font-serif"
           style={{ fontFamily: 'Inter, Arial, sans-serif' }}
         >
           Discover your story in 3 minutes.
@@ -316,10 +317,11 @@ const Index = () => {
           transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
           whileHover={{ scale: 1.08, boxShadow: '0 8px 32px 0 rgba(0,0,0,0.10)' }}
           onClick={handleStartQuiz}
-          className="bg-black text-white rounded-full px-10 py-4 font-bold text-lg md:text-2xl shadow-lg hover:bg-gray-800 transition mt-8"
+          className="bg-black text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg hover:bg-gray-800 transition mt-6"
         >
           Take the Quiz
         </motion.button>
+        </div>
       </main>
 
       {/* How It Works Section */}
@@ -472,29 +474,8 @@ const Index = () => {
             Skipping meat once a week saves water and reduces your footprint.
           </div>
         </div>
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-10"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, amount: 0.3 }}
-        >
-          {spotlightCards.map((card, i) => (
-            <motion.div
-              key={card.title}
-              className={`bg-white/80 backdrop-blur rounded-3xl p-8 shadow-xl border-l-4 ${card.border} flex flex-col justify-between min-h-[200px] transition-all hover:scale-105 hover:shadow-2xl`}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.12, duration: 0.7, ease: 'easeOut' }}
-              viewport={{ once: false, amount: 0.3 }}
-            >
-              <div className="text-gray-700 text-lg font-medium leading-relaxed mb-6">{card.title}</div>
-              <div className="flex items-center gap-3 mt-auto">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${card.effort === 'Low Effort' ? 'bg-emerald-100 text-emerald-700' : card.effort === 'Medium Effort' ? 'bg-yellow-100 text-yellow-700' : 'bg-pink-100 text-pink-700'}`}>{card.effort}</span>
-                <span className="text-gray-400 text-sm">{card.sub}</span>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        {/* --- New Action Spotlight Cards --- */}
+        <ActionSpotlightCards />
         {/* Reflections Archive */}
         <section className="w-full max-w-7xl mx-auto my-24 px-8 md:px-16">
           <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-10">Reflections Archive</h2>
@@ -586,5 +567,70 @@ const Index = () => {
     </Layout>
   );
 };
+
+// --- ActionSpotlightCards component ---
+const actionSpotlightData = [
+  {
+    gif: '/gif/reversed_bike.gif',
+    title: 'Bike to work',
+    impact: 'Saves 8kg CO₂, like skipping 1 car ride.',
+    detail: 'Biking to work just once a week can save 8kg of CO₂ emissions, improve your health, and reduce traffic congestion. Small change, big impact!'
+  },
+  {
+    gif: '/gif/eco_friendly_market.gif',
+    title: 'Meatless Monday',
+    impact: 'Saves 20L water, like planting 2 trees.',
+    detail: 'Going meatless one day a week saves water and reduces your carbon footprint. It\'s a simple, delicious way to help the planet.'
+  },
+  {
+    gif: '/gif/solar_saving.gif',
+    title: 'Home solar estimate',
+    impact: 'Saves 500kg CO₂, like a year of LEDs.',
+    detail: 'Getting a home solar estimate is a big step, but it can save 500kg of CO₂ per year and lower your energy bills.'
+  },
+];
+
+function ActionSpotlightCards() {
+  const [flipped, setFlipped] = useState([false, false, false]);
+
+  const handleFlip = (idx: number) => {
+    setFlipped(f => f.map((v, i) => (i === idx ? !v : v)));
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {actionSpotlightData.map((card, idx: number) => (
+        <div
+          key={card.title}
+          className={`group relative bg-white border-4 border-white rounded-[2.5rem] overflow-hidden cursor-pointer transition-transform duration-300 aspect-[3/4] ${flipped[idx] ? 'scale-105' : 'hover:scale-105 hover:shadow-lg'}`}
+          style={{ minHeight: 340 }}
+          onMouseEnter={() => setFlipped(f => f.map((v, i) => (i === idx ? true : v)))}
+          onMouseLeave={() => setFlipped(f => f.map((v, i) => (i === idx ? false : v)))}
+          onClick={() => handleFlip(idx)}
+        >
+          {/* Card front: GIF/image only, with heart icon */}
+          <div className={`w-full h-full transition-opacity duration-300 ${flipped[idx] ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+            <img src={card.gif} alt={card.title} className="w-full h-full object-cover" />
+            {/* Heart icon top-right */}
+            <div className="absolute top-4 right-4 bg-white/60 rounded-full p-2 flex items-center justify-center shadow-md">
+              <svg width="28" height="28" fill="none" viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="white" fillOpacity="0.0"/><path d="M19.5 10.5c0-1.38-1.12-2.5-2.5-2.5-.88 0-1.67.46-2.1 1.16C14.17 8.46 13.38 8 12.5 8c-1.38 0-2.5 1.12-2.5 2.5 0 3.04 5 6.5 5 6.5s5-3.46 5-6.5z" stroke="#E57373" strokeWidth="2" fill="none"/></svg>
+            </div>
+          </div>
+          {/* Card back: Impact detail */}
+          <div className={`absolute inset-0 flex flex-col items-center justify-center bg-white p-8 rounded-[2.5rem] shadow-xl transition-opacity duration-300 ${flipped[idx] ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+            <div className="text-lg font-bold text-emerald-700 mb-2 text-center">Impact Detail</div>
+            <div className="text-base text-gray-700 text-center mb-4">{card.detail}</div>
+            <button
+              className="mt-2 px-4 py-2 bg-emerald-600 text-white rounded-full font-bold shadow hover:bg-emerald-700 transition"
+              onClick={e => { e.stopPropagation(); handleFlip(idx); }}
+            >
+              Back
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default Index;

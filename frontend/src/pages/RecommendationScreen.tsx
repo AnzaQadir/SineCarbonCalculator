@@ -60,9 +60,9 @@ const RecommendationScreen: React.FC = () => {
   if (isLoading) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      </div>
       </Layout>
     );
   }
@@ -73,18 +73,18 @@ const RecommendationScreen: React.FC = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <RecommendationEngine
-            personalityData={personalityData}
-            profileImage={user?.profileImage || '/default-avatar.png'}
-            personality={personalityType}
-            userName={user?.name || 'Eco Hero'}
-            autoSimulate={true}
-            onBack={() => navigate('/results')}
-          />
-        </main>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <RecommendationEngine
+          personalityData={personalityData}
+          profileImage={user?.profileImage || '/default-avatar.png'}
+          personality={personalityType}
+          userName={user?.name || 'Eco Hero'}
+          autoSimulate={true}
+          onBack={() => navigate('/results')}
+        />
+      </main>
+        </div>
     </Layout>
   );
 };
