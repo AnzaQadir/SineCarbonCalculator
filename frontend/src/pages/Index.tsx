@@ -325,12 +325,12 @@ const Index = () => {
       </main>
 
       {/* How It Works Section */}
-      <section className="w-full max-w-full mx-auto px-8 md:px-16 bg-white min-h-[600px] mt-16">
+      <section className="w-full max-w-screen-2xl mx-auto my-24 px-2">
         <div className="flex flex-col items-center mb-10">
           <h2 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 tracking-tight mb-8">How It Works</h2>
         </div>
-        <div className="mx-auto max-w-3xl my-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+        <div className="mx-auto max-w-5xl my-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
             {/* Row 1: Text left, Image right */}
             <motion.div
               className="flex flex-col justify-center"
@@ -351,8 +351,8 @@ const Index = () => {
               custom={1}
               variants={cardVariants}
             >
-              <div className="h-80 w-80 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-                <img src="/images/image.png" alt="Take the Quiz" className="h-64 w-64 object-contain" />
+              <div className="h-96 w-96 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+                <img src="/images/image.png" alt="Take the Quiz" className="h-80 w-80 object-contain" />
               </div>
             </motion.div>
             {/* Row 2: Image left, Text right */}
@@ -364,8 +364,8 @@ const Index = () => {
               custom={2}
               variants={cardVariants}
             >
-              <div className="h-80 w-80 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-                <img src="/images/color_story.png" alt="Discover Your Story" className="h-64 w-64 object-contain" />
+              <div className="h-96 w-96 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+                <img src="/images/color_story.png" alt="Discover Your Story" className="h-80 w-80 object-contain" />
               </div>
             </motion.div>
             <motion.div
@@ -401,8 +401,8 @@ const Index = () => {
               custom={5}
               variants={cardVariants}
             >
-              <div className="h-80 w-80 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-                <img src="/images/reflect.png" alt="Reflect & Reimagine" className="h-64 w-64 object-contain" />
+              <div className="h-96 w-96 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
+                <img src="/images/reflect.png" alt="Reflect & Reimagine" className="h-80 w-80 object-contain" />
             </div>
             </motion.div>
           </div>
@@ -410,22 +410,12 @@ const Index = () => {
       </section>
       
       {/* Impact at a Glance Section */}
-      <section className="relative w-full max-w-7xl mx-auto my-24 px-8 md:px-16">
-        {/* Animated SVG background */}
-        <svg className="absolute left-0 right-0 top-0 mx-auto z-0" width="100%" height="220" viewBox="0 0 1200 220" fill="none" style={{ pointerEvents: 'none' }}>
-          <ellipse cx="600" cy="110" rx="550" ry="80" fill="url(#impactGradient)" opacity="0.12" />
-          <defs>
-            <linearGradient id="impactGradient" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#6ee7b7" />
-              <stop offset="1" stopColor="#38bdf8" />
-            </linearGradient>
-          </defs>
-        </svg>
+      <section className="relative w-full max-w-screen-2xl mx-auto my-24 px-2">
         <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 relative z-10">Your Impact at a Glance</h2>
-        <div className="text-center text-lg text-gray-500 mb-10 max-w-2xl mx-auto relative z-10">See the values that shape your climate journey and your unique impact so far.</div>
+        <div className="text-center text-lg text-gray-500 mb-10 max-w-4xl mx-auto relative z-10">See the values that shape your climate journey and your unique impact so far.</div>
         {/* Value Ribbon */}
         <motion.div
-          className="flex flex-wrap justify-center gap-6 mb-16 relative z-10"
+          className="flex flex-wrap justify-center gap-10 mb-20 relative z-10 max-w-5xl mx-auto"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.3 }}
@@ -455,34 +445,30 @@ const Index = () => {
           ))}
         </motion.div>
         {/* Animated numbers for impact card */}
-        <div className="mx-auto max-w-xl bg-white/70 backdrop-blur-lg rounded-3xl shadow-2xl border border-blue-100 p-10 flex items-center gap-8 relative z-10" style={{ boxShadow: '0 8px 40px 0 rgba(16,185,129,0.10)' }}>
-          <img src="/images/color_story.png" alt="Impact Illustration" className="h-24 w-24 object-contain rounded-xl shadow" />
+        <div className="mx-auto max-w-3xl bg-white/70 backdrop-blur-lg rounded-3xl shadow-2xl border border-blue-100 p-14 flex items-center gap-12 relative z-10" style={{ boxShadow: '0 8px 40px 0 rgba(16,185,129,0.10)' }}>
+          <img src="/images/color_story.png" alt="Impact Illustration" className="h-32 w-32 object-contain rounded-xl shadow" />
           <div className="text-left">
-            <p className="text-xl md:text-2xl text-gray-700 font-semibold mb-2">Your unique impact so far:</p>
+            <p className="text-2xl md:text-3xl text-gray-700 font-semibold mb-2">Your unique impact so far:</p>
             <p className="text-lg text-gray-500">You've already saved <span className="text-emerald-700 font-bold">82kg CO₂</span>, conserved <span className="text-blue-700 font-bold">34L water</span>, and reduced <span className="text-green-700 font-bold">7kg waste</span>. Every step you take makes a real difference—keep going!</p>
           </div>
         </div>
       </section>
       
       {/* Action Spotlight & Reflections Archive Section */}
-      <section className="w-full max-w-7xl mx-auto my-24 px-8 md:px-16">
+      <section className="w-full max-w-screen-2xl mx-auto my-24 px-2">
         {/* Action Spotlight */}
-        <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-10">Action Spotlight</h2>
-        <h3 className="text-2xl md:text-3xl font-bold text-gray-400 text-center mb-8 leading-relaxed">Impact made simple</h3>
-        <div className="flex justify-center mb-12">
-          <div className="bg-white/80 backdrop-blur px-6 py-3 rounded-full shadow text-lg text-emerald-700 font-medium">
-            Skipping meat once a week saves water and reduces your footprint.
-          </div>
-        </div>
-        {/* --- New Action Spotlight Cards --- */}
+        <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center mb-4 tracking-tight">Action Spotlight</h2>
+        <div className="mx-auto mb-8 w-24 h-1 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 opacity-70" />
+        <h3 className="text-2xl md:text-3xl font-bold text-gray-400 text-center mb-16 leading-relaxed">Real stories. Small shifts. Lasting change.</h3>
         <ActionSpotlightCards />
         {/* Reflections Archive */}
-        <section className="w-full max-w-7xl mx-auto my-24 px-8 md:px-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-10">Reflections Archive</h2>
-          <div className="text-xl md:text-2xl text-gray-500 text-center leading-relaxed mb-8">
+        <section className="w-full max-w-screen-2xl mx-auto my-24 px-2">
+          <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center mb-4 tracking-tight">Reflections Archive</h2>
+          <div className="mx-auto mb-8 w-24 h-1 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 opacity-70" />
+          <div className="text-2xl md:text-3xl text-gray-500 text-center mb-6 leading-relaxed font-medium">
             Discover journeys, share your story, and see the ripple effect of climate action in our community.
           </div>
-          <div className="text-base text-gray-400 text-center mb-8 max-w-2xl mx-auto">
+          <div className="text-lg md:text-xl text-gray-400 text-center mb-8 max-w-2xl mx-auto italic">
             Browse real eco-persona reflections, filter by topic or region, and inspire others with your unique perspective.
           </div>
           <div className="flex justify-center mb-12">
@@ -515,7 +501,7 @@ const Index = () => {
           </div>
         </section>
         <div className="border-t border-gray-100 my-8"></div>
-        <section className="w-full max-w-7xl mx-auto mb-0 px-8 md:px-16">
+        <section className="w-full max-w-screen-2xl mx-auto mb-0 px-2">
           <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-10">Meet the Founders</h2>
           <div className="text-xl md:text-2xl text-gray-500 text-center leading-relaxed mb-6">
             Anza and Salma believe storytelling can turn climate worry into climate action.
@@ -552,7 +538,7 @@ const Index = () => {
       </section>
 
       {/* Meet the Founders & Contact Us Section */}
-      <section className="w-full max-w-7xl mx-auto mt-0 mb-24 px-8 md:px-16 flex flex-col items-center justify-center">
+      <section className="w-full max-w-screen-2xl mx-auto mt-0 mb-24 px-2">
         <Dialog open={contactOpen} onOpenChange={setContactOpen}>
           <DialogTrigger asChild>
             <button className="bg-emerald-600 text-white rounded-full px-6 py-2 font-bold shadow hover:bg-emerald-700 transition text-base md:text-lg">
@@ -574,24 +560,31 @@ const actionSpotlightData = [
     gif: '/gif/reversed_bike.gif',
     title: 'Bike to work',
     impact: 'Saves 8kg CO₂, like skipping 1 car ride.',
-    detail: 'Biking to work just once a week can save 8kg of CO₂ emissions, improve your health, and reduce traffic congestion. Small change, big impact!'
+    detail: 'Biking to work just once a week can save 8kg of CO₂ emissions, improve your health, and reduce traffic congestion. Small change, big impact!',
+    icon: '🚲',
+    color: 'from-blue-400 to-cyan-300'
   },
   {
     gif: '/gif/eco_friendly_market.gif',
-    title: 'Meatless Monday',
-    impact: 'Saves 20L water, like planting 2 trees.',
-    detail: 'Going meatless one day a week saves water and reduces your carbon footprint. It\'s a simple, delicious way to help the planet.'
+    title: 'Buy Local & Seasonal',
+    impact: 'Cuts food miles—like taking 3 cars off the road for a day.',
+    detail: 'Choosing local or seasonal produce means your food travels less, slashing transport emissions and supporting nearby farmers. Every fresh, local bite helps the planet and your community thrive!',
+    icon: '🥕',
+    color: 'from-green-400 to-emerald-300'
   },
   {
     gif: '/gif/solar_saving.gif',
     title: 'Home solar estimate',
     impact: 'Saves 500kg CO₂, like a year of LEDs.',
-    detail: 'Getting a home solar estimate is a big step, but it can save 500kg of CO₂ per year and lower your energy bills.'
+    detail: 'Getting a home solar estimate is a big step, but it can save 500kg of CO₂ per year and lower your energy bills.',
+    icon: '☀️',
+    color: 'from-yellow-400 to-orange-300'
   },
 ];
 
 function ActionSpotlightCards() {
   const [flipped, setFlipped] = useState([false, false, false]);
+  const [hovered, setHovered] = useState<number | null>(null);
 
   const handleFlip = (idx: number) => {
     setFlipped(f => f.map((v, i) => (i === idx ? !v : v)));
@@ -599,35 +592,94 @@ function ActionSpotlightCards() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {actionSpotlightData.map((card, idx: number) => (
-        <div
+      {actionSpotlightData.map((card, idx) => (
+        <motion.div
           key={card.title}
-          className={`group relative bg-white border-4 border-white rounded-[2.5rem] overflow-hidden cursor-pointer transition-transform duration-300 aspect-[3/4] ${flipped[idx] ? 'scale-105' : 'hover:scale-105 hover:shadow-lg'}`}
-          style={{ minHeight: 340 }}
-          onMouseEnter={() => setFlipped(f => f.map((v, i) => (i === idx ? true : v)))}
-          onMouseLeave={() => setFlipped(f => f.map((v, i) => (i === idx ? false : v)))}
-          onClick={() => handleFlip(idx)}
+          className="group relative"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: idx * 0.2 }}
+          viewport={{ once: true }}
+          onHoverStart={() => setHovered(idx)}
+          onHoverEnd={() => setHovered(null)}
         >
-          {/* Card front: GIF/image only, with heart icon */}
-          <div className={`w-full h-full transition-opacity duration-300 ${flipped[idx] ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-            <img src={card.gif} alt={card.title} className="w-full h-full object-cover" />
-            {/* Heart icon top-right */}
-            <div className="absolute top-4 right-4 bg-white/60 rounded-full p-2 flex items-center justify-center shadow-md">
-              <svg width="28" height="28" fill="none" viewBox="0 0 28 28"><circle cx="14" cy="14" r="14" fill="white" fillOpacity="0.0"/><path d="M19.5 10.5c0-1.38-1.12-2.5-2.5-2.5-.88 0-1.67.46-2.1 1.16C14.17 8.46 13.38 8 12.5 8c-1.38 0-2.5 1.12-2.5 2.5 0 3.04 5 6.5 5 6.5s5-3.46 5-6.5z" stroke="#E57373" strokeWidth="2" fill="none"/></svg>
+          <motion.div
+            className={`relative bg-white rounded-[2.5rem] overflow-hidden cursor-pointer transition-all duration-500 aspect-[3/4] ${
+              flipped[idx] ? 'scale-105' : 'hover:scale-105'
+            }`}
+            style={{ minHeight: 420, minWidth: 315, boxShadow: hovered === idx ? '0 20px 40px rgba(0,0,0,0.1)' : '0 10px 20px rgba(0,0,0,0.05)' }}
+            onClick={() => handleFlip(idx)}
+            whileHover={{ y: -5 }}
+          >
+            {/* GIF/Image */}
+            <motion.img
+              src={card.gif}
+              alt={card.title}
+              className="w-full h-full object-cover"
+              whileHover={flipped[idx] ? {} : { scale: 1.06, rotate: -2 }}
+              whileTap={flipped[idx] ? {} : { scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            />
+            {/* Light overlay for glow effect */}
+            <div className="absolute inset-0 bg-white/10 pointer-events-none rounded-[2.5rem]" />
+            {/* Content overlay */}
+            <div className="absolute inset-0 p-8 flex flex-col justify-end">
+              <div className="bg-white/80 rounded-xl px-3 py-2 shadow-md inline-block w-full">
+                <div className="text-2xl mb-1 flex justify-center">{card.icon}</div>
+                <h3 className="text-lg font-bold text-emerald-800 mb-0.5 text-center">{card.title}</h3>
+                <div className="flex flex-col items-center">
+                  <span className="font-bold text-emerald-700 text-sm">{card.impact.split('—')[0]}</span>
+                  <span className="text-gray-700 text-xs">{card.impact.split('—')[1]}</span>
+                </div>
+              </div>
             </div>
-          </div>
-          {/* Card back: Impact detail */}
-          <div className={`absolute inset-0 flex flex-col items-center justify-center bg-white p-8 rounded-[2.5rem] shadow-xl transition-opacity duration-300 ${flipped[idx] ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-            <div className="text-lg font-bold text-emerald-700 mb-2 text-center">Impact Detail</div>
-            <div className="text-base text-gray-700 text-center mb-4">{card.detail}</div>
-            <button
-              className="mt-2 px-4 py-2 bg-emerald-600 text-white rounded-full font-bold shadow hover:bg-emerald-700 transition"
-              onClick={e => { e.stopPropagation(); handleFlip(idx); }}
+
+            {/* Heart icon */}
+            <motion.div 
+              className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
             >
-              Back
-            </button>
-          </div>
-        </div>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </motion.div>
+          </motion.div>
+
+          {/* Card back */}
+          <motion.div
+            className={`absolute inset-0 bg-white p-8 rounded-[2.5rem] transition-opacity duration-500 ${
+              flipped[idx] ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          >
+            <div className="h-full flex flex-col">
+              <div className="text-4xl mb-4">{card.icon}</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{card.title}</h3>
+              <p className="text-gray-600 mb-6 flex-grow">{card.detail}</p>
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-emerald-600">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span className="font-medium">{card.impact}</span>
+                </div>
+                
+                <motion.button
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-400 text-white rounded-full py-3 font-bold shadow-lg hover:shadow-xl transition-all duration-300"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleFlip(idx);
+                  }}
+                >
+                  Take Action
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
       ))}
     </div>
   );
