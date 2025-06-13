@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import Calculator from '@/components/Calculator';
@@ -6,9 +6,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LeafyGreen, Droplets, Wind, Trees, FileText, BarChart4, Map, Users, CheckCircle, Smile, Heart, Check, Globe, Hexagon, Star, Zap, Share2, PauseCircle, Medal, Lightbulb, Leaf, Sun, Recycle } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useInView } from 'framer-motion';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
+import { FaInstagram, FaFacebook, FaTiktok, FaSlack } from "react-icons/fa";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -230,6 +231,111 @@ const ContactForm = () => {
   );
 };
 
+// --- How It Works Section ---
+const howItWorksStepNumbers = ['①','②','③','④'];
+
+function HowItWorksSection({ steps }: { steps: { title: string; desc: string; img: string; alt: string }[] }) {
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  // For each step, track in-view state and card height
+  const stepRefs = steps.map(() => useRef<HTMLDivElement>(null));
+  const stepInViews = stepRefs.map(ref => useInView(ref, { margin: '-20% 0px -20% 0px', once: false }));
+  const [cardHeights, setCardHeights] = useState<number[]>(Array(steps.length).fill(0));
+  const activeIdx = stepInViews.lastIndexOf(true);
+  const pastelBg = ["bg-emerald-50", "bg-blue-50", "bg-yellow-50", "bg-pink-50"];
+
+  useEffect(() => {
+    setCardHeights(stepRefs.map(ref => ref.current ? ref.current.offsetHeight : 0));
+  }, [stepRefs.map(ref => ref.current ? ref.current.offsetHeight : 0).join(",")]);
+
+  return (
+    <section ref={sectionRef} className="w-full py-32 px-2" style={{ background: 'linear-gradient(to right, #F3FDF8, #FFFDF3)' }}>
+      <div className="flex flex-col items-center mb-16">
+        <h2 className="text-[24px] md:text-[32px] font-extrabold text-center text-gray-900 tracking-tight mb-12">How It Works</h2>
+      </div>
+      <div className="mx-auto flex flex-col gap-24" style={{ maxWidth: '80vw' }}>
+        {steps.map((step, idx) => {
+          const isEven = idx % 2 === 0;
+          const notLast = idx < steps.length - 1;
+          return (
+            <div key={step.title} className="flex flex-row items-center w-full relative">
+              {/* Step circle + connector */}
+              <div className="flex flex-col items-center w-[140px] relative z-10">
+                <motion.div
+                  className={`w-[104px] h-[104px] flex items-center justify-center rounded-full border-2 border-emerald-200 shadow-lg text-4xl font-bold transition-all duration-300 ${pastelBg[idx % pastelBg.length]} ${activeIdx > idx ? 'ring-4 ring-emerald-100 border-emerald-400 text-emerald-600' : activeIdx === idx ? 'ring-4 ring-emerald-200 border-emerald-400 text-emerald-700' : 'border-emerald-100 text-emerald-300'}`}
+                  animate={activeIdx === idx ? { scale: 1.18, boxShadow: '0 0 0 16px rgba(16,185,129,0.10)' } : { scale: 1, boxShadow: '0 2px 8px 0 rgba(16,185,129,0.05)' }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {activeIdx > idx ? (
+                    <svg className="w-14 h-14 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l6 6L19 7" /></svg>
+                  ) : (
+                    howItWorksStepNumbers[idx]
+                  )}
+                </motion.div>
+                {/* Connector line below (except last) */}
+                {notLast && (
+                  <svg height={cardHeights[idx] ? cardHeights[idx] : 180} width="8" className="block mx-auto z-0" style={{ marginTop: 0 }}>
+                    <motion.line
+                      x1="4" y1="0" x2="4" y2={cardHeights[idx] ? cardHeights[idx] : 180}
+                      stroke="#A7F3D0"
+                      strokeWidth="10"
+                      strokeLinecap="round"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: activeIdx > idx ? 1 : activeIdx === idx ? scrollYProgress.get() : 0 }}
+                      style={{ filter: 'drop-shadow(0 2px 8px #A7F3D033)' }}
+                    />
+                  </svg>
+                )}
+              </div>
+              {/* Step card (text + icon, alternating) */}
+              <div className={`flex-1 flex ${isEven ? 'flex-row' : 'flex-row-reverse'} items-center`}>
+                <motion.div
+                  ref={stepRefs[idx]}
+                  className={`flex-1 flex flex-col justify-center bg-[#FAFAF6] rounded-3xl shadow-2xl p-12 md:p-16 z-10 mx-8`}
+                  initial={{ opacity: 0, y: 64 }}
+                  animate={stepInViews[idx] ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.8, delay: idx * 0.12, ease: 'easeOut' }}
+                >
+                  <h3 className="text-[24px] font-bold text-gray-900 mb-6">{step.title}</h3>
+                  <motion.p
+                    className="text-[#6B7280] text-2xl md:text-3xl leading-relaxed"
+                    initial={{ opacity: 0 }}
+                    animate={stepInViews[idx] ? { opacity: 1 } : {}}
+                    transition={{ duration: 0.7, delay: 0.2 + idx * 0.1 }}
+                  >
+                    {step.desc.split(/(vibes-based)/gi).map((part: string, i: number) =>
+                      part.toLowerCase() === 'vibes-based' ? (
+                        <motion.span
+                          key={i}
+                          className="bg-emerald-50 px-3 py-1 rounded-md text-emerald-700 font-semibold"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={stepInViews[idx] ? { opacity: 1, y: 0, color: '#3BAF79' } : {}}
+                          transition={{ duration: 0.5, delay: 0.4 + idx * 0.1 }}
+                        >{part}</motion.span>
+                      ) : part
+                    )}
+                  </motion.p>
+                </motion.div>
+                {/* Icon column */}
+                <div className={`flex-1 flex items-center justify-center mt-12 md:mt-0`}>
+                  <motion.div
+                    className="rounded-2xl bg-[#FFFDF3] shadow-lg flex items-center justify-center p-12"
+                    whileHover={{ scale: 1.15, boxShadow: '0 12px 48px 0 rgba(253, 224, 71, 0.18)' }}
+                    animate={stepInViews[idx] ? { scale: 1.12, rotate: 2, boxShadow: '0 12px 48px 0 rgba(16,185,129,0.10)' } : { scale: 1, rotate: 0 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
+                    <img src={step.img} alt={step.alt} className="h-44 w-44 object-contain drop-shadow-md" />
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 const Index = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const location = useLocation();
@@ -261,37 +367,33 @@ const Index = () => {
   const howItWorksSteps = [
     {
       title: "Take the Quiz",
-      desc: "Answer quick, vibes-based questions about daily habits.",
+      desc: "Answer questions across lifestyle areas that shape your environmental footprint — with no judgment, just vibes.",
       img: "/images/image.png",
       alt: "Take the Quiz"
     },
     {
       title: "Discover Your Story",
-      desc: "Uncover your unique eco-persona and what makes you shine.",
+      desc: "Get a personalized profile with your sustainability \"style,\" strengths, and gentle steps to move forward.",
       img: "/images/color_story.png",
       alt: "Discover Your Story"
     },
     {
       title: "Reflect & Reimagine",
-      desc: "See gentle, clear tips for making a bigger impact.",
+      desc: "Use our insights to rethink daily choices in a way that feels empowering — not overwhelming.",
       img: "/images/reflect.png",
       alt: "Reflect & Reimagine"
+    },
+    {
+      title: "Share Your Story",
+      desc: "Post your profile, swap notes with friends, or start a ripple. The smallest stories spark the biggest shifts.",
+      img: "/images/share_story.png",
+      alt: "Share Your Story"
     }
   ];
 
-  useEffect(() => {
-    if (!contactOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Backspace') setContactOpen(false);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [contactOpen]);
-
-  // --- Minimalist Hero Section ---
   return (
     <Layout>
-      <main className="w-screen aspect-[1536/1024] flex flex-col items-center text-center px-0 relative bg-white" style={{ backgroundImage: 'url(/images/bg_green_1.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: 'white' }}>
+      <main className="w-screen aspect-[1536/1024] flex flex-col items-center text-center px-0 relative bg-white" style={{ backgroundImage: 'url(/images/green_bg_short.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: 'white' }}>
         <div className="mt-32">
         <motion.h1
           initial={{ opacity: 0, y: 40 }}
@@ -324,132 +426,38 @@ const Index = () => {
         </div>
       </main>
 
-      {/* How It Works Section */}
-      <section className="w-full max-w-screen-2xl mx-auto my-24 px-2">
-        <div className="flex flex-col items-center mb-10">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 tracking-tight mb-8">How It Works</h2>
-        </div>
-        <div className="mx-auto max-w-5xl my-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
-            {/* Row 1: Text left, Image right */}
-            <motion.div
-              className="flex flex-col justify-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.3 }}
-              custom={0}
-              variants={cardVariants}
-            >
-              <h3 className="text-2xl font-extrabold mb-1">Take the Quiz</h3>
-              <p className="text-gray-400 text-lg">Answer quick, vibes-based questions about daily habits.</p>
-            </motion.div>
-            <motion.div
-              className="flex items-center justify-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.3 }}
-              custom={1}
-              variants={cardVariants}
-            >
-              <div className="h-96 w-96 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-                <img src="/images/image.png" alt="Take the Quiz" className="h-80 w-80 object-contain" />
-              </div>
-            </motion.div>
-            {/* Row 2: Image left, Text right */}
-            <motion.div
-              className="flex items-center justify-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.3 }}
-              custom={2}
-              variants={cardVariants}
-            >
-              <div className="h-96 w-96 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-                <img src="/images/color_story.png" alt="Discover Your Story" className="h-80 w-80 object-contain" />
-              </div>
-            </motion.div>
-            <motion.div
-              className="flex flex-col justify-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.3 }}
-              custom={3}
-              variants={cardVariants}
-            >
-              <h3 className="text-2xl font-extrabold mb-2">Discover Your Story</h3>
-              <p className="text-gray-400 text-lg">Uncover your unique eco-persona and what makes you shine.</p>
-            </motion.div>
-          </div>
-          {/* Row 3: Text left, Image right */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
-            <motion.div
-              className="flex flex-col justify-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.3 }}
-              custom={4}
-              variants={cardVariants}
-            >
-              <h3 className="text-2xl font-extrabold mb-2">Reflect & Reimagine</h3>
-              <p className="text-gray-400 text-lg">See gentle, clear tips for making a bigger impact.</p>
-            </motion.div>
-            <motion.div
-              className="flex items-center justify-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.3 }}
-              custom={5}
-              variants={cardVariants}
-            >
-              <div className="h-96 w-96 bg-gray-50 rounded-2xl shadow flex items-center justify-center">
-                <img src="/images/reflect.png" alt="Reflect & Reimagine" className="h-80 w-80 object-contain" />
-            </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-      
+      <HowItWorksSection steps={howItWorksSteps} />
+
       {/* Impact at a Glance Section */}
       <section className="relative w-full max-w-screen-2xl mx-auto my-24 px-2">
-        <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 relative z-10">Your Impact at a Glance</h2>
-        <div className="text-center text-lg text-gray-500 mb-10 max-w-4xl mx-auto relative z-10">See the values that shape your climate journey and your unique impact so far.</div>
-        {/* Value Ribbon */}
-        <motion.div
-          className="flex flex-wrap justify-center gap-10 mb-20 relative z-10 max-w-5xl mx-auto"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, amount: 0.3 }}
-        >
-          {[
-            { icon: Zap, label: 'Reflective', desc: 'You pause and consider your impact.' },
-            { icon: Star, label: 'Guilt-Free', desc: 'No shame, just positive steps.' },
-            { icon: Hexagon, label: 'Story-Driven', desc: 'Your journey is a story.' },
-            { icon: Smile, label: 'Calm Mood', desc: 'A gentle, welcoming vibe.' },
-            { icon: PauseCircle, label: 'Own Pace', desc: 'Go at your speed—no pressure.' },
-          ].map((v, i) => (
-            <motion.div
-              key={v.label}
-              className="flex flex-col items-center bg-white/70 backdrop-blur-lg rounded-2xl px-8 py-6 shadow-md border border-blue-100 hover:shadow-xl transition group cursor-pointer relative"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08, duration: 0.5, ease: 'easeOut' }}
-              viewport={{ once: false, amount: 0.3 }}
-              title={v.desc}
-              whileHover={{ scale: 1.07, boxShadow: '0 8px 32px 0 rgba(16,185,129,0.10)' }}
-            >
-              <v.icon className="h-8 w-8 mb-2 text-emerald-500 group-hover:scale-110 transition-transform" />
-              <span className="font-bold text-lg md:text-xl text-gray-900">{v.label}</span>
-              {/* Tooltip (simple) */}
-              <span className="absolute left-1/2 -bottom-2 -translate-x-1/2 mt-2 px-3 py-1 rounded bg-emerald-700 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20 whitespace-nowrap shadow-lg">{v.desc}</span>
-            </motion.div>
-          ))}
-        </motion.div>
-        {/* Animated numbers for impact card */}
-        <div className="mx-auto max-w-3xl bg-white/70 backdrop-blur-lg rounded-3xl shadow-2xl border border-blue-100 p-14 flex items-center gap-12 relative z-10" style={{ boxShadow: '0 8px 40px 0 rgba(16,185,129,0.10)' }}>
-          <img src="/images/color_story.png" alt="Impact Illustration" className="h-32 w-32 object-contain rounded-xl shadow" />
-          <div className="text-left">
-            <p className="text-2xl md:text-3xl text-gray-700 font-semibold mb-2">Your unique impact so far:</p>
-            <p className="text-lg text-gray-500">You've already saved <span className="text-emerald-700 font-bold">82kg CO₂</span>, conserved <span className="text-blue-700 font-bold">34L water</span>, and reduced <span className="text-green-700 font-bold">7kg waste</span>. Every step you take makes a real difference—keep going!</p>
+        <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center mb-6 tracking-tighter">Why Zerrah?</h2>
+        <div className="text-2xl md:text-3xl text-gray-500 text-center mb-3 leading-snug font-medium">
+          Because climate change isn't just a data problem — it's a story problem.
+          </div>
+        <div className="text-lg md:text-xl text-gray-400 text-center mb-12 max-w-3xl mx-auto italic leading-relaxed">
+          This is how the story shifts when Zerrah enters the picture.
+        </div>
+        {/* Headings row above columns */}
+        <div className="flex flex-row gap-12 justify-center items-center max-w-5xl mx-auto mb-2">
+          <div className="flex-1 flex justify-center">
+            <div className="text-2xl md:text-3xl font-bold text-emerald-700 text-center">With Zerrah</div>
+          </div>
+          <div className="flex-1 flex justify-center">
+            <div className="text-2xl md:text-3xl font-bold text-gray-400 text-center">Without Zerrah</div>
+          </div>
+                </div>
+        <div className="flex flex-col md:flex-row gap-12 justify-center items-start max-w-5xl mx-auto mb-20">
+          {/* With Zerrah */}
+          <div className="flex-1 bg-emerald-50/80 rounded-3xl p-10 md:p-14 shadow-lg flex items-center justify-center relative flex-col mt-8">
+            <div className="w-[450px] mx-auto">
+              <PillsColumn pills={zerrahPills} />
+                </div>
+                </div>
+          {/* Without Zerrah */}
+          <div className="flex-1 bg-gray-50/80 rounded-3xl p-10 md:p-14 shadow-lg flex items-center justify-center relative flex-col mt-8">
+            <div className="w-[450px] mx-auto">
+              <PillsColumn pills={withoutPills} delay={0.2} />
+                </div>
           </div>
         </div>
       </section>
@@ -472,26 +480,7 @@ const Index = () => {
             Browse real eco-persona reflections, filter by topic or region, and inspire others with your unique perspective.
           </div>
           <div className="flex justify-center mb-12">
-            <svg width="400" height="200" viewBox="0 0 400 200" fill="none" className="mx-auto" style={{ filter: 'drop-shadow(0 4px 24px rgba(16,185,129,0.10))' }}>
-              <defs>
-                <radialGradient id="rippleGradient" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#6ee7b7" stopOpacity="0.7" />
-                  <stop offset="100%" stopColor="#10b981" stopOpacity="0.2" />
-                </radialGradient>
-              </defs>
-              {/* Ripples */}
-              <ellipse cx="200" cy="100" rx="160" ry="60" stroke="url(#rippleGradient)" strokeWidth="3" opacity="0.25" />
-              <ellipse cx="200" cy="100" rx="110" ry="40" stroke="url(#rippleGradient)" strokeWidth="3" opacity="0.5" />
-              <ellipse cx="200" cy="100" rx="60" ry="22" stroke="#10b981" strokeWidth="3" opacity="0.8" />
-              {/* Central circle */}
-              <circle cx="200" cy="100" r="24" fill="#fff" stroke="#10b981" strokeWidth="5" />
-              <circle cx="200" cy="100" r="32" fill="none" stroke="#6ee7b7" strokeWidth="2" opacity="0.5">
-                <animate attributeName="r" values="32;50;32" dur="2s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite" />
-              </circle>
-              <text x="200" y="107" textAnchor="middle" fontSize="20" fill="#10b981" fontWeight="bold" fontFamily="Inter, Arial, sans-serif">You</text>
-              <text x="200" y="170" textAnchor="middle" fontSize="28" fill="#94a3b8" fontWeight="bold" fontFamily="Inter, Arial, sans-serif" opacity="0.8">Community</text>
-            </svg>
+            <SocialRippleDiagram />
           </div>
           <div className="text-center text-gray-500 text-lg mb-8">Your story creates ripples.</div>
           <div className="flex justify-center">
@@ -679,6 +668,115 @@ function ActionSpotlightCards() {
               </div>
             </div>
           </motion.div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+function SocialRippleDiagram() {
+  const icons = [
+    { icon: <FaInstagram className="text-pink-500 w-7 h-7" />, style: "top-2 left-2" },
+    { icon: <FaFacebook className="text-blue-600 w-7 h-7" />, style: "bottom-4 right-8" },
+    { icon: <FaTiktok className="text-black w-7 h-7" />, style: "bottom-2 left-8" },
+    { icon: <FaSlack className="text-[#611f69] w-7 h-7" />, style: "top-4 right-8" },
+  ];
+  const avatarSrc = "/images/Planets-Main-Character-Girl.png";
+  const avatars = [
+    { src: avatarSrc, style: "top-8 left-1/2 -translate-x-1/2" },
+    { src: avatarSrc, style: "left-8 top-1/2 -translate-y-1/2" },
+    { src: avatarSrc, style: "bottom-8 left-1/2 -translate-x-1/2" },
+    { src: avatarSrc, style: "right-8 top-1/2 -translate-y-1/2" },
+  ];
+  return (
+    <div className="relative w-[400px] h-[400px] mx-auto bg-gradient-to-br from-emerald-50 to-white rounded-3xl shadow-lg mb-12">
+      {/* Central personality image */}
+      <motion.img
+        src={avatarSrc}
+        alt="Personality"
+        className="absolute left-1/2 top-1/2 w-24 h-24 rounded-full object-cover border-4 border-white shadow-xl z-10 -translate-x-1/2 -translate-y-1/2"
+        whileHover={{ scale: 1.08 }}
+      />
+      {/* Social icons */}
+      {icons.map((item, i) => (
+        <motion.div
+          key={i}
+          className={`absolute w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg ${item.style}`}
+          initial={{ scale: 0.9, opacity: 0.8 }}
+          animate={{ scale: 1, opacity: 1, y: [0, -8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
+        >
+          {item.icon}
+        </motion.div>
+      ))}
+      {/* Avatars */}
+      {avatars.map((item, i) => (
+        <motion.img
+          key={i}
+          src={item.src}
+          alt=""
+          className={`absolute w-12 h-12 rounded-full object-cover border-2 border-white shadow ${item.style}`}
+          initial={{ scale: 0.9, opacity: 0.8 }}
+          animate={{ scale: 1, opacity: 1, y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+        />
+      ))}
+    </div>
+  );
+}
+
+const zerrahPills = [
+  { text: "Curiosity", color: "bg-emerald-200 text-emerald-900", rotate: -8 },
+  { text: "Compassion", color: "bg-blue-200 text-blue-900", rotate: 6 },
+  { text: "Story", color: "bg-white text-emerald-700 border border-emerald-100", rotate: -4 },
+  { text: "Clarity", color: "bg-emerald-100 text-emerald-800", rotate: 8 },
+  { text: "Momentum", color: "bg-blue-100 text-blue-800", rotate: -6 },
+];
+const withoutPills = [
+  { text: "Panic", color: "bg-gray-200 text-gray-700", rotate: 7 },
+  { text: "Shame", color: "bg-gray-100 text-gray-500", rotate: -5 },
+  { text: "Noise", color: "bg-gray-200 text-gray-700", rotate: 4 },
+  { text: "Overload", color: "bg-gray-100 text-gray-500", rotate: -7 },
+  { text: "Stall", color: "bg-gray-200 text-gray-700", rotate: 5 },
+];
+function PillsColumn({ pills, delay = 0 }: { pills: { text: string; color: string; rotate: number }[]; delay?: number }) {
+  const entranceDuration = 0.7;
+  const entranceDelay = 0.35;
+  const floatDuration = 2.5;
+  const totalEntrance = delay + (pills.length - 1) * entranceDelay + entranceDuration;
+
+  return (
+    <div className="flex flex-col items-center justify-center h-[420px]">
+      {pills.map((pill, i) => (
+        <motion.div
+          key={pill.text}
+          className={`px-10 py-5 rounded-full font-bold shadow-lg my-3 ${pill.color}`}
+          style={{
+            rotate: pill.rotate,
+            fontSize: "1.35rem",
+            minWidth: 200,
+            textAlign: "center",
+          }}
+          initial={{ opacity: 0, y: -60 }}
+          animate={{
+            opacity: 1,
+            y: [-60, 0, -8, 0, 8, 0],
+            rotate: [pill.rotate, pill.rotate, pill.rotate + 3, pill.rotate - 3, pill.rotate],
+          }}
+          transition={{
+            times: [0, 0.2, 0.5, 0.7, 0.85, 1],
+            delay: delay + i * entranceDelay,
+            duration: totalEntrance + floatDuration,
+            repeat: Infinity,
+            repeatType: "loop",
+            ease: "easeInOut",
+          }}
+          whileHover={{
+            scale: 1.08,
+            boxShadow: "0 8px 32px 0 rgba(16,185,129,0.18)",
+          }}
+        >
+          {pill.text}
         </motion.div>
       ))}
     </div>

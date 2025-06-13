@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center justify-start">
             <Link to="/" className="flex items-center gap-4">
               <img src="/images/zerrah_logo_white_transparent.png" alt="Zerrah Logo" className="h-16 w-auto" />
-              <span className="font-serif font-bold text-6xl text-emerald-700 tracking-tight">Zerrah</span>
+              <span className="font-serif font-bold text-6xl text-emerald-700 tracking-tight" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Zerrah</span>
             </Link>
           </div>
           {/* Navigation (centered absolutely) */}
