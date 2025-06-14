@@ -567,7 +567,7 @@ const Index = () => {
         >
           <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Why Zerrah?</h2>
           <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-[2]">Because climate change isn't just a data problem — it's a story problem.</div>
-          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-3xl mx-auto italic leading-[2]">This is how the story shifts when Zerrah enters the picture.</div>
+          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-[2]">This is how the story shifts when Zerrah enters the picture.</div>
         </motion.div>
 
         {/* Headings row above columns */}
@@ -672,8 +672,7 @@ const Index = () => {
       </section>
 
       {/* Reflections Archive */}
-      <section className="relative w-full max-w-[2200px] mx-auto py-12 md:py-24 px-2 md:px-8 rounded-3xl shadow-lg border border-gray-100/60 mb-24 overflow-hidden">
-        <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-white via-emerald-50 to-white" />
+      <section className="relative w-full max-w-[2200px] mx-auto py-12 md:py-24 px-2 md:px-8 rounded-3xl shadow-lg border border-gray-100/60 mb-24 overflow-hidden bg-gradient-to-b from-white via-emerald-50 to-white">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -681,64 +680,90 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Reflections Archive</h2>
+          <div className="max-w-4xl mx-auto mb-10 flex flex-col md:flex-row gap-6">
+            <div className="bg-white/80 rounded-xl shadow p-6 flex-1 flex flex-col items-center">
+              <div className="text-xl md:text-2xl italic text-gray-700 text-center mb-2">“I never thought my small changes would inspire my friends. Now we all bike to work!”</div>
+              <div className="text-base text-gray-400 text-center">— Jamie, Toronto</div>
+            </div>
+            <div className="bg-white/80 rounded-xl shadow p-6 flex-1 flex flex-col items-center">
+              <div className="text-xl md:text-2xl italic text-gray-700 text-center mb-2">“Sharing my story helped me realize I'm not alone in this journey.”</div>
+              <div className="text-base text-gray-400 text-center">— Priya, Bangalore</div>
+            </div>
+          </div>
+          {/* Add margin below testimonial cards */}
+          <div className="mb-12" />
           <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-[2]">Discover journeys, share your story, and see the ripple effect of climate action in our community.</div>
-          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-3xl mx-auto italic leading-[2]">Browse real eco-persona reflections, filter by topic or region, and inspire others with your unique perspective.</div>
+          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-[2]">Browse real eco-persona reflections, filter by topic or region, and inspire others with your unique perspective.</div>
           <div className="flex justify-center mb-12">
             <SocialRippleDiagram large />
           </div>
           <div className="text-center text-gray-500 text-2xl md:text-3xl font-semibold mb-8">Your story creates ripples.</div>
+          <div className="text-center text-emerald-700 text-xl md:text-2xl font-bold mb-6">Ready to inspire others? Share your own climate journey.</div>
           <div className="flex justify-center">
-            <button className="bg-emerald-600 text-white rounded-full px-16 py-6 font-extrabold shadow hover:bg-emerald-700 hover:-translate-y-0.5 transition-all duration-150 text-3xl md:text-4xl mt-8">
-              Share Your Story
+            <button className="bg-emerald-600 text-white rounded-full px-8 py-3 font-extrabold shadow hover:bg-emerald-700 hover:-translate-y-0.5 transition-all duration-150 text-xl md:text-2xl mt-8">
+              <span className="block font-extrabold">Share Your Story</span>
+            </button>
+          </div>
+          <div className="text-center text-gray-400 text-xl md:text-2xl mt-8 italic">All stories are welcome. Let's celebrate progress, not perfection.</div>
+        </motion.div>
+        <div className="absolute left-0 right-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }} />
+      </section>
+      <div className="border-t border-gray-100 my-12"></div>
+      <section className="relative w-full max-w-[1800px] mx-auto py-12 md:py-24 px-2 md:px-8 rounded-3xl shadow-lg border border-gray-100/60 mb-24 overflow-hidden bg-gradient-to-b from-white via-emerald-50 to-white">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Meet the Founders</h2>
+          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-[2]">Anza and Salma believe storytelling can turn climate worry into climate action.</div>
+          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-12 max-w-5xl mx-auto italic leading-[2]">
+            Each brings a love for gentle design, clear guidance, and true inclusivity. Reach out with feedback, connect on LinkedIn, or share your reflections. Your story shapes Zerrah.
+          </div>
+          <div className="flex flex-col md:flex-row gap-10 md:gap-20 justify-center items-center mb-10">
+            {/* Founder 1 */}
+            <motion.div
+              whileHover={{ scale: 1.05, boxShadow: '0 8px 32px 0 rgba(16,185,129,0.18)' }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col items-center"
+            >
+              <img src="/images/Kind-of-Conscious-Boy.png" alt="Anza Qadir"
+                className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white shadow-lg object-cover mb-4 transition-all duration-200" />
+              <div className="text-2xl md:text-3xl font-bold text-gray-900">Anza Qadir</div>
+              <div className="text-base md:text-lg text-gray-400 mb-2">Co-Founder</div>
+              <a href="https://www.linkedin.com/in/anza-qadir/" target="_blank" rel="noopener noreferrer"
+                 className="flex items-center gap-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white font-medium mt-2 px-4 py-2 rounded-full shadow transition-all duration-150 hover:-translate-y-0.5">
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
+                LinkedIn
+              </a>
+            </motion.div>
+            {/* Founder 2 */}
+            <motion.div
+              whileHover={{ scale: 1.05, boxShadow: '0 8px 32px 0 rgba(16,185,129,0.18)' }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col items-center"
+            >
+              <img src="/images/Sustainability-Slayer-Girl.png" alt="Salma Zahra"
+                className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white shadow-lg object-cover mb-4 transition-all duration-200" />
+              <div className="text-2xl md:text-3xl font-bold text-gray-900">Salma Zahra</div>
+              <div className="text-base md:text-lg text-gray-400 mb-2">Co-Founder</div>
+              <a href="https://www.linkedin.com/in/salma-zahra-05285112b/" target="_blank" rel="noopener noreferrer"
+                 className="flex items-center gap-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white font-medium mt-2 px-4 py-2 rounded-full shadow transition-all duration-150 hover:-translate-y-0.5">
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
+                LinkedIn
+              </a>
+            </motion.div>
+          </div>
+          <div className="flex justify-center">
+            <button className="bg-emerald-600 text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg hover:bg-emerald-700 hover:scale-105 transition-all duration-150 mt-10">
+              Contact Us
             </button>
           </div>
         </motion.div>
         <div className="absolute left-0 right-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }} />
       </section>
       <div className="border-t border-gray-100 my-12"></div>
-      <section className="w-full max-w-screen-2xl mx-auto mb-0 px-2">
-        <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Meet the Founders</h2>
-        <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-[2]">Anza and Salma believe storytelling can turn climate worry into climate action.</div>
-        <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-3xl mx-auto italic leading-[2]">Each brings a love for gentle design, clear guidance, and true inclusivity. Reach out with feedback, connect on LinkedIn, or share your reflections. Your story shapes Zerrah.</div>
-        <div className="flex flex-col md:flex-row gap-12 justify-center items-center">
-          {/* Founder 1 */}
-          <div className="flex flex-col items-center bg-white/80 backdrop-blur rounded-2xl p-6 shadow-lg hover:shadow-2xl transition">
-            <img src="/profile.jpg" alt="Anza Qadir" className="h-32 w-32 rounded-full border-4 border-white shadow-md object-cover mb-4" />
-            <div className="mt-2 text-xl font-bold text-gray-900">Anza Qadir</div>
-            <div className="text-sm text-gray-400 mb-2">Co-Founder</div>
-            <a href="https://www.linkedin.com/in/anza-qadir/" target="_blank" rel="noopener noreferrer"
-               className="flex items-center gap-2 text-emerald-700 hover:text-emerald-900 font-medium mt-1">
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
-              LinkedIn
-            </a>
-          </div>
-          {/* Founder 2 */}
-          <div className="flex flex-col items-center bg-white/80 backdrop-blur rounded-2xl p-6 shadow-lg hover:shadow-2xl transition">
-            <img src="/images/Sustainability-Soft-Launch-Girl.png" alt="Salma" className="h-32 w-32 rounded-full border-4 border-white shadow-md object-cover mb-4" />
-            <div className="mt-2 text-xl font-bold text-gray-900">Salma Zahra</div>
-            <div className="text-sm text-gray-400 mb-2">Co-Founder</div>
-            <a href="https://www.linkedin.com/in/salma-zahra-05285112b/" target="_blank" rel="noopener noreferrer"
-               className="flex items-center gap-2 text-emerald-700 hover:text-emerald-900 font-medium mt-1">
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
-              LinkedIn
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Meet the Founders & Contact Us Section */}
-      <section className="w-full max-w-screen-2xl mx-auto mt-0 mb-24 px-2 flex justify-center text-center">
-        <Dialog open={contactOpen} onOpenChange={setContactOpen}>
-          <DialogTrigger asChild>
-            <button className="bg-emerald-600 text-white rounded-full px-6 py-2 font-bold shadow hover:bg-emerald-700 transition text-base md:text-lg mt-8">
-              Contact Us
-            </button>
-          </DialogTrigger>
-          <DialogContent>
-            <ContactForm />
-          </DialogContent>
-        </Dialog>
-      </section>
     </Layout>
   );
 };
@@ -820,11 +845,11 @@ function ActionSpotlightCards() {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-30">
         {actionSpotlightData.map((card, idx) => (
           <motion.div
             key={card.title}
-            className="group relative cursor-pointer"
+            className="group relative cursor-pointer mx-4 md:mx-8 mt-12"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.2 }}
@@ -840,6 +865,8 @@ function ActionSpotlightCards() {
                 <div className="text-base md:text-lg text-gray-600 font-medium mt-2 text-center">{card.subtext}</div>
               )}
             </div>
+            {/* Add margin below subtext and above gif */}
+            <div className="mb-8" />
             {/* Card visual container (gif) */}
             <motion.div
               className={`relative bg-white rounded-[2.5rem] overflow-hidden cursor-pointer transition-all duration-500 aspect-[4/5] mx-3`}
@@ -930,23 +957,22 @@ function ActionSpotlightCards() {
 
 function SocialRippleDiagram({ large = false }: { large?: boolean }): React.ReactNode {
   const icons = [
-    { icon: <FaInstagram className="text-pink-500 w-7 h-7" />, style: "top-2 left-2" },
-    { icon: <FaFacebook className="text-blue-600 w-7 h-7" />, style: "bottom-4 right-8" },
-    { icon: <FaTiktok className="text-black w-7 h-7" />, style: "bottom-2 left-8" },
-    { icon: <FaSlack className="text-[#611f69] w-7 h-7" />, style: "top-4 right-8" },
+    { icon: <FaInstagram className="text-pink-500 w-14 h-14" />, style: "top-2 left-2" },
+    { icon: <FaFacebook className="text-blue-600 w-14 h-14" />, style: "bottom-4 right-8" },
+    { icon: <FaTiktok className="text-black w-14 h-14" />, style: "bottom-2 left-8" },
+    { icon: <FaSlack className="text-[#611f69] w-14 h-14" />, style: "top-4 right-8" },
   ];
-  const avatarSrc = "/images/Planets-Main-Character-Girl.png";
   const avatars = [
-    { src: avatarSrc, style: "top-8 left-1/2 -translate-x-1/2" },
-    { src: avatarSrc, style: "left-8 top-1/2 -translate-y-1/2" },
-    { src: avatarSrc, style: "bottom-8 left-1/2 -translate-x-1/2" },
-    { src: avatarSrc, style: "right-8 top-1/2 -translate-y-1/2" },
+    { src: "/images/Kind-of-Conscious-Boy.png", style: "top-8 left-1/2 -translate-x-1/2" },
+    { src: "/images/Planets-Main-Character-Boy.png", style: "left-8 top-1/2 -translate-y-1/2" },
+    { src: "/images/Eco-in-Progres-Boy.png", style: "bottom-8 left-1/2 -translate-x-1/2" },
+    { src: "/images/Sustainability-Slayer-Girl.png", style: "right-8 top-1/2 -translate-y-1/2" },
   ];
   return (
     <div className={`relative ${large ? 'w-[650px] h-[650px]' : 'w-[400px] h-[400px]'} mx-auto bg-gradient-to-br from-emerald-50 to-white rounded-3xl shadow-lg mb-12`}>
       {/* Central personality image */}
       <motion.img
-        src={avatarSrc}
+        src="/images/Planets-Main-Character-Girl.png"
         alt="Personality"
         className="absolute left-1/2 top-1/2 w-24 h-24 rounded-full object-cover border-4 border-white shadow-xl z-10 -translate-x-1/2 -translate-y-1/2"
         whileHover={{ scale: 1.08 }}
@@ -955,7 +981,7 @@ function SocialRippleDiagram({ large = false }: { large?: boolean }): React.Reac
       {icons.map((item, i) => (
         <motion.div
           key={i}
-          className={`absolute w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg ${item.style}`}
+          className={`absolute w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-lg ${item.style}`}
           initial={{ scale: 0.9, opacity: 0.8 }}
           animate={{ scale: 1, opacity: 1, y: [0, -8, 0] }}
           transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}

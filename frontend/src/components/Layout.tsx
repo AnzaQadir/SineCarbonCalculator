@@ -13,7 +13,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Responsive Header */}
-      <header className="w-full bg-white shadow-lg border-b border-emerald-100 py-8 transition-all duration-500 animate-navbar-fade-in">
+      <header className="w-full bg-white shadow-lg border-b border-emerald-100 py-8 transition-all duration-500 animate-navbar-fade-in sticky top-0 z-40 backdrop-blur-md">
         <div className="w-full flex items-center px-6 relative">
           {/* Logo (extreme left) */}
           <div className="flex items-center justify-start">
@@ -65,7 +65,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         )}
       </header>
-      <main className="flex-grow">{children}</main>
+      <main className="flex-grow pt-8 md:pt-12">{children}</main>
       <Footer />
     </div>
   );

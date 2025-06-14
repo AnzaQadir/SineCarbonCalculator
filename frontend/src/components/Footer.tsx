@@ -8,54 +8,55 @@ const LinkedInIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 const Footer = () => (
-  <footer className="w-full border-t border-emerald-900/30 py-12 bg-gradient-to-r from-emerald-700 via-emerald-800 to-emerald-700 text-white shadow-lg mt-24">
+  <footer className="relative w-full bg-gradient-to-t from-emerald-100/60 via-white to-emerald-50 rounded-t-3xl border-t-2 border-emerald-100 shadow-[0_-8px_32px_0_rgba(16,185,129,0.08)] py-6 md:py-8 px-4 animate-fade-in-up mt-24 transition-all duration-700 overflow-hidden">
+    {/* Elegant gradient border */}
+    <div className="absolute top-0 left-0 w-full h-[2.5px] z-50 pointer-events-none">
+      <div className="w-full h-full rounded-t-3xl" style={{background: 'linear-gradient(90deg, #34d399 0%, #a7f3d0 50%, #60a5fa 100%)'}} />
+    </div>
     {/* Top-centered logo and tagline */}
-    <div className="w-full flex flex-col items-center justify-center mb-8">
-      <img src="/images/zerrah_logo_white_transparent.png" alt="Zerrah Logo" className="h-28 w-auto opacity-90 mb-2" />
-      <span className="text-emerald-100 text-base text-center max-w-xl">
+    <div className="w-full flex flex-col items-center justify-center mb-4">
+      <img src="/images/logo_without_bg.png" alt="Zerrah Logo" className="h-12 w-auto opacity-90 mb-1 drop-shadow-lg" />
+      <span className="text-emerald-700 text-base md:text-lg text-center max-w-xl font-serif font-semibold">
         Zerrah helps you understand and reduce your climate impact—joyfully, simply, and personally.
       </span>
     </div>
     {/* Navigation, Connect, Resources */}
-    <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start justify-between px-8 gap-12">
+    <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-start justify-between px-2 md:px-8 gap-4 md:gap-8">
       <div>
-        <h4 className="font-semibold mb-3 text-lg text-white tracking-wide">Navigation</h4>
-        <ul className="space-y-1">
-          <li><a href="/" className="text-emerald-100 hover:text-white transition">Home</a></li>
-          <li><a href="/quiz" className="text-emerald-100 hover:text-white transition">Quiz</a></li>
-          <li><a href="/reflections" className="text-emerald-100 hover:text-white transition">Reflections</a></li>
+        <h4 className="font-semibold mb-4 text-lg text-emerald-700 tracking-wide">Navigation</h4>
+        <ul className="space-y-2">
+          <li><a href="/" className="text-gray-500 hover:text-emerald-600 transition-colors duration-200 font-medium">Home</a></li>
+          <li><a href="/quiz" className="text-gray-500 hover:text-emerald-600 transition-colors duration-200 font-medium">Quiz</a></li>
+          <li><a href="/reflections" className="text-gray-500 hover:text-emerald-600 transition-colors duration-200 font-medium">Reflections</a></li>
         </ul>
       </div>
       <div>
-        <h4 className="font-semibold mb-3 text-lg text-white tracking-wide">Connect</h4>
-        <ul className="space-y-1">
-          <li>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-emerald-100 hover:text-white transition">
-              <InstagramIcon className="h-4 w-4" /> Instagram
-            </a>
-          </li>
-          <li>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-emerald-100 hover:text-white transition">
-              <LinkedInIcon className="h-4 w-4" /> LinkedIn
-            </a>
-          </li>
-        </ul>
+        <h4 className="font-semibold mb-4 text-lg text-emerald-700 tracking-wide">Connect</h4>
+        <div className="flex gap-4 mt-2">
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white shadow hover:shadow-lg hover:-translate-y-1 hover:bg-emerald-50 transition-all duration-200 flex items-center" aria-label="Instagram">
+            <InstagramIcon className="h-6 w-6 text-pink-500" />
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white shadow hover:shadow-lg hover:-translate-y-1 hover:bg-emerald-50 transition-all duration-200 flex items-center" aria-label="LinkedIn">
+            <LinkedInIcon className="h-6 w-6 text-blue-600" />
+          </a>
+        </div>
       </div>
       <div>
-        <h4 className="font-semibold mb-3 text-lg text-white tracking-wide">Resources</h4>
-        <ul className="space-y-1">
-          <li><a href="#" className="text-emerald-100 hover:text-white transition">Sustainability Tips</a></li>
-          <li><a href="#" className="text-emerald-100 hover:text-white transition">FAQ</a></li>
+        <h4 className="font-semibold mb-4 text-lg text-emerald-700 tracking-wide">Resources</h4>
+        <ul className="space-y-2">
+          <li><a href="#" className="text-gray-500 hover:text-emerald-600 transition-colors duration-200 font-medium">Sustainability Tips</a></li>
+          <li><a href="#" className="text-gray-500 hover:text-emerald-600 transition-colors duration-200 font-medium">FAQ</a></li>
         </ul>
       </div>
     </div>
-    <div className="mt-10 pt-6 border-t border-emerald-900/30 text-center text-sm text-emerald-100/80 flex flex-col md:flex-row justify-between items-center gap-2 mx-4">
+    <div className="mt-6 pt-4 border-t border-gray-100/70 text-center text-xs text-gray-400 flex flex-col md:flex-row justify-between items-center gap-2 mx-4">
       <span>© {new Date().getFullYear()} Zerrah. All rights reserved.</span>
       <div className="flex gap-4">
-        <a href="#" className="hover:text-white transition">Privacy Policy</a>
-        <a href="#" className="hover:text-white transition">Terms</a>
+        <a href="#" className="hover:text-emerald-600 transition-colors duration-200">Privacy Policy</a>
+        <a href="#" className="hover:text-emerald-600 transition-colors duration-200">Terms</a>
       </div>
     </div>
+    <div className="text-center text-sm text-emerald-700 mt-4 font-serif font-semibold">Thanks for being part of the ripple 🌱</div>
   </footer>
 );
 
