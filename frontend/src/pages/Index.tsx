@@ -566,8 +566,8 @@ const Index = () => {
           className="relative"
         >
           <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Why Zerrah?</h2>
-          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-[2]">Because climate change isn't just a data problem — it's a story problem.</div>
-          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-[2]">This is how the story shifts when Zerrah enters the picture.</div>
+          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Because climate change isn't just a data problem — it's a story problem.</div>
+          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-loose">This is how the story shifts when Zerrah enters the picture.</div>
         </motion.div>
 
         {/* Headings row above columns */}
@@ -656,7 +656,7 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Action Spotlight</h2>
-          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-[2]">Real stories. Small shifts. Lasting change.</div>
+          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Real stories. Small shifts. Lasting change.</div>
         </motion.div>
         <ActionSpotlightCards />
         {/* Section closure: soft gradient fade at bottom */}
@@ -692,8 +692,8 @@ const Index = () => {
           </div>
           {/* Add margin below testimonial cards */}
           <div className="mb-12" />
-          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-[2]">Discover journeys, share your story, and see the ripple effect of climate action in our community.</div>
-          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-[2]">Browse real eco-persona reflections, filter by topic or region, and inspire others with your unique perspective.</div>
+          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Discover journeys, share your story, and see the ripple effect of climate action in our community.</div>
+          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-loose">Browse real eco-persona reflections, filter by topic or region, and inspire others with your unique perspective.</div>
           <div className="flex justify-center mb-12">
             <SocialRippleDiagram large />
           </div>
@@ -717,8 +717,8 @@ const Index = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Meet the Founders</h2>
-          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-[2]">Anza and Salma believe storytelling can turn climate worry into climate action.</div>
-          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-12 max-w-5xl mx-auto italic leading-[2]">
+          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Anza and Salma believe storytelling can turn climate worry into climate action.</div>
+          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-12 max-w-5xl mx-auto italic leading-loose">
             Each brings a love for gentle design, clear guidance, and true inclusivity. Reach out with feedback, connect on LinkedIn, or share your reflections. Your story shapes Zerrah.
           </div>
           <div className="flex flex-col md:flex-row gap-10 md:gap-20 justify-center items-center mb-10">
@@ -836,7 +836,7 @@ function ActionSpotlightCards() {
   };
   useEffect(() => {
     if (!modalOpen) return;
-    function onKeyDown(e) {
+    function onKeyDown(e: any) {
       if (e.key === 'Escape') closeModal();
     }
     window.addEventListener('keydown', onKeyDown);
