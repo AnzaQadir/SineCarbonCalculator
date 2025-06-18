@@ -11,23 +11,12 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/comp
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { FaInstagram, FaFacebook, FaTiktok, FaSlack } from "react-icons/fa";
 
-// Add Proxima Nova Semibold font style
-const proximaNovaStyle = `
-@font-face {
-  font-family: 'Proxima Nova';
-  src: url('/fonts/proxima-nova-semibold.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-`;
-
-// Add style tag to head
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style');
-  style.textContent = proximaNovaStyle;
-  document.head.appendChild(style);
-}
+// Use PROMOVA Semibold from OnlineWebFonts
+const defaultStyles = {
+  fontFamily: "'PROMOVA', sans-serif",
+  fontWeight: 600,
+};
+const fontClass = "font-semibold antialiased";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -40,12 +29,6 @@ const cardVariants = {
       ease: 'easeOut',
     },
   }),
-};
-
-// Add default font styles
-const defaultStyles = {
-  fontFamily: "'Proxima Nova', sans-serif",
-  fontWeight: 600,
 };
 
 const iconVariants = {
@@ -528,8 +511,8 @@ const Index = () => {
 
   return (
     <Layout>
-      <div className="font-['Proxima Nova']">
-        <main className="w-screen aspect-[1536/1024] flex flex-col items-center text-center px-0 relative bg-white" style={{ backgroundImage: 'url(/images/green_bg_short.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: 'white' }}>
+      <div className={fontClass} style={defaultStyles}>
+        <main className={`w-screen aspect-[1536/1024] flex flex-col items-center text-center px-0 relative bg-white ${fontClass}`} style={{ ...defaultStyles, backgroundImage: 'url(/images/green_bg_short.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: 'white' }}>
           <motion.div
             className="flex flex-col items-center justify-center min-h-[60vh] py-12 md:py-16 px-4 max-w-3xl mx-auto mt-8"
             initial={{ opacity: 0, y: 32 }}
@@ -559,7 +542,8 @@ const Index = () => {
               transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
               whileHover={{ scale: 1.08, boxShadow: '0 8px 32px 0 rgba(0,0,0,0.10)' }}
               onClick={handleStartQuiz}
-              className="bg-emerald-700 text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg border border-emerald-200 hover:bg-emerald-800 hover:scale-105 transition-all duration-150 mt-8"
+              className="text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg border hover:scale-105 transition-all duration-150 mt-8"
+              style={{ backgroundColor: '#9BD290', borderColor: '#9BD290' }}
             >
               Take the Quiz
             </motion.button>
