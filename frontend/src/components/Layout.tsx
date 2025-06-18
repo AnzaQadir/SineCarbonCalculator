@@ -30,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </nav>
           {/* CTA (extreme right) */}
           <div className="flex items-center justify-end ml-auto">
-            <Link to="/signup" className="ml-8 bg-emerald-700 text-white rounded-full px-10 py-4 font-extrabold shadow border border-emerald-800 hover:bg-emerald-800 hover:scale-105 transition-all duration-150 text-2xl">
+            <Link to="/signup" className="ml-8 text-white rounded-full px-10 py-4 font-extrabold shadow border hover:scale-105 transition-all duration-150 text-2xl" style={{ backgroundColor: '#9BD290', borderColor: '#9BD290' }}>
               Join The Community
             </Link>
             {/* Hamburger for mobile */}
@@ -58,7 +58,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link to="/" className="text-gray-700 hover:text-emerald-600 text-3xl font-extrabold px-4 py-3 rounded-lg transition-colors" onClick={() => setMobileNavOpen(false)}>Home</Link>
                 <Link to="/quiz" className="text-gray-700 hover:text-emerald-600 text-3xl font-extrabold px-4 py-3 rounded-lg transition-colors" onClick={() => setMobileNavOpen(false)}>Quiz</Link>
                 <Link to="/reflections" className="text-gray-700 hover:text-emerald-600 text-3xl font-extrabold px-4 py-3 rounded-lg transition-colors" onClick={() => setMobileNavOpen(false)}>Reflections</Link>
-                <Link to="/signup" className="mt-12 bg-emerald-700 text-white rounded-full px-12 py-6 font-extrabold shadow border border-emerald-800 hover:bg-emerald-800 hover:scale-105 transition-all text-3xl text-center" onClick={() => setMobileNavOpen(false)}>Join the community</Link>
+                <Link to="/signup" className="mt-12 text-white rounded-full px-12 py-6 font-extrabold shadow border hover:scale-105 transition-all text-3xl text-center" style={{ backgroundColor: '#9BD290', borderColor: '#9BD290' }} onClick={() => setMobileNavOpen(false)}>Join the community</Link>
               </nav>
             </div>
             <div className="flex-1" onClick={() => setMobileNavOpen(false)} />
