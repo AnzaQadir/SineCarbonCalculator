@@ -11,6 +11,24 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/comp
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { FaInstagram, FaFacebook, FaTiktok, FaSlack } from "react-icons/fa";
 
+// Add Proxima Nova Semibold font style
+const proximaNovaStyle = `
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/fonts/proxima-nova-semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+`;
+
+// Add style tag to head
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = proximaNovaStyle;
+  document.head.appendChild(style);
+}
+
 const cardVariants = {
   hidden: { opacity: 0, y: 40 },
   visible: (i = 1) => ({
@@ -22,6 +40,12 @@ const cardVariants = {
       ease: 'easeOut',
     },
   }),
+};
+
+// Add default font styles
+const defaultStyles = {
+  fontFamily: "'Proxima Nova', sans-serif",
+  fontWeight: 600,
 };
 
 const iconVariants = {
@@ -250,7 +274,7 @@ function HowItWorksSection({ steps }: { steps: { title: string; desc: string; im
   return (
     <section 
       ref={sectionRef} 
-      className="w-full py-32 px-2 relative overflow-hidden" 
+      className="w-full py-32 px-2 relative overflow-hidden font-['Proxima Nova']" 
       style={{ 
         background: 'linear-gradient(to right, #F3FDF8, #FFFDF3)',
         backgroundSize: '200% 200%',
@@ -269,7 +293,7 @@ function HowItWorksSection({ steps }: { steps: { title: string; desc: string; im
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           viewport={{ once: true }}
-          className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight"
+          className="text-5xl md:text-6xl font-extrabold text-center text-gray-900 mb-10 tracking-tight"
         >
           How It Works
         </motion.h2>
@@ -504,266 +528,268 @@ const Index = () => {
 
   return (
     <Layout>
-      <main className="w-screen aspect-[1536/1024] flex flex-col items-center text-center px-0 relative bg-white" style={{ backgroundImage: 'url(/images/green_bg_short.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: 'white' }}>
-        <motion.div
-          className="flex flex-col items-center justify-center min-h-[60vh] py-12 md:py-16 px-4 max-w-3xl mx-auto mt-8"
-          initial={{ opacity: 0, y: 32 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-        >
-          <motion.h1
-            initial={{ opacity: 0, y: 40 }}
+      <div className="font-['Proxima Nova']">
+        <main className="w-screen aspect-[1536/1024] flex flex-col items-center text-center px-0 relative bg-white" style={{ backgroundImage: 'url(/images/green_bg_short.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: 'white' }}>
+          <motion.div
+            className="flex flex-col items-center justify-center min-h-[60vh] py-12 md:py-16 px-4 max-w-3xl mx-auto mt-8"
+            initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold font-serif text-gray-900 mb-6 animate-fade-in drop-shadow-lg leading-[2] whitespace-nowrap"
           >
-            Small actions. Big climate impact.
-          </motion.h1>
-          <motion.h2
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.2, ease: 'easeOut' }}
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-gray-500 mb-10 leading-[2] animate-fade-in drop-shadow"
-            style={{ animationDelay: '0.2s' }}
-          >
-            Discover your story in 3 minutes.
-          </motion.h2>
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
-            whileHover={{ scale: 1.08, boxShadow: '0 8px 32px 0 rgba(0,0,0,0.10)' }}
-            onClick={handleStartQuiz}
-            className="bg-emerald-700 text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg border border-emerald-200 hover:bg-emerald-800 hover:scale-105 transition-all duration-150 mt-8"
-          >
-            Take the Quiz
-          </motion.button>
-          <div className="mt-12 animate-bounce opacity-80 transition-opacity duration-300">
-            <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mx-auto text-emerald-400">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-        </motion.div>
-        {/* Soft gradient fade at section bottom for closure */}
-        <div className="absolute left-0 right-0 bottom-0 h-16 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #F3FDF8 80%)' }} />
-      </main>
-
-      <HowItWorksSection steps={howItWorksSteps} />
-
-      {/* Impact at a Glance Section */}
-      <section className="relative w-full max-w-screen-2xl mx-auto my-32 px-2 overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-100/20 rounded-full blur-3xl transform -translate-x-1/2" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-yellow-100/20 rounded-full blur-3xl transform translate-x-1/2" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          viewport={{ once: true }}
-          className="relative"
-        >
-          <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Why Zerrah?</h2>
-          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Because climate change isn't just a data problem — it's a story problem.</div>
-          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-loose">This is how the story shifts when Zerrah enters the picture.</div>
-        </motion.div>
-
-        {/* Headings row above columns */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5, ease: 'easeOut' }}
-          viewport={{ once: true }}
-          className="flex flex-row gap-12 justify-center items-center max-w-5xl mx-auto mb-8"
-        >
-          <div className="flex-1 flex justify-center">
-            <div className="text-2xl md:text-3xl font-bold text-emerald-700 text-center relative group">
-              With Zerrah
-              <motion.div 
-                className="absolute -bottom-2 left-0 right-0 h-0.5 bg-emerald-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
-                initial={false}
-                whileHover={{ scaleX: 1 }}
-              />
+            <motion.h1
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6 animate-fade-in drop-shadow-lg leading-[2] whitespace-nowrap"
+            >
+              Small actions. Big climate impact.
+            </motion.h1>
+            <motion.h2
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.2, ease: 'easeOut' }}
+              className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-gray-500 mb-10 leading-[2] animate-fade-in drop-shadow"
+              style={{ animationDelay: '0.2s' }}
+            >
+              Discover your story in 3 minutes.
+            </motion.h2>
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
+              whileHover={{ scale: 1.08, boxShadow: '0 8px 32px 0 rgba(0,0,0,0.10)' }}
+              onClick={handleStartQuiz}
+              className="bg-emerald-700 text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg border border-emerald-200 hover:bg-emerald-800 hover:scale-105 transition-all duration-150 mt-8"
+            >
+              Take the Quiz
+            </motion.button>
+            <div className="mt-12 animate-bounce opacity-80 transition-opacity duration-300">
+              <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mx-auto text-emerald-400">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
             </div>
-          </div>
-          <div className="flex-1 flex justify-center">
-            <div className="text-2xl md:text-3xl font-bold text-gray-400 text-center relative group">
-              Without Zerrah
-              <motion.div 
-                className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gray-300 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
-                initial={false}
-                whileHover={{ scaleX: 1 }}
-              />
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+          {/* Soft gradient fade at section bottom for closure */}
+          <div className="absolute left-0 right-0 bottom-0 h-16 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #F3FDF8 80%)' }} />
+        </main>
 
-        <div className="flex flex-col md:flex-row gap-12 justify-center items-start max-w-5xl mx-auto mb-20">
-          {/* With Zerrah */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.6, ease: 'easeOut' }}
+        <HowItWorksSection steps={howItWorksSteps} />
+
+        {/* Impact at a Glance Section */}
+        <section className="relative w-full max-w-screen-2xl mx-auto my-32 px-2 overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-100/20 rounded-full blur-3xl transform -translate-x-1/2" />
+            <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-yellow-100/20 rounded-full blur-3xl transform translate-x-1/2" />
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
             viewport={{ once: true }}
-            className="flex-1 bg-white/80 backdrop-blur-sm rounded-3xl p-10 md:p-14 shadow-xl flex items-center justify-center relative flex-col mt-8 border border-emerald-50/50 hover:shadow-2xl transition-all duration-300"
+            className="relative"
           >
-            <div className="w-[450px] mx-auto">
-              <PillsColumn pills={zerrahPills} />
+            <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Why Zerrah?</h2>
+            <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Because climate change isn't just a data problem — it's a story problem.</div>
+            <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-loose">This is how the story shifts when Zerrah enters the picture.</div>
+          </motion.div>
+
+          {/* Headings row above columns */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5, ease: 'easeOut' }}
+            viewport={{ once: true }}
+            className="flex flex-row gap-12 justify-center items-center max-w-5xl mx-auto mb-8"
+          >
+            <div className="flex-1 flex justify-center">
+              <div className="text-2xl md:text-3xl font-bold text-emerald-700 text-center relative group">
+                With Zerrah
+                <motion.div 
+                  className="absolute -bottom-2 left-0 right-0 h-0.5 bg-emerald-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+                  initial={false}
+                  whileHover={{ scaleX: 1 }}
+                />
+              </div>
+            </div>
+            <div className="flex-1 flex justify-center">
+              <div className="text-2xl md:text-3xl font-bold text-gray-400 text-center relative group">
+                Without Zerrah
+                <motion.div 
+                  className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gray-300 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+                  initial={false}
+                  whileHover={{ scaleX: 1 }}
+                />
+              </div>
             </div>
           </motion.div>
 
-          {/* Without Zerrah */}
+          <div className="flex flex-col md:flex-row gap-12 justify-center items-start max-w-5xl mx-auto mb-20">
+            {/* With Zerrah */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.6, ease: 'easeOut' }}
+              viewport={{ once: true }}
+              className="flex-1 bg-white/80 backdrop-blur-sm rounded-3xl p-10 md:p-14 shadow-xl flex items-center justify-center relative flex-col mt-8 border border-emerald-50/50 hover:shadow-2xl transition-all duration-300"
+            >
+              <div className="w-[450px] mx-auto">
+                <PillsColumn pills={zerrahPills} />
+              </div>
+            </motion.div>
+
+            {/* Without Zerrah */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.7, ease: 'easeOut' }}
+              viewport={{ once: true }}
+              className="flex-1 bg-white/80 backdrop-blur-sm rounded-3xl p-10 md:p-14 shadow-xl flex items-center justify-center relative flex-col mt-8 border border-gray-100/50 hover:shadow-2xl transition-all duration-300"
+            >
+              <div className="w-[450px] mx-auto">
+                <PillsColumn pills={withoutPills} delay={0.2} />
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Section closure */}
           <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.7, ease: 'easeOut' }}
+            className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
             viewport={{ once: true }}
-            className="flex-1 bg-white/80 backdrop-blur-sm rounded-3xl p-10 md:p-14 shadow-xl flex items-center justify-center relative flex-col mt-8 border border-gray-100/50 hover:shadow-2xl transition-all duration-300"
+            style={{ 
+              background: 'linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8))'
+            }}
+          />
+        </section>
+        
+        {/* Action Spotlight & Reflections Archive Section */}
+        <section className="relative w-full py-24 px-2 md:px-8 bg-[#FAFAF6]">
+          <div className="max-w-[2200px] mx-auto rounded-3xl shadow-lg p-10 md:p-20 bg-white/80">
+          {/* Decorative background/gradient for polish */}
+          <div className="absolute inset-0 pointer-events-none -z-10">
+            <div className="absolute top-0 left-1/3 w-[400px] h-[400px] bg-emerald-100/30 rounded-full blur-3xl -translate-x-1/2" />
+            <div className="absolute bottom-0 right-1/4 w-[350px] h-[350px] bg-yellow-100/20 rounded-full blur-3xl translate-x-1/2" />
+            </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            viewport={{ once: true }}
           >
-            <div className="w-[450px] mx-auto">
-              <PillsColumn pills={withoutPills} delay={0.2} />
+            <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Action Spotlight</h2>
+            <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Real stories. Small shifts. Lasting change.</div>
+          </motion.div>
+          <ActionSpotlightCards />
+          {/* Section closure: soft gradient fade at bottom */}
+          <motion.div 
+            className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.7, delay: 0.5 }}
+            viewport={{ once: true }}
+            style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }}
+          />
+          </div>
+        </section>
+
+        {/* Reflections Archive */}
+        <section className="relative w-full max-w-[2200px] mx-auto py-12 md:py-24 px-2 md:px-8 rounded-3xl shadow-lg border border-gray-100/60 mb-24 overflow-hidden bg-gradient-to-b from-white via-emerald-50 to-white">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Reflections Archive</h2>
+            <div className="max-w-4xl mx-auto mb-10 flex flex-col md:flex-row gap-6">
+              <div className="bg-white/80 rounded-xl shadow p-6 flex-1 flex flex-col items-center">
+                <div className="text-xl md:text-2xl italic text-gray-700 text-center mb-2">“I never thought my small changes would inspire my friends. Now we all bike to work!”</div>
+                <div className="text-base text-gray-400 text-center">— Jamie, Toronto</div>
+              </div>
+              <div className="bg-white/80 rounded-xl shadow p-6 flex-1 flex flex-col items-center">
+                <div className="text-xl md:text-2xl italic text-gray-700 text-center mb-2">“Sharing my story helped me realize I'm not alone in this journey.”</div>
+                <div className="text-base text-gray-400 text-center">— Priya, Bangalore</div>
+              </div>
+            </div>
+            {/* Add margin below testimonial cards */}
+            <div className="mb-12" />
+            <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Discover journeys, share your story, and see the ripple effect of climate action in our community.</div>
+            <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-loose">Browse real eco-persona reflections, filter by topic or region, and inspire others with your unique perspective.</div>
+            <div className="flex justify-center mb-12">
+              <SocialRippleDiagram large />
+            </div>
+            <div className="text-center text-gray-500 text-2xl md:text-3xl font-semibold mb-8">Your story creates ripples.</div>
+            <div className="text-center text-emerald-700 text-xl md:text-2xl font-bold mb-6">Ready to inspire others? Share your own climate journey.</div>
+            <div className="flex justify-center">
+              <button className="bg-emerald-600 text-white rounded-full px-8 py-3 font-extrabold shadow hover:bg-emerald-700 hover:-translate-y-0.5 transition-all duration-150 text-xl md:text-2xl mt-8">
+                <span className="block font-extrabold">Share Your Story</span>
+              </button>
+            </div>
+            <div className="text-center text-gray-400 text-xl md:text-2xl mt-8 italic">All stories are welcome. Let's celebrate progress, not perfection.</div>
+          </motion.div>
+          <div className="absolute left-0 right-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }} />
+        </section>
+        <div className="border-t border-gray-100 my-12"></div>
+        <section className="relative w-full max-w-[1800px] mx-auto py-12 md:py-24 px-2 md:px-8 rounded-3xl shadow-lg border border-gray-100/60 mb-24 overflow-hidden bg-gradient-to-b from-white via-emerald-50 to-white">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Meet the Founders</h2>
+            <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Anza and Salma believe storytelling can turn climate worry into climate action.</div>
+            <div className="text-2xl md:text-3xl text-gray-400 text-center mb-12 max-w-5xl mx-auto italic leading-loose">
+              Each brings a love for gentle design, clear guidance, and true inclusivity. Reach out with feedback, connect on LinkedIn, or share your reflections. Your story shapes Zerrah.
+            </div>
+            <div className="flex flex-col md:flex-row gap-10 md:gap-20 justify-center items-center mb-10">
+              {/* Founder 1 */}
+              <motion.div
+                whileHover={{ scale: 1.05, boxShadow: '0 8px 32px 0 rgba(16,185,129,0.18)' }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col items-center"
+              >
+                <img src="/images/Kind-of-Conscious-Boy.png" alt="Anza Qadir"
+                  className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white shadow-lg object-cover mb-4 transition-all duration-200" />
+                <div className="text-2xl md:text-3xl font-bold text-gray-900">Anza Qadir</div>
+                <div className="text-base md:text-lg text-gray-400 mb-2">Co-Founder</div>
+                <a href="https://www.linkedin.com/in/anza-qadir/" target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white font-medium mt-2 px-4 py-2 rounded-full shadow transition-all duration-150 hover:-translate-y-0.5">
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
+                  LinkedIn
+                </a>
+              </motion.div>
+              {/* Founder 2 */}
+              <motion.div
+                whileHover={{ scale: 1.05, boxShadow: '0 8px 32px 0 rgba(16,185,129,0.18)' }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col items-center"
+              >
+                <img src="/images/Sustainability-Slayer-Girl.png" alt="Salma Zahra"
+                  className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white shadow-lg object-cover mb-4 transition-all duration-200" />
+                <div className="text-2xl md:text-3xl font-bold text-gray-900">Salma Zahra</div>
+                <div className="text-base md:text-lg text-gray-400 mb-2">Co-Founder</div>
+                <a href="https://www.linkedin.com/in/salma-zahra-05285112b/" target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white font-medium mt-2 px-4 py-2 rounded-full shadow transition-all duration-150 hover:-translate-y-0.5">
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
+                  LinkedIn
+                </a>
+              </motion.div>
+            </div>
+            <div className="flex justify-center">
+              <button className="bg-emerald-600 text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg hover:bg-emerald-700 hover:scale-105 transition-all duration-150 mt-10">
+                Contact Us
+              </button>
             </div>
           </motion.div>
-        </div>
-
-        {/* Section closure */}
-        <motion.div 
-          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          viewport={{ once: true }}
-          style={{ 
-            background: 'linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8))'
-          }}
-        />
-      </section>
-      
-      {/* Action Spotlight & Reflections Archive Section */}
-      <section className="relative w-full py-24 px-2 md:px-8 bg-[#FAFAF6]">
-        <div className="max-w-[2200px] mx-auto rounded-3xl shadow-lg p-10 md:p-20 bg-white/80">
-        {/* Decorative background/gradient for polish */}
-        <div className="absolute inset-0 pointer-events-none -z-10">
-          <div className="absolute top-0 left-1/3 w-[400px] h-[400px] bg-emerald-100/30 rounded-full blur-3xl -translate-x-1/2" />
-          <div className="absolute bottom-0 right-1/4 w-[350px] h-[350px] bg-yellow-100/20 rounded-full blur-3xl translate-x-1/2" />
-          </div>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Action Spotlight</h2>
-          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Real stories. Small shifts. Lasting change.</div>
-        </motion.div>
-        <ActionSpotlightCards />
-        {/* Section closure: soft gradient fade at bottom */}
-        <motion.div 
-          className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          viewport={{ once: true }}
-          style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }}
-        />
-                </div>
-      </section>
-
-      {/* Reflections Archive */}
-      <section className="relative w-full max-w-[2200px] mx-auto py-12 md:py-24 px-2 md:px-8 rounded-3xl shadow-lg border border-gray-100/60 mb-24 overflow-hidden bg-gradient-to-b from-white via-emerald-50 to-white">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Reflections Archive</h2>
-          <div className="max-w-4xl mx-auto mb-10 flex flex-col md:flex-row gap-6">
-            <div className="bg-white/80 rounded-xl shadow p-6 flex-1 flex flex-col items-center">
-              <div className="text-xl md:text-2xl italic text-gray-700 text-center mb-2">“I never thought my small changes would inspire my friends. Now we all bike to work!”</div>
-              <div className="text-base text-gray-400 text-center">— Jamie, Toronto</div>
-            </div>
-            <div className="bg-white/80 rounded-xl shadow p-6 flex-1 flex flex-col items-center">
-              <div className="text-xl md:text-2xl italic text-gray-700 text-center mb-2">“Sharing my story helped me realize I'm not alone in this journey.”</div>
-              <div className="text-base text-gray-400 text-center">— Priya, Bangalore</div>
-            </div>
-          </div>
-          {/* Add margin below testimonial cards */}
-          <div className="mb-12" />
-          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Discover journeys, share your story, and see the ripple effect of climate action in our community.</div>
-          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-loose">Browse real eco-persona reflections, filter by topic or region, and inspire others with your unique perspective.</div>
-          <div className="flex justify-center mb-12">
-            <SocialRippleDiagram large />
-          </div>
-          <div className="text-center text-gray-500 text-2xl md:text-3xl font-semibold mb-8">Your story creates ripples.</div>
-          <div className="text-center text-emerald-700 text-xl md:text-2xl font-bold mb-6">Ready to inspire others? Share your own climate journey.</div>
-          <div className="flex justify-center">
-            <button className="bg-emerald-600 text-white rounded-full px-8 py-3 font-extrabold shadow hover:bg-emerald-700 hover:-translate-y-0.5 transition-all duration-150 text-xl md:text-2xl mt-8">
-              <span className="block font-extrabold">Share Your Story</span>
-            </button>
-          </div>
-          <div className="text-center text-gray-400 text-xl md:text-2xl mt-8 italic">All stories are welcome. Let's celebrate progress, not perfection.</div>
-        </motion.div>
-        <div className="absolute left-0 right-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }} />
-      </section>
-      <div className="border-t border-gray-100 my-12"></div>
-      <section className="relative w-full max-w-[1800px] mx-auto py-12 md:py-24 px-2 md:px-8 rounded-3xl shadow-lg border border-gray-100/60 mb-24 overflow-hidden bg-gradient-to-b from-white via-emerald-50 to-white">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Meet the Founders</h2>
-          <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Anza and Salma believe storytelling can turn climate worry into climate action.</div>
-          <div className="text-2xl md:text-3xl text-gray-400 text-center mb-12 max-w-5xl mx-auto italic leading-loose">
-            Each brings a love for gentle design, clear guidance, and true inclusivity. Reach out with feedback, connect on LinkedIn, or share your reflections. Your story shapes Zerrah.
-          </div>
-          <div className="flex flex-col md:flex-row gap-10 md:gap-20 justify-center items-center mb-10">
-            {/* Founder 1 */}
-            <motion.div
-              whileHover={{ scale: 1.05, boxShadow: '0 8px 32px 0 rgba(16,185,129,0.18)' }}
-              transition={{ duration: 0.2 }}
-              className="flex flex-col items-center"
-            >
-              <img src="/images/Kind-of-Conscious-Boy.png" alt="Anza Qadir"
-                className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white shadow-lg object-cover mb-4 transition-all duration-200" />
-              <div className="text-2xl md:text-3xl font-bold text-gray-900">Anza Qadir</div>
-              <div className="text-base md:text-lg text-gray-400 mb-2">Co-Founder</div>
-              <a href="https://www.linkedin.com/in/anza-qadir/" target="_blank" rel="noopener noreferrer"
-                 className="flex items-center gap-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white font-medium mt-2 px-4 py-2 rounded-full shadow transition-all duration-150 hover:-translate-y-0.5">
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
-                LinkedIn
-              </a>
-            </motion.div>
-            {/* Founder 2 */}
-            <motion.div
-              whileHover={{ scale: 1.05, boxShadow: '0 8px 32px 0 rgba(16,185,129,0.18)' }}
-              transition={{ duration: 0.2 }}
-              className="flex flex-col items-center"
-            >
-              <img src="/images/Sustainability-Slayer-Girl.png" alt="Salma Zahra"
-                className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white shadow-lg object-cover mb-4 transition-all duration-200" />
-              <div className="text-2xl md:text-3xl font-bold text-gray-900">Salma Zahra</div>
-              <div className="text-base md:text-lg text-gray-400 mb-2">Co-Founder</div>
-              <a href="https://www.linkedin.com/in/salma-zahra-05285112b/" target="_blank" rel="noopener noreferrer"
-                 className="flex items-center gap-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white font-medium mt-2 px-4 py-2 rounded-full shadow transition-all duration-150 hover:-translate-y-0.5">
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
-                LinkedIn
-              </a>
-            </motion.div>
-          </div>
-          <div className="flex justify-center">
-            <button className="bg-emerald-600 text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg hover:bg-emerald-700 hover:scale-105 transition-all duration-150 mt-10">
-              Contact Us
-            </button>
-          </div>
-        </motion.div>
-        <div className="absolute left-0 right-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }} />
-      </section>
-      <div className="border-t border-gray-100 my-12"></div>
+          <div className="absolute left-0 right-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }} />
+        </section>
+        <div className="border-t border-gray-100 my-12"></div>
+      </div>
     </Layout>
   );
 };
@@ -845,7 +871,7 @@ function ActionSpotlightCards() {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-30">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-30 font-['Proxima Nova']">
         {actionSpotlightData.map((card, idx) => (
           <motion.div
             key={card.title}
@@ -969,7 +995,7 @@ function SocialRippleDiagram({ large = false }: { large?: boolean }): React.Reac
     { src: "/images/Sustainability-Slayer-Girl.png", style: "right-8 top-1/2 -translate-y-1/2" },
   ];
   return (
-    <div className={`relative ${large ? 'w-[650px] h-[650px]' : 'w-[400px] h-[400px]'} mx-auto bg-gradient-to-br from-emerald-50 to-white rounded-3xl shadow-lg mb-12`}>
+    <div className={`relative ${large ? 'w-[650px] h-[650px]' : 'w-[400px] h-[400px]'} mx-auto bg-gradient-to-br from-emerald-50 to-white rounded-3xl shadow-lg mb-12 font-['Proxima Nova']`}>
       {/* Central personality image */}
       <motion.img
         src="/images/Planets-Main-Character-Girl.png"
@@ -1026,7 +1052,7 @@ function PillsColumn({ pills, delay = 0 }: { pills: { text: string; color: strin
   const totalEntrance = delay + (pills.length - 1) * entranceDelay + entranceDuration;
 
   return (
-    <div className="flex flex-col items-center justify-center h-[420px]">
+    <div className="flex flex-col items-center justify-center h-[420px] font-['Proxima Nova']">
       {pills.map((pill, i) => (
         <motion.div
           key={pill.text}
