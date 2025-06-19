@@ -31,7 +31,7 @@ const EarthIcon = ({ className = '', glow = false }) => (
 );
 
 const milestoneBgColors = [
-  'border-green-200',
+  'border-amber-200',
   'border-blue-200',
   'border-amber-200',
   'border-cyan-200',
@@ -41,7 +41,7 @@ const milestoneBgColors = [
   'border-rose-200',
 ];
 const milestoneIconColors = [
-  'text-emerald-500',
+  'text-amber-500',
   'text-sky-400',
   'text-yellow-400',
   'text-cyan-400',

@@ -106,7 +106,7 @@ const Signup = () => {
     <Layout>
       <div className="min-h-[calc(100vh-160px)] flex items-center justify-center bg-gradient-to-br from-white to-emerald-50 py-12 px-4">
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-8 space-y-6">
-          <h1 className="text-3xl font-bold text-center text-emerald-800 mb-2">Tell Us About Yourself</h1>
+          <h1 className="text-3xl font-bold text-center text-amber-800 mb-2">Tell Us About Yourself</h1>
           <p className="text-center text-gray-500 mb-6">We'd love to get to know you! What name should we use when we chat about your eco-journey?</p>
           <input name="name" type="text" placeholder="Your Name" value={form.name} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-emerald-400" required />
           <div>
@@ -125,7 +125,7 @@ const Signup = () => {
                     value={range}
                     checked={form.age === range}
                     onChange={handleChange}
-                    className="form-radio text-emerald-600"
+                    className="form-radio text-amber-600"
                     required
                   />
                   <span>{range}</span>

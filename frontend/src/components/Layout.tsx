@@ -13,7 +13,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Responsive Header */}
-      <header className="w-full h-24 bg-white/80 shadow-sm border-b border-gray-100 px-6 flex items-center transition-all duration-500 animate-navbar-fade-in sticky top-0 z-40 backdrop-blur-lg">
+      <header className="w-full h-24 bg-white/80 shadow-sm border-b border-gray-100 px-6 flex items-center transition-all duration-500 animate-navbar-fade-in sticky top-0 z-50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between relative h-full">
           {/* Logo (extreme left) */}
           <div className="flex items-center justify-start h-full pl-6">
