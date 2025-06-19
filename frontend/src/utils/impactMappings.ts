@@ -14,7 +14,7 @@ export const impactMappings = {
       impact: "Your energy upgrades save you money and emissions every year.",
       details: "Based on your answer to the home energy question.",
       icon: Leaf,
-      iconClass: "h-6 w-6 text-emerald-400",
+      iconClass: "h-6 w-6 text-amber-400",
     },
     STANDARD: {
       title: "Standard Home",

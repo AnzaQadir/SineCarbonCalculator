@@ -121,9 +121,9 @@ const ReflectionScreen: React.FC = () => {
                   <div className="text-sm text-gray-500 mb-2">By {post.author}</div>
                   <p className="text-base text-gray-700 mb-4">{post.description}</p>
                   <div className="flex items-center gap-4 mt-auto pt-2">
-                    <button className="group flex items-center gap-1 text-gray-400 hover:text-emerald-600 transition"><Heart className="w-5 h-5" /><span className="sr-only">Like</span></button>
-                    <button className="group flex items-center gap-1 text-gray-400 hover:text-emerald-600 transition"><MessageCircle className="w-5 h-5" /><span className="sr-only">Comment</span></button>
-                    <button className="group flex items-center gap-1 text-gray-400 hover:text-emerald-600 transition ml-auto"><Bookmark className="w-5 h-5" /><span className="sr-only">Save</span></button>
+                    <button className="group flex items-center gap-1 text-gray-400 hover:text-amber-600 transition"><Heart className="w-5 h-5" /><span className="sr-only">Like</span></button>
+                    <button className="group flex items-center gap-1 text-gray-400 hover:text-amber-600 transition"><MessageCircle className="w-5 h-5" /><span className="sr-only">Comment</span></button>
+                    <button className="group flex items-center gap-1 text-gray-400 hover:text-amber-600 transition ml-auto"><Bookmark className="w-5 h-5" /><span className="sr-only">Save</span></button>
                   </div>
                 </div>
               </Card>
