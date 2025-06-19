@@ -1,0 +1,22 @@
+{
+  "champions": [
+    {
+      "id": 1,
+      "name": "Eco Warrior",
+      "image": "/champions/eco-warrior.jpg",
+      "description": "Leading the charge in environmental protection"
+    },
+    {
+      "id": 2,
+      "name": "Green Innovator",
+      "image": "/champions/green-innovator.jpg",
+      "description": "Pioneering sustainable solutions"
+    },
+    {
+      "id": 3,
+      "name": "Climate Guardian",
+      "image": "/champions/climate-guardian.jpg",
+      "description": "Protecting our planet's future"
+    }
+  ]
+} 
