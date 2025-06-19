@@ -49,7 +49,8 @@ const InviteScreen: React.FC = () => {
             <h1 className="text-3xl font-serif font-extrabold text-emerald-700 text-center mb-2">Invalid Invite</h1>
             <p className="text-lg text-blue-700 text-center mb-4">Sorry, this invite link is missing the task information.</p>
             <Button
-              className="w-full bg-gradient-to-r from-emerald-500 to-blue-400 hover:from-emerald-600 hover:to-blue-500 text-white rounded-full shadow-lg transition text-lg font-bold flex items-center justify-center gap-2"
+              className="w-full text-white rounded-full shadow-lg transition text-lg font-bold flex items-center justify-center gap-2"
+              style={{ backgroundColor: '#5E1614' }}
               onClick={() => navigate('/recommendations')}
             >
               <ArrowLeft className="h-4 w-4" /> Go Back to Recommendations
@@ -91,13 +92,15 @@ const InviteScreen: React.FC = () => {
             </p>
           </div>
           <Button
-            className="w-full bg-gradient-to-r from-emerald-500 to-blue-400 hover:from-emerald-600 hover:to-blue-500 text-white rounded-full shadow-lg transition text-lg font-bold flex items-center justify-center gap-2 mt-4"
+            className="w-full text-white rounded-full shadow-lg transition text-lg font-bold flex items-center justify-center gap-2 mt-4"
+            style={{ backgroundColor: '#5E1614' }}
             onClick={handleAccept}
           >
             <CheckCircle className="h-4 w-4" /> Accept & Add to My Tasks
           </Button>
           <Button
-            className="w-full bg-gradient-to-r from-blue-400 to-emerald-400 hover:from-blue-500 hover:to-emerald-500 text-white rounded-full shadow-lg transition text-lg font-bold flex items-center justify-center gap-2 mt-2"
+            className="w-full text-white rounded-full shadow-lg transition text-lg font-bold flex items-center justify-center gap-2 mt-2"
+            style={{ backgroundColor: '#5E1614' }}
             onClick={handleShare}
           >
             <span className="text-base mr-2">🤝</span> Share This Invite

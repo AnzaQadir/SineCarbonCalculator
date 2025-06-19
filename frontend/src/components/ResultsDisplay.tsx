@@ -740,7 +740,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const renderRecommendationsButton = () => (
     <Button
       onClick={() => navigate('/recommendations')}
-      className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition text-lg py-3 font-semibold mt-4"
+      className="w-full text-white rounded-lg shadow transition text-lg py-3 font-semibold mt-4"
+      style={{ backgroundColor: '#5E1614' }}
     >
       View Personalized Recommendations
     </Button>
@@ -849,7 +850,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               {/* Share Button */}
               <button
                 onClick={handleShare}
-                className="mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition text-base font-semibold"
+                className="mt-2 px-4 py-2 text-white rounded-lg shadow transition text-base font-semibold"
+                style={{ backgroundColor: '#5E1614' }}
               >
                 Share Your Eco-Personality
               </button>
@@ -918,7 +920,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </div>
                   </div>
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition text-lg py-3 font-semibold"
+                    className="w-full text-white rounded-lg shadow transition text-lg py-3 font-semibold"
+                    style={{ backgroundColor: '#5E1614' }}
                     onClick={() => alert('Simulate recommendation: ' + recommendations[0].title)}
                   >
                     Simulate Recommendation

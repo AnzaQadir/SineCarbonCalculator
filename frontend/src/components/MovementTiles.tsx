@@ -21,13 +21,13 @@ const MovementTile: React.FC<MovementTileProps> = ({
       className={cn(
         "relative p-6 rounded-xl cursor-pointer transition-all duration-300",
         "border-2 hover:shadow-lg transform hover:-translate-y-1",
-        selected ? "border-green-500 bg-green-50" : "border-gray-200 bg-white hover:border-gray-300"
+        selected ? "border-gray-500 bg-gray-50" : "border-gray-200 bg-white hover:border-gray-300"
       )}
     >
       <div className="flex flex-col gap-4">
         <div className={cn(
           "p-3 rounded-lg w-fit",
-          selected ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-600"
+          selected ? "bg-gray-100 text-gray-600" : "bg-gray-100 text-gray-600"
         )}>
           <Users className="h-6 w-6" />
         </div>
@@ -37,7 +37,7 @@ const MovementTile: React.FC<MovementTileProps> = ({
         </div>
       </div>
       {selected && (
-        <div className="absolute -top-2 -right-2 p-1 rounded-full bg-green-500">
+        <div className="absolute -top-2 -right-2 p-1 rounded-full bg-gray-500">
           <Leaf className="h-4 w-4 text-white" />
         </div>
       )}

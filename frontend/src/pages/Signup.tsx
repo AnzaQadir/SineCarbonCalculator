@@ -168,7 +168,7 @@ const Signup = () => {
           </div>
           {error && <div className="text-red-500 text-center text-sm">{error}</div>}
           {success && <div className="text-green-600 text-center text-sm">Signup successful!</div>}
-          <button type="submit" className="w-full bg-emerald-600 text-white rounded-full py-3 font-bold text-lg shadow hover:bg-emerald-700 transition">Sign Up</button>
+          <button type="submit" className="w-full text-white rounded-full py-3 font-bold text-lg shadow transition" style={{ backgroundColor: '#5E1614' }}>Sign Up</button>
         </form>
       </div>
     </Layout>
