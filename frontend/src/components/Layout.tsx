@@ -13,13 +13,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Responsive Header */}
-      <header className="w-full bg-white shadow-lg border-b border-emerald-100 py-8 transition-all duration-500 animate-navbar-fade-in sticky top-0 z-40 backdrop-blur-md">
-        <div className="w-full flex items-center px-8 relative">
+      <header className="w-full h-28 bg-white shadow-lg border-b border-emerald-100 px-4 flex items-center transition-all duration-500 animate-navbar-fade-in sticky top-0 z-40 backdrop-blur-md">
+        <div className="w-full flex items-center relative h-full">
           {/* Logo (extreme left) */}
-          <div className="flex items-center justify-start">
-            <Link to="/" className="flex items-center gap-6">
-              <img src="/images/zerrah_logo_white_transparent.png" alt="Zerrah Logo" className="h-20 w-auto" />
-              <span className="font-serif font-bold text-6xl text-emerald-700 tracking-tight transition-transform duration-150 hover:scale-105 hover:shadow-md" style={{ fontFamily: 'Cormorant Garamond, serif' }}>Zerrah</span>
+          <div className="flex items-center justify-start pl-2 h-full">
+            <Link to="/" className="flex items-center h-full">
+              <img src="/images/new_logo.png" alt="Zerrah Logo" className="h-36 w-auto object-contain m-0 p-0" />
             </Link>
           </div>
           {/* Navigation (centered absolutely) */}
