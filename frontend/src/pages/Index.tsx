@@ -355,10 +355,17 @@ function HowItWorksSection({ steps }: { steps: { title: string; desc: string; im
                 )}
               </div>
               {/* Step card (text + icon, alternating) */}
-              <div className={`flex-1 flex ${isEven ? 'flex-row' : 'flex-row-reverse'} items-center`}>
+              <motion.div
+                layout
+                transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+                className={`flex-1 flex ${isEven ? 'flex-row' : 'flex-row-reverse'} items-stretch gap-10 h-[260px]`}
+              >
+                {/* Text card */}
                 <motion.div
+                  layout
+                  transition={{ type: 'spring', stiffness: 500, damping: 40 }}
                   ref={stepRefs[idx]}
-                  className={`flex-1 flex flex-col justify-center bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-12 md:p-16 z-10 mx-8 border border-emerald-50/50`}
+                  className={`flex-[2] flex flex-col justify-center bg-white/90 rounded-3xl shadow-2xl p-12 z-10 border border-emerald-50/50 card-box h-full`}
                   initial={{ opacity: 0, y: 64, x: isEven ? 32 : -32 }}
                   animate={stepInViews[idx] ? { opacity: 1, y: 0, x: 0 } : {}}
                   transition={{ 
@@ -374,7 +381,7 @@ function HowItWorksSection({ steps }: { steps: { title: string; desc: string; im
                   }}
                 >
                   <motion.h3 
-                    className="text-[28px] font-bold text-gray-900 mb-6"
+                    className="text-3xl font-bold text-gray-900 mb-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={stepInViews[idx] ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.6, delay: 0.2 + idx * 0.1 }}
@@ -382,7 +389,7 @@ function HowItWorksSection({ steps }: { steps: { title: string; desc: string; im
                     {step.title}
                   </motion.h3>
                   <motion.p
-                    className="text-[#6B7280] text-xl md:text-2xl leading-relaxed"
+                    className="text-xl text-gray-500"
                     initial={{ opacity: 0 }}
                     animate={stepInViews[idx] ? { opacity: 1 } : {}}
                     transition={{ duration: 0.7, delay: 0.3 + idx * 0.1 }}
@@ -401,39 +408,37 @@ function HowItWorksSection({ steps }: { steps: { title: string; desc: string; im
                   </motion.p>
                 </motion.div>
                 {/* Icon column */}
-                <div className={`flex-1 flex items-center justify-center mt-12 md:mt-0`}>
-                  <motion.div
-                    className="rounded-2xl bg-white/80 backdrop-blur-sm shadow-lg flex items-center justify-center p-12 border border-emerald-50/50"
-                    whileHover={{ 
-                      scale: 1.15, 
-                      boxShadow: '0 12px 48px 0 rgba(253, 224, 71, 0.18)',
-                      rotate: [0, 2, -2, 0],
-                      transition: { duration: 0.4 }
-                    }}
-                    animate={stepInViews[idx] ? { 
-                      scale: 1.12, 
-                      rotate: 2, 
-                      boxShadow: '0 12px 48px 0 rgba(16,185,129,0.10)'
-                    } : { 
-                      scale: 1, 
-                      rotate: 0 
-                    }}
-                    transition={{ 
-                      type: 'spring', 
-                      stiffness: 300,
-                      rotate: { duration: 0.8, ease: 'easeInOut' }
-                    }}
-                  >
-                    <motion.img 
-                      src={step.img} 
-                      alt={step.alt} 
-                      className="h-44 w-44 object-contain drop-shadow-md"
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, y: 32 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 40, delay: idx * 0.1 }}
+                  className="icon-box flex items-center justify-center bg-white/90 rounded-3xl shadow-2xl border border-emerald-50/50 p-12 transition-transform duration-300 hover:scale-105 hover:shadow-emerald-100 h-full"
+                  whileHover={{ scale: 1.05, boxShadow: '0 12px 48px 0 rgba(16,185,129,0.10)' }}
+                >
+                  <div className="rounded-2xl flex items-center justify-center h-full w-full">
+                    <motion.img
+                      src={step.img}
+                      alt={step.alt}
+                      className="h-32 w-40 object-contain drop-shadow-md"
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{
+                        scale: 1,
+                        opacity: 1,
+                        y: [0, -8, 0, 8, 0],
+                        rotate: [0, 2, 0, -2, 0],
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: idx * 0.15,
+                      }}
                       whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.3 }}
                     />
-                  </motion.div>
-                </div>
-              </div>
+                  </div>
+                </motion.div>
+              </motion.div>
             </div>
           );
         })}
