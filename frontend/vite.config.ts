@@ -16,6 +16,19 @@ export default defineConfig(({ mode }) => ({
       }
     }
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tooltip'],
+          icons: ['lucide-react', 'react-icons'],
+        },
+      },
+    },
+    sourcemap: false,
+    minify: 'terser',
+  },
   plugins: [
     react(),
     mode === 'development' &&
@@ -25,5 +38,8 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  optimizeDeps: {
+    include: ['react-icons/fa', 'react-icons/gi', 'react-icons/md', 'react-icons/io'],
   },
 }));

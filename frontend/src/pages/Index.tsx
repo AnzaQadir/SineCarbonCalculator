@@ -363,12 +363,14 @@ function HowItWorksSection({ steps }: { steps: { title: string; desc: string; im
                 {/* Text card */}
                 <motion.div
                   layout
-                  transition={{ type: 'spring', stiffness: 500, damping: 40 }}
                   ref={stepRefs[idx]}
                   className={`flex-[2] flex flex-col justify-center bg-white/90 rounded-3xl shadow-2xl p-12 z-10 border border-emerald-50/50 card-box h-full`}
                   initial={{ opacity: 0, y: 64, x: isEven ? 32 : -32 }}
                   animate={stepInViews[idx] ? { opacity: 1, y: 0, x: 0 } : {}}
                   transition={{ 
+                    type: 'spring',
+                    stiffness: 500,
+                    damping: 40,
                     duration: 0.8, 
                     delay: idx * 0.12, 
                     ease: [0.22, 1, 0.36, 1],
