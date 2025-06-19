@@ -296,7 +296,8 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({ personality
               </div>
 
               <Button
-                className="w-full bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg transition-all duration-200 text-lg font-bold flex items-center justify-center gap-2 focus:ring-2 focus:ring-green-400"
+                className="w-full text-white rounded-full shadow-lg transition-all duration-200 text-lg font-bold flex items-center justify-center gap-2 focus:ring-2 focus:ring-green-400"
+                style={{ backgroundColor: '#5E1614' }}
                 aria-label="Try This Action"
                 onClick={() => handleSimulate(recommendations[currentIndex])}
               >

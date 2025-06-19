@@ -38,7 +38,8 @@ const ResultsScreen: React.FC = () => {
         />
         <div className="flex justify-center mt-8">
           <Button
-            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg shadow-lg text-lg font-semibold"
+            className="text-white px-8 py-3 rounded-lg shadow-lg text-lg font-semibold"
+            style={{ backgroundColor: '#5E1614' }}
             onClick={() => navigate('/recommendations')}
           >
             View Personalized Recommendations

@@ -239,7 +239,7 @@ const ContactForm = () => {
 };
 
 // --- How It Works Section ---
-const howItWorksStepNumbers = ['①','②','③','④'];
+const howItWorksStepNumbers = ['1','2','3','4'];
 
 function HowItWorksSection({ steps }: { steps: { title: string; desc: string; img: string; alt: string }[] }) {
   const sectionRef = useRef(null);
@@ -295,9 +295,9 @@ function HowItWorksSection({ steps }: { steps: { title: string; desc: string; im
                 <motion.div
                   className={`w-[104px] h-[104px] flex items-center justify-center rounded-full border-2 shadow-lg text-4xl font-bold transition-all duration-500 ${pastelBg[idx % pastelBg.length]} ${
                     activeIdx > idx 
-                      ? 'ring-4 ring-emerald-100 border-emerald-400 text-emerald-600 scale-110' 
+                      ? 'border-emerald-400 text-emerald-600 scale-110' 
                       : activeIdx === idx 
-                        ? 'ring-4 ring-emerald-200 border-emerald-400 text-emerald-700 scale-105' 
+                        ? 'border-emerald-400 text-emerald-700 scale-105' 
                         : 'border-emerald-100 text-emerald-300'
                   }`}
                   animate={activeIdx === idx 
@@ -492,7 +492,7 @@ const Index = () => {
   const howItWorksSteps = [
     {
       title: "Take the Quiz",
-      desc: "Answer questions across lifestyle areas that shape your environmental footprint — with no judgment, just vibes.",
+      desc: "Answer questions across lifestyle areas that shape your environmental footprint — with no judgment.",
       img: "/images/image.png",
       alt: "Take the Quiz"
     },
@@ -550,7 +550,7 @@ const Index = () => {
               whileHover={{ scale: 1.08, boxShadow: '0 8px 32px 0 rgba(0,0,0,0.10)' }}
               onClick={handleStartQuiz}
               className="text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg border hover:scale-105 transition-all duration-150 mt-8"
-              style={{ backgroundColor: '#9BD290', borderColor: '#9BD290' }}
+              style={{ backgroundColor: '#5E1614', borderColor: '#5E1614' }}
             >
               Take the Quiz
             </motion.button>
@@ -716,7 +716,7 @@ const Index = () => {
             <div className="text-center text-gray-500 text-2xl md:text-3xl font-semibold mb-8">Your story creates ripples.</div>
             <div className="text-center text-emerald-700 text-xl md:text-2xl font-bold mb-6">Ready to inspire others? Share your own climate journey.</div>
             <div className="flex justify-center">
-              <button className="bg-emerald-600 text-white rounded-full px-8 py-3 font-extrabold shadow hover:bg-emerald-700 hover:-translate-y-0.5 transition-all duration-150 text-xl md:text-2xl mt-8">
+              <button className="text-white rounded-full px-8 py-3 font-extrabold shadow hover:-translate-y-0.5 transition-all duration-150 text-xl md:text-2xl mt-8" style={{ backgroundColor: '#5E1614' }}>
                 <span className="block font-extrabold">Share Your Story</span>
               </button>
             </div>
@@ -749,7 +749,7 @@ const Index = () => {
                 <div className="text-2xl md:text-3xl font-bold text-gray-900">Anza Qadir</div>
                 <div className="text-base md:text-lg text-gray-400 mb-2">Co-Founder</div>
                 <a href="https://www.linkedin.com/in/anza-qadir/" target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white font-medium mt-2 px-4 py-2 rounded-full shadow transition-all duration-150 hover:-translate-y-0.5">
+                   className="flex items-center gap-2 text-white hover:text-white font-medium mt-2 px-4 py-2 rounded-full shadow transition-all duration-150 hover:-translate-y-0.5" style={{ backgroundColor: '#5E1614' }}>
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
                   LinkedIn
                 </a>
@@ -765,14 +765,14 @@ const Index = () => {
                 <div className="text-2xl md:text-3xl font-bold text-gray-900">Salma Zahra</div>
                 <div className="text-base md:text-lg text-gray-400 mb-2">Co-Founder</div>
                 <a href="https://www.linkedin.com/in/salma-zahra-05285112b/" target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white font-medium mt-2 px-4 py-2 rounded-full shadow transition-all duration-150 hover:-translate-y-0.5">
+                   className="flex items-center gap-2 text-white hover:text-white font-medium mt-2 px-4 py-2 rounded-full shadow transition-all duration-150 hover:-translate-y-0.5" style={{ backgroundColor: '#5E1614' }}>
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z"/></svg>
                   LinkedIn
                 </a>
               </motion.div>
             </div>
             <div className="flex justify-center">
-              <button className="bg-emerald-600 text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg hover:bg-emerald-700 hover:scale-105 transition-all duration-150 mt-10">
+              <button className="text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg hover:scale-105 transition-all duration-150 mt-10" style={{ backgroundColor: '#5E1614' }}>
                 Contact Us
               </button>
             </div>

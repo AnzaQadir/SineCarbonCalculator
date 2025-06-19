@@ -145,9 +145,9 @@ export const EcoAvatarCustomization: React.FC<EcoAvatarCustomizationProps> = ({
                           className={cn(
                             "p-4 rounded-xl border-2 cursor-pointer transition-colors",
                             selectedItems[item.type] === item.id
-                              ? "border-green-500 bg-green-50"
+                              ? "border-gray-500 bg-gray-50"
                               : item.unlocked
-                              ? "border-gray-200 hover:border-green-200"
+                              ? "border-gray-200 hover:border-gray-300"
                               : "border-gray-200 opacity-50 cursor-not-allowed"
                           )}
                           onClick={() => handleItemSelect(item)}
@@ -166,7 +166,7 @@ export const EcoAvatarCustomization: React.FC<EcoAvatarCustomizationProps> = ({
                               <div className="flex items-center justify-between">
                                 <h4 className="font-medium">{item.name}</h4>
                                 {selectedItems[item.type] === item.id && (
-                                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                  <CheckCircle2 className="h-4 w-4 text-gray-600" />
                                 )}
                               </div>
                               <p className="text-sm text-gray-600 mt-1">{item.description}</p>

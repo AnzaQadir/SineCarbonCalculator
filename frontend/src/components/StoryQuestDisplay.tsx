@@ -115,7 +115,7 @@ export const StoryQuestDisplay: React.FC<StoryQuestDisplayProps> = ({
                     "p-2 rounded-lg",
                     quest.type === 'individual' ? "bg-purple-100" :
                     quest.type === 'team' ? "bg-blue-100" :
-                    "bg-green-100"
+                    "bg-gray-100"
                   )}>
                     {getQuestIcon(quest.type)}
                   </div>
@@ -183,7 +183,7 @@ export const StoryQuestDisplay: React.FC<StoryQuestDisplayProps> = ({
 
             {/* Completion Badge */}
             {quest.progress === 100 && (
-              <div className="absolute -top-2 -right-2 p-1.5 rounded-full bg-green-500 text-white">
+              <div className="absolute -top-2 -right-2 p-1.5 rounded-full bg-gray-500 text-white">
                 <CheckCircle2 className="h-5 w-5" />
               </div>
             )}
@@ -213,7 +213,7 @@ export const StoryQuestDisplay: React.FC<StoryQuestDisplayProps> = ({
                       "p-2 rounded-lg",
                       selectedQuest.type === 'individual' ? "bg-purple-100" :
                       selectedQuest.type === 'team' ? "bg-blue-100" :
-                      "bg-green-100"
+                      "bg-gray-100"
                     )}>
                       {getQuestIcon(selectedQuest.type)}
                     </div>
@@ -244,7 +244,7 @@ export const StoryQuestDisplay: React.FC<StoryQuestDisplayProps> = ({
                         className={cn(
                           "p-4 rounded-lg border-2 transition-colors",
                           task.completed
-                            ? "border-green-200 bg-green-50"
+                            ? "border-gray-200 bg-gray-50"
                             : "border-gray-200"
                         )}
                       >
@@ -255,7 +255,7 @@ export const StoryQuestDisplay: React.FC<StoryQuestDisplayProps> = ({
                             className={cn(
                               "rounded-full w-6 h-6 p-0",
                               task.completed
-                                ? "bg-green-100 text-green-600"
+                                ? "bg-gray-100 text-gray-600"
                                 : "bg-gray-100 text-gray-400 hover:text-gray-600"
                             )}
                             onClick={() => onTaskComplete(selectedQuest.id, task.id)}

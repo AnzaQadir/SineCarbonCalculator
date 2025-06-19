@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import {
-  Leaf, Tree, Globe, Users, Star, Trophy,
+  Leaf, Trees, Globe, Users, Star, Trophy,
   BookOpen, Sprout, Heart, Zap, Award,
   BadgeCheck, Target, Crown, Sparkles
 } from 'lucide-react';
@@ -189,8 +189,8 @@ export const EcoPersonalityDisplay: React.FC<EcoPersonalityDisplayProps> = ({
                       className={cn(
                         "p-4 rounded-lg border-2 transition-colors",
                         task.completed
-                          ? "border-green-200 bg-green-50"
-                          : "border-gray-200 hover:border-green-200"
+                          ? "border-gray-200 bg-gray-50"
+                          : "border-gray-200 hover:border-gray-300"
                       )}
                     >
                       <div className="flex items-start gap-3">

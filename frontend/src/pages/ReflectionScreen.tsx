@@ -6,8 +6,8 @@ import { Heart, MessageCircle, Bookmark } from 'lucide-react';
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 
 const categories = [
-  { label: 'All', value: 'all', color: 'bg-emerald-200 text-emerald-900' },
-  { label: 'People Story', value: 'People Story', color: 'bg-green-200 text-green-900' },
+  { label: 'All', value: 'all', color: 'bg-gray-200 text-gray-900' },
+  { label: 'People Story', value: 'People Story', color: 'bg-gray-200 text-gray-900' },
   { label: 'Expert Opinion', value: 'Expert Opinion', color: 'bg-teal-200 text-teal-900' },
   { label: 'Research Insight', value: 'Research Insight', color: 'bg-lime-200 text-lime-900' },
 ];
@@ -67,7 +67,7 @@ const posts = [
 ];
 
 const categoryColor = {
-  'People Story': 'bg-green-100 text-green-800',
+  'People Story': 'bg-gray-100 text-gray-800',
   'Expert Opinion': 'bg-teal-100 text-teal-800',
   'Research Insight': 'bg-lime-100 text-lime-800',
 };
@@ -89,7 +89,7 @@ const ReflectionScreen: React.FC = () => {
           {categories.map(cat => (
             <button
               key={cat.value}
-              className={`px-5 py-2 rounded-full font-semibold transition-all duration-150 border border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-400 text-base md:text-lg ${selected === cat.value ? cat.color + ' shadow' : 'bg-white text-gray-500 hover:bg-emerald-50'}`}
+              className={`px-5 py-2 rounded-full font-semibold transition-all duration-150 border border-transparent focus:outline-none focus:ring-2 focus:ring-gray-400 text-base md:text-lg ${selected === cat.value ? cat.color + ' shadow' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
               onClick={() => setSelected(cat.value)}
             >
               {cat.label}
@@ -153,7 +153,7 @@ const ReflectionScreen: React.FC = () => {
           </Dialog>
         )}
         {/* CTA */}
-        <Button size="lg" className="rounded-full bg-emerald-600 text-white font-bold text-lg px-8 py-4 shadow hover:bg-emerald-700 transition-all duration-150">
+        <Button size="lg" className="rounded-full text-white font-bold text-lg px-8 py-4 shadow transition-all duration-150" style={{ backgroundColor: '#5E1614' }}>
           Explore All Reflections
         </Button>
       </div>
