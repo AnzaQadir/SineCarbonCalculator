@@ -23,8 +23,12 @@ app.use('/api/personality', personalityRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Welcome to the API' });
 });
 
 // Error handling middleware
@@ -39,4 +43,6 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 // Start server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
-}); 
+});
+
+export default app; 
