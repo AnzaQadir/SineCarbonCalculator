@@ -156,7 +156,7 @@ const personalityRecommendations: Recommendation[] = [
       weekly: "6kg CO₂",
       monthly: "24kg CO₂ = 1 tree"
     },
-    personas: ["Kind of Conscious"],
+    personas: ["Kind of Conscious, Kind of Confused"],
     region: "South Asia",
     lifestyle: "Commuter"
   },
@@ -175,7 +175,7 @@ const personalityRecommendations: Recommendation[] = [
       weekly: "2kg CO₂",
       monthly: "8kg CO₂"
     },
-    personas: ["Kind of Conscious"],
+    personas: ["Kind of Conscious, Kind of Confused"],
     region: "Global",
     lifestyle: "Remote Worker"
   },
@@ -193,7 +193,7 @@ const personalityRecommendations: Recommendation[] = [
     simulation: {
       monthly: "10kg CO₂, 1 tree saved"
     },
-    personas: ["Kind of Conscious"],
+    personas: ["Kind of Conscious, Kind of Confused"],
     region: "Global",
     lifestyle: "Family Household"
   },
