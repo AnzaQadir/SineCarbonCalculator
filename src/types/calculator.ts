@@ -11,6 +11,18 @@ export interface FootprintResults {
   comparedToTarget: number;
 }
 
+export interface FootprintResults1 {
+  total: number;
+  home: number;
+  transport: number;
+  food: number;
+  waste: number;
+  fashion: number;
+  comparedToUS: number;
+  comparedToGlobal: number;
+  comparedToTarget: number;
+}
+
 export interface CalculatorState {
   // Demographics
   name: string;
