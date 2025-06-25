@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { PersonalityType } from '@/types/personality';
 import { getPersonalityImage } from '@/utils/personalityImages';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '@/services/api';
 
 // Type guard for PersonalityType
 const isPersonalityType = (value: string): value is PersonalityType => {
@@ -89,7 +90,7 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({ personality
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('/api/recommendations/static', {
+        const res = await fetch(`${API_BASE_URL}/recommendations/static`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(personalityData),
