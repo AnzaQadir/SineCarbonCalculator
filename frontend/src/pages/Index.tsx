@@ -965,7 +965,7 @@ const actionSpotlightData = [
     subtext: 'Cut 1kg of CO₂ per 3 miles',
     impactStat: '🚴 1 ride = 8kg CO₂ saved = 1 full day\'s electricity for a fridge',
     whyItMatters: 'Transportation is the largest contributor to carbon emissions in most cities. Even one ride a week helps shift that.',
-    cta: '💡 Want to build a habit? Try a "2 Wheels Tuesday" challenge for 30 days.',
+    cta: undefined,
   },
   {
     gif: '/gif/eco_friendly_market.gif',
@@ -977,7 +977,7 @@ const actionSpotlightData = [
     subtext: 'Support farmers in your locality',
     impactStat: '🧺 Buying local cuts food miles by up to 90% — that\'s less packaging, refrigeration, and transport pollution.',
     whyItMatters: 'Most produce travels over 1,500 miles before reaching you. Local food travels fewer miles and supports nearby growers.',
-    cta: '🌍 Try exploring your local farmer\'s market this weekend — or download our seasonal produce cheat sheet.',
+    cta: undefined,
   },
   {
     gif: '/gif/solar_saving.gif',
@@ -989,6 +989,7 @@ const actionSpotlightData = [
     subtext: 'Reduce your energy bill by 40%',
     impactStat: '☀️ One home solar setup = 500kg CO₂ saved = the equivalent of planting 12 trees every year.',
     whyItMatters: 'Solar doesn\'t just save energy — it sends a signal. It shows you\'re investing in a cleaner grid for everyone.',
+    cta: undefined,
   },
 ];
 
