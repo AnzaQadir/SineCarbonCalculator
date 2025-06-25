@@ -1224,32 +1224,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </CardContent>
         </Card>
 
-        {/* Climate Champions Card */}
-        <Card className="bg-green-50 overflow-hidden rounded-2xl shadow-lg">
-          <CardContent className="p-8 lg:p-12">
-            <div className="space-y-8">
-              <div className="flex items-center gap-3">
-                <Trophy className="h-8 w-8 text-yellow-500" />
-                <h2 className="text-3xl font-serif text-gray-800">Climate Champions</h2>
-              </div>
-              
-              <p className="text-lg text-gray-600">
-                Connect with inspiring climate leaders who share your passion for {dominantCategory} sustainability.
-              </p>
-
-              <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6">
-                <ClimateChampions
-                  dominantCategory={dominantCategory}
-                  userScore={score}
-                  onActionSelect={(action) => {
-                    console.log('Selected action:', action);
-                  }}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {showWrapped && (
           <motion.div
             initial={{ opacity: 0 }}
