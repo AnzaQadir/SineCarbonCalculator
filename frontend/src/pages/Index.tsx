@@ -892,7 +892,7 @@ const Index = () => {
             <div className="absolute left-0 right-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }} />
           </section>
           <div className="border-t border-gray-100 my-12"></div>
-          <section className="relative w-full max-w-[1800px] mx-auto py-12 md:py-24 px-2 md:px-8 rounded-3xl shadow-lg border border-gray-100/60 mb-24 overflow-hidden bg-gradient-to-b from-white via-emerald-50 to-white">
+          <section className="relative w-full max-w-[1800px] mx-auto py-16 md:py-24 px-2 md:px-8 rounded-3xl shadow-lg border border-gray-100/60 mb-0 pb-0 overflow-hidden bg-gradient-to-b from-white via-emerald-50 to-white">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -938,15 +938,14 @@ const Index = () => {
                   </a>
                 </motion.div>
               </div>
-              <div className="flex justify-center">
-                <button className="text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg hover:scale-105 transition-all duration-150 mt-10" style={{ backgroundColor: '#5E1614' }}>
+              <div className="flex justify-center mt-16">
+                <button className="text-white rounded-full px-8 py-3 font-bold text-lg md:text-xl shadow-lg hover:scale-105 transition-all duration-150" style={{ backgroundColor: '#5E1614' }}>
                   Contact Us
                 </button>
               </div>
             </motion.div>
             <div className="absolute left-0 right-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }} />
           </section>
-          <div className="border-t border-gray-100 my-12"></div>
         </main>
       </div>
     </Layout>
