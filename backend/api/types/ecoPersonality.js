@@ -140,15 +140,22 @@ exports.personalityMappings = {
     },
     food: {
         dietType: {
-            'PLANT_BASED': ['Sustainability Slayer', 'Eco Warrior'],
+            'VEGAN': ['Sustainability Slayer', 'Eco Warrior'],
             'VEGETARIAN': ['Green Guardian', 'Climate Conscious'],
             'FLEXITARIAN': ['Eco Explorer', 'Green Novice'],
-            'MODERATE_MEAT': ['Certified Climate Snoozer']
+            'MEAT_MODERATE': ['Certified Climate Snoozer'],
+            'MEAT_HEAVY': ['Certified Climate Snoozer']
         },
-        foodSource: {
-            'LOCAL_SEASONAL': ['Sustainability Slayer', 'Eco Warrior'],
-            'MIXED': ['Green Guardian', 'Climate Conscious'],
-            'CONVENTIONAL': ['Eco Explorer', 'Green Novice', 'Certified Climate Snoozer']
+        plateProfile: {
+            'A': ['Sustainability Slayer', 'Eco Warrior'],
+            'B': ['Green Guardian', 'Climate Conscious'],
+            'C': ['Eco Explorer', 'Green Novice', 'Certified Climate Snoozer']
+        },
+        monthlyDiningOut: {
+            'A': ['Sustainability Slayer', 'Eco Warrior'],
+            'B': ['Green Guardian', 'Climate Conscious'],
+            'C': ['Eco Explorer', 'Green Novice'],
+            'D': ['Certified Climate Snoozer']
         }
     },
     waste: {
@@ -162,16 +169,40 @@ exports.personalityMappings = {
             'A': ['Sustainability Slayer', 'Eco Warrior'],
             'B': ['Green Guardian', 'Climate Conscious'],
             'C': ['Eco Explorer', 'Green Novice', 'Certified Climate Snoozer']
+        },
+        repairOrReplace: {
+            'A': ['Sustainability Slayer', 'Eco Warrior'],
+            'B': ['Green Guardian', 'Climate Conscious'],
+            'C': ['Eco Explorer', 'Green Novice', 'Certified Climate Snoozer']
         }
     },
     airQuality: {
-        monitoring: {
+        outdoorAirQuality: {
+            'A': ['Sustainability Slayer', 'Eco Warrior'],
+            'B': ['Green Guardian', 'Climate Conscious'],
+            'C': ['Eco Explorer', 'Green Novice'],
+            'D': ['Certified Climate Snoozer'],
+            'E': ['Certified Climate Snoozer']
+        },
+        aqiMonitoring: {
             'A': ['Sustainability Slayer', 'Eco Warrior'],
             'B': ['Green Guardian', 'Climate Conscious'],
             'C': ['Eco Explorer', 'Green Novice'],
             'D': ['Certified Climate Snoozer']
         },
-        impact: {
+        indoorAirQuality: {
+            'A': ['Sustainability Slayer', 'Eco Warrior'],
+            'B': ['Green Guardian', 'Climate Conscious'],
+            'C': ['Eco Explorer', 'Green Novice'],
+            'D': ['Certified Climate Snoozer']
+        },
+        airQualityCommuting: {
+            'A': ['Sustainability Slayer', 'Eco Warrior'],
+            'B': ['Green Guardian', 'Climate Conscious'],
+            'C': ['Eco Explorer', 'Green Novice'],
+            'D': ['Certified Climate Snoozer']
+        },
+        airQualityImpact: {
             'A': ['Sustainability Slayer', 'Eco Warrior'],
             'B': ['Green Guardian', 'Climate Conscious'],
             'C': ['Eco Explorer', 'Green Novice'],
@@ -185,6 +216,11 @@ exports.personalityMappings = {
             'C': ['Eco Explorer', 'Green Novice', 'Certified Climate Snoozer']
         },
         mindfulUpgrades: {
+            'A': ['Sustainability Slayer', 'Eco Warrior'],
+            'B': ['Green Guardian', 'Climate Conscious'],
+            'C': ['Eco Explorer', 'Green Novice', 'Certified Climate Snoozer']
+        },
+        durability: {
             'A': ['Sustainability Slayer', 'Eco Warrior'],
             'B': ['Green Guardian', 'Climate Conscious'],
             'C': ['Eco Explorer', 'Green Novice', 'Certified Climate Snoozer']

@@ -5,7 +5,7 @@ import {
   Zap, Leaf, Bus, Bike, Train,
   Apple, Beef, PackageCheck, Recycle,
   Battery, CloudSun, PackageX, ShoppingBag, ShoppingCart, Store,
-  Sun, Cloud, Info, MapPin, Timer, FileText, Shirt
+  Sun, Cloud, Info, MapPin, Timer, FileText, Shirt, Wrench
 } from 'lucide-react';
 
 interface QuestionTileProps {
@@ -55,7 +55,7 @@ const QuestionTile: React.FC<QuestionTileProps> = ({
 
 interface QuestionTilesProps {
   category: 'homeEnergy' | 'transport' | 'food' | 'waste' | 'airQuality' | 'clothing';
-  subCategory: 'efficiency' | 'management' | 'primary' | 'carProfile' | 'diet' | 'plateProfile' | 'prevention' | 'monitoring' | 'impact' | 'shopping' | 'wasteManagement' | 'outdoorQuality' | 'indoorQuality' | 'commuting' | 'wardrobeImpact' | 'mindfulUpgrades' | 'durability' | 'wasteComposition' | 'localvsseasonal' | 'consumptionFrequency' | 'brandLoyalty';
+  subCategory: 'efficiency' | 'management' | 'primary' | 'carProfile' | 'diet' | 'plateProfile' | 'prevention' | 'monitoring' | 'impact' | 'shopping' | 'wasteManagement' | 'outdoorQuality' | 'indoorQuality' | 'commuting' | 'wardrobeImpact' | 'mindfulUpgrades' | 'durability' | 'wasteComposition' | 'localvsseasonal' | 'consumptionFrequency' | 'brandLoyalty' | 'monthlyDiningOut' | 'repairOrReplace';
   value: string;
   onChange: (value: string) => void;
 }
@@ -184,6 +184,39 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               icon: <Beef className="h-6 w-6" />,
               title: 'Moderate Meat',
               description: 'Regular meat consumption'
+            },
+            {
+              value: 'MEAT_HEAVY',
+              icon: <Beef className="h-6 w-6" />,
+              title: 'Mostly Meat',
+              description: 'Heavy meat consumption'
+            }
+          ];
+        } else if (subCategory === 'monthlyDiningOut') {
+          return [
+            {
+              value: 'A',
+              icon: <Utensils className="h-6 w-6" />,
+              title: 'Rarely Dine Out',
+              description: 'Less than 1 time a month'
+            },
+            {
+              value: 'B',
+              icon: <Utensils className="h-6 w-6" />,
+              title: 'Occasionally',
+              description: '1-4 times a month'
+            },
+            {
+              value: 'C',
+              icon: <ShoppingBag className="h-6 w-6" />,
+              title: 'Regularly',
+              description: '5-10 times a month'
+            },
+            {
+              value: 'D',
+              icon: <ShoppingBag className="h-6 w-6" />,
+              title: 'Frequently',
+              description: 'More than 10 times a month'
             }
           ];
         } else if (subCategory === 'localvsseasonal') {
@@ -224,8 +257,8 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
             {
               value: 'C',
               icon: <PackageCheck className="h-6 w-6" />,
-              title: 'Conventional',
-              description: 'Primarily conventional and imported foods'
+              title: 'Mostly Imported',
+              description: 'Primarily imported and conventional foods'
             }
           ];
         } else {
@@ -245,8 +278,8 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
             {
               value: 'C',
               icon: <PackageCheck className="h-6 w-6" />,
-              title: 'Conventional',
-              description: 'Primarily conventional and imported foods'
+              title: 'Mostly Imported',
+              description: 'Primarily imported and conventional foods'
             }
           ];
         }
@@ -277,6 +310,27 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               icon: <PackageX className="h-6 w-6" />,
               title: 'Basic Disposer',
               description: 'I rarely think about reusables until I see the trash piling up'
+            }
+          ];
+        } else if (subCategory === 'repairOrReplace') {
+          return [
+            {
+              value: 'A',
+              icon: <Wrench className="h-6 w-6" />,
+              title: 'Always Repair',
+              description: 'I always try to repair items before considering replacement'
+            },
+            {
+              value: 'B',
+              icon: <Wrench className="h-6 w-6" />,
+              title: 'Sometimes Repair',
+              description: 'I sometimes repair items, depending on the situation and cost'
+            },
+            {
+              value: 'C',
+              icon: <PackageX className="h-6 w-6" />,
+              title: 'Usually Replace',
+              description: 'I usually replace broken items rather than repairing them'
             }
           ];
         } else if (subCategory === 'shopping') {
@@ -425,6 +479,12 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               icon: <Info className="h-6 w-6" />,
               title: 'Not Sure',
               description: 'I rarely pay attention to the air quality'
+            },
+            {
+              value: 'E',
+              icon: <Cloud className="h-6 w-6" />,
+              title: 'Mostly Polluted',
+              description: 'The air quality is consistently poor and visibly polluted'
             }
           ];
         } else if (subCategory === 'monitoring') {
@@ -454,19 +514,19 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               value: 'A',
               icon: <Leaf className="h-6 w-6" />,
               title: 'Low Impact',
-              description: 'Use of air-friendly products and practices'
+              description: 'I don\'t notice a difference in mood and energy levels'
             },
             {
               value: 'B',
               icon: <Wind className="h-6 w-6" />,
               title: 'Moderate Impact',
-              description: 'Some consideration for air quality'
+              description: 'My energy levels are a little lower and I sometimes feel irritable'
             },
             {
               value: 'C',
               icon: <Wind className="h-6 w-6" />,
               title: 'High Impact',
-              description: 'Limited consideration for air quality'
+              description: 'My energy levels are significantly lower and I feel quite irritable'
             }
           ];
         }

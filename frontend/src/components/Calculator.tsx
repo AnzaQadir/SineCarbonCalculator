@@ -87,14 +87,14 @@ interface BaseCalculatorState {
   // Transportation
   primaryTransportMode: "" | "A" | "B" | "C" | "D";
   carProfile: "" | "A" | "B" | "C" | "D" | "E";
-  annualMileage: string;
+  weeklyKm: string;
   costPerMile: string;
   longDistanceTravel: "" | "A" | "B" | "C";
   
   // Food & Diet
   dietType: "VEGAN" | "VEGETARIAN" | "FLEXITARIAN" | "MEAT_MODERATE" | "MEAT_HEAVY";
   plateProfile: "" | "A" | "B" | "C";
-  diningStyle: "" | "A" | "B" | "C";
+  monthlyDiningOut: "" | "A" | "B" | "C" | "D";
   plantBasedMealsPerWeek: string;
   
   // Waste
@@ -103,12 +103,12 @@ interface BaseCalculatorState {
     smartShopping: "" | "A" | "B" | "C";
     dailyWaste: "" | "A" | "B" | "C" | "D";
     management: "" | "A" | "B" | "C";
-    repairOrReplace: boolean;
+    repairOrReplace: "" | "A" | "B" | "C";
   };
 
   // Air Quality
   airQuality: {
-    outdoorAirQuality: "" | "A" | "B" | "C" | "D";
+    outdoorAirQuality: "" | "A" | "B" | "C" | "D" | "E";
     aqiMonitoring: "" | "A" | "B" | "C" | "D";
     indoorAirQuality: "" | "A" | "B" | "C" | "D";
     airQualityCommuting: "" | "A" | "B" | "C" | "D";
@@ -195,10 +195,10 @@ const Calculator = ({
     smartShopping: '' as '' | 'A' | 'B' | 'C',
     dailyWaste: '' as '' | 'A' | 'B' | 'C' | 'D',
     management: '' as '' | 'A' | 'B' | 'C',
-    repairOrReplace: false,
+    repairOrReplace: '' as '' | 'A' | 'B' | 'C',
   };
   const defaultAirQuality = {
-    outdoorAirQuality: '' as '' | 'A' | 'B' | 'C' | 'D',
+    outdoorAirQuality: '' as '' | 'A' | 'B' | 'C' | 'D' | 'E',
     aqiMonitoring: '' as '' | 'A' | 'B' | 'C' | 'D',
     indoorAirQuality: '' as '' | 'A' | 'B' | 'C' | 'D',
     airQualityCommuting: '' as '' | 'A' | 'B' | 'C' | 'D',
@@ -261,15 +261,21 @@ const Calculator = ({
       hasEnergyStarAppliances: false,
       primaryTransportMode: '',
       carProfile: '',
-      annualMileage: '',
+      weeklyKm: '',
       costPerMile: '',
       longDistanceTravel: '',
       dietType: 'MEAT_MODERATE',
       plateProfile: '',
-      diningStyle: '',
+      monthlyDiningOut: '',
       plantBasedMealsPerWeek: '',
-      waste: { ...defaultWaste },
-      airQuality: { ...defaultAirQuality },
+      waste: { 
+        ...defaultWaste,
+        repairOrReplace: ''
+      },
+      airQuality: { 
+        ...defaultAirQuality,
+        outdoorAirQuality: ''
+      },
       clothing: { ...defaultClothing },
       calculationResults: undefined
     });
@@ -340,12 +346,13 @@ const Calculator = ({
         break;
     }
     
-    // Car-specific emissions
-    if (state.annualMileage && state.costPerMile) {
-      const miles = parseFloat(state.annualMileage);
+    // Car-specific emissions - convert weekly km to annual miles for calculation
+    if (state.weeklyKm && state.costPerMile) {
+      const weeklyKm = parseFloat(state.weeklyKm);
       const costPerMile = parseFloat(state.costPerMile);
-      if (!isNaN(miles) && !isNaN(costPerMile)) {
-        emissions += miles * costPerMile * 0.4; // 0.4 kg CO2e per mile
+      if (!isNaN(weeklyKm) && !isNaN(costPerMile)) {
+        const annualMiles = (weeklyKm * 52) / 1.60934; // Convert weekly km to annual miles
+        emissions += annualMiles * costPerMile * 0.4; // 0.4 kg CO2e per mile
       }
     }
     
@@ -374,7 +381,7 @@ const Calculator = ({
       VEGETARIAN: 2.0,
       FLEXITARIAN: 2.5,
       MEAT_MODERATE: 3.0,
-      MEAT_HEAVY: 4.0
+      MEAT_HEAVY: 4.5 // Updated for heavy meat consumption
     };
     
     emissions += dietFactors[state.dietType] * 365; // Daily emissions * days
@@ -385,6 +392,22 @@ const Calculator = ({
       if (!isNaN(plantBasedMeals)) {
         emissions *= (1 - (plantBasedMeals / 21) * 0.3); // 30% reduction per plant-based meal
       }
+    }
+    
+    // Adjust for dining out frequency
+    switch (state.monthlyDiningOut) {
+      case "A": // <1 a month
+        emissions *= 0.95;
+        break;
+      case "B": // 1-4 times a month
+        emissions *= 1.0;
+        break;
+      case "C": // 5-10 times a month
+        emissions *= 1.1;
+        break;
+      case "D": // >10 times a month
+        emissions *= 1.2;
+        break;
     }
     
     return emissions;
@@ -425,8 +448,18 @@ const Calculator = ({
         break;
     }
     
-    // Apply additional modifiers
-    if (state.waste.repairOrReplace) emissions *= 0.95;
+    // Apply repair/replace factors
+    switch (state.waste.repairOrReplace) {
+      case "A": // Always repair
+        emissions *= 0.9;
+        break;
+      case "B": // Sometimes repair
+        emissions *= 0.95;
+        break;
+      case "C": // Usually replace
+        emissions *= 1.0;
+        break;
+    }
     
     return emissions;
   };
@@ -488,6 +521,7 @@ const Calculator = ({
             isVisible={true}
             onReset={handleReset}
             state={state}
+            gender={state.gender === 'female' ? 'girl' : 'boy'}
           />
         ) : (
           <div className="text-center py-8">
@@ -929,7 +963,7 @@ const Calculator = ({
           />
         </div>
 
-        {/* Annual Mileage Question */}
+        {/* Weekly Kilometers Question - Updated */}
         <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
@@ -937,53 +971,53 @@ const Calculator = ({
             </div>
             <div>
               <label className="text-lg font-medium text-foreground block mb-2">
-                How many miles do you drive annually?
+                How many kilometers do you drive weekly?
               </label>
               <p className="text-muted-foreground text-sm">This helps us calculate your transportation emissions.</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Button
-              variant={state.annualMileage === "5000" ? "default" : "outline"}
+              variant={state.weeklyKm === "50" ? "default" : "outline"}
               className="h-20 flex flex-col items-center justify-center gap-1"
-              onClick={() => onUpdate({ annualMileage: "5000" })}
+              onClick={() => onUpdate({ weeklyKm: "50" })}
             >
               <span className="font-medium">Light</span>
-              <span className="text-sm text-muted-foreground">~5,000 mi</span>
+              <span className="text-sm text-muted-foreground">~50 km/week</span>
             </Button>
             <Button
-              variant={state.annualMileage === "10000" ? "default" : "outline"}
+              variant={state.weeklyKm === "100" ? "default" : "outline"}
               className="h-20 flex flex-col items-center justify-center gap-1"
-              onClick={() => onUpdate({ annualMileage: "10000" })}
+              onClick={() => onUpdate({ weeklyKm: "100" })}
             >
               <span className="font-medium">Moderate</span>
-              <span className="text-sm text-muted-foreground">~10,000 mi</span>
+              <span className="text-sm text-muted-foreground">~100 km/week</span>
             </Button>
             <Button
-              variant={state.annualMileage === "15000" ? "default" : "outline"}
+              variant={state.weeklyKm === "200" ? "default" : "outline"}
               className="h-20 flex flex-col items-center justify-center gap-1"
-              onClick={() => onUpdate({ annualMileage: "15000" })}
+              onClick={() => onUpdate({ weeklyKm: "200" })}
             >
               <span className="font-medium">Regular</span>
-              <span className="text-sm text-muted-foreground">~15,000 mi</span>
+              <span className="text-sm text-muted-foreground">~200 km/week</span>
             </Button>
             <Button
-              variant={state.annualMileage === "20000" ? "default" : "outline"}
+              variant={state.weeklyKm === "300" ? "default" : "outline"}
               className="h-20 flex flex-col items-center justify-center gap-1"
-              onClick={() => onUpdate({ annualMileage: "20000" })}
+              onClick={() => onUpdate({ weeklyKm: "300" })}
             >
               <span className="font-medium">Frequent</span>
-              <span className="text-sm text-muted-foreground">~20,000 mi</span>
+              <span className="text-sm text-muted-foreground">~300 km/week</span>
             </Button>
           </div>
           <div className="flex items-center gap-4 mt-4">
-            <div className="text-sm text-muted-foreground">Or enter custom mileage:</div>
+            <div className="text-sm text-muted-foreground">Or enter custom weekly km:</div>
             <Input
               type="number"
-              placeholder="Enter annual miles"
+              placeholder="Enter weekly km"
               className="max-w-[200px]"
-              value={state.annualMileage || ''}
-              onChange={(e) => onUpdate({ annualMileage: e.target.value })}
+              value={state.weeklyKm || ''}
+              onChange={(e) => onUpdate({ weeklyKm: e.target.value })}
             />
           </div>
         </div>
@@ -1049,7 +1083,7 @@ const Calculator = ({
           />
         </div>
 
-        {/* Dining Style Question (NEW) */}
+        {/* Monthly Dining Out Question - Updated */}
         <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
@@ -1057,7 +1091,7 @@ const Calculator = ({
             </div>
             <div>
               <label className="text-lg font-medium text-foreground block mb-2">
-                How do you usually choose between cooking at home and dining out?
+                How many times a month do you choose dining out/takeout over cooking at home?
               </label>
               <p className="text-muted-foreground text-sm">
                 Tell us about your typical meal preparation and dining habits.
@@ -1066,9 +1100,9 @@ const Calculator = ({
           </div>
           <QuestionTiles
             category="food"
-            subCategory="localvsseasonal"
-            value={state.diningStyle}
-            onChange={(value) => onUpdate({ diningStyle: value as "" | "A" | "B" | "C" })}
+            subCategory="monthlyDiningOut"
+            value={state.monthlyDiningOut}
+            onChange={(value) => onUpdate({ monthlyDiningOut: value as "" | "A" | "B" | "C" | "D" })}
           />
         </div>
       </CardContent>
@@ -1235,23 +1269,6 @@ const Calculator = ({
     // Ensure waste state is initialized
     const wasteState = state.waste || defaultWaste;
 
-    // Log initial state
-    console.log('Rendering waste section with state:', {
-      waste: wasteState,
-      defaultWaste,
-      hasWasteState: !!state.waste,
-      wasteKeys: Object.keys(wasteState)
-    });
-
-    // Log values before rendering
-    console.log('QuestionTiles values:', {
-      prevention: wasteState.prevention,
-      shopping: wasteState.smartShopping,
-      wasteManagement: wasteState.dailyWaste,
-      management: wasteState.management,
-      repairOrReplace: wasteState.repairOrReplace
-    });
-
     return (
       <div className="animate-fade-in">
         <CardHeader className="pb-8">
@@ -1286,7 +1303,6 @@ const Calculator = ({
               subCategory="prevention"
               value={wasteState.prevention}
               onChange={(value) => {
-                console.log('Prevention onChange called with value:', value);
                 onUpdate({ 
                   waste: { 
                     ...wasteState,
@@ -1315,7 +1331,6 @@ const Calculator = ({
               subCategory="shopping"
               value={wasteState.smartShopping}
               onChange={(value) => {
-                console.log('Shopping onChange called with value:', value);
                 onUpdate({ 
                   waste: { 
                     ...wasteState,
@@ -1344,7 +1359,6 @@ const Calculator = ({
               subCategory="wasteManagement"
               value={wasteState.dailyWaste}
               onChange={(value) => {
-                console.log('WasteManagement onChange called with value:', value);
                 onUpdate({ 
                   waste: { 
                     ...wasteState,
@@ -1373,7 +1387,6 @@ const Calculator = ({
               subCategory="management"
               value={wasteState.management}
               onChange={(value) => {
-                console.log('Management onChange called with value:', value);
                 onUpdate({ 
                   waste: { 
                     ...wasteState,
@@ -1384,36 +1397,32 @@ const Calculator = ({
             />
           </div>
 
-          {/* Repair or Replace Question */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 flex flex-col gap-4 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="bg-green-50 rounded-full p-3 flex items-center justify-center">
-                <Wrench className="h-6 w-6 text-green-600" />
+          {/* Repair or Replace Question - Updated with Sometimes option */}
+          <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+            <div className="flex items-start gap-4 mb-5">
+              <div className="p-2 bg-primary/10 rounded-lg mt-1">
+                <Wrench className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <div className="text-lg md:text-xl font-semibold text-gray-900">
+                <label className="text-lg font-medium text-foreground block mb-2">
                   When something breaks, do you try to repair it instead of replacing it right away?
-                </div>
-                <div className="text-gray-500 text-sm mt-1">
-                  Repairing items can significantly reduce waste and resource consumption.
-                </div>
+                </label>
+                <p className="text-muted-foreground text-sm">Repairing items can significantly reduce waste and resource consumption.</p>
               </div>
             </div>
-            <div className="flex justify-center gap-4 mt-2">
-              <YesNoToggle
-                value={wasteState.repairOrReplace}
-                onChange={(value) => {
-                  console.log('RepairOrReplace onChange called with value:', value);
-                  onUpdate({ 
-                    waste: { 
-                      ...wasteState,
-                      repairOrReplace: value 
-                    } 
-                  });
-                }}
-                className="w-full max-w-md"
-              />
-            </div>
+            <QuestionTiles
+              category="waste"
+              subCategory="repairOrReplace"
+              value={wasteState.repairOrReplace}
+              onChange={(value) => {
+                onUpdate({ 
+                  waste: { 
+                    ...wasteState,
+                    repairOrReplace: value as "" | "A" | "B" | "C" 
+                  } 
+                });
+              }}
+            />
           </div>
         </CardContent>
       </div>
@@ -1429,7 +1438,7 @@ const Calculator = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-8">
-        {/* Outdoor Air Quality */}
+        {/* Outdoor Air Quality - Updated with Mostly Polluted option */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <Wind className="h-6 w-6 text-primary" />
@@ -1442,7 +1451,7 @@ const Calculator = ({
             category="airQuality"
             subCategory="outdoorQuality"
             value={state.airQuality.outdoorAirQuality}
-            onChange={(value) => onUpdate({ airQuality: { ...state.airQuality, outdoorAirQuality: value as "" | "A" | "B" | "C" | "D" } })}
+            onChange={(value) => onUpdate({ airQuality: { ...state.airQuality, outdoorAirQuality: value as "" | "A" | "B" | "C" | "D" | "E" } })}
           />
         </div>
         {/* AQI Monitoring */}
@@ -1619,6 +1628,7 @@ const Calculator = ({
           isVisible={showResults}
           onReset={handleReset}
           state={state}
+          gender={state.gender === 'female' ? 'girl' : 'boy'}
         />
       ) : null}
     </div>

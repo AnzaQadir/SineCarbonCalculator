@@ -68,14 +68,14 @@ export interface CalculatorState {
   // Transportation
   primaryTransportMode: "" | "A" | "B" | "C" | "D";
   carProfile: "" | "A" | "B" | "C" | "D" | "E";
-  annualMileage: number;
+  weeklyKm: number;
   costPerMile: number;
   longDistanceTravel: "" | "A" | "B" | "C";
 
   // Food & Diet
   dietType: "VEGAN" | "VEGETARIAN" | "FLEXITARIAN" | "MEAT_MODERATE" | "MEAT_HEAVY";
   plateProfile: "" | "A" | "B" | "C";
-  diningStyle: "" | "A" | "B" | "C";
+  monthlyDiningOut: "" | "A" | "B" | "C" | "D";
   plantBasedMealsPerWeek: number;
   buysLocalFood: boolean;
   followsSustainableDiet: boolean;
@@ -91,12 +91,12 @@ export interface CalculatorState {
     smartShopping: "" | "A" | "B" | "C";
     dailyWaste: "" | "A" | "B" | "C" | "D";
     management: "" | "A" | "B" | "C";
-    repairOrReplace: boolean;
+    repairOrReplace: "" | "A" | "B" | "C";
   };
 
   // Air Quality
   airQuality: {
-    outdoorAirQuality: "" | "A" | "B" | "C" | "D";
+    outdoorAirQuality: "" | "A" | "B" | "C" | "D" | "E";
     aqiMonitoring: "" | "A" | "B" | "C" | "D";
     indoorAirQuality: "" | "A" | "B" | "C" | "D";
     airQualityCommuting: "" | "A" | "B" | "C" | "D";
@@ -161,14 +161,14 @@ export const useCalculator = () => {
     // Transportation defaults
     primaryTransportMode: '',
     carProfile: '',
-    annualMileage: 0,
+    weeklyKm: 0,
     costPerMile: 0,
     longDistanceTravel: '',
 
     // Food & Diet defaults
     dietType: 'MEAT_MODERATE',
     plateProfile: '',
-    diningStyle: '',
+    monthlyDiningOut: '',
     plantBasedMealsPerWeek: 0,
     buysLocalFood: false,
     followsSustainableDiet: false,
@@ -184,7 +184,7 @@ export const useCalculator = () => {
       smartShopping: '',
       dailyWaste: '',
       management: '',
-      repairOrReplace: false
+      repairOrReplace: ''
     },
 
     // Air Quality defaults
@@ -238,35 +238,39 @@ export const useCalculator = () => {
     
     // Base transport emissions based on primary mode
     switch (state.primaryTransportMode) {
-      case 'A': // Walk, cycle, or public transit
-        emissions += 0.5; // Minimal emissions from public transit
+      case "A": // Walk, bike, or public transit
+        emissions += 0.5; // Minimal emissions
         break;
-      case 'B': // Mixed transport
-        emissions += 2.0; // Moderate emissions from mixed use
+      case "B": // Mixed transport
+        emissions += 2.0;
         break;
-      case 'C': // Car dependent
-        emissions += 4.0; // Higher emissions from regular car use
+      case "C": // Car dependent
+        emissions += 4.0;
         break;
-      case 'D': // Frequent flyer
-        emissions += 6.0; // Highest emissions from frequent air travel
+      case "D": // Frequent flyer
+        emissions += 6.0;
         break;
-      default:
-        emissions += 2.0; // Default to moderate emissions
     }
-
+    
+    // Car-specific emissions - convert weekly km to annual miles for calculation
+    if (state.weeklyKm && state.costPerMile) {
+      const weeklyKm = state.weeklyKm;
+      const costPerMile = state.costPerMile;
+      const annualMiles = (weeklyKm * 52) / 1.60934; // Convert weekly km to annual miles
+      emissions += annualMiles * costPerMile * 0.4; // 0.4 kg CO2e per mile
+    }
+    
     // Long distance travel impact
     switch (state.longDistanceTravel) {
-      case 'A': // Rail and bus
-        emissions *= 0.8; // 20% reduction for sustainable long-distance travel
+      case "A": // Rail and bus
+        emissions *= 0.8;
         break;
-      case 'B': // Balanced
-        emissions *= 1.2; // 20% increase for occasional flights
+      case "B": // Balanced
+        emissions *= 1.2;
         break;
-      case 'C': // Frequent flyer
-        emissions *= 1.5; // 50% increase for frequent flights
+      case "C": // Frequent flyer
+        emissions *= 1.5;
         break;
-      default:
-        emissions *= 1.0; // No modification
     }
     
     return emissions;
@@ -276,25 +280,37 @@ export const useCalculator = () => {
     let emissions = 0;
     
     // Base diet emissions
-    emissions += EMISSION_FACTORS.diet[state.dietType] * 365;
+    const dietFactors = {
+      VEGAN: 1.5,
+      VEGETARIAN: 2.0,
+      FLEXITARIAN: 2.5,
+      MEAT_MODERATE: 3.0,
+      MEAT_HEAVY: 4.5 // Updated for heavy meat consumption
+    };
+    
+    emissions += dietFactors[state.dietType] * 365; // Daily emissions * days
     
     // Adjust for plant-based meals
-    emissions *= (1 - (state.plantBasedMealsPerWeek / 21) * 0.3);
+    if (state.plantBasedMealsPerWeek) {
+      const plantBasedMeals = state.plantBasedMealsPerWeek;
+      emissions *= (1 - (plantBasedMeals / 21) * 0.3); // 30% reduction per plant-based meal
+    }
     
-    // Apply modifiers
-    if (state.buysLocalFood) emissions *= 0.9;
-    if (state.growsOwnFood) emissions *= 0.95;
-    if (state.compostsFood) emissions *= 0.95;
-    if (state.usesMealPlanning) emissions *= 0.9;
-    
-    // Dining out impact
-    const diningMultiplier = {
-      RARELY: 1,
-      SOMETIMES: 1.1,
-      FREQUENTLY: 1.2,
-    }[state.diningOutFrequency];
-    
-    emissions *= diningMultiplier;
+    // Adjust for dining out frequency
+    switch (state.monthlyDiningOut) {
+      case "A": // <1 a month
+        emissions *= 0.95;
+        break;
+      case "B": // 1-4 times a month
+        emissions *= 1.0;
+        break;
+      case "C": // 5-10 times a month
+        emissions *= 1.1;
+        break;
+      case "D": // >10 times a month
+        emissions *= 1.2;
+        break;
+    }
     
     return emissions;
   };
@@ -304,53 +320,47 @@ export const useCalculator = () => {
     
     // Base waste emissions
     if (state.waste.dailyWaste) {
-      const dailyWasteFactor = {
-        'A': 0.5,  // Minimal waste
-        'B': 0.75, // Moderate waste
-        'C': 1.0,  // Average waste
-        'D': 1.25  // High waste
-      }[state.waste.dailyWaste] || 1.0;
-      
-      emissions += dailyWasteFactor * 365; // Daily emissions * days
+      const dailyWaste = parseFloat(state.waste.dailyWaste);
+      if (!isNaN(dailyWaste)) {
+        emissions += dailyWaste * 0.5; // 0.5 kg CO2e per pound
+      }
     }
     
-    // Apply shopping reduction
+    // Apply recycling reduction
     if (state.waste.smartShopping) {
-      const shoppingFactor = {
-        'A': 0.7,  // Conscious consumer
-        'B': 0.85, // Balanced shopper
-        'C': 1.0   // Convenience shopper
-      }[state.waste.smartShopping] || 1.0;
-      
-      emissions *= shoppingFactor;
+      const shoppingRate = parseFloat(state.waste.smartShopping);
+      if (!isNaN(shoppingRate)) {
+        emissions *= (1 - (shoppingRate / 100) * 0.5); // 50% reduction for recycled materials
+      }
     }
     
-    // Apply prevention factors
-    if (state.waste.prevention) {
-      const preventionFactor = {
-        'A': 0.7,  // Zero waste champion
-        'B': 0.85, // Consistent reuser
-        'C': 1.0,  // Occasional reuser
-        'D': 1.2   // Basic disposer
-      }[state.waste.prevention] || 1.0;
-      
-      emissions *= preventionFactor;
+    // Apply waste prevention factors
+    switch (state.waste.prevention) {
+      case "A":
+        emissions *= 0.7;
+        break;
+      case "B":
+        emissions *= 0.85;
+        break;
+      case "C":
+        emissions *= 1.0;
+        break;
+      case "D":
+        emissions *= 1.2;
+        break;
     }
     
-    // Apply management factors
-    if (state.waste.management) {
-      const managementFactor = {
-        'A': 0.8,  // Advanced management
-        'B': 0.9,  // Basic management
-        'C': 1.0   // Limited management
-      }[state.waste.management] || 1.0;
-      
-      emissions *= managementFactor;
-    }
-    
-    // Apply repair factor
-    if (state.waste.repairOrReplace) {
-      emissions *= 0.95; // 5% reduction for repair preference
+    // Apply repair/replace factors
+    switch (state.waste.repairOrReplace) {
+      case "A": // Always repair
+        emissions *= 0.9;
+        break;
+      case "B": // Sometimes repair
+        emissions *= 0.95;
+        break;
+      case "C": // Usually replace
+        emissions *= 1.0;
+        break;
     }
     
     return emissions;
@@ -408,14 +418,14 @@ export const useCalculator = () => {
       // Transportation defaults
       primaryTransportMode: '',
       carProfile: '',
-      annualMileage: 0,
+      weeklyKm: 0,
       costPerMile: 0,
       longDistanceTravel: '',
 
       // Food & Diet defaults
       dietType: 'MEAT_MODERATE',
       plateProfile: '',
-      diningStyle: '',
+      monthlyDiningOut: '',
       plantBasedMealsPerWeek: 0,
       buysLocalFood: false,
       followsSustainableDiet: false,
@@ -431,7 +441,7 @@ export const useCalculator = () => {
         smartShopping: '',
         dailyWaste: '',
         management: '',
-        repairOrReplace: false
+        repairOrReplace: ''
       },
 
       // Air Quality defaults
