@@ -5,45 +5,67 @@ console.log('VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 export interface UserResponses {
-  homeEnergy?: {
-    efficiency?: 'A' | 'B' | 'C' | '';
-    management?: 'A' | 'B' | 'C' | '';
-    homeScale?: '1' | '2' | '3' | '4' | '5' | '6' | '7+';
-  };
-  transport?: {
-    primary?: 'A' | 'B' | 'C' | 'D' | '';
-    carProfile?: 'A' | 'B' | 'C' | 'D' | 'E' | '';
-    longDistance?: 'A' | 'B' | 'C' | 'D' | 'E';
-  };
-  food?: {
-    dietType?: 'PLANT_BASED' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MODERATE_MEAT';
-    foodSource?: 'LOCAL_SEASONAL' | 'MIXED' | 'CONVENTIONAL';
-    diningStyle?: 'HOME_COOKED' | 'BALANCED' | 'FREQUENT_DINE_OUT';
-    buysLocalFood?: boolean;
-    followsSustainableDiet?: boolean;
-    growsOwnFood?: boolean;
-    compostsFood?: boolean;
-    usesMealPlanning?: boolean;
-    plantBasedMealsPerWeek?: number;
-  };
+  // Demographics
+  name?: string;
+  email?: string;
+  age?: string;
+  gender?: string;
+  profession?: string;
+  location?: string;
+  country?: string;
+  householdSize?: string;
+  
+  // Home Energy
+  homeSize?: '1' | '2' | '3' | '4' | '5' | '6' | '7+' | '';
+  homeEfficiency?: 'A' | 'B' | 'C' | '';
+  energyManagement?: 'A' | 'B' | 'C' | '';
+  electricityKwh?: string;
+  naturalGasTherm?: string;
+  heatingOilGallons?: string;
+  propaneGallons?: string;
+  usesRenewableEnergy?: boolean;
+  hasEnergyEfficiencyUpgrades?: boolean;
+  hasSmartThermostats?: boolean;
+  hasEnergyStarAppliances?: boolean;
+  
+  // Transportation
+  primaryTransportMode?: 'A' | 'B' | 'C' | 'D' | '';
+  carProfile?: 'A' | 'B' | 'C' | 'D' | 'E' | '';
+  weeklyKm?: string;
+  costPerMile?: string;
+  longDistanceTravel?: 'A' | 'B' | 'C' | '';
+  
+  // Food & Diet
+  dietType?: 'VEGAN' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MEAT_MODERATE' | 'MEAT_HEAVY';
+  plateProfile?: 'A' | 'B' | 'C' | '';
+  monthlyDiningOut?: 'A' | 'B' | 'C' | 'D' | '';
+  plantBasedMealsPerWeek?: string;
+  
+  // Waste
   waste?: {
     prevention?: 'A' | 'B' | 'C' | 'D' | '';
+    smartShopping?: 'A' | 'B' | 'C' | '';
+    dailyWaste?: 'A' | 'B' | 'C' | 'D' | '';
     management?: 'A' | 'B' | 'C' | '';
-    smartShopping?: 'A' | 'B' | 'C';
-    dailyWaste?: 'A' | 'B' | 'C' | 'D';
-    wastePrevention?: 'A' | 'B' | 'C' | 'D';
-    repairOrReplace?: boolean;
+    repairOrReplace?: 'A' | 'B' | 'C' | '';
   };
+
+  // Air Quality
   airQuality?: {
-    monitoring?: 'A' | 'B' | 'C' | 'D' | '';
-    impact?: 'A' | 'B' | 'C' | 'D' | '';
+    outdoorAirQuality?: 'A' | 'B' | 'C' | 'D' | 'E' | '';
+    aqiMonitoring?: 'A' | 'B' | 'C' | 'D' | '';
+    indoorAirQuality?: 'A' | 'B' | 'C' | 'D' | '';
+    airQualityCommuting?: 'A' | 'B' | 'C' | 'D' | '';
+    airQualityImpact?: 'A' | 'B' | 'C' | 'D' | '';
   };
+
+  // Clothing
   clothing?: {
     wardrobeImpact?: 'A' | 'B' | 'C' | '';
     mindfulUpgrades?: 'A' | 'B' | 'C' | '';
     durability?: 'A' | 'B' | 'C' | '';
-    consumptionFrequency?: 'A' | 'B' | 'C' | 'D';
-    brandLoyalty?: 'A' | 'B' | 'C' | 'D';
+    consumptionFrequency?: 'A' | 'B' | 'C' | 'D' | '';
+    brandLoyalty?: 'A' | 'B' | 'C' | 'D' | '';
   };
 }
 

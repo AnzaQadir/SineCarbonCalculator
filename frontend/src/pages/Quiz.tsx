@@ -4,6 +4,10 @@ import Calculator from '@/components/Calculator';
 import { useCalculator } from '@/hooks/useCalculator';
 import { motion } from 'framer-motion';
 import { Leaf } from 'lucide-react';
+import ResultsDisplay from '@/components/ResultsDisplay';
+import { calculatePersonality } from '@/services/api';
+import type { PersonalityResponse } from '@/services/api';
+import type { UserResponses } from '@/services/api';
 
 const pastel = {
   lavender: '#E6E6F7',
@@ -74,7 +78,7 @@ function CircularImageReveal() {
   );
 }
 
-function QuizIntro({ onStart, onBack }: { onStart: () => void; onBack?: () => void }) {
+function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onStartB: () => void; onBack?: () => void }) {
   return (
     <div
       className="min-h-screen flex flex-col bg-[#F9F7E8]"
@@ -206,31 +210,58 @@ function QuizIntro({ onStart, onBack }: { onStart: () => void; onBack?: () => vo
         variants={fadeUp}
         className="w-full max-w-4xl mx-auto px-6 md:px-12 mt-0 flex flex-col items-center pb-6 mb-2"
       >
-        <motion.button
-          whileHover={{
-            scale: 1.03,
-            boxShadow: '0 0 0 8px #A7D58E33',
-            opacity: 0.95
-          }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onStart}
-          style={{
-            background: '#A7D58E',
-            color: '#fff',
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 22,
-            border: 'none',
-            borderRadius: 999,
-            padding: '18px 48px',
-            boxShadow: '0 6px 28px 0 rgba(167,213,142,0.18)',
-            cursor: 'pointer',
-            fontWeight: 400,
-            letterSpacing: '0.02em',
-            marginBottom: 32
-          }}
-        >
-          Step Into the Story
-        </motion.button>
+        <div className="flex flex-col md:flex-row gap-4 w-full justify-center">
+          <motion.button
+            whileHover={{
+              scale: 1.03,
+              boxShadow: '0 0 0 8px #A7D58E33',
+              opacity: 0.95
+            }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onStartA}
+            style={{
+              background: '#A7D58E',
+              color: '#fff',
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 22,
+              border: 'none',
+              borderRadius: 999,
+              padding: '18px 48px',
+              boxShadow: '0 6px 28px 0 rgba(167,213,142,0.18)',
+              cursor: 'pointer',
+              fontWeight: 400,
+              letterSpacing: '0.02em',
+              marginBottom: 0
+            }}
+          >
+            Start Variant A
+          </motion.button>
+          <motion.button
+            whileHover={{
+              scale: 1.03,
+              boxShadow: '0 0 0 8px #E07A7A33',
+              opacity: 0.95
+            }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onStartB}
+            style={{
+              background: '#E07A7A',
+              color: '#fff',
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 22,
+              border: 'none',
+              borderRadius: 999,
+              padding: '18px 48px',
+              boxShadow: '0 6px 28px 0 rgba(224,122,122,0.18)',
+              cursor: 'pointer',
+              fontWeight: 400,
+              letterSpacing: '0.02em',
+              marginBottom: 0
+            }}
+          >
+            Start Variant B
+          </motion.button>
+        </div>
       </motion.div>
     </div>
   );
@@ -239,7 +270,7 @@ function QuizIntro({ onStart, onBack }: { onStart: () => void; onBack?: () => vo
 const Quiz = () => {
   const { state, updateCalculator } = useCalculator();
   const [currentStep, setCurrentStep] = useState(0);
-  const [started, setStarted] = useState(false);
+  const [started, setStarted] = useState<null | 'A' | 'B'>(null);
   const [notReady, setNotReady] = useState(false);
 
   const handleCalculate = () => {
@@ -259,60 +290,822 @@ const Quiz = () => {
     setCurrentStep(step);
   };
 
-  if (!started) {
-    return <QuizIntro onStart={() => setStarted(true)} />;
+  if (started === null) {
+    return (
+      <QuizIntro
+        onStartA={() => setStarted('A')}
+        onStartB={() => setStarted('B')}
+      />
+    );
   }
 
-  return (
-    <Layout>
-      <section className="py-20 bg-white">
-        <div className="container px-4">
-          <div className="mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-8">
-                Lifestyle Persona Snapshot
-              </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Answer a few quick questions about your lifestyle to discover your unique persona and get personalized climate action tips.
-              </p>
+  if (started === 'A') {
+    return (
+      <Layout>
+        <section className="py-20 bg-white">
+          <div className="container px-4">
+            <div className="mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-bold mb-8">
+                  Lifestyle Persona Snapshot
+                </h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  Answer a few quick questions about your lifestyle to discover your unique persona and get personalized climate action tips.
+                </p>
+              </div>
+              <Calculator 
+                state={{
+                  ...state,
+                  householdSize: state.householdSize.toString(),
+                  electricityKwh: state.electricityKwh.toString(),
+                  naturalGasTherm: state.naturalGasTherm.toString(),
+                  heatingOilGallons: state.heatingOilGallons.toString(),
+                  propaneGallons: state.propaneGallons.toString(),
+                  weeklyKm: state.weeklyKm.toString(),
+                  costPerMile: state.costPerMile.toString(),
+                  plantBasedMealsPerWeek: state.plantBasedMealsPerWeek.toString(),
+                }}
+                onUpdate={(updates) => {
+                  const processedUpdates = {
+                    ...updates,
+                    householdSize: updates.householdSize ? Number(updates.householdSize) : state.householdSize,
+                    electricityKwh: updates.electricityKwh ? Number(updates.electricityKwh) : state.electricityKwh,
+                    naturalGasTherm: updates.naturalGasTherm ? Number(updates.naturalGasTherm) : state.naturalGasTherm,
+                    heatingOilGallons: updates.heatingOilGallons ? Number(updates.heatingOilGallons) : state.heatingOilGallons,
+                    propaneGallons: updates.propaneGallons ? Number(updates.propaneGallons) : state.propaneGallons,
+                    weeklyKm: updates.weeklyKm ? Number(updates.weeklyKm) : state.weeklyKm,
+                    costPerMile: updates.costPerMile ? Number(updates.costPerMile) : state.costPerMile,
+                    plantBasedMealsPerWeek: updates.plantBasedMealsPerWeek ? Number(updates.plantBasedMealsPerWeek) : state.plantBasedMealsPerWeek,
+                  };
+                  updateCalculator(processedUpdates);
+                }}
+                onCalculate={handleCalculate}
+                onBack={handleBack}
+                onNext={handleNext}
+                onStepChange={handleStepChange}
+                currentStep={currentStep}
+              />
             </div>
-            <Calculator 
-              state={{
-                ...state,
-                householdSize: state.householdSize.toString(),
-                electricityKwh: state.electricityKwh.toString(),
-                naturalGasTherm: state.naturalGasTherm.toString(),
-                heatingOilGallons: state.heatingOilGallons.toString(),
-                propaneGallons: state.propaneGallons.toString(),
-                annualMileage: state.annualMileage.toString(),
-                costPerMile: state.costPerMile.toString(),
-                plantBasedMealsPerWeek: state.plantBasedMealsPerWeek.toString(),
-              }}
-              onUpdate={(updates) => {
-                const processedUpdates = {
-                  ...updates,
-                  householdSize: updates.householdSize ? Number(updates.householdSize) : state.householdSize,
-                  electricityKwh: updates.electricityKwh ? Number(updates.electricityKwh) : state.electricityKwh,
-                  naturalGasTherm: updates.naturalGasTherm ? Number(updates.naturalGasTherm) : state.naturalGasTherm,
-                  heatingOilGallons: updates.heatingOilGallons ? Number(updates.heatingOilGallons) : state.heatingOilGallons,
-                  propaneGallons: updates.propaneGallons ? Number(updates.propaneGallons) : state.propaneGallons,
-                  annualMileage: updates.annualMileage ? Number(updates.annualMileage) : state.annualMileage,
-                  costPerMile: updates.costPerMile ? Number(updates.costPerMile) : state.costPerMile,
-                  plantBasedMealsPerWeek: updates.plantBasedMealsPerWeek ? Number(updates.plantBasedMealsPerWeek) : state.plantBasedMealsPerWeek,
-                };
-                updateCalculator(processedUpdates);
-              }}
-              onCalculate={handleCalculate}
-              onBack={handleBack}
-              onNext={handleNext}
-              onStepChange={handleStepChange}
-              currentStep={currentStep}
-            />
+          </div>
+        </section>
+      </Layout>
+    );
+  }
+
+  if (started === 'B') {
+    return (
+      <PoeticJourneyQuiz />
+    );
+  }
+};
+
+// Copy transformStateToApiFormat from ResultsDisplay
+function transformStateToApiFormat(state: any): UserResponses {
+  return {
+    homeEnergy: {
+      efficiency: (state.homeEfficiency || '') as 'A' | 'B' | 'C' | '',
+      management: (state.energyManagement || '') as 'A' | 'B' | 'C' | '',
+      // Only set homeScale if not empty string
+      homeScale: state.homeSize && state.homeSize !== '' ? (state.homeSize as '1' | '2' | '3' | '4' | '5' | '6' | '7+') : undefined,
+    },
+    transport: {
+      primary: (state.primaryTransportMode || '') as 'A' | 'B' | 'C' | 'D' | '',
+      carProfile: state.carProfile && state.carProfile !== '' ? (state.carProfile as 'A' | 'B' | 'C' | 'D' | 'E') : undefined,
+      longDistance: state.longDistanceTravel && state.longDistanceTravel !== '' ? (state.longDistanceTravel as 'A' | 'B' | 'C' | 'D' | 'E') : undefined,
+    },
+    food: {
+      dietType: (
+        state.dietType === "VEGAN" ? "PLANT_BASED" :
+        state.dietType === "VEGETARIAN" ? "VEGETARIAN" :
+        state.dietType === "FLEXITARIAN" ? "FLEXITARIAN" :
+        state.dietType === "MEAT_MODERATE" ? "MODERATE_MEAT" :
+        state.dietType === "MEAT_HEAVY" ? "HEAVY_MEAT" :
+        undefined
+      ) as 'PLANT_BASED' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MODERATE_MEAT' | 'HEAVY_MEAT' | undefined,
+      foodSource: (
+        state.plateProfile === "A" ? "LOCAL_SEASONAL" :
+        state.plateProfile === "B" ? "MIXED" :
+        state.plateProfile === "C" ? "MOSTLY_IMPORTED" :
+        undefined
+      ) as 'LOCAL_SEASONAL' | 'MIXED' | 'MOSTLY_IMPORTED' | undefined,
+      diningStyle: (
+        state.monthlyDiningOut === "A" ? "RARELY_DINE_OUT" :
+        state.monthlyDiningOut === "B" ? "OCCASIONALLY_DINE_OUT" :
+        state.monthlyDiningOut === "C" ? "REGULARLY_DINE_OUT" :
+        state.monthlyDiningOut === "D" ? "FREQUENTLY_DINE_OUT" :
+        undefined
+      ) as 'RARELY_DINE_OUT' | 'OCCASIONALLY_DINE_OUT' | 'REGULARLY_DINE_OUT' | 'FREQUENTLY_DINE_OUT' | undefined,
+      plantBasedMealsPerWeek: state.plantBasedMealsPerWeek ? parseInt(state.plantBasedMealsPerWeek) : undefined
+    },
+    waste: {
+      prevention: (state.waste?.prevention || '') as 'A' | 'B' | 'C' | 'D' | '',
+      management: (state.waste?.management || '') as 'A' | 'B' | 'C' | '',
+      smartShopping: (state.waste?.smartShopping || '') as 'A' | 'B' | 'C',
+      dailyWaste: (state.waste?.dailyWaste || '') as 'A' | 'B' | 'C' | 'D',
+      repairOrReplace: (state.waste?.repairOrReplace || '') as 'A' | 'B' | 'C' | '',
+    },
+    airQuality: {
+      monitoring: (state.airQuality?.aqiMonitoring || '') as 'A' | 'B' | 'C' | 'D' | '',
+      impact: (state.airQuality?.airQualityImpact || '') as 'A' | 'B' | 'C' | 'D' | '',
+    },
+    clothing: {
+      wardrobeImpact: state.clothing?.wardrobeImpact || undefined,
+      mindfulUpgrades: state.clothing?.mindfulUpgrades || undefined,
+      durability: state.clothing?.durability || undefined,
+      consumptionFrequency: state.clothing?.consumptionFrequency || undefined,
+      brandLoyalty: state.clothing?.brandLoyalty || undefined,
+    },
+  };
+}
+
+function getSectionInfo(key: string) {
+  if ([
+    'homeSize', 'homeEfficiency', 'energyManagement',
+  ].includes(key)) {
+    return {
+      title: 'Chapter I: The Hearth That Holds You',
+      sub: 'Tell us about the home that nurtures your daily rhythm.'
+    };
+  }
+  if ([
+    'primaryTransportMode', 'carProfile', 'weeklyKm', 'longDistanceTravel',
+  ].includes(key)) {
+    return {
+      title: 'Chapter II: The Way You Move',
+      sub: 'How do you most often travel through your world?'
+    };
+  }
+  if ([
+    'dietType', 'plateProfile', 'monthlyDiningOut', 'plantBasedMealsPerWeek',
+  ].includes(key)) {
+    return {
+      title: 'Chapter III: The Meals You Gather',
+      sub: 'What kind of harvest shapes your daily plate?'
+    };
+  }
+  if ([
+    'clothing.wardrobeImpact', 'clothing.mindfulUpgrades', 'clothing.durability', 'clothing.consumptionFrequency', 'clothing.brandLoyalty',
+  ].includes(key)) {
+    return {
+      title: 'Chapter IV: The Clothes You Keep',
+      sub: 'How often does new fabric fold into your life?'
+    };
+  }
+  if ([
+    'waste.prevention', 'waste.smartShopping', 'waste.dailyWaste', 'waste.management', 'waste.repairOrReplace',
+  ].includes(key)) {
+    return {
+      title: 'Chapter V: What You Let Go',
+      sub: 'How do you part with what no longer serves you?'
+    };
+  }
+  if ([
+    'airQuality.outdoorAirQuality', 'airQuality.aqiMonitoring', 'airQuality.indoorAirQuality', 'airQuality.airQualityCommuting', 'airQuality.airQualityImpact',
+  ].includes(key)) {
+    return {
+      title: 'Chapter VI: The Air Around You',
+      sub: 'How does the air you breathe feel—inside and out?'
+    };
+  }
+  // Demographics
+  return {
+    title: 'Chapter VII: Your Story & Context',
+    sub: 'A few details about you—so we can better reflect your journey.'
+  };
+}
+
+function PoeticJourneyQuiz() {
+  const { state, updateCalculator } = useCalculator();
+  const [step, setStep] = useState(0);
+  const [showResults, setShowResults] = useState(false);
+  const [results, setResults] = useState<PersonalityResponse | null>(null);
+  const [loadingResults, setLoadingResults] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  // Expanded questions array covering all Calculator questions
+  const questions = [
+    // --- Home Energy ---
+    {
+      key: 'homeSize',
+      header: 'Chapter 1: The Energy of Home',
+      icon: '🏠',
+      question: 'How many bedrooms does your home have?',
+      type: 'select',
+      options: [
+        { value: '1', label: '1 Bedroom' },
+        { value: '2', label: '2 Bedrooms' },
+        { value: '3', label: '3 Bedrooms' },
+        { value: '4', label: '4 Bedrooms' },
+        { value: '5', label: '5 Bedrooms' },
+        { value: '6', label: '6 Bedrooms' },
+        { value: '7+', label: '7+ Bedrooms' }
+      ]
+    },
+    {
+      key: 'homeEfficiency',
+      header: 'Chapter 1: The Energy of Home',
+      icon: '⚡',
+      question: 'How energy efficient is your home?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Energy Efficient Home' },
+        { value: 'B', label: 'Mixed Efficiency' },
+        { value: 'C', label: 'Standard Home' }
+      ]
+    },
+    {
+      key: 'energyManagement',
+      header: 'Chapter 1: The Energy of Home',
+      icon: '🌬️',
+      question: 'How do you manage your energy sources?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Renewable Energy' },
+        { value: 'B', label: 'Mixed Sources' },
+        { value: 'C', label: 'Traditional Grid' }
+      ]
+    },
+
+    // --- Transportation ---
+    {
+      key: 'primaryTransportMode',
+      header: 'Chapter 2: Journeys & Movement',
+      icon: '🚌',
+      question: "What's your primary mode of transportation?",
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Active Transport' },
+        { value: 'B', label: 'Public Transit' },
+        { value: 'C', label: 'Personal Vehicle' },
+        { value: 'D', label: 'Frequent Flyer' }
+      ]
+    },
+    {
+      key: 'carProfile',
+      header: 'Chapter 2: Journeys & Movement',
+      icon: '🚗',
+      question: "What's your car profile?",
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Electric Vehicle' },
+        { value: 'B', label: 'Hybrid Vehicle' },
+        { value: 'C', label: 'Standard Vehicle' },
+        { value: 'D', label: 'Large Vehicle' },
+        { value: 'E', label: 'Luxury Vehicle' }
+      ]
+    },
+    {
+      key: 'weeklyKm',
+      header: 'Chapter 2: Journeys & Movement',
+      icon: '🗺️',
+      question: 'How many kilometers do you drive weekly?',
+      type: 'select',
+      options: [
+        { value: '50', label: 'Light (~50 km/week)' },
+        { value: '100', label: 'Moderate (~100 km/week)' },
+        { value: '200', label: 'Regular (~200 km/week)' },
+        { value: '300', label: 'Frequent (~300 km/week)' }
+      ]
+    },
+    {
+      key: 'longDistanceTravel',
+      header: 'Chapter 2: Journeys & Movement',
+      icon: '✈️',
+      question: 'How do you travel long distances?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Rail and Bus' },
+        { value: 'B', label: 'Balanced' },
+        { value: 'C', label: 'Frequent Flyer' }
+      ]
+    },
+
+    // --- Food & Diet ---
+    {
+      key: 'dietType',
+      header: 'Chapter 3: Nourishment & Choice',
+      icon: '🍎',
+      question: "What's your diet type?",
+      type: 'select',
+      options: [
+        { value: 'VEGAN', label: 'Plant-Based Diet' },
+        { value: 'VEGETARIAN', label: 'Vegetarian' },
+        { value: 'FLEXITARIAN', label: 'Flexitarian' },
+        { value: 'MEAT_MODERATE', label: 'Moderate Meat' },
+        { value: 'MEAT_HEAVY', label: 'Mostly Meat' }
+      ]
+    },
+    {
+      key: 'plateProfile',
+      header: 'Chapter 3: Nourishment & Choice',
+      icon: '🥗',
+      question: 'How do you source your food?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Local & Seasonal' },
+        { value: 'B', label: 'Mixed Sources' },
+        { value: 'C', label: 'Mostly Imported' }
+      ]
+    },
+    {
+      key: 'monthlyDiningOut',
+      header: 'Chapter 3: Nourishment & Choice',
+      icon: '🍽️',
+      question: 'How many times a month do you choose dining out/takeout over cooking at home?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Rarely Dine Out (<1 a month)' },
+        { value: 'B', label: 'Occasionally (1-4 times a month)' },
+        { value: 'C', label: 'Regularly (5-10 times a month)' },
+        { value: 'D', label: 'Frequently (>10 times a month)' }
+      ]
+    },
+    {
+      key: 'plantBasedMealsPerWeek',
+      header: 'Chapter 3: Nourishment & Choice',
+      icon: '🌱',
+      question: 'How many plant-based meals do you eat per week?',
+      type: 'number',
+      placeholder: 'Enter number of meals'
+    },
+
+    // --- Clothing ---
+    {
+      key: 'clothing.wardrobeImpact',
+      header: 'Chapter 4: Style & Substance',
+      icon: '👕',
+      question: 'How do you approach shopping for clothes?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Minimal Wardrobe' },
+        { value: 'B', label: 'Balanced Collection' },
+        { value: 'C', label: 'Extensive Wardrobe' }
+      ]
+    },
+    {
+      key: 'clothing.mindfulUpgrades',
+      header: 'Chapter 4: Style & Substance',
+      icon: '🛍️',
+      question: 'When you upgrade your wardrobe, what do you consider?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Sustainable Brands' },
+        { value: 'B', label: 'Mixed Approach' },
+        { value: 'C', label: 'Conventional Shopping' }
+      ]
+    },
+    {
+      key: 'clothing.durability',
+      header: 'Chapter 4: Style & Substance',
+      icon: '⏰',
+      question: 'How long do your clothes typically last?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Long-lasting Items' },
+        { value: 'B', label: 'Mixed Quality' },
+        { value: 'C', label: 'Fast Fashion' }
+      ]
+    },
+    {
+      key: 'clothing.consumptionFrequency',
+      header: 'Chapter 4: Style & Substance',
+      icon: '🛒',
+      question: 'How often do you buy new clothes?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Infrequent Shopper' },
+        { value: 'B', label: 'Seasonal Shopper' },
+        { value: 'C', label: 'Frequent Shopper' }
+      ]
+    },
+    {
+      key: 'clothing.brandLoyalty',
+      header: 'Chapter 4: Style & Substance',
+      icon: '🏷️',
+      question: 'How do you choose your clothing brands?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Brand Conscious' },
+        { value: 'B', label: 'Flexible Shopper' },
+        { value: 'C', label: 'Variety Seeker' }
+      ]
+    },
+
+    // --- Waste ---
+    {
+      key: 'waste.prevention',
+      header: 'Chapter 5: Waste & Wisdom',
+      icon: '♻️',
+      question: 'Imagine a typical day—how do you stop waste from ever reaching your bin?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Zero Waste Champion' },
+        { value: 'B', label: 'Consistent Reuser' },
+        { value: 'C', label: 'Occasional Reuser' },
+        { value: 'D', label: 'Basic Disposer' }
+      ]
+    },
+    {
+      key: 'waste.smartShopping',
+      header: 'Chapter 5: Waste & Wisdom',
+      icon: '🛍️',
+      question: 'Every purchase and disposal shapes the waste we create. Which option best describes your everyday approach?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Conscious Consumer' },
+        { value: 'B', label: 'Balanced Shopper' },
+        { value: 'C', label: 'Convenience Shopper' }
+      ]
+    },
+    {
+      key: 'waste.dailyWaste',
+      header: 'Chapter 5: Waste & Wisdom',
+      icon: '🗑️',
+      question: 'How much waste do you typically generate in a day?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Minimal Waste' },
+        { value: 'B', label: 'Moderate Waste' },
+        { value: 'C', label: 'Regular Waste' },
+        { value: 'D', label: 'High Waste' }
+      ]
+    },
+    {
+      key: 'waste.management',
+      header: 'Chapter 5: Waste & Wisdom',
+      icon: '♻️',
+      question: 'Think about how you manage your everyday waste—what best reflects your habits?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Advanced Management' },
+        { value: 'B', label: 'Basic Management' },
+        { value: 'C', label: 'Limited Management' }
+      ]
+    },
+    {
+      key: 'waste.repairOrReplace',
+      header: 'Chapter 5: Waste & Wisdom',
+      icon: '🔧',
+      question: 'When something breaks, do you try to repair it instead of replacing it right away?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Always Repair' },
+        { value: 'B', label: 'Sometimes Repair' },
+        { value: 'C', label: 'Usually Replace' }
+      ]
+    },
+
+    // --- Air Quality ---
+    {
+      key: 'airQuality.outdoorAirQuality',
+      header: 'Chapter 6: Breath of Life',
+      icon: '🌬️',
+      question: 'Imagine stepping outside into your neighborhood. How would you describe the quality of the air you breathe?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Fresh and Clean' },
+        { value: 'B', label: 'Generally Clear' },
+        { value: 'C', label: 'Sometimes Polluted' },
+        { value: 'D', label: 'Not Sure' },
+        { value: 'E', label: 'Mostly Polluted' }
+      ]
+    },
+    {
+      key: 'airQuality.aqiMonitoring',
+      header: 'Chapter 6: Breath of Life',
+      icon: '☀️',
+      question: 'Do you check the Air Quality Index (AQI) in your area to plan your day or outdoor activities?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Active Monitoring' },
+        { value: 'B', label: 'Basic Awareness' },
+        { value: 'C', label: 'No Monitoring' }
+      ]
+    },
+    {
+      key: 'airQuality.indoorAirQuality',
+      header: 'Chapter 6: Breath of Life',
+      icon: '🏠',
+      question: 'How do you manage the air inside your home to keep it as fresh as possible?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Air Purifiers & Plants' },
+        { value: 'B', label: 'Natural Ventilation' },
+        { value: 'C', label: 'Basic Management' },
+        { value: 'D', label: 'Not Considered' }
+      ]
+    },
+    {
+      key: 'airQuality.airQualityCommuting',
+      header: 'Chapter 6: Breath of Life',
+      icon: '🚶',
+      question: 'While commuting or running errands, do you make an effort to avoid times or areas with particularly poor air quality?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Air Quality Conscious' },
+        { value: 'B', label: 'Sometimes Considerate' },
+        { value: 'C', label: 'Not Considered' },
+        { value: 'D', label: 'Never Thought About It' }
+      ]
+    },
+    {
+      key: 'airQuality.airQualityImpact',
+      header: 'Chapter 6: Breath of Life',
+      icon: '🌿',
+      question: 'Have you ever felt that changes in air quality affect your mood or energy levels?',
+      type: 'select',
+      options: [
+        { value: 'A', label: 'Low Impact' },
+        { value: 'B', label: 'Moderate Impact' },
+        { value: 'C', label: 'High Impact' }
+      ]
+    },
+
+    // --- Demographics ---
+    {
+      key: 'name',
+      header: 'Chapter 7: Your Story',
+      icon: '👤',
+      question: 'What name should we use when we chat about your eco-journey?',
+      type: 'text',
+      placeholder: 'Enter your name'
+    },
+    {
+      key: 'email',
+      header: 'Chapter 7: Your Story',
+      icon: '📧',
+      question: 'Where can we send your personalized tips and progress updates?',
+      type: 'text',
+      placeholder: 'Enter your email'
+    },
+    {
+      key: 'age',
+      header: 'Chapter 7: Your Story',
+      icon: '🎂',
+      question: 'How many years young are you?',
+      type: 'select',
+      options: [
+        { value: '18-24', label: '18-24' },
+        { value: '25-34', label: '25-34' },
+        { value: '35-44', label: '35-44' },
+        { value: '45-54', label: '45-54' },
+        { value: '55-64', label: '55-64' },
+        { value: '65+', label: '65+' }
+      ]
+    },
+    {
+      key: 'gender',
+      header: 'Chapter 7: Your Story',
+      icon: '🌈',
+      question: 'Which gender do you identify with?',
+      type: 'select',
+      options: [
+        { value: 'male', label: 'Male' },
+        { value: 'female', label: 'Female' },
+        { value: 'non-binary', label: 'Non-binary' },
+        { value: 'prefer-not-to-say', label: 'Prefer not to say' }
+      ]
+    },
+    {
+      key: 'profession',
+      header: 'Chapter 7: Your Story',
+      icon: '💼',
+      question: "What's your profession or what field are you studying?",
+      type: 'select',
+      options: [
+        { value: 'student', label: 'Student' },
+        { value: 'education', label: 'Education' },
+        { value: 'business', label: 'Business & Management' },
+        { value: 'engineering', label: 'Engineering & Technology' },
+        { value: 'health', label: 'Health & Medicine' },
+        { value: 'science', label: 'Science & Research' },
+        { value: 'law', label: 'Law & Policy' },
+        { value: 'environment', label: 'Environment & Sustainability' },
+        { value: 'arts', label: 'Arts, Design & Creative Fields' },
+        { value: 'media', label: 'Media & Communications' },
+        { value: 'social', label: 'Social Sciences & Humanities' },
+        { value: 'it', label: 'IT & Software Development' },
+        { value: 'government', label: 'Government & Public Sector' },
+        { value: 'hospitality', label: 'Hospitality, Travel & Tourism' },
+        { value: 'trades', label: 'Skilled Trades' },
+        { value: 'retail', label: 'Retail, Sales & Customer Service' },
+        { value: 'logistics', label: 'Logistics, Transport & Delivery' },
+        { value: 'caregiving', label: 'Home & Caregiving' },
+        { value: 'unemployed', label: 'Currently Unemployed' },
+        { value: 'prefer-not-to-say', label: 'Prefer Not to Say' }
+      ]
+    },
+    {
+      key: 'country',
+      header: 'Chapter 7: Your Story',
+      icon: '🌍',
+      question: 'Where do you call home?',
+      type: 'text',
+      placeholder: 'Enter your country'
+    },
+    {
+      key: 'location',
+      header: 'Chapter 7: Your Story',
+      icon: '🏙️',
+      question: 'Which city do you live in?',
+      type: 'text',
+      placeholder: 'Enter your city'
+    },
+    {
+      key: 'householdSize',
+      header: 'Chapter 7: Your Story',
+      icon: '👨‍👩‍👧‍👦',
+      question: 'How many people, including you, share your home?',
+      type: 'number',
+      placeholder: 'Enter number of people'
+    }
+  ];
+
+  // Store answers in the same structure as CalculatorState
+  const [answers, setAnswers] = useState<any>({ ...state });
+
+  // Helper to set nested value by dot notation
+  function setNestedValue(obj: any, path: string, value: any) {
+    const keys = path.split('.');
+    let temp = obj;
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (!temp[keys[i]]) temp[keys[i]] = {};
+      temp = temp[keys[i]];
+    }
+    temp[keys[keys.length - 1]] = value;
+    return { ...obj };
+  }
+
+  function handleSelect(key: string, value: string) {
+    console.log('handleSelect', 'key:', key, 'value:', value);
+    if (key.includes('.')) {
+      setAnswers((prev: any) => setNestedValue({ ...prev }, key, value));
+      updateCalculator(setNestedValue({ ...state }, key, value));
+    } else {
+      setAnswers((prev: any) => ({ ...prev, [key]: value }));
+      updateCalculator({ [key]: value });
+    }
+  }
+
+  function handleNext() {
+    if (step < questions.length - 1) {
+      setStep(step + 1);
+    } else {
+      // On last question, calculate and show results
+      handleFinishQuiz();
+    }
+  }
+
+  function handleBack() {
+    if (step > 0) setStep(step - 1);
+  }
+
+  // Helper to get nested value by dot notation
+  function getNestedValue(obj: any, path: string) {
+    return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj);
+  }
+
+  async function handleFinishQuiz() {
+    setLoadingResults(true);
+    setApiError(null);
+    try {
+      const apiPayload = transformStateToApiFormat(answers);
+      const apiResults = await calculatePersonality(apiPayload);
+      setResults(apiResults);
+      setShowResults(true);
+    } catch (err) {
+      setApiError('Failed to fetch results. Please try again.');
+    } finally {
+      setLoadingResults(false);
+    }
+  }
+
+  if (showResults) {
+    if (loadingResults) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F7E8] px-4 py-12">
+          <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] text-center">
+            <h1 className="text-3xl font-serif mb-4">Calculating your results...</h1>
+            <div className="text-lg text-[#A08C7D] italic">Please wait while we fetch your personalized results.</div>
           </div>
         </div>
-      </section>
-    </Layout>
+      );
+    }
+    if (apiError) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F7E8] px-4 py-12">
+          <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] text-center">
+            <h1 className="text-3xl font-serif mb-4">Error</h1>
+            <div className="text-lg text-red-600 italic mb-4">{apiError}</div>
+            <button className="bg-green-600 text-white px-6 py-2 rounded-xl" onClick={handleFinishQuiz}>Try Again</button>
+          </div>
+        </div>
+      );
+    }
+    // Compose categoryEmissions to match ResultsDisplay's expected type
+    const categoryEmissions = {
+      home: results?.categoryScores?.home?.score || 0,
+      transport: results?.categoryScores?.transport?.score || 0,
+      food: results?.categoryScores?.food?.score || 0,
+      waste: results?.categoryScores?.waste?.score || 0,
+    };
+    // For recommendations, pass an empty array (or map if you have Recommendation[])
+    return (
+      <ResultsDisplay
+        score={results?.finalScore || 0}
+        emissions={Number(results?.impactMetrics?.carbonReduced) || 0}
+        categoryEmissions={categoryEmissions}
+        recommendations={[]}
+        isVisible={true}
+        onReset={() => window.location.reload()}
+        state={answers}
+        gender={answers.gender === 'female' ? 'girl' : 'boy'}
+      />
+    );
+  }
+
+  const q = questions[step];
+  const section = getSectionInfo(q.key);
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F7E8] px-4 py-12">
+      <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22]">
+        {/* Chapter Title */}
+        <div className="mb-2">
+          <h2 className="text-2xl md:text-3xl font-serif text-[#7A8B7A] text-center mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>{section.title}</h2>
+          <div className="text-base md:text-lg text-[#A08C7D] text-center italic mb-4" style={{ fontFamily: 'Inter, sans-serif', fontStyle: 'italic', fontWeight: 400 }}>{section.sub}</div>
+        </div>
+        {/* Question */}
+        <div className="flex flex-col items-center mb-6">
+          <span style={{ fontSize: 48 }}>{q.icon}</span>
+          <div className="text-2xl md:text-3xl font-serif text-[#7A8B7A] text-center mt-4 mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 500 }}>{q.question}</div>
+        </div>
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          {Array.isArray(q.options) ? (
+            q.options.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => handleSelect(q.key, opt.value)}
+                className={`rounded-xl px-8 py-4 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
+                style={{ minWidth: 140 }}
+              >
+                {opt.label}
+              </button>
+            ))
+          ) : q.type === 'text' ? (
+            <input
+              type="text"
+              value={getNestedValue(answers, q.key) || ''}
+              onChange={e => handleSelect(q.key, e.target.value)}
+              placeholder={q.placeholder}
+              className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md"
+            />
+          ) : q.type === 'number' ? (
+            <input
+              type="number"
+              value={getNestedValue(answers, q.key) || ''}
+              onChange={e => handleSelect(q.key, e.target.value)}
+              placeholder={q.placeholder}
+              className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md"
+            />
+          ) : q.type === 'yesno' ? (
+            <div className="flex gap-4">
+              <button
+                onClick={() => handleSelect(q.key, 'yes')}
+                className={`rounded-xl px-8 py-4 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) === 'yes' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
+                style={{ minWidth: 140 }}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => handleSelect(q.key, 'no')}
+                className={`rounded-xl px-8 py-4 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) === 'no' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
+                style={{ minWidth: 140 }}
+              >
+                No
+              </button>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex justify-between mt-8">
+          <button
+            onClick={handleBack}
+            disabled={step === 0}
+            className="rounded-full px-6 py-2 bg-[#E6E6F7] text-[#7A8B7A] font-serif text-lg shadow hover:bg-[#D6F5E3] transition"
+          >
+            Back
+          </button>
+          <button
+            onClick={handleNext}
+            className="rounded-full px-6 py-2 bg-[#A7D58E] text-white font-serif text-lg shadow hover:bg-[#7A8B7A] transition"
+            disabled={!getNestedValue(answers, q.key)}
+          >
+            {step === questions.length - 1 ? 'See Results' : 'Next'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
-};
+}
 
 export default Quiz; 
