@@ -135,49 +135,47 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
           <motion.div custom={0} variants={fadeUp} className="mb-2 mt-0 p-0 m-0">
             <span
               style={{
-                fontSize: 28,
-                color: '#7A8B7A', // more prominent moss green or slate
-                fontStyle: 'italic',
+                fontSize: 36,
+                color: '#7A8B7A',
+                fontWeight: 700,
                 textAlign: 'center',
                 display: 'block',
-                fontWeight: 500,
                 letterSpacing: '0.01em',
-                lineHeight: 1.7
+                lineHeight: 1.3
               }}
             >
-              Every journey begins with a quiet question.
+              What's your sustainability story?
             </span>
           </motion.div>
-          <motion.h1
+          <motion.div
             custom={1}
             variants={fadeUp}
             className="mb-2"
             style={{
-              fontSize: 48,
-              color: '#E07A7A', // dusty rose
-              fontWeight: 400,
+              fontSize: 22,
+              color: '#A08C7D',
+              fontStyle: 'italic',
               textAlign: 'center',
               lineHeight: 1.5,
-              letterSpacing: '-0.01em',
               fontFamily: "'Cormorant Garamond', serif"
             }}
           >
-            Let&apos;s begin your story.
-          </motion.h1>
+            *Spoiler: it's not about being perfect, eating lettuce forever, or turning your life upside down overnight.*
+          </motion.div>
           <motion.div
             custom={2}
             variants={fadeUp}
             className="mb-2"
             style={{
               fontSize: 20,
-              color: '#B97B5B', // muted coral/ochre
+              color: '#B97B5B',
               textAlign: 'center',
               lineHeight: 1.6,
               maxWidth: 540,
               fontFamily: "'Cormorant Garamond', serif"
             }}
           >
-            This isn&apos;t a test. It&apos;s a gentle mirror — a place to pause, breathe, and meet yourself where you are.
+            Take the Zerrah Quiz to discover your personal sustainability story, uncover your strengths, and get purposeful ideas to move forward.
           </motion.div>
           {/* Illustration with hover reveal */}
           <motion.div
@@ -193,14 +191,14 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
             className="mb-4"
             style={{
               fontSize: 19,
-              color: '#A08C7D', // soft taupe
+              color: '#A08C7D',
               textAlign: 'center',
               lineHeight: 1.5,
               fontStyle: 'italic',
               fontFamily: "'Cormorant Garamond', serif"
             }}
           >
-            Each question is a whisper. Each answer reveals a quiet truth.
+            Because the small stuff? It adds up.
           </motion.div>
         </motion.div>
       </div>
