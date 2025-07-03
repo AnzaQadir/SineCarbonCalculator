@@ -298,56 +298,56 @@ const Quiz = () => {
   }
 
   if (started === 'A') {
-    return (
-      <Layout>
-        <section className="py-20 bg-white">
-          <div className="container px-4">
-            <div className="mx-auto">
-              <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold mb-8">
-                  Lifestyle Persona Snapshot
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Answer a few quick questions about your lifestyle to discover your unique persona and get personalized climate action tips.
-                </p>
-              </div>
-              <Calculator 
-                state={{
-                  ...state,
-                  householdSize: state.householdSize.toString(),
-                  electricityKwh: state.electricityKwh.toString(),
-                  naturalGasTherm: state.naturalGasTherm.toString(),
-                  heatingOilGallons: state.heatingOilGallons.toString(),
-                  propaneGallons: state.propaneGallons.toString(),
-                  weeklyKm: state.weeklyKm.toString(),
-                  costPerMile: state.costPerMile.toString(),
-                  plantBasedMealsPerWeek: state.plantBasedMealsPerWeek.toString(),
-                }}
-                onUpdate={(updates) => {
-                  const processedUpdates = {
-                    ...updates,
-                    householdSize: updates.householdSize ? Number(updates.householdSize) : state.householdSize,
-                    electricityKwh: updates.electricityKwh ? Number(updates.electricityKwh) : state.electricityKwh,
-                    naturalGasTherm: updates.naturalGasTherm ? Number(updates.naturalGasTherm) : state.naturalGasTherm,
-                    heatingOilGallons: updates.heatingOilGallons ? Number(updates.heatingOilGallons) : state.heatingOilGallons,
-                    propaneGallons: updates.propaneGallons ? Number(updates.propaneGallons) : state.propaneGallons,
-                    weeklyKm: updates.weeklyKm ? Number(updates.weeklyKm) : state.weeklyKm,
-                    costPerMile: updates.costPerMile ? Number(updates.costPerMile) : state.costPerMile,
-                    plantBasedMealsPerWeek: updates.plantBasedMealsPerWeek ? Number(updates.plantBasedMealsPerWeek) : state.plantBasedMealsPerWeek,
-                  };
-                  updateCalculator(processedUpdates);
-                }}
-                onCalculate={handleCalculate}
-                onBack={handleBack}
-                onNext={handleNext}
-                onStepChange={handleStepChange}
-                currentStep={currentStep}
-              />
+  return (
+    <Layout>
+      <section className="py-20 bg-white">
+        <div className="container px-4">
+          <div className="mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-8">
+                Lifestyle Persona Snapshot
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Answer a few quick questions about your lifestyle to discover your unique persona and get personalized climate action tips.
+              </p>
             </div>
+            <Calculator 
+              state={{
+                ...state,
+                householdSize: state.householdSize.toString(),
+                electricityKwh: state.electricityKwh.toString(),
+                naturalGasTherm: state.naturalGasTherm.toString(),
+                heatingOilGallons: state.heatingOilGallons.toString(),
+                propaneGallons: state.propaneGallons.toString(),
+                  weeklyKm: state.weeklyKm.toString(),
+                costPerMile: state.costPerMile.toString(),
+                plantBasedMealsPerWeek: state.plantBasedMealsPerWeek.toString(),
+              }}
+              onUpdate={(updates) => {
+                const processedUpdates = {
+                  ...updates,
+                  householdSize: updates.householdSize ? Number(updates.householdSize) : state.householdSize,
+                  electricityKwh: updates.electricityKwh ? Number(updates.electricityKwh) : state.electricityKwh,
+                  naturalGasTherm: updates.naturalGasTherm ? Number(updates.naturalGasTherm) : state.naturalGasTherm,
+                  heatingOilGallons: updates.heatingOilGallons ? Number(updates.heatingOilGallons) : state.heatingOilGallons,
+                  propaneGallons: updates.propaneGallons ? Number(updates.propaneGallons) : state.propaneGallons,
+                    weeklyKm: updates.weeklyKm ? Number(updates.weeklyKm) : state.weeklyKm,
+                  costPerMile: updates.costPerMile ? Number(updates.costPerMile) : state.costPerMile,
+                  plantBasedMealsPerWeek: updates.plantBasedMealsPerWeek ? Number(updates.plantBasedMealsPerWeek) : state.plantBasedMealsPerWeek,
+                };
+                updateCalculator(processedUpdates);
+              }}
+              onCalculate={handleCalculate}
+              onBack={handleBack}
+              onNext={handleNext}
+              onStepChange={handleStepChange}
+              currentStep={currentStep}
+            />
           </div>
-        </section>
-      </Layout>
-    );
+        </div>
+      </section>
+    </Layout>
+  );
   }
 
   if (started === 'B') {
@@ -360,59 +360,44 @@ const Quiz = () => {
 // Copy transformStateToApiFormat from ResultsDisplay
 function transformStateToApiFormat(state: any): UserResponses {
   return {
-    homeEnergy: {
-      efficiency: (state.homeEfficiency || '') as 'A' | 'B' | 'C' | '',
-      management: (state.energyManagement || '') as 'A' | 'B' | 'C' | '',
-      // Only set homeScale if not empty string
-      homeScale: state.homeSize && state.homeSize !== '' ? (state.homeSize as '1' | '2' | '3' | '4' | '5' | '6' | '7+') : undefined,
-    },
-    transport: {
-      primary: (state.primaryTransportMode || '') as 'A' | 'B' | 'C' | 'D' | '',
-      carProfile: state.carProfile && state.carProfile !== '' ? (state.carProfile as 'A' | 'B' | 'C' | 'D' | 'E') : undefined,
-      longDistance: state.longDistanceTravel && state.longDistanceTravel !== '' ? (state.longDistanceTravel as 'A' | 'B' | 'C' | 'D' | 'E') : undefined,
-    },
-    food: {
-      dietType: (
-        state.dietType === "VEGAN" ? "PLANT_BASED" :
-        state.dietType === "VEGETARIAN" ? "VEGETARIAN" :
-        state.dietType === "FLEXITARIAN" ? "FLEXITARIAN" :
-        state.dietType === "MEAT_MODERATE" ? "MODERATE_MEAT" :
-        state.dietType === "MEAT_HEAVY" ? "HEAVY_MEAT" :
-        undefined
-      ) as 'PLANT_BASED' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MODERATE_MEAT' | 'HEAVY_MEAT' | undefined,
-      foodSource: (
-        state.plateProfile === "A" ? "LOCAL_SEASONAL" :
-        state.plateProfile === "B" ? "MIXED" :
-        state.plateProfile === "C" ? "MOSTLY_IMPORTED" :
-        undefined
-      ) as 'LOCAL_SEASONAL' | 'MIXED' | 'MOSTLY_IMPORTED' | undefined,
-      diningStyle: (
-        state.monthlyDiningOut === "A" ? "RARELY_DINE_OUT" :
-        state.monthlyDiningOut === "B" ? "OCCASIONALLY_DINE_OUT" :
-        state.monthlyDiningOut === "C" ? "REGULARLY_DINE_OUT" :
-        state.monthlyDiningOut === "D" ? "FREQUENTLY_DINE_OUT" :
-        undefined
-      ) as 'RARELY_DINE_OUT' | 'OCCASIONALLY_DINE_OUT' | 'REGULARLY_DINE_OUT' | 'FREQUENTLY_DINE_OUT' | undefined,
-      plantBasedMealsPerWeek: state.plantBasedMealsPerWeek ? parseInt(state.plantBasedMealsPerWeek) : undefined
-    },
-    waste: {
-      prevention: (state.waste?.prevention || '') as 'A' | 'B' | 'C' | 'D' | '',
-      management: (state.waste?.management || '') as 'A' | 'B' | 'C' | '',
-      smartShopping: (state.waste?.smartShopping || '') as 'A' | 'B' | 'C',
-      dailyWaste: (state.waste?.dailyWaste || '') as 'A' | 'B' | 'C' | 'D',
-      repairOrReplace: (state.waste?.repairOrReplace || '') as 'A' | 'B' | 'C' | '',
-    },
-    airQuality: {
-      monitoring: (state.airQuality?.aqiMonitoring || '') as 'A' | 'B' | 'C' | 'D' | '',
-      impact: (state.airQuality?.airQualityImpact || '') as 'A' | 'B' | 'C' | 'D' | '',
-    },
-    clothing: {
-      wardrobeImpact: state.clothing?.wardrobeImpact || undefined,
-      mindfulUpgrades: state.clothing?.mindfulUpgrades || undefined,
-      durability: state.clothing?.durability || undefined,
-      consumptionFrequency: state.clothing?.consumptionFrequency || undefined,
-      brandLoyalty: state.clothing?.brandLoyalty || undefined,
-    },
+    // Demographics
+    name: state.name,
+    email: state.email,
+    age: state.age,
+    gender: state.gender,
+    profession: state.profession,
+    location: state.location,
+    country: state.country,
+    householdSize: state.householdSize,
+    // Home Energy
+    homeSize: state.homeSize,
+    homeEfficiency: state.homeEfficiency,
+    energyManagement: state.energyManagement,
+    electricityKwh: state.electricityKwh,
+    naturalGasTherm: state.naturalGasTherm,
+    heatingOilGallons: state.heatingOilGallons,
+    propaneGallons: state.propaneGallons,
+    usesRenewableEnergy: state.usesRenewableEnergy,
+    hasEnergyEfficiencyUpgrades: state.hasEnergyEfficiencyUpgrades,
+    hasSmartThermostats: state.hasSmartThermostats,
+    hasEnergyStarAppliances: state.hasEnergyStarAppliances,
+    // Transportation
+    primaryTransportMode: state.primaryTransportMode,
+    carProfile: state.carProfile,
+    weeklyKm: state.weeklyKm,
+    costPerMile: state.costPerMile,
+    longDistanceTravel: state.longDistanceTravel,
+    // Food & Diet
+    dietType: state.dietType,
+    plateProfile: state.plateProfile,
+    monthlyDiningOut: state.monthlyDiningOut,
+    plantBasedMealsPerWeek: state.plantBasedMealsPerWeek,
+    // Waste
+    waste: state.waste,
+    // Air Quality
+    airQuality: state.airQuality,
+    // Clothing
+    clothing: state.clothing,
   };
 }
 
@@ -573,7 +558,7 @@ function PoeticJourneyQuiz() {
       type: 'select',
       options: [
         { value: 'A', label: 'Rail and Bus' },
-        { value: 'B', label: 'Balanced' },
+        { value: 'B', label: 'Mix of Flights & Trains' },
         { value: 'C', label: 'Frequent Flyer' }
       ]
     },
@@ -1025,9 +1010,51 @@ function PoeticJourneyQuiz() {
   const q = questions[step];
   const section = getSectionInfo(q.key);
 
+  // Determine background image based on question section
+  let backgroundImage = '/images/home_background.png';
+  if ([
+    'primaryTransportMode', 'carProfile', 'weeklyKm', 'longDistanceTravel'
+  ].includes(q.key)) {
+    backgroundImage = '/images/transport.background.png';
+  } else if ([
+    'clothing.wardrobeImpact', 'clothing.mindfulUpgrades', 'clothing.durability', 'clothing.consumptionFrequency', 'clothing.brandLoyalty'
+  ].includes(q.key)) {
+    backgroundImage = '/images/clothes_background.png';
+  } else if ([
+    'dietType', 'plateProfile', 'monthlyDiningOut', 'plantBasedMealsPerWeek'
+  ].includes(q.key)) {
+    backgroundImage = '/images/food_clothes.png';
+  } else if ([
+    'waste.prevention', 'waste.smartShopping', 'waste.dailyWaste', 'waste.management', 'waste.repairOrReplace'
+  ].includes(q.key)) {
+    backgroundImage = '/images/waste_background.png';
+  } else if ([
+    'airQuality.outdoorAirQuality', 'airQuality.aqiMonitoring', 'airQuality.indoorAirQuality', 'airQuality.airQualityCommuting', 'airQuality.airQualityImpact'
+  ].includes(q.key)) {
+    backgroundImage = '/images/air_background.png';
+  }
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F7E8] px-4 py-12">
-      <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22]">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundRepeat: 'repeat',
+        backgroundSize: 'auto',
+        backgroundPosition: 'top left',
+        backgroundColor: '#F9F7E8',
+        position: 'relative',
+      }}
+    >
+      {/* Optional overlay for extra softness */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'rgba(255,255,255,0.7)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
+      <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] relative z-10">
         {/* Chapter Title */}
         <div className="mb-2">
           <h2 className="text-2xl md:text-3xl font-serif text-[#7A8B7A] text-center mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>{section.title}</h2>
@@ -1039,7 +1066,30 @@ function PoeticJourneyQuiz() {
           <div className="text-2xl md:text-3xl font-serif text-[#7A8B7A] text-center mt-4 mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 500 }}>{q.question}</div>
         </div>
         <div className="flex flex-wrap justify-center gap-4 mb-8">
-          {Array.isArray(q.options) ? (
+          {q.key === 'plantBasedMealsPerWeek' ? (
+            <div className="flex flex-wrap gap-2 mb-4">
+              <button
+                type="button"
+                className={`rounded-xl px-6 py-3 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) == '1' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
+                onClick={() => handleSelect(q.key, '1')}
+              >&lt; 2</button>
+              <button
+                type="button"
+                className={`rounded-xl px-6 py-3 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) == '3' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
+                onClick={() => handleSelect(q.key, '3')}
+              >2–4</button>
+              <button
+                type="button"
+                className={`rounded-xl px-6 py-3 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) == '5' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
+                onClick={() => handleSelect(q.key, '5')}
+              >5–6</button>
+              <button
+                type="button"
+                className={`rounded-xl px-6 py-3 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) == '7' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
+                onClick={() => handleSelect(q.key, '7')}
+              >7+</button>
+            </div>
+          ) : Array.isArray(q.options) ? (
             q.options.map((opt) => (
               <button
                 key={opt.value}
