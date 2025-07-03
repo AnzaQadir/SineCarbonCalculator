@@ -883,8 +883,34 @@ function PoeticJourneyQuiz() {
       header: 'Chapter 7: Your Story',
       icon: '🌍',
       question: 'Where do you call home?',
-      type: 'text',
-      placeholder: 'Enter your country'
+      type: 'select',
+      options: [
+        { value: 'United States', label: 'United States' },
+        { value: 'Canada', label: 'Canada' },
+        { value: 'United Kingdom', label: 'United Kingdom' },
+        { value: 'Australia', label: 'Australia' },
+        { value: 'India', label: 'India' },
+        { value: 'Pakistan', label: 'Pakistan' },
+        { value: 'United Arab Emirates', label: 'United Arab Emirates' },
+        { value: 'Saudi Arabia', label: 'Saudi Arabia' },
+        { value: 'Germany', label: 'Germany' },
+        { value: 'France', label: 'France' },
+        { value: 'Brazil', label: 'Brazil' },
+        { value: 'Japan', label: 'Japan' },
+        { value: 'China', label: 'China' },
+        { value: 'South Africa', label: 'South Africa' },
+        { value: 'Turkey', label: 'Turkey' },
+        { value: 'Indonesia', label: 'Indonesia' },
+        { value: 'Bangladesh', label: 'Bangladesh' },
+        { value: 'Nigeria', label: 'Nigeria' },
+        { value: 'Mexico', label: 'Mexico' },
+        { value: 'Russia', label: 'Russia' },
+        { value: 'Egypt', label: 'Egypt' },
+        { value: 'Argentina', label: 'Argentina' },
+        { value: 'Italy', label: 'Italy' },
+        { value: 'Spain', label: 'Spain' },
+        { value: 'Other', label: 'Other' }
+      ]
     },
     {
       key: 'location',
@@ -1034,6 +1060,34 @@ function PoeticJourneyQuiz() {
     backgroundImage = '/images/air_background.png';
   }
 
+  // Add this mapping near the top of the file (inside the component or above it):
+  const countryCityMap: Record<string, string[]> = {
+    "United States": ["New York", "Los Angeles", "Chicago", "San Francisco", "Other"],
+    "Pakistan": ["Karachi", "Lahore", "Islamabad", "Rawalpindi", "Other"],
+    "United Arab Emirates": ["Dubai", "Abu Dhabi", "Sharjah", "Other"],
+    "Saudi Arabia": ["Riyadh", "Jeddah", "Mecca", "Other"],
+    "India": ["Mumbai", "Delhi", "Bangalore", "Chennai", "Other"],
+    "Canada": ["Toronto", "Vancouver", "Montreal", "Calgary", "Other"],
+    "United Kingdom": ["London", "Manchester", "Birmingham", "Liverpool", "Other"],
+    "Australia": ["Sydney", "Melbourne", "Brisbane", "Perth", "Other"],
+    "Germany": ["Berlin", "Munich", "Frankfurt", "Hamburg", "Other"],
+    "France": ["Paris", "Lyon", "Marseille", "Nice", "Other"],
+    "Brazil": ["São Paulo", "Rio de Janeiro", "Brasília", "Salvador", "Other"],
+    "Japan": ["Tokyo", "Osaka", "Kyoto", "Yokohama", "Other"],
+    "China": ["Beijing", "Shanghai", "Guangzhou", "Shenzhen", "Other"],
+    "South Africa": ["Johannesburg", "Cape Town", "Durban", "Pretoria", "Other"],
+    "Turkey": ["Istanbul", "Ankara", "Izmir", "Bursa", "Other"],
+    "Indonesia": ["Jakarta", "Surabaya", "Bandung", "Medan", "Other"],
+    "Bangladesh": ["Dhaka", "Chittagong", "Khulna", "Rajshahi", "Other"],
+    "Nigeria": ["Lagos", "Abuja", "Kano", "Ibadan", "Other"],
+    "Mexico": ["Mexico City", "Guadalajara", "Monterrey", "Puebla", "Other"],
+    "Russia": ["Moscow", "Saint Petersburg", "Novosibirsk", "Yekaterinburg", "Other"],
+    "Egypt": ["Cairo", "Alexandria", "Giza", "Shubra El Kheima", "Other"],
+    "Argentina": ["Buenos Aires", "Córdoba", "Rosario", "Mendoza", "Other"],
+    "Italy": ["Rome", "Milan", "Naples", "Turin", "Other"],
+    "Spain": ["Madrid", "Barcelona", "Valencia", "Seville", "Other"],
+  };
+
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
@@ -1066,29 +1120,113 @@ function PoeticJourneyQuiz() {
           <div className="text-2xl md:text-3xl font-serif text-[#7A8B7A] text-center mt-4 mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 500 }}>{q.question}</div>
         </div>
         <div className="flex flex-wrap justify-center gap-4 mb-8">
-          {q.key === 'plantBasedMealsPerWeek' ? (
-            <div className="flex flex-wrap gap-2 mb-4">
-              <button
-                type="button"
-                className={`rounded-xl px-6 py-3 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) == '1' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
-                onClick={() => handleSelect(q.key, '1')}
-              >&lt; 2</button>
-              <button
-                type="button"
-                className={`rounded-xl px-6 py-3 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) == '3' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
-                onClick={() => handleSelect(q.key, '3')}
-              >2–4</button>
-              <button
-                type="button"
-                className={`rounded-xl px-6 py-3 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) == '5' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
-                onClick={() => handleSelect(q.key, '5')}
-              >5–6</button>
-              <button
-                type="button"
-                className={`rounded-xl px-6 py-3 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) == '7' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
-                onClick={() => handleSelect(q.key, '7')}
-              >7+</button>
-            </div>
+          {q.key === 'country' ? (
+            <select
+              value={getNestedValue(answers, q.key) || ''}
+              onChange={e => handleSelect(q.key, e.target.value)}
+              className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md bg-white appearance-none transition-colors duration-200 hover:border-[#A7D58E]"
+              style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.25rem 1.25rem', paddingRight: '3rem' }}
+            >
+              <option value="" disabled>Enter your country</option>
+              <option value="United States">United States</option>
+              <option value="Canada">Canada</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Australia">Australia</option>
+              <option value="India">India</option>
+              <option value="Pakistan">Pakistan</option>
+              <option value="United Arab Emirates">United Arab Emirates</option>
+              <option value="Saudi Arabia">Saudi Arabia</option>
+              <option value="Germany">Germany</option>
+              <option value="France">France</option>
+              <option value="Brazil">Brazil</option>
+              <option value="Japan">Japan</option>
+              <option value="China">China</option>
+              <option value="South Africa">South Africa</option>
+              <option value="Turkey">Turkey</option>
+              <option value="Indonesia">Indonesia</option>
+              <option value="Bangladesh">Bangladesh</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Mexico">Mexico</option>
+              <option value="Russia">Russia</option>
+              <option value="Egypt">Egypt</option>
+              <option value="Argentina">Argentina</option>
+              <option value="Italy">Italy</option>
+              <option value="Spain">Spain</option>
+              <option value="Other">Other</option>
+            </select>
+          ) : q.key === 'location' ? (
+            (() => {
+              const selectedCountry = getNestedValue(answers, 'country');
+              const cities = countryCityMap[selectedCountry];
+              if (!selectedCountry) {
+                return (
+                  <select
+                    disabled
+                    className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] bg-gray-100 text-gray-400 shadow w-full max-w-md appearance-none"
+                  >
+                    <option value="">Select a country first</option>
+                  </select>
+                );
+              } else if (cities) {
+                return (
+                  <select
+                    value={getNestedValue(answers, q.key) || ''}
+                    onChange={e => handleSelect(q.key, e.target.value)}
+                    className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md bg-white appearance-none transition-colors duration-200 hover:border-[#A7D58E]"
+                    style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.25rem 1.25rem', paddingRight: '3rem' }}
+                  >
+                    <option value="" disabled>Select your city</option>
+                    {cities.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                );
+              } else {
+                return (
+                  <input
+                    type="text"
+                    value={getNestedValue(answers, q.key) || ''}
+                    onChange={e => handleSelect(q.key, e.target.value)}
+                    placeholder="Enter your city"
+                    className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md"
+                  />
+                );
+              }
+            })()
+          ) : q.key === 'country' ? (
+            <select
+              value={getNestedValue(answers, q.key) || ''}
+              onChange={e => handleSelect(q.key, e.target.value)}
+              className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md bg-white appearance-none transition-colors duration-200 hover:border-[#A7D58E]"
+              style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.25rem 1.25rem', paddingRight: '3rem' }}
+            >
+              <option value="" disabled>Enter your country</option>
+              <option value="United States">United States</option>
+              <option value="Canada">Canada</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Australia">Australia</option>
+              <option value="India">India</option>
+              <option value="Pakistan">Pakistan</option>
+              <option value="United Arab Emirates">United Arab Emirates</option>
+              <option value="Saudi Arabia">Saudi Arabia</option>
+              <option value="Germany">Germany</option>
+              <option value="France">France</option>
+              <option value="Brazil">Brazil</option>
+              <option value="Japan">Japan</option>
+              <option value="China">China</option>
+              <option value="South Africa">South Africa</option>
+              <option value="Turkey">Turkey</option>
+              <option value="Indonesia">Indonesia</option>
+              <option value="Bangladesh">Bangladesh</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Mexico">Mexico</option>
+              <option value="Russia">Russia</option>
+              <option value="Egypt">Egypt</option>
+              <option value="Argentina">Argentina</option>
+              <option value="Italy">Italy</option>
+              <option value="Spain">Spain</option>
+              <option value="Other">Other</option>
+            </select>
           ) : Array.isArray(q.options) ? (
             q.options.map((opt) => (
               <button
