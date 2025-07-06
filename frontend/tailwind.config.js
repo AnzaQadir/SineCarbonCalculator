@@ -76,6 +76,16 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        zerrah: {
+          red: '#D94B5A',
+          orange: '#F89C4E',
+          yellow: '#F9E28C',
+          green: '#8FD19E',
+          blue: '#4A90C2',
+          lightgreen: '#E2F29B',
+          deepgreen: '#4B8F6E',
+          deepblue: '#22577A',
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

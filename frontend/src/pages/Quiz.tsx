@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import Calculator from '@/components/Calculator';
 import { useCalculator } from '@/hooks/useCalculator';
@@ -80,187 +80,29 @@ function CircularImageReveal() {
 
 function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onStartB: () => void; onBack?: () => void }) {
   return (
-    <div
-      className="min-h-screen flex flex-col bg-[#F9F7E8]"
-      style={{ fontFamily: "'Cormorant Garamond', serif" }}
-    >
-      {/* Back Button */}
-      <button
-        onClick={onBack ? onBack : () => window.history.back()}
-        style={{
-          position: 'absolute',
-          top: 18,
-          left: 18,
-          background: 'none',
-          border: 'none',
-          color: '#7A8B7A', // gentle moss green
-          fontSize: 32,
-          cursor: 'pointer',
-          opacity: 0.85,
-          zIndex: 10,
-          padding: 0,
-          lineHeight: 1,
-          display: 'flex',
-          alignItems: 'center'
-        }}
-        aria-label="Back"
-      >
-        <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 28L8 16L20 4" />
-        </svg>
-      </button>
-      {/* Brand */}
-      <div className="pt-0 pl-8 pb-0 m-0">
-        <img
-          src="/images/new_logo.png"
-          alt="Zerrah logo"
-          style={{
-            height: 140,
-            width: 'auto',
-            opacity: 0.85,
-            objectFit: 'contain',
-            filter: 'brightness(0.85)',
-            display: 'block',
-            marginLeft: 'auto',
-            marginRight: 'auto'
-          }}
-        />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9F7E8] px-4 py-12">
+      {/* Brand logo */}
+      <img src="/images/new_logo.png" alt="Zerrah logo" className="h-32 mb-6 opacity-90" />
+      {/* Decorative background shape and illustration */}
+      <div className="relative mb-8">
+        <div className="absolute inset-0 w-80 h-80 bg-amber-100 rounded-full blur-2xl opacity-60 -z-10"></div>
+        <img src="/images/intro_girl.png" alt="Quiz intro" className="w-64 h-64 rounded-full shadow-xl border-4 border-amber-200 object-cover" />
       </div>
-      <div className="flex flex-col w-full max-w-4xl mx-auto px-6 md:px-12 gap-0 items-center">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          className="flex-1 flex flex-col items-center"
-        >
-          <motion.div custom={0} variants={fadeUp} className="mb-2 mt-0 p-0 m-0">
-            <span
-              style={{
-                fontSize: 36,
-                color: '#7A8B7A',
-                fontWeight: 700,
-                textAlign: 'center',
-                display: 'block',
-                letterSpacing: '0.01em',
-                lineHeight: 1.3
-              }}
-            >
-              What's your sustainability story?
-            </span>
-          </motion.div>
-          <motion.div
-            custom={1}
-            variants={fadeUp}
-            className="mb-2"
-            style={{
-              fontSize: 22,
-              color: '#A08C7D',
-              fontStyle: 'italic',
-              textAlign: 'center',
-              lineHeight: 1.5,
-              fontFamily: "'Cormorant Garamond', serif"
-            }}
-          >
-            *Spoiler: it's not about being perfect, eating lettuce forever, or turning your life upside down overnight.*
-          </motion.div>
-          <motion.div
-            custom={2}
-            variants={fadeUp}
-            className="mb-2"
-            style={{
-              fontSize: 20,
-              color: '#B97B5B',
-              textAlign: 'center',
-              lineHeight: 1.6,
-              maxWidth: 540,
-              fontFamily: "'Cormorant Garamond', serif"
-            }}
-          >
-            Take the Zerrah Quiz to discover your personal sustainability story, uncover your strengths, and get purposeful ideas to move forward.
-          </motion.div>
-          {/* Illustration with hover reveal */}
-          <motion.div
-            custom={3}
-            variants={fadeUp}
-            className="mb-4 w-full flex justify-center"
-          >
-            <CircularImageReveal />
-          </motion.div>
-          <motion.div
-            custom={4}
-            variants={fadeUp}
-            className="mb-4"
-            style={{
-              fontSize: 19,
-              color: '#A08C7D',
-              textAlign: 'center',
-              lineHeight: 1.5,
-              fontStyle: 'italic',
-              fontFamily: "'Cormorant Garamond', serif"
-            }}
-          >
-            Because the small stuff? It adds up.
-          </motion.div>
-        </motion.div>
+      {/* Headline */}
+      <h1 className="text-5xl font-extrabold text-emerald-900 mb-3 font-serif tracking-tight text-center">What's your sustainability story?</h1>
+      {/* Subtitle */}
+      <p className="italic text-lg text-amber-700 mb-4 max-w-2xl text-center">*Spoiler: it's not about being perfect, eating lettuce forever, or turning your life upside down overnight.*</p>
+      {/* Description */}
+      <p className="text-xl text-amber-900 mb-6 max-w-2xl text-center leading-relaxed">
+        Take the Zerrah Quiz to discover your personal sustainability story, uncover your strengths, and get purposeful ideas to move forward.
+      </p>
+      {/* Final line */}
+      <p className="text-base text-emerald-700 italic mb-8 text-center">Because the small stuff? It adds up.</p>
+      {/* CTA Buttons */}
+      <div className="flex gap-6">
+        <button className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-bold py-3 px-8 rounded-full shadow transition" onClick={onStartA}>Begin My Story</button>
+        <button className="bg-amber-500 hover:bg-amber-600 text-white text-lg font-bold py-3 px-8 rounded-full shadow transition" onClick={onStartB}>Surprise Me</button>
       </div>
-      {/* CTA Button (left-aligned under illustration/text) */}
-      <motion.div
-        custom={5}
-        variants={fadeUp}
-        className="w-full max-w-4xl mx-auto px-6 md:px-12 mt-0 flex flex-col items-center pb-6 mb-2"
-      >
-        <div className="flex flex-col md:flex-row gap-4 w-full justify-center">
-          <motion.button
-            whileHover={{
-              scale: 1.03,
-              boxShadow: '0 0 0 8px #A7D58E33',
-              opacity: 0.95
-            }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onStartA}
-            style={{
-              background: '#A7D58E',
-              color: '#fff',
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 22,
-              border: 'none',
-              borderRadius: 999,
-              padding: '18px 48px',
-              boxShadow: '0 6px 28px 0 rgba(167,213,142,0.18)',
-              cursor: 'pointer',
-              fontWeight: 400,
-              letterSpacing: '0.02em',
-              marginBottom: 0
-            }}
-          >
-            Start Variant A
-          </motion.button>
-          <motion.button
-            whileHover={{
-              scale: 1.03,
-              boxShadow: '0 0 0 8px #E07A7A33',
-              opacity: 0.95
-            }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onStartB}
-            style={{
-              background: '#E07A7A',
-              color: '#fff',
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 22,
-              border: 'none',
-              borderRadius: 999,
-              padding: '18px 48px',
-              boxShadow: '0 6px 28px 0 rgba(224,122,122,0.18)',
-              cursor: 'pointer',
-              fontWeight: 400,
-              letterSpacing: '0.02em',
-              marginBottom: 0
-            }}
-          >
-            Start Variant B
-          </motion.button>
-        </div>
-      </motion.div>
     </div>
   );
 }
@@ -298,56 +140,56 @@ const Quiz = () => {
   }
 
   if (started === 'A') {
-  return (
-    <Layout>
-      <section className="py-20 bg-white">
-        <div className="container px-4">
-          <div className="mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-8">
-                Lifestyle Persona Snapshot
-              </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Answer a few quick questions about your lifestyle to discover your unique persona and get personalized climate action tips.
-              </p>
-            </div>
-            <Calculator 
-              state={{
-                ...state,
-                householdSize: state.householdSize.toString(),
-                electricityKwh: state.electricityKwh.toString(),
-                naturalGasTherm: state.naturalGasTherm.toString(),
-                heatingOilGallons: state.heatingOilGallons.toString(),
-                propaneGallons: state.propaneGallons.toString(),
+    return (
+      <Layout>
+        <section className="py-20 bg-white">
+          <div className="container px-4">
+            <div className="mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-bold mb-8">
+                  Lifestyle Persona Snapshot
+                </h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  Answer a few quick questions about your lifestyle to discover your unique persona and get personalized climate action tips.
+                </p>
+              </div>
+              <Calculator 
+                state={{
+                  ...state,
+                  householdSize: state.householdSize.toString(),
+                  electricityKwh: state.electricityKwh.toString(),
+                  naturalGasTherm: state.naturalGasTherm.toString(),
+                  heatingOilGallons: state.heatingOilGallons.toString(),
+                  propaneGallons: state.propaneGallons.toString(),
                   weeklyKm: state.weeklyKm.toString(),
-                costPerMile: state.costPerMile.toString(),
-                plantBasedMealsPerWeek: state.plantBasedMealsPerWeek.toString(),
-              }}
-              onUpdate={(updates) => {
-                const processedUpdates = {
-                  ...updates,
-                  householdSize: updates.householdSize ? Number(updates.householdSize) : state.householdSize,
-                  electricityKwh: updates.electricityKwh ? Number(updates.electricityKwh) : state.electricityKwh,
-                  naturalGasTherm: updates.naturalGasTherm ? Number(updates.naturalGasTherm) : state.naturalGasTherm,
-                  heatingOilGallons: updates.heatingOilGallons ? Number(updates.heatingOilGallons) : state.heatingOilGallons,
-                  propaneGallons: updates.propaneGallons ? Number(updates.propaneGallons) : state.propaneGallons,
+                  costPerMile: state.costPerMile.toString(),
+                  plantBasedMealsPerWeek: state.plantBasedMealsPerWeek.toString(),
+                }}
+                onUpdate={(updates) => {
+                  const processedUpdates = {
+                    ...updates,
+                    householdSize: updates.householdSize ? Number(updates.householdSize) : state.householdSize,
+                    electricityKwh: updates.electricityKwh ? Number(updates.electricityKwh) : state.electricityKwh,
+                    naturalGasTherm: updates.naturalGasTherm ? Number(updates.naturalGasTherm) : state.naturalGasTherm,
+                    heatingOilGallons: updates.heatingOilGallons ? Number(updates.heatingOilGallons) : state.heatingOilGallons,
+                    propaneGallons: updates.propaneGallons ? Number(updates.propaneGallons) : state.propaneGallons,
                     weeklyKm: updates.weeklyKm ? Number(updates.weeklyKm) : state.weeklyKm,
-                  costPerMile: updates.costPerMile ? Number(updates.costPerMile) : state.costPerMile,
-                  plantBasedMealsPerWeek: updates.plantBasedMealsPerWeek ? Number(updates.plantBasedMealsPerWeek) : state.plantBasedMealsPerWeek,
-                };
-                updateCalculator(processedUpdates);
-              }}
-              onCalculate={handleCalculate}
-              onBack={handleBack}
-              onNext={handleNext}
-              onStepChange={handleStepChange}
-              currentStep={currentStep}
-            />
+                    costPerMile: updates.costPerMile ? Number(updates.costPerMile) : state.costPerMile,
+                    plantBasedMealsPerWeek: updates.plantBasedMealsPerWeek ? Number(updates.plantBasedMealsPerWeek) : state.plantBasedMealsPerWeek,
+                  };
+                  updateCalculator(processedUpdates);
+                }}
+                onCalculate={handleCalculate}
+                onBack={handleBack}
+                onNext={handleNext}
+                onStepChange={handleStepChange}
+                currentStep={currentStep}
+              />
+            </div>
           </div>
-        </div>
-      </section>
-    </Layout>
-  );
+        </section>
+      </Layout>
+    );
   }
 
   if (started === 'B') {
@@ -464,6 +306,15 @@ function PoeticJourneyQuiz() {
   const [results, setResults] = useState<PersonalityResponse | null>(null);
   const [loadingResults, setLoadingResults] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [showScrollHint, setShowScrollHint] = useState(false);
+
+  // Show scroll hint after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowScrollHint(true);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Expanded questions array covering all Calculator questions
   const questions = [
@@ -1090,14 +941,13 @@ function PoeticJourneyQuiz() {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-12 relative"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundRepeat: 'repeat',
         backgroundSize: 'auto',
         backgroundPosition: 'top left',
         backgroundColor: '#F9F7E8',
-        position: 'relative',
       }}
     >
       {/* Optional overlay for extra softness */}
@@ -1108,6 +958,49 @@ function PoeticJourneyQuiz() {
         pointerEvents: 'none',
         zIndex: 0
       }} />
+      
+      {/* Fading edge gradient at bottom */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-5"
+        style={{
+          background: 'linear-gradient(to top, rgba(249, 247, 232, 0.9) 0%, rgba(249, 247, 232, 0.6) 30%, rgba(249, 247, 232, 0.3) 60%, transparent 100%)',
+          zIndex: 5
+        }}
+      />
+      
+      {/* Animated down arrow */}
+      <div className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 pointer-events-none transition-opacity duration-1000 ${showScrollHint ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="flex flex-col items-center">
+          <div className="text-sm text-[#7A8B7A] opacity-70 mb-2 font-serif italic scroll-hint-text">
+            More questions await...
+          </div>
+          <div className="scroll-hint-arrow">
+            <svg 
+              className="w-6 h-6 text-[#A7D58E] opacity-80" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      {/* Mobile swipe hint */}
+      <div className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 pointer-events-none md:hidden transition-opacity duration-1000 ${showScrollHint ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="flex items-center gap-2 opacity-60">
+          <div className="w-8 h-0.5 bg-[#A7D58E] rounded-full scroll-hint-line"></div>
+          <span className="text-xs text-[#7A8B7A] font-serif scroll-hint-text">Swipe up</span>
+          <div className="w-8 h-0.5 bg-[#A7D58E] rounded-full scroll-hint-line"></div>
+        </div>
+      </div>
+      
       <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] relative z-10">
         {/* Chapter Title */}
         <div className="mb-2">

@@ -409,30 +409,30 @@ const Signup = () => {
             </div>
 
             {/* Age Selection */}
-            <div>
-              <label className="block text-gray-700 mb-1">Your Age</label>
-              <div className="flex flex-wrap gap-2">
-                {ageRanges.map((range) => (
+          <div>
+            <label className="block text-gray-700 mb-1">Your Age</label>
+            <div className="flex flex-wrap gap-2">
+              {ageRanges.map((range) => (
                   <label key={range} className="flex items-center space-x-2 p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-                    <input
-                      type="radio"
-                      name="age"
-                      value={range}
-                      checked={form.age === range}
-                      onChange={handleChange}
-                      className="form-radio text-amber-600"
-                      required
-                    />
+                  <input
+                    type="radio"
+                    name="age"
+                    value={range}
+                    checked={form.age === range}
+                    onChange={handleChange}
+                    className="form-radio text-amber-600"
+                    required
+                  />
                     <span className="text-sm">{range}</span>
-                  </label>
-                ))}
-              </div>
-              <span className="text-xs text-gray-400">How many years young are you?</span>
+                </label>
+              ))}
             </div>
+            <span className="text-xs text-gray-400">How many years young are you?</span>
+          </div>
 
             {/* Gender Selection */}
-            <div>
-              <label className="block text-gray-700 mb-1">Your Identity</label>
+          <div>
+            <label className="block text-gray-700 mb-1">Your Identity</label>
               <select 
                 name="gender" 
                 value={form.gender} 
@@ -440,15 +440,15 @@ const Signup = () => {
                 className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
                 required
               >
-                <option value="">Select...</option>
-                {genders.map((g) => <option key={g} value={g}>{g}</option>)}
-              </select>
-              <span className="text-xs text-gray-400">Your answer helps us understand our community better.</span>
-            </div>
+              <option value="">Select...</option>
+              {genders.map((g) => <option key={g} value={g}>{g}</option>)}
+            </select>
+            <span className="text-xs text-gray-400">Your answer helps us understand our community better.</span>
+          </div>
 
             {/* Profession Selection */}
-            <div>
-              <label className="block text-gray-700 mb-1">Your Work & Lifestyle</label>
+          <div>
+            <label className="block text-gray-700 mb-1">Your Work & Lifestyle</label>
               <select 
                 name="profession" 
                 value={form.profession} 
@@ -456,13 +456,13 @@ const Signup = () => {
                 className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
                 required
               >
-                <option value="">Select...</option>
-                {professions.map((p) => <option key={p} value={p}>{p}</option>)}
-              </select>
-            </div>
+              <option value="">Select...</option>
+              {professions.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </div>
 
             {/* Location Fields - Country First, Then City */}
-            <div>
+          <div>
               <label className="block text-gray-700 mb-1">Your Location</label>
               <select 
                 name="country" 
@@ -471,9 +471,9 @@ const Signup = () => {
                 className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200 mb-2"
                 required
               >
-                <option value="">Select Country...</option>
-                {countries.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <option value="">Select Country...</option>
+              {countries.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
               <select 
                 name="city" 
                 value={form.city} 
@@ -486,13 +486,13 @@ const Signup = () => {
                   {form.country ? 'Select City...' : 'Select a country first'}
                 </option>
                 {getFilteredCities().map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-              <span className="text-xs text-gray-400">This helps us see local trends in our eco-community.</span>
-            </div>
+            </select>
+            <span className="text-xs text-gray-400">This helps us see local trends in our eco-community.</span>
+          </div>
 
             {/* Household Size Options */}
-            <div>
-              <label className="block text-gray-700 mb-1">Your Tribe at Home</label>
+          <div>
+            <label className="block text-gray-700 mb-1">Your Tribe at Home</label>
               <select 
                 name="household" 
                 value={form.household} 
@@ -503,7 +503,7 @@ const Signup = () => {
                 <option value="">Select household size...</option>
                 {householdSizes.map((size) => <option key={size} value={size}>{size}</option>)}
               </select>
-              <span className="text-xs text-gray-400">Every household is a team effort towards a better planet.</span>
+            <span className="text-xs text-gray-400">Every household is a team effort towards a better planet.</span>
             </div>
 
             {/* Microcopy Reassurance */}
