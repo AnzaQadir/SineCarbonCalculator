@@ -73,7 +73,7 @@ export interface CalculatorState {
   longDistanceTravel: "" | "A" | "B" | "C";
 
   // Food & Diet
-  dietType: "VEGAN" | "VEGETARIAN" | "FLEXITARIAN" | "MEAT_MODERATE" | "MEAT_HEAVY";
+  dietType: "" | "VEGAN" | "VEGETARIAN" | "FLEXITARIAN" | "MEAT_MODERATE" | "MEAT_HEAVY";
   plateProfile: "" | "A" | "B" | "C";
   monthlyDiningOut: "" | "A" | "B" | "C" | "D";
   plantBasedMealsPerWeek: number;
@@ -166,7 +166,7 @@ export const useCalculator = () => {
     longDistanceTravel: '',
 
     // Food & Diet defaults
-    dietType: 'MEAT_MODERATE',
+    dietType: '',
     plateProfile: '',
     monthlyDiningOut: '',
     plantBasedMealsPerWeek: 0,
@@ -278,7 +278,6 @@ export const useCalculator = () => {
 
   const calculateFoodEmissions = () => {
     let emissions = 0;
-    
     // Base diet emissions
     const dietFactors = {
       VEGAN: 1.5,
@@ -287,15 +286,15 @@ export const useCalculator = () => {
       MEAT_MODERATE: 3.0,
       MEAT_HEAVY: 4.5 // Updated for heavy meat consumption
     };
-    
-    emissions += dietFactors[state.dietType] * 365; // Daily emissions * days
-    
+    if (!state.dietType || !(state.dietType in dietFactors)) {
+      return 0;
+    }
+    emissions += dietFactors[state.dietType as keyof typeof dietFactors] * 365; // Daily emissions * days
     // Adjust for plant-based meals
     if (state.plantBasedMealsPerWeek) {
       const plantBasedMeals = state.plantBasedMealsPerWeek;
       emissions *= (1 - (plantBasedMeals / 21) * 0.3); // 30% reduction per plant-based meal
     }
-    
     // Adjust for dining out frequency
     switch (state.monthlyDiningOut) {
       case "A": // <1 a month
@@ -311,7 +310,6 @@ export const useCalculator = () => {
         emissions *= 1.2;
         break;
     }
-    
     return emissions;
   };
 
@@ -423,7 +421,7 @@ export const useCalculator = () => {
       longDistanceTravel: '',
 
       // Food & Diet defaults
-      dietType: 'MEAT_MODERATE',
+      dietType: '',
       plateProfile: '',
       monthlyDiningOut: '',
       plantBasedMealsPerWeek: 0,

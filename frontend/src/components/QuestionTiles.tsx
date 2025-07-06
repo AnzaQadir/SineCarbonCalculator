@@ -5,7 +5,8 @@ import {
   Zap, Leaf, Bus, Bike, Train,
   Apple, Beef, PackageCheck, Recycle,
   Battery, CloudSun, PackageX, ShoppingBag, ShoppingCart, Store,
-  Sun, Cloud, Info, MapPin, Timer, FileText, Shirt, Wrench
+  Sun, Cloud, Info, MapPin, Timer, FileText, Shirt, Wrench,
+  Plane, Truck, Star
 } from 'lucide-react';
 
 interface QuestionTileProps {
@@ -14,41 +15,67 @@ interface QuestionTileProps {
   icon: React.ReactNode;
   title: string;
   description: string;
+  color: string;
 }
+
+const zerrahColors = [
+  'zerrah-red',
+  'zerrah-orange',
+  'zerrah-yellow',
+  'zerrah-lightgreen',
+  'zerrah-green',
+  'zerrah-blue',
+];
 
 const QuestionTile: React.FC<QuestionTileProps> = ({
   selected,
   onClick,
   icon,
   title,
-  description
+  description,
+  color
 }) => {
+  // Ripple effect state
+  const [ripple, setRipple] = React.useState(false);
   return (
     <div
-      onClick={onClick}
+      tabIndex={0}
+      role="button"
+      aria-pressed={selected}
+      onClick={e => {
+        setRipple(true);
+        setTimeout(() => setRipple(false), 400);
+        onClick();
+      }}
+      onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onClick()}
       className={cn(
-        "relative p-6 rounded-xl cursor-pointer transition-all duration-300",
-        "border-2 hover:shadow-lg transform hover:-translate-y-1",
-        selected ? "border-gray-500 bg-gray-50" : "border-gray-200 bg-white hover:border-gray-300"
+        "relative flex flex-col items-center p-8 rounded-3xl cursor-pointer transition-all duration-200 outline-none h-full min-h-[320px]",
+        "border-2 shadow-md hover:shadow-xl hover:-translate-y-1 focus:ring-4",
+        selected
+          ? `${color} bg-opacity-20 border-${color} ring-2 ring-${color}`
+          : "bg-white border-gray-200"
       )}
+      style={{ minWidth: 220, maxWidth: 320 }}
     >
-      <div className="flex flex-col gap-4">
-        <div className={cn(
-          "p-3 rounded-lg w-fit",
-          selected ? "bg-gray-100 text-gray-600" : "bg-gray-100 text-gray-600"
-        )}>
-          {icon}
-        </div>
-        <div>
-          <h3 className="font-semibold text-lg mb-2">{title}</h3>
-          <p className="text-gray-600 text-sm">{description}</p>
-        </div>
-      </div>
-      {selected && (
-        <div className="absolute -top-2 -right-2 p-1 rounded-full bg-gray-500">
-          <Leaf className="h-4 w-4 text-white" />
-        </div>
+      {/* Ripple effect */}
+      {ripple && (
+        <span className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 ${color} opacity-30 rounded-full animate-ping pointer-events-none z-0`} />
       )}
+      <div className={cn(
+        "flex items-center justify-center mb-4 rounded-full transition-all duration-300",
+        selected ? `${color} bg-opacity-30` : `${color} bg-opacity-10`
+      )} style={{ width: 64, height: 64, fontSize: 36, position: 'relative', zIndex: 1 }}>
+        <span className={selected ? `text-${color} transition-colors duration-300` : `text-gray-500 transition-colors duration-300`}>
+          {icon}
+        </span>
+        {selected && (
+          <span className={`absolute -top-2 -right-2 ${color} rounded-full p-1 shadow animate-bounce`}>
+            <svg className="h-4 w-4 text-white animate-scale-in" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 6.293a1 1 0 00-1.414 0L9 12.586l-2.293-2.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" /></svg>
+          </span>
+        )}
+      </div>
+      <h3 className="font-extrabold text-xl text-center mb-1 text-gray-900">{title}</h3>
+      <p className="text-gray-600 text-base text-center leading-snug">{description}</p>
     </div>
   );
 };
@@ -73,13 +100,13 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
           return [
             {
               value: 'A',
-              icon: <Battery className="h-6 w-6" />,
+              icon: <Zap className="h-6 w-6" />,
               title: 'Energy Efficient Home',
               description: 'Smart thermostats, LED lights, and energy-efficient appliances'
             },
             {
               value: 'B',
-              icon: <Zap className="h-6 w-6" />,
+              icon: <Battery className="h-6 w-6" />,
               title: 'Mixed Efficiency',
               description: 'Some energy-efficient features but room for improvement'
             },
@@ -100,13 +127,13 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
             },
             {
               value: 'B',
-              icon: <Zap className="h-6 w-6" />,
+              icon: <Sun className="h-6 w-6" />,
               title: 'Mixed Sources',
               description: 'Combination of renewable and traditional energy'
             },
             {
               value: 'C',
-              icon: <Home className="h-6 w-6" />,
+              icon: <Zap className="h-6 w-6" />,
               title: 'Traditional Grid',
               description: 'Standard utility provider without renewable options'
             }
@@ -133,6 +160,12 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               icon: <Car className="h-6 w-6" />,
               title: 'Personal Vehicle',
               description: 'Primary use of personal car for transport'
+            },
+            {
+              value: 'D',
+              icon: <Plane className="h-6 w-6" />,
+              title: 'Frequent Flyer',
+              description: 'Frequent air travel'
             }
           ];
         } else {
@@ -145,7 +178,7 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
             },
             {
               value: 'B',
-              icon: <Car className="h-6 w-6" />,
+              icon: <Battery className="h-6 w-6" />,
               title: 'Hybrid Vehicle',
               description: 'Hybrid or fuel-efficient vehicle'
             },
@@ -154,6 +187,18 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
               icon: <Car className="h-6 w-6" />,
               title: 'Standard Vehicle',
               description: 'Traditional gasoline/diesel vehicle'
+            },
+            {
+              value: 'D',
+              icon: <Truck className="h-6 w-6" />,
+              title: 'Large Vehicle',
+              description: 'Large or heavy-duty vehicle'
+            },
+            {
+              value: 'E',
+              icon: <Star className="h-6 w-6" />,
+              title: 'Luxury Vehicle',
+              description: 'Luxury or high-end vehicle'
             }
           ];
         }
@@ -648,16 +693,18 @@ export const QuestionTiles: React.FC<QuestionTilesProps> = ({
   const options = getTileOptions();
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {(options || []).map((option) => (
-        <QuestionTile
-          key={option.value}
-          selected={value === option.value}
-          onClick={() => onChange(option.value)}
-          icon={option.icon}
-          title={option.title}
-          description={option.description}
-        />
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-8 w-full">
+      {(options || []).map((option, idx) => (
+        <div key={option.value} className="mx-3 my-4">
+          <QuestionTile
+            selected={value === option.value}
+            onClick={() => onChange(option.value)}
+            icon={option.icon}
+            title={option.title}
+            description={option.description}
+            color={zerrahColors[idx % zerrahColors.length]}
+          />
+        </div>
       ))}
     </div>
   );

@@ -166,3 +166,56 @@
   transform: translateY(-20px);
   transition: opacity 300ms, transform 300ms;
 }
+
+/* Delicate scroll hints */
+@keyframes gentle-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes gentle-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-hint-arrow {
+  animation: gentle-bounce 3s ease-in-out infinite;
+}
+
+.scroll-hint-text {
+  animation: fade-in-up 0.8s ease-out;
+}
+
+.scroll-hint-line {
+  animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+/* Gradient fade effect */
+.gradient-fade {
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.3) 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.3) 60%, transparent 100%);
+}

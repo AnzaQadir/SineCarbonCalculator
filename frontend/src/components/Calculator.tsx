@@ -60,6 +60,18 @@ import { QuestionTiles } from './QuestionTiles';
 import { AgeTiles } from '@/components/AgeTiles';
 import { Country, State, City } from 'country-state-city';
 
+// Section color mapping for Calculator steps
+const sectionColors = [
+  'zerrah-red',      // Home
+  'zerrah-orange',   // Transport
+  'zerrah-yellow',   // Food
+  'zerrah-lightgreen', // Clothing
+  'zerrah-green',    // Waste
+  'zerrah-blue',     // Air Quality
+  'zerrah-deepgreen',// Results
+  'zerrah-deepblue', // Demographics
+];
+
 interface BaseCalculatorState {
   // Demographics
   name: string;
@@ -92,7 +104,7 @@ interface BaseCalculatorState {
   longDistanceTravel: "" | "A" | "B" | "C";
   
   // Food & Diet
-  dietType: "VEGAN" | "VEGETARIAN" | "FLEXITARIAN" | "MEAT_MODERATE" | "MEAT_HEAVY";
+  dietType: "" | "VEGAN" | "VEGETARIAN" | "FLEXITARIAN" | "MEAT_MODERATE" | "MEAT_HEAVY";
   plateProfile: "" | "A" | "B" | "C";
   monthlyDiningOut: "" | "A" | "B" | "C" | "D";
   plantBasedMealsPerWeek: string;
@@ -264,7 +276,7 @@ const Calculator = ({
       weeklyKm: '',
       costPerMile: '',
       longDistanceTravel: '',
-      dietType: 'MEAT_MODERATE',
+      dietType: '',
       plateProfile: '',
       monthlyDiningOut: '',
       plantBasedMealsPerWeek: '',
@@ -374,7 +386,6 @@ const Calculator = ({
 
   const calculateFoodEmissions = () => {
     let emissions = 0;
-    
     // Base diet emissions
     const dietFactors = {
       VEGAN: 1.5,
@@ -383,9 +394,10 @@ const Calculator = ({
       MEAT_MODERATE: 3.0,
       MEAT_HEAVY: 4.5 // Updated for heavy meat consumption
     };
-    
-    emissions += dietFactors[state.dietType] * 365; // Daily emissions * days
-    
+    if (!state.dietType || !(state.dietType in dietFactors)) {
+      return 0;
+    }
+    emissions += dietFactors[state.dietType as keyof typeof dietFactors] * 365; // Daily emissions * days
     // Adjust for plant-based meals
     if (state.plantBasedMealsPerWeek) {
       const plantBasedMeals = parseFloat(state.plantBasedMealsPerWeek);
@@ -393,7 +405,6 @@ const Calculator = ({
         emissions *= (1 - (plantBasedMeals / 21) * 0.3); // 30% reduction per plant-based meal
       }
     }
-    
     // Adjust for dining out frequency
     switch (state.monthlyDiningOut) {
       case "A": // <1 a month
@@ -409,7 +420,6 @@ const Calculator = ({
         emissions *= 1.2;
         break;
     }
-    
     return emissions;
   };
 
@@ -829,7 +839,11 @@ const Calculator = ({
       </CardHeader>
       <CardContent className="space-y-8">
         {/* Home Size Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <Home className="h-5 w-5 text-primary" />
@@ -861,7 +875,11 @@ const Calculator = ({
         </div>
 
         {/* Home Efficiency Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <Zap className="h-5 w-5 text-primary" />
@@ -882,7 +900,11 @@ const Calculator = ({
         </div>
 
         {/* Energy Management Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <Wind className="h-5 w-5 text-primary" />
@@ -922,7 +944,11 @@ const Calculator = ({
       </CardHeader>
       <CardContent className="space-y-8">
         {/* Primary Transport Mode Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <Bus className="h-5 w-5 text-primary" />
@@ -943,7 +969,11 @@ const Calculator = ({
         </div>
 
         {/* Car Profile Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <Car className="h-5 w-5 text-primary" />
@@ -964,7 +994,11 @@ const Calculator = ({
         </div>
 
         {/* Weekly Kilometers Question - Updated */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <MapPin className="h-5 w-5 text-primary" />
@@ -1042,7 +1076,11 @@ const Calculator = ({
       </CardHeader>
       <CardContent className="space-y-8">
         {/* Diet Type Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <Apple className="h-5 w-5 text-primary" />
@@ -1058,12 +1096,16 @@ const Calculator = ({
             category="food"
             subCategory="diet"
             value={state.dietType}
-            onChange={(value) => onUpdate({ dietType: value as "VEGAN" | "VEGETARIAN" | "FLEXITARIAN" | "MEAT_MODERATE" | "MEAT_HEAVY" })}
+            onChange={(value) => onUpdate({ dietType: value as "" | "VEGAN" | "VEGETARIAN" | "FLEXITARIAN" | "MEAT_MODERATE" | "MEAT_HEAVY" })}
           />
         </div>
 
         {/* Plate Profile Question */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <Leaf className="h-5 w-5 text-primary" />
@@ -1084,7 +1126,11 @@ const Calculator = ({
         </div>
 
         {/* Monthly Dining Out Question - Updated */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <Utensils className="h-5 w-5 text-primary" />
@@ -1126,7 +1172,11 @@ const Calculator = ({
       </CardHeader>
       <CardContent className="space-y-8">
         {/* Wardrobe Impact */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <ShoppingBag className="h-5 w-5 text-primary" />
@@ -1154,7 +1204,11 @@ const Calculator = ({
           />
         </div>
         {/* Mindful Upgrades */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <PackageCheck className="h-5 w-5 text-primary" />
@@ -1182,7 +1236,11 @@ const Calculator = ({
           />
         </div>
         {/* Durability */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <Timer className="h-5 w-5 text-primary" />
@@ -1210,7 +1268,11 @@ const Calculator = ({
           />
         </div>
         {/* Consumption Frequency */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <ShoppingCart className="h-5 w-5 text-primary" />
@@ -1236,7 +1298,11 @@ const Calculator = ({
           />
         </div>
         {/* Brand Loyalty */}
-        <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+            <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+          </div>
           <div className="flex items-start gap-4 mb-5">
             <div className="p-2 bg-primary/10 rounded-lg mt-1">
               <Store className="h-5 w-5 text-primary" />
@@ -1286,7 +1352,11 @@ const Calculator = ({
         </CardHeader>
         <CardContent className="space-y-8">
           {/* Waste Prevention Question */}
-          <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+              <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+            </div>
             <div className="flex items-start gap-4 mb-5">
               <div className="p-2 bg-primary/10 rounded-lg mt-1">
                 <PackageX className="h-5 w-5 text-primary" />
@@ -1314,7 +1384,11 @@ const Calculator = ({
           </div>
 
           {/* Smart Shopping Question */}
-          <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+              <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+            </div>
             <div className="flex items-start gap-4 mb-5">
               <div className="p-2 bg-primary/10 rounded-lg mt-1">
                 <ShoppingBag className="h-5 w-5 text-primary" />
@@ -1342,7 +1416,11 @@ const Calculator = ({
           </div>
 
           {/* Daily Waste Question */}
-          <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+              <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+            </div>
             <div className="flex items-start gap-4 mb-5">
               <div className="p-2 bg-primary/10 rounded-lg mt-1">
                 <Trash2 className="h-5 w-5 text-primary" />
@@ -1370,7 +1448,11 @@ const Calculator = ({
           </div>
 
           {/* Waste Management Question */}
-          <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+              <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+            </div>
             <div className="flex items-start gap-4 mb-5">
               <div className="p-2 bg-primary/10 rounded-lg mt-1">
                 <Recycle className="h-5 w-5 text-primary" />
@@ -1398,7 +1480,11 @@ const Calculator = ({
           </div>
 
           {/* Repair or Replace Question - Updated with Sometimes option */}
-          <div className="bg-card border border-border/50 rounded-xl p-6 hover:border-primary/20 transition-colors">
+          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 px-6 py-10 mt-8 mb-12 transition-all duration-300">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="h-1 w-8 bg-emerald-200 rounded-full"></span>
+              <span className="text-sm text-emerald-700 font-semibold uppercase tracking-wide">Choose one</span>
+            </div>
             <div className="flex items-start gap-4 mb-5">
               <div className="p-2 bg-primary/10 rounded-lg mt-1">
                 <Wrench className="h-5 w-5 text-primary" />
@@ -1534,6 +1620,7 @@ const Calculator = ({
   ];
 
   const CurrentStepIcon = steps[currentStep].icon;
+  const currentSectionColor = sectionColors[currentStep] || 'zerrah-green';
 
   const renderStep = () => {
     switch (currentStep) {
@@ -1573,16 +1660,18 @@ const Calculator = ({
     <div 
       id="calculator" 
       className={cn(
-        "w-max mx-auto transition-opacity duration-500 py-10",
+        "max-w-4xl w-full mx-auto transition-opacity duration-500 py-10",
         isVisible ? "opacity-100" : "opacity-0"
       )}
     >
       {!showResults ? (
         <Card variant="elevated">
-          <CardContent className="p-6 w-max" >
+          <CardContent className="p-6 max-w-4xl w-full mx-auto">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
-                <CurrentStepIcon className="h-5 w-5 text-primary" />
+                <span className={`rounded-full p-2 bg-${currentSectionColor} bg-opacity-20`}>
+                  <CurrentStepIcon className={`h-5 w-5 text-${currentSectionColor}`} />
+                </span>
                 <h2 className="text-xl font-semibold">{steps[currentStep].title}</h2>
               </div>
               <div className="text-sm text-muted-foreground">
@@ -1605,17 +1694,20 @@ const Calculator = ({
               {currentStep === steps.length - 1 ? (
                 <Button 
                   onClick={handleCalculate}
-                  className="bg-primary hover:bg-primary/90"
+                  className={`bg-${currentSectionColor} hover:bg-${currentSectionColor}/90 text-white`}
                 >
                   Calculate Impact
                   <Check className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
-                <Button onClick={handleNext}>
+                <Button 
+                  className={`bg-white text-${currentSectionColor} border-2 border-${currentSectionColor} hover:bg-${currentSectionColor}/10`} 
+                  onClick={handleNext}
+                >
                   Next
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-        )}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              )}
             </div>
           </CardContent>
       </Card>
