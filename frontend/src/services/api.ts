@@ -101,4 +101,60 @@ export const calculatePersonality = async (responses: UserResponses): Promise<Pe
     console.error('Error calculating personality:', error);
     throw error;
   }
+};
+
+// User signup interface
+export interface SignupData {
+  email: string;
+  firstName?: string;
+  age?: string;
+  gender?: string;
+  profession?: string;
+  country?: string;
+  city?: string;
+  household?: string;
+  ctaVariant?: 'A' | 'B';
+}
+
+export interface SignupResponse {
+  success: boolean;
+  user: {
+    id: string;
+    email: string;
+    firstName?: string;
+    age?: string;
+    gender?: string;
+    profession?: string;
+    country?: string;
+    city?: string;
+    household?: string;
+    waitlistPosition: number;
+    ctaVariant: 'A' | 'B';
+    createdAt: string;
+    updatedAt: string;
+  };
+  waitlistPosition: number;
+  message: string;
+}
+
+// User signup
+export const signupUser = async (userData: SignupData): Promise<SignupResponse> => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/users/signup`, userData);
+    return response.data;
+  } catch (error) {
+    console.error('Error signing up user:', error);
+    throw error;
+  }
+};
+
+// Join community
+export const joinCommunity = async (userId: string): Promise<any> => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/users/join-community`, { userId });
+    return response.data;
+  } catch (error) {
+    console.error('Error joining community:', error);
+    throw error;
+  }
 }; 

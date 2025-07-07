@@ -10,6 +10,7 @@ const morgan_1 = __importDefault(require("morgan"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const personalityRoutes_1 = require("./routes/personalityRoutes");
 const recommendationRoutes_1 = require("./routes/recommendationRoutes");
+const userRoutes_1 = require("./routes/userRoutes");
 // Load environment variables
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -22,6 +23,7 @@ app.use(express_1.default.json());
 // Routes
 app.use('/api/personality', personalityRoutes_1.personalityRoutes);
 app.use('/api/recommendations', recommendationRoutes_1.recommendationRoutes);
+app.use('/api/users', userRoutes_1.userRoutes);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
