@@ -1,21 +1,50 @@
 import { SignupUserData, User, UserActivity } from '../types/user';
-
-// In-memory storage for demo purposes
-// In production, this would be replaced with a real database
-const users: User[] = [];
-const userActivities: UserActivity[] = [];
+import { User as UserModel, UserActivity as UserActivityModel } from '../models';
 
 export class UserService {
+  /**
+   * Helper function to convert UserModel to User interface
+   */
+  private static convertUserModelToUser(user: any): User {
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      age: user.age,
+      gender: user.gender,
+      profession: user.profession,
+      country: user.country,
+      city: user.city,
+      household: user.household,
+      waitlistPosition: user.waitlistPosition,
+      ctaVariant: (user.ctaVariant || 'A') as 'A' | 'B',
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
+
+  /**
+   * Helper function to convert UserActivityModel to UserActivity interface
+   */
+  private static convertActivityModelToActivity(activity: any): UserActivity {
+    return {
+      id: activity.id,
+      userId: activity.userId,
+      activityType: activity.activityType as 'SIGNUP' | 'EMAIL_SENT' | 'COMMUNITY_JOINED' | 'PROFILE_UPDATED',
+      metadata: activity.metadata,
+      createdAt: activity.createdAt,
+    };
+  }
   /**
    * Create a new user and track signup activity
    */
   static async createUser(userData: SignupUserData): Promise<User> {
-    // Generate waitlist position based on current user count
-    const waitlistPosition = users.length + 1;
+    // Get current user count for waitlist position
+    const userCount = await UserModel.count();
+    const waitlistPosition = userCount + 1;
     
-    // Create user object
-    const user: User = {
-      id: this.generateUserId(),
+    // Create user in database
+    const user = await UserModel.create({
       email: userData.email.toLowerCase(),
       firstName: userData.firstName,
       age: userData.age,
@@ -25,13 +54,8 @@ export class UserService {
       city: userData.city,
       household: userData.household,
       waitlistPosition,
-      ctaVariant: userData.ctaVariant || 'A',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    // Store user
-    users.push(user);
+      ctaVariant: (userData.ctaVariant || 'A') as 'A' | 'B',
+    });
 
     // Track signup activity
     await this.trackUserActivity(user.id, 'SIGNUP', {
@@ -47,7 +71,8 @@ export class UserService {
       }
     });
 
-    return user;
+    // Convert to User interface
+    return this.convertUserModelToUser(user);
   }
 
   /**
@@ -55,73 +80,87 @@ export class UserService {
    */
   static async trackUserActivity(
     userId: string, 
-    activityType: UserActivity['activityType'], 
+    activityType: 'SIGNUP' | 'EMAIL_SENT' | 'COMMUNITY_JOINED' | 'PROFILE_UPDATED', 
     metadata?: Record<string, any>
   ): Promise<UserActivity> {
-    const activity: UserActivity = {
-      id: this.generateActivityId(),
+    const activity = await UserActivityModel.create({
       userId,
       activityType,
       metadata,
-      createdAt: new Date(),
-    };
+    });
 
-    userActivities.push(activity);
-    return activity;
+    return {
+      id: activity.id,
+      userId: activity.userId,
+      activityType: activity.activityType as 'SIGNUP' | 'EMAIL_SENT' | 'COMMUNITY_JOINED' | 'PROFILE_UPDATED',
+      metadata: activity.metadata,
+      createdAt: activity.createdAt,
+    };
   }
 
   /**
    * Get user by email
    */
   static async getUserByEmail(email: string): Promise<User | null> {
-    return users.find(user => user.email === email.toLowerCase()) || null;
+    const user = await UserModel.findOne({ where: { email: email.toLowerCase() } });
+    if (!user) return null;
+
+    return this.convertUserModelToUser(user);
   }
 
   /**
    * Get user by ID
    */
   static async getUserById(id: string): Promise<User | null> {
-    return users.find(user => user.id === id) || null;
+    const user = await UserModel.findByPk(id);
+    if (!user) return null;
+
+    return this.convertUserModelToUser(user);
   }
 
   /**
    * Get all users (for admin purposes)
    */
   static async getAllUsers(): Promise<User[]> {
-    return [...users];
+    const users = await UserModel.findAll({
+      order: [['createdAt', 'DESC']],
+    });
+
+    return users.map(user => this.convertUserModelToUser(user));
   }
 
   /**
    * Get user activities
    */
   static async getUserActivities(userId: string): Promise<UserActivity[]> {
-    return userActivities.filter(activity => activity.userId === userId);
+    const activities = await UserActivityModel.findAll({
+      where: { userId },
+      order: [['createdAt', 'DESC']],
+    });
+
+    return activities.map(activity => this.convertActivityModelToActivity(activity));
   }
 
   /**
    * Get total user count
    */
   static async getUserCount(): Promise<number> {
-    return users.length;
+    return await UserModel.count();
   }
 
   /**
    * Update user profile
    */
   static async updateUser(id: string, updates: Partial<User>): Promise<User | null> {
-    const userIndex = users.findIndex(user => user.id === id);
-    if (userIndex === -1) return null;
+    const user = await UserModel.findByPk(id);
+    if (!user) return null;
 
-    users[userIndex] = {
-      ...users[userIndex],
-      ...updates,
-      updatedAt: new Date(),
-    };
+    await user.update(updates);
 
     // Track profile update activity
     await this.trackUserActivity(id, 'PROFILE_UPDATED', { updates });
 
-    return users[userIndex];
+    return this.convertUserModelToUser(user);
   }
 
   /**
@@ -141,19 +180,5 @@ export class UserService {
       emailType,
       sentAt: new Date().toISOString(),
     });
-  }
-
-  /**
-   * Generate unique user ID
-   */
-  private static generateUserId(): string {
-    return `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * Generate unique activity ID
-   */
-  private static generateActivityId(): string {
-    return `activity_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 } 

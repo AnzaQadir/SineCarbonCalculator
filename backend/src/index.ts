@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { personalityRoutes } from './routes/personalityRoutes';
 import { recommendationRoutes } from './routes/recommendationRoutes';
 import { userRoutes } from './routes/userRoutes';
+import { initializeDatabase } from './models';
 
 // Load environment variables
 dotenv.config();
@@ -42,9 +43,22 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// Start server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+// Initialize database and start server
+const startServer = async () => {
+  try {
+    // Initialize database
+    await initializeDatabase();
+    
+    // Start server
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 export default app; 
