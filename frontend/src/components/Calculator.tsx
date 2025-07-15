@@ -1012,32 +1012,48 @@ const Calculator = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Button
-              variant={state.weeklyKm === "50" ? "default" : "outline"}
-              className="h-20 flex flex-col items-center justify-center gap-1"
+              variant="outline"
+              className={`h-20 flex flex-col items-center justify-center gap-1 border-2 transition-colors duration-200 ${
+                state.weeklyKm === "50"
+                  ? "bg-green-100 border-green-300 text-green-800"
+                  : "bg-white border-green-300 text-green-700 hover:bg-green-50"
+              }`}
               onClick={() => onUpdate({ weeklyKm: "50" })}
             >
               <span className="font-medium">Light</span>
               <span className="text-sm text-muted-foreground">~50 km/week</span>
             </Button>
             <Button
-              variant={state.weeklyKm === "100" ? "default" : "outline"}
-              className="h-20 flex flex-col items-center justify-center gap-1"
+              variant="outline"
+              className={`h-20 flex flex-col items-center justify-center gap-1 border-2 transition-colors duration-200 ${
+                state.weeklyKm === "100"
+                  ? "bg-blue-100 border-blue-300 text-blue-800"
+                  : "bg-white border-blue-300 text-blue-700 hover:bg-blue-50"
+              }`}
               onClick={() => onUpdate({ weeklyKm: "100" })}
             >
               <span className="font-medium">Moderate</span>
               <span className="text-sm text-muted-foreground">~100 km/week</span>
             </Button>
             <Button
-              variant={state.weeklyKm === "200" ? "default" : "outline"}
-              className="h-20 flex flex-col items-center justify-center gap-1"
+              variant="outline"
+              className={`h-20 flex flex-col items-center justify-center gap-1 border-2 transition-colors duration-200 ${
+                state.weeklyKm === "200"
+                  ? "bg-yellow-100 border-yellow-300 text-yellow-800"
+                  : "bg-white border-yellow-300 text-yellow-700 hover:bg-yellow-50"
+              }`}
               onClick={() => onUpdate({ weeklyKm: "200" })}
             >
               <span className="font-medium">Regular</span>
               <span className="text-sm text-muted-foreground">~200 km/week</span>
             </Button>
             <Button
-              variant={state.weeklyKm === "300" ? "default" : "outline"}
-              className="h-20 flex flex-col items-center justify-center gap-1"
+              variant="outline"
+              className={`h-20 flex flex-col items-center justify-center gap-1 border-2 transition-colors duration-200 ${
+                state.weeklyKm === "300"
+                  ? "bg-orange-100 border-orange-300 text-orange-800"
+                  : "bg-white border-orange-300 text-orange-700 hover:bg-orange-50"
+              }`}
               onClick={() => onUpdate({ weeklyKm: "300" })}
             >
               <span className="font-medium">Frequent</span>

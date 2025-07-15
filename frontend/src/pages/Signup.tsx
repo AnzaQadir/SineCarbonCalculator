@@ -274,9 +274,9 @@ const Signup = () => {
       
       // Store user ID for community join functionality
       localStorage.setItem('zerrah_user_id', response.user.id);
-      
-      setIsLoading(false);
-      setIsSuccess(true);
+    
+    setIsLoading(false);
+    setIsSuccess(true);
     } catch (error) {
       console.error('Signup error:', error);
       setIsLoading(false);
