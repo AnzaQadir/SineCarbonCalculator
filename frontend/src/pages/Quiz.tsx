@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import Calculator from '@/components/Calculator';
 import { useCalculator } from '@/hooks/useCalculator';
@@ -8,6 +7,18 @@ import ResultsDisplay from '@/components/ResultsDisplay';
 import { calculatePersonality } from '@/services/api';
 import type { PersonalityResponse } from '@/services/api';
 import type { UserResponses } from '@/services/api';
+import { personalityQuestions } from '@/data/personalityQuestions';
+
+// Add a type for questions
+interface Question {
+  key: string;
+  header: string;
+  icon: string;
+  question: string;
+  type: string;
+  options?: { value: string; label: string }[];
+  placeholder?: string;
+}
 
 const pastel = {
   lavender: '#E6E6F7',
@@ -243,7 +254,13 @@ function transformStateToApiFormat(state: any): UserResponses {
   };
 }
 
-function getSectionInfo(key: string) {
+function getSectionInfo(key: string, type?: string) {
+  if (type === 'personality') {
+    return {
+      title: 'YOU AND BOBO',
+      sub: 'A few fun questions to get to know you and Bobo the Panda!'
+    };
+  }
   if ([
     'homeSize', 'homeEfficiency', 'energyManagement',
   ].includes(key)) {
@@ -316,8 +333,14 @@ function PoeticJourneyQuiz() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Expanded questions array covering all Calculator questions
-  const questions = [
+  // Combine personality questions and main questions
+  const questions: Question[] = [
+    ...personalityQuestions.map(q => ({
+      ...q,
+      type: 'personality',
+      header: 'Personality Insights',
+      icon: q.icon,
+    })),
     // --- Home Energy ---
     {
       key: 'homeSize',
@@ -885,11 +908,13 @@ function PoeticJourneyQuiz() {
   }
 
   const q = questions[step];
-  const section = getSectionInfo(q.key);
+  const section = getSectionInfo(q.key, q.type);
 
   // Determine background image based on question section
   let backgroundImage = '/images/home_background.png';
-  if ([
+  if (q.type === 'personality') {
+    backgroundImage = '/images/panda_bg.png';
+  } else if ([
     'primaryTransportMode', 'carProfile', 'weeklyKm', 'longDistanceTravel'
   ].includes(q.key)) {
     backgroundImage = '/images/transport.background.png';
@@ -1009,7 +1034,12 @@ function PoeticJourneyQuiz() {
         </div>
         {/* Question */}
         <div className="flex flex-col items-center mb-6">
-          <span style={{ fontSize: 48 }}>{q.icon}</span>
+          {q.type === 'personality' ? (
+            // Panda GIF with 2s pause after each loop
+            <PandaGifWithDelay />
+          ) : (
+            <span style={{ fontSize: 48 }}>{q.icon}</span>
+          )}
           <div className="text-2xl md:text-3xl font-serif text-[#7A8B7A] text-center mt-4 mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 500 }}>{q.question}</div>
         </div>
         <div className="flex flex-wrap justify-center gap-4 mb-8">
@@ -1086,40 +1116,19 @@ function PoeticJourneyQuiz() {
                 );
               }
             })()
-          ) : q.key === 'country' ? (
-            <select
-              value={getNestedValue(answers, q.key) || ''}
-              onChange={e => handleSelect(q.key, e.target.value)}
-              className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md bg-white appearance-none transition-colors duration-200 hover:border-[#A7D58E]"
-              style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.25rem 1.25rem', paddingRight: '3rem' }}
-            >
-              <option value="" disabled>Enter your country</option>
-              <option value="United States">United States</option>
-              <option value="Canada">Canada</option>
-              <option value="United Kingdom">United Kingdom</option>
-              <option value="Australia">Australia</option>
-              <option value="India">India</option>
-              <option value="Pakistan">Pakistan</option>
-              <option value="United Arab Emirates">United Arab Emirates</option>
-              <option value="Saudi Arabia">Saudi Arabia</option>
-              <option value="Germany">Germany</option>
-              <option value="France">France</option>
-              <option value="Brazil">Brazil</option>
-              <option value="Japan">Japan</option>
-              <option value="China">China</option>
-              <option value="South Africa">South Africa</option>
-              <option value="Turkey">Turkey</option>
-              <option value="Indonesia">Indonesia</option>
-              <option value="Bangladesh">Bangladesh</option>
-              <option value="Nigeria">Nigeria</option>
-              <option value="Mexico">Mexico</option>
-              <option value="Russia">Russia</option>
-              <option value="Egypt">Egypt</option>
-              <option value="Argentina">Argentina</option>
-              <option value="Italy">Italy</option>
-              <option value="Spain">Spain</option>
-              <option value="Other">Other</option>
-            </select>
+          ) : q.type === 'personality' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {q.options?.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => handleSelect(q.key, opt.value)}
+                  className={`rounded-xl px-8 py-4 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
+                  style={{ minWidth: 140 }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           ) : Array.isArray(q.options) ? (
             q.options.map((opt) => (
               <button
@@ -1188,3 +1197,34 @@ function PoeticJourneyQuiz() {
 }
 
 export default Quiz; 
+
+// PandaGifWithDelay: Shows a looping GIF with a 2s pause after each loop
+import React, { useRef, useEffect, useState } from 'react';
+const PANDA_GIF_URL = '/gif/panda.gif';
+const GIF_DURATION_MS = 2000; // Set this to the actual duration of your GIF in ms
+const PAUSE_MS = 2000; // 2s pause
+
+function PandaGifWithDelay() {
+  const [key, setKey] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // After GIF_DURATION_MS, pause for PAUSE_MS, then reload the GIF
+    timeoutRef.current = setTimeout(() => {
+      setKey(k => k + 1); // Force <img> reload
+    }, GIF_DURATION_MS + PAUSE_MS);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [key]);
+
+  return (
+    <img
+      key={key}
+      src={PANDA_GIF_URL}
+      alt="Panda GIF"
+      className="h-48 w-48 mx-auto mb-2 rounded-full object-cover border-4 border-yellow-200 shadow-lg"
+      style={{ objectFit: 'contain' }}
+    />
+  );
+} 

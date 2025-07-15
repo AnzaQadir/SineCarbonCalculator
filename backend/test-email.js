@@ -9,8 +9,8 @@ async function testEmailService() {
     // Test 1: Signup with email
     console.log('1️⃣ Testing signup with email notification...');
     const signupData = {
-      email: 'test-email@example.com',
-      firstName: 'Alice',
+      email: 'anzaqadir123@gmail.com',
+      firstName: 'Anza',
       age: '25-30',
       gender: 'Female',
       profession: 'Education (Teacher, Lecturer, Academic)',

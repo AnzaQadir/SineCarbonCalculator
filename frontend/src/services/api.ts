@@ -101,7 +101,7 @@ export const calculatePersonality = async (responses: UserResponses): Promise<Pe
     console.error('Error calculating personality:', error);
     throw error;
   }
-};
+}; 
 
 // User signup interface
 export interface SignupData {
