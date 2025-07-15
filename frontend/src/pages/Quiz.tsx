@@ -1035,8 +1035,7 @@ function PoeticJourneyQuiz() {
         {/* Question */}
         <div className="flex flex-col items-center mb-6">
           {q.type === 'personality' ? (
-            // Panda GIF with 2s pause after each loop
-            <PandaGifWithDelay />
+            <PandaGifWithDelay gifUrl={step % 2 === 0 ? '/gif/joyful_panda.gif' : '/gif/panda.gif'} />
           ) : (
             <span style={{ fontSize: 48 }}>{q.icon}</span>
           )}
@@ -1204,7 +1203,7 @@ const PANDA_GIF_URL = '/gif/panda.gif';
 const GIF_DURATION_MS = 2000; // Set this to the actual duration of your GIF in ms
 const PAUSE_MS = 2000; // 2s pause
 
-function PandaGifWithDelay() {
+function PandaGifWithDelay({ gifUrl }: { gifUrl: string }) {
   const [key, setKey] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -1219,12 +1218,19 @@ function PandaGifWithDelay() {
   }, [key]);
 
   return (
-    <img
-      key={key}
-      src={PANDA_GIF_URL}
-      alt="Panda GIF"
-      className="h-48 w-48 mx-auto mb-2 rounded-full object-cover border-4 border-yellow-200 shadow-lg"
-      style={{ objectFit: 'contain' }}
-    />
+    <div className="mx-auto mb-2 flex items-center justify-center" style={{ width: '12rem', height: '12rem' }}>
+      <div
+        className="rounded-full overflow-hidden border-4 border-yellow-200 shadow-lg flex items-center justify-center"
+        style={{ width: '12rem', height: '12rem', background: '#fff' }}
+      >
+        <img
+          key={key}
+          src={gifUrl}
+          alt="Panda GIF"
+          className="w-full h-full object-cover"
+          style={{ display: 'block' }}
+        />
+      </div>
+    </div>
   );
 } 
