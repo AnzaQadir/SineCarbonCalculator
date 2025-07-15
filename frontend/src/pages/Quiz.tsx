@@ -325,6 +325,9 @@ function PoeticJourneyQuiz() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [showScrollHint, setShowScrollHint] = useState(false);
 
+  // NEW: Collect personality traits in a separate object
+  const [personalityTraits, setPersonalityTraits] = useState<any>({});
+
   // Show scroll hint after 3 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -821,6 +824,10 @@ function PoeticJourneyQuiz() {
 
   function handleSelect(key: string, value: string) {
     console.log('handleSelect', 'key:', key, 'value:', value);
+    // If this is a personality question, update personalityTraits
+    if (personalityQuestions.some(q => q.key === key)) {
+      setPersonalityTraits((prev: any) => ({ ...prev, [key]: value }));
+    }
     if (key.includes('.')) {
       setAnswers((prev: any) => setNestedValue({ ...prev }, key, value));
       updateCalculator(setNestedValue({ ...state }, key, value));
@@ -852,7 +859,10 @@ function PoeticJourneyQuiz() {
     setLoadingResults(true);
     setApiError(null);
     try {
-      const apiPayload = transformStateToApiFormat(answers);
+      const apiPayload = {
+        ...transformStateToApiFormat(answers),
+        personalityTraits // <-- include the traits in the payload
+      };
       const apiResults = await calculatePersonality(apiPayload);
       setResults(apiResults);
       setShowResults(true);

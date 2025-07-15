@@ -67,6 +67,21 @@ export interface UserResponses {
     consumptionFrequency?: 'A' | 'B' | 'C' | 'D' | '';
     brandLoyalty?: 'A' | 'B' | 'C' | 'D' | '';
   };
+
+  // Personality Traits (NEW)
+  personalityTraits?: {
+    relationshipWithChange?: string;
+    decisionMaking?: string;
+    motivation?: string;
+    ecoIdentity?: string;
+    opennessToLearning?: string;
+    socialInfluence?: string;
+    emotionalConnection?: string;
+    barriers?: string;
+    goalSetting?: string;
+    selfEfficacy?: string;
+    [key: string]: string | undefined;
+  };
 }
 
 export interface PersonalityResponse {
@@ -91,6 +106,19 @@ export interface PersonalityResponse {
   };
   finalScore: number;
   powerMoves: string[];
+  personalityTraits?: {
+    relationshipWithChange?: string;
+    decisionMaking?: string;
+    motivation?: string;
+    ecoIdentity?: string;
+    opennessToLearning?: string;
+    socialInfluence?: string;
+    emotionalConnection?: string;
+    barriers?: string;
+    goalSetting?: string;
+    selfEfficacy?: string;
+    [key: string]: string | undefined;
+  };
 }
 
 export const calculatePersonality = async (responses: UserResponses): Promise<PersonalityResponse> => {

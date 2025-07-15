@@ -63,6 +63,21 @@ interface UserResponses {
     consumptionFrequency?: 'A' | 'B' | 'C' | 'D' | '';
     brandLoyalty?: 'A' | 'B' | 'C' | 'D' | '';
   };
+
+  // Personality Traits (NEW)
+  personalityTraits?: {
+    relationshipWithChange?: string;
+    decisionMaking?: string;
+    motivation?: string;
+    ecoIdentity?: string;
+    opennessToLearning?: string;
+    socialInfluence?: string;
+    emotionalConnection?: string;
+    barriers?: string;
+    goalSetting?: string;
+    selfEfficacy?: string;
+    [key: string]: string | undefined;
+  };
 }
 
 interface CategoryScore {
@@ -110,6 +125,19 @@ interface PersonalityResponse {
   impactMetrics: ImpactMetrics;
   finalScore: number;
   powerMoves: string[];
+  personalityTraits?: {
+    relationshipWithChange?: string;
+    decisionMaking?: string;
+    motivation?: string;
+    ecoIdentity?: string;
+    opennessToLearning?: string;
+    socialInfluence?: string;
+    emotionalConnection?: string;
+    barriers?: string;
+    goalSetting?: string;
+    selfEfficacy?: string;
+    [key: string]: string | undefined;
+  };
 }
 
 export class PersonalityService {
@@ -639,7 +667,9 @@ export class PersonalityService {
       categoryScores: scores.categoryScores,
       impactMetrics,
       finalScore: scores.finalScore,
-      powerMoves
+      powerMoves,
+      // Return personalityTraits if present in input
+      ...(responses.personalityTraits ? { personalityTraits: responses.personalityTraits } : {})
     };
     
     console.log('Final response:', response);
