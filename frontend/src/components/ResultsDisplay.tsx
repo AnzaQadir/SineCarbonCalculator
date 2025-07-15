@@ -256,7 +256,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   recommendations,
   isVisible,
   onReset,
-  state,
+  state: _state,
   gender
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -282,6 +282,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const journeyRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { setQuizResults } = useQuizStore();
+  // Always use the persisted quizAnswers from the store
+  const quizAnswers = useQuizStore(s => s.quizAnswers);
+  const state = quizAnswers || _state;
   // Debug: Log all props and key state
   console.log('ResultsDisplay props:', { score, emissions, categoryEmissions, recommendations, isVisible, state });
   console.log('DynamicPersonality at top of render:', dynamicPersonality);
@@ -599,56 +602,38 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // Function to transform state to API format
   const transformStateToApiFormat = (state: State): UserResponses => {
     return {
-      homeEnergy: {
-        efficiency: (state.homeEfficiency || '') as 'A' | 'B' | 'C' | '',
-        management: (state.energyManagement || '') as 'A' | 'B' | 'C' | '',
-        homeScale: (state.homeScale || '') as '1' | '2' | '3' | '4' | '5' | '6' | '7+',
-      },
-      transport: {
-        primary: (state.primaryTransportMode || '') as 'A' | 'B' | 'C' | 'D' | '',
-        carProfile: (state.carProfile || '') as 'A' | 'B' | 'C' | 'D' | 'E' | '',
-        longDistance: (state.longDistance || '') as 'A' | 'B' | 'C' | 'D' | 'E',
-      },
-      food: {
-        dietType: (
-          state.dietType === "VEGAN" ? "PLANT_BASED" :
-          state.dietType === "VEGETARIAN" ? "VEGETARIAN" :
-          state.dietType === "FLEXITARIAN" ? "FLEXITARIAN" :
-          state.dietType === "MEAT_MODERATE" ? "MODERATE_MEAT" :
-          undefined
-        ) as 'PLANT_BASED' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MODERATE_MEAT' | undefined,
-        foodSource: (
-          state.plateProfile === "A" ? "LOCAL_SEASONAL" :
-          state.plateProfile === "B" ? "MIXED" :
-          state.plateProfile === "C" ? "CONVENTIONAL" :
-          undefined
-        ) as 'LOCAL_SEASONAL' | 'MIXED' | 'CONVENTIONAL' | undefined,
-        diningStyle: (
-          state.diningStyle === "A" ? "HOME_COOKED" :
-          state.diningStyle === "B" ? "BALANCED" :
-          state.diningStyle === "C" ? "FREQUENT_DINE_OUT" :
-          undefined
-        ) as 'HOME_COOKED' | 'BALANCED' | 'FREQUENT_DINE_OUT' | undefined,
-        plantBasedMealsPerWeek: state.plantBasedMealsPerWeek ? parseInt(state.plantBasedMealsPerWeek) : undefined
-      },
-      waste: {
-        prevention: (state.waste?.prevention || '') as 'A' | 'B' | 'C' | 'D' | '',
-        management: (state.waste?.management || '') as 'A' | 'B' | 'C' | '',
-        smartShopping: (state.waste?.smartShopping || '') as 'A' | 'B' | 'C',
-        dailyWaste: (state.waste?.dailyWaste || '') as 'A' | 'B' | 'C' | 'D',
-        repairOrReplace: Boolean(state.waste?.repairOrReplace),
-      },
-      airQuality: {
-        monitoring: (state.airQuality?.monitoring || '') as 'A' | 'B' | 'C' | 'D' | '',
-        impact: (state.airQuality?.impact || '') as 'A' | 'B' | 'C' | 'D' | '',
-      },
-      clothing: {
-        wardrobeImpact: state.clothing?.wardrobeImpact || undefined,
-        mindfulUpgrades: state.clothing?.mindfulUpgrades || undefined,
-        durability: state.clothing?.durability || undefined,
-        consumptionFrequency: state.clothing?.consumptionFrequency || undefined,
-        brandLoyalty: state.clothing?.brandLoyalty || undefined
-      },
+      // Home Energy
+      homeEfficiency: state.homeEfficiency as '' | 'A' | 'B' | 'C' | undefined,
+      energyManagement: state.energyManagement as '' | 'A' | 'B' | 'C' | undefined,
+      // Transportation
+      primaryTransportMode: state.primaryTransportMode as '' | 'A' | 'B' | 'C' | 'D' | undefined,
+      carProfile: state.carProfile as '' | 'A' | 'B' | 'C' | 'D' | 'E' | undefined,
+      longDistanceTravel: state.longDistance as '' | 'A' | 'B' | 'C' | undefined,
+      // Food & Diet
+      dietType: state.dietType as 'VEGAN' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MEAT_MODERATE' | 'MEAT_HEAVY' | undefined,
+      plateProfile: state.plateProfile as '' | 'A' | 'B' | 'C' | undefined,
+      plantBasedMealsPerWeek: state.plantBasedMealsPerWeek,
+      // Waste
+      waste: state.waste ? {
+        prevention: state.waste.prevention as '' | 'A' | 'B' | 'C' | 'D' | undefined,
+        management: state.waste.management as '' | 'A' | 'B' | 'C' | undefined,
+        smartShopping: state.waste.smartShopping as '' | 'A' | 'B' | 'C' | undefined,
+        dailyWaste: state.waste.dailyWaste as '' | 'A' | 'B' | 'C' | 'D' | undefined,
+        repairOrReplace: typeof state.waste.repairOrReplace === 'string' ? state.waste.repairOrReplace as '' | 'A' | 'B' | 'C' | undefined : '',
+      } : undefined,
+      // Air Quality
+      airQuality: state.airQuality ? {
+        aqiMonitoring: state.airQuality.monitoring as '' | 'A' | 'B' | 'C' | 'D' | undefined,
+        airQualityImpact: state.airQuality.impact as '' | 'A' | 'B' | 'C' | 'D' | undefined,
+      } : undefined,
+      // Clothing
+      clothing: state.clothing ? {
+        wardrobeImpact: state.clothing.wardrobeImpact as '' | 'A' | 'B' | 'C' | undefined,
+        mindfulUpgrades: state.clothing.mindfulUpgrades as '' | 'A' | 'B' | 'C' | undefined,
+        durability: state.clothing.durability as '' | 'A' | 'B' | 'C' | undefined,
+        consumptionFrequency: state.clothing.consumptionFrequency as '' | 'A' | 'B' | 'C' | 'D' | undefined,
+        brandLoyalty: state.clothing.brandLoyalty as '' | 'A' | 'B' | 'C' | 'D' | undefined,
+      } : undefined,
     };
   };
 
@@ -662,7 +647,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       setError(null);
 
       const apiResponses = transformStateToApiFormat(state);
-      const result = await calculatePersonality(apiResponses);
+      // If quizAnswers includes personalityTraits, include them in the payload
+      const payload = quizAnswers && quizAnswers.personalityTraits
+        ? { ...apiResponses, personalityTraits: quizAnswers.personalityTraits }
+        : apiResponses;
+      const result = await calculatePersonality(payload);
 
       // Map the API response to the expected format
       setDynamicPersonality({

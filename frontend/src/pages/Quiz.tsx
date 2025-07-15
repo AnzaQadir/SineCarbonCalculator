@@ -8,6 +8,7 @@ import { calculatePersonality } from '@/services/api';
 import type { PersonalityResponse } from '@/services/api';
 import type { UserResponses } from '@/services/api';
 import { personalityQuestions } from '@/data/personalityQuestions';
+import { useQuizStore } from '@/stores/quizStore';
 
 // Add a type for questions
 interface Question {
@@ -324,9 +325,9 @@ function PoeticJourneyQuiz() {
   const [loadingResults, setLoadingResults] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [showScrollHint, setShowScrollHint] = useState(false);
-
   // NEW: Collect personality traits in a separate object
   const [personalityTraits, setPersonalityTraits] = useState<any>({});
+  const setQuizAnswers = useQuizStore(state => state.setQuizAnswers);
 
   // Show scroll hint after 3 seconds
   useEffect(() => {
@@ -863,6 +864,7 @@ function PoeticJourneyQuiz() {
         ...transformStateToApiFormat(answers),
         personalityTraits // <-- include the traits in the payload
       };
+      setQuizAnswers(apiPayload); // Persist the full answers in the store
       const apiResults = await calculatePersonality(apiPayload);
       setResults(apiResults);
       setShowResults(true);
