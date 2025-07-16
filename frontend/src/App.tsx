@@ -12,6 +12,7 @@ import InviteScreen from '@/pages/InviteScreen';
 import ReflectionScreen from './pages/ReflectionScreen';
 import Signup from './pages/Signup';
 import Quiz from './pages/Quiz';
+import { Analytics } from '@vercel/analytics/react';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ function App() {
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
+      <Analytics />
     </StrictMode>
   );
 }
