@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { signupUser, joinCommunity, SignupData } from '@/services/api';
+import ChatSignup from '@/components/ChatSignup';
 
 // A/B Test variants
 const CTA_VARIANTS = {
@@ -186,103 +187,9 @@ const householdSizes = [
 ];
 
 const Signup = () => {
-  const [form, setForm] = useState({
-    email: '',
-    firstName: '',
-    age: '',
-    gender: '',
-    profession: '',
-    country: '',
-    city: '',
-    household: '',
-  });
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [emailValid, setEmailValid] = useState<boolean | null>(null);
-  const [ctaVariant, setCtaVariant] = useState<'A' | 'B'>('A');
   const [waitlistPosition, setWaitlistPosition] = useState(0);
-
-  // A/B Test: Randomly assign variant on component mount
-  useEffect(() => {
-    setCtaVariant(Math.random() > 0.5 ? 'A' : 'B');
-    // Simulate waitlist position
-    setWaitlistPosition(Math.floor(Math.random() * 1000) + 1);
-  }, []);
-
-  // Email validation
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-    return emailRegex.test(email);
-  };
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const email = e.target.value;
-    setForm({ ...form, email });
-    
-    if (email.length > 0) {
-      setEmailValid(validateEmail(email));
-    } else {
-      setEmailValid(null);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    
-    // If country is changed, reset city and update form
-    if (name === 'country') {
-      setForm({ ...form, country: value, city: '' });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
-  };
-
-  // Get filtered cities based on selected country
-  const getFilteredCities = () => {
-    if (!form.country) return [];
-    return citiesByCountry[form.country] || [];
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    if (!validateEmail(form.email)) {
-      return;
-    }
-
-    setIsLoading(true);
-    
-    try {
-      // Prepare signup data
-      const signupData: SignupData = {
-        email: form.email,
-        firstName: form.firstName,
-        age: form.age,
-        gender: form.gender,
-        profession: form.profession,
-        country: form.country,
-        city: form.city,
-        household: form.household,
-        ctaVariant: ctaVariant,
-      };
-
-      // Call signup API
-      const response = await signupUser(signupData);
-      
-      // Update waitlist position from API response
-      setWaitlistPosition(response.waitlistPosition);
-      
-      // Store user ID for community join functionality
-      localStorage.setItem('zerrah_user_id', response.user.id);
-    
-    setIsLoading(false);
-    setIsSuccess(true);
-    } catch (error) {
-      console.error('Signup error:', error);
-      setIsLoading(false);
-      // Handle error (you might want to show an error message)
-    }
-  };
 
   // Success confirmation screen
   if (isSuccess) {
@@ -296,12 +203,10 @@ const Signup = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            
             <h1 className="text-3xl font-bold text-amber-800">Congratulations!</h1>
             <p className="text-gray-600 text-lg">
               You're on the Zerrah waiting list. We'll send you an invite as soon as we launch.
             </p>
-            
             {/* Waitlist Position */}
             <div className="bg-amber-50 rounded-lg p-4">
               <p className="text-amber-800 font-semibold">
@@ -309,7 +214,6 @@ const Signup = () => {
               </p>
               <p className="text-amber-600 text-sm">We're launching soon!</p>
             </div>
-
             {/* Share Buttons */}
             <div className="space-y-3">
               <p className="text-gray-600 font-medium">Share the good news!</p>
@@ -340,7 +244,6 @@ const Signup = () => {
                 </button>
               </div>
             </div>
-
             {/* Progressive Engagement */}
             <div className="border-t pt-6 space-y-4">
               <p className="text-gray-600">Stay connected while you wait:</p>
@@ -385,205 +288,35 @@ const Signup = () => {
     );
   }
 
+  // Conversational signup flow
   return (
     <Layout>
-      <div className="min-h-[calc(100vh-160px)] flex items-center justify-center bg-gradient-to-br from-white to-emerald-50 py-12 px-4">
-        <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 space-y-6">
-          {/* Hero Header */}
-          <div className="text-center space-y-3">
-            <div className="relative flex items-center justify-center mx-auto" style={{ width: 96, height: 96 }}>
-              {/* Glowing animated ring */}
-              <span className="absolute inline-block w-full h-full rounded-full bg-amber-100 animate-pulse opacity-70"></span>
-              {/* Icon with shadow */}
-              <div className="relative z-10 w-20 h-20 bg-amber-200 rounded-full flex items-center justify-center shadow-lg border-4 border-amber-300">
-                <img
-                  src="/images/particles.png"
-                  alt="Zerrah particles"
-                  className="w-16 h-16 object-contain"
-                />
-              </div>
-            </div>
-            <h1 className="text-4xl font-bold text-amber-800 mt-2">Join Zerrah</h1>
-            <p className="text-lg text-gray-600">Small actions, big impact</p>
-            <div className="text-amber-700 font-semibold text-base mt-1">Your Climate Impact Starts Here</div>
-          </div>
-
-          {/* Enhanced Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <input
-                name="firstName"
-                type="text"
-                placeholder="First name (optional)"
-                value={form.firstName}
-                onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
-              />
-            </div>
-            
-            <div className="relative">
-              <input
-                name="email"
-                type="email"
-                placeholder="Enter your email"
-                value={form.email}
-                onChange={handleEmailChange}
-                className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-amber-400 focus:border-transparent ${
-                  emailValid === null 
-                    ? 'border-gray-200' 
-                    : emailValid 
-                    ? 'border-green-300 bg-green-50' 
-                    : 'border-red-300 bg-red-50'
-                }`}
-                required
-              />
-              
-              {/* Inline Validation */}
-              {emailValid !== null && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  {emailValid ? (
-                    <span className="text-green-500 text-xl">✔️</span>
-                  ) : (
-                    <span className="text-red-500 text-xl">❌</span>
-                  )}
-                </div>
-              )}
-              
-              {emailValid === false && (
-                <p className="text-red-500 text-sm mt-1">That doesn't look right</p>
-              )}
-            </div>
-
-            {/* Age Selection */}
-          <div>
-            <label className="block text-gray-700 mb-1">Your Age</label>
-            <div className="flex flex-wrap gap-2">
-              {ageRanges.map((range) => (
-                  <label key={range} className="flex items-center space-x-2 p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-                  <input
-                    type="radio"
-                    name="age"
-                    value={range}
-                    checked={form.age === range}
-                    onChange={handleChange}
-                    className="form-radio text-amber-600"
-                    required
-                  />
-                    <span className="text-sm">{range}</span>
-                </label>
-              ))}
-            </div>
-            <span className="text-xs text-gray-400">How many years young are you?</span>
-          </div>
-
-            {/* Gender Selection */}
-          <div>
-            <label className="block text-gray-700 mb-1">Your Identity</label>
-              <select 
-                name="gender" 
-                value={form.gender} 
-                onChange={handleChange} 
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
-                required
-              >
-              <option value="">Select...</option>
-              {genders.map((g) => <option key={g} value={g}>{g}</option>)}
-            </select>
-            <span className="text-xs text-gray-400">Your answer helps us understand our community better.</span>
-          </div>
-
-            {/* Profession Selection */}
-          <div>
-            <label className="block text-gray-700 mb-1">Your Work & Lifestyle</label>
-              <select 
-                name="profession" 
-                value={form.profession} 
-                onChange={handleChange} 
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
-                required
-              >
-              <option value="">Select...</option>
-              {professions.map((p) => <option key={p} value={p}>{p}</option>)}
-            </select>
-          </div>
-
-            {/* Location Fields - Country First, Then City */}
-          <div>
-              <label className="block text-gray-700 mb-1">Your Location</label>
-              <select 
-                name="country" 
-                value={form.country} 
-                onChange={handleChange} 
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200 mb-2"
-                required
-              >
-              <option value="">Select Country...</option>
-              {countries.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-              <select 
-                name="city" 
-                value={form.city} 
-                onChange={handleChange} 
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
-                required
-                disabled={!form.country}
-              >
-                <option value="">
-                  {form.country ? 'Select City...' : 'Select a country first'}
-                </option>
-                {getFilteredCities().map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <span className="text-xs text-gray-400">This helps us see local trends in our eco-community.</span>
-          </div>
-
-            {/* Household Size Options */}
-          <div>
-            <label className="block text-gray-700 mb-1">Your Tribe at Home</label>
-              <select 
-                name="household" 
-                value={form.household} 
-                onChange={handleChange} 
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
-                required
-              >
-                <option value="">Select household size...</option>
-                {householdSizes.map((size) => <option key={size} value={size}>{size}</option>)}
-              </select>
-            <span className="text-xs text-gray-400">Every household is a team effort towards a better planet.</span>
-            </div>
-
-            {/* Microcopy Reassurance */}
-            <p className="text-xs text-gray-500 text-center">
-              No spam—just gentle updates on your climate story
-            </p>
-
-            {/* CTA Button with Loading State */}
-            <button
-              type="submit"
-              disabled={!emailValid || isLoading}
-              className={`w-full py-3 px-6 rounded-full font-bold text-lg transition-all duration-300 transform ${
-                isLoading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-amber-600 hover:bg-amber-700 hover:scale-105 active:scale-95'
-              } text-white shadow-lg`}
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Joining...
-                </div>
-              ) : (
-                CTA_VARIANTS[ctaVariant]
-              )}
-            </button>
-          </form>
-
-          {/* A/B Test Tracking */}
-          <div className="text-xs text-gray-400 text-center">
-            Testing variant: {ctaVariant}
-          </div>
-        </div>
-      </div>
+      <ChatSignup
+        onComplete={async (data) => {
+          setIsLoading(true);
+          try {
+            const response = await signupUser({
+              email: data.email,
+              firstName: data.name,
+              age: data.age,
+              gender: data.gender,
+              profession: data.profession,
+              country: data.location?.split(',').pop()?.trim() || '',
+              city: data.location?.split(',')[0]?.trim() || '',
+              household: data.household,
+              ctaVariant: 'A', // or randomize if needed
+            });
+            setWaitlistPosition(response.waitlistPosition);
+            localStorage.setItem('zerrah_user_id', response.user.id);
+            setIsSuccess(true);
+          } catch (error) {
+            console.error('Signup error:', error);
+            // Optionally show error toast
+          } finally {
+            setIsLoading(false);
+          }
+        }}
+      />
     </Layout>
   );
 };
