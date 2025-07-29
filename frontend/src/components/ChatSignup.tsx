@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { Send } from 'lucide-react';
 
 // Avatar image paths
 const pandaSrc = '/images/panda.svg';
@@ -115,6 +116,7 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [finished, setFinished] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -171,6 +173,7 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
         ...m,
         { role: 'bot', text: `🐼 Bobo: “Thank you for sharing, ${updatedAns.name || 'friend'}! I can’t wait to walk beside you — one gentle step at a time.”` },
       ]);
+      setFinished(true);
       onComplete(updatedAns);
     }
   };
@@ -189,14 +192,19 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'bot' ? 'items-start' : 'items-end justify-end'}`}>
             {msg.role === 'bot' && <img src={pandaSrc} alt="panda" className="w-8 h-8 mr-2" />}
-            <div className={`rounded-2xl px-4 py-2 text-sm ${msg.role === 'bot' ? 'bg-white text-gray-800' : 'bg-emerald-500 text-white'}`}>{msg.text}</div>
+            <div
+              className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line shadow ${msg.role === 'bot' ? 'bg-emerald-50 text-gray-900 border border-emerald-100' : 'bg-emerald-500 text-white'}`}
+              style={{ maxWidth: '80%' }}
+            >
+              {msg.text}
+            </div>
             {msg.role === 'user' && <img src={penguinSrc} alt="penguin" className="w-8 h-8 ml-2" />}
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
       {/* Input */}
-      {!isLast || !inputValue || error ? (
+      {!finished ? (
         <div className="border-t p-3 flex gap-2 bg-white">
           {current.inputType === 'select' ? (
             <select
@@ -217,7 +225,14 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
               className="flex-1 border rounded px-3 py-2 text-sm"
             />
           )}
-          <Button type="button" onClick={sendUserAnswer} disabled={!inputValue.trim()}>Send</Button>
+          <Button
+            type="button"
+            onClick={sendUserAnswer}
+            disabled={!inputValue.trim()}
+            className="h-10 w-10 min-w-0 p-0 bg-emerald-500 hover:bg-emerald-600 rounded-full flex items-center justify-center"
+          >
+            <Send className="h-5 w-5 text-white" />
+          </Button>
         </div>
       ) : null}
     </div>
