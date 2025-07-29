@@ -659,6 +659,67 @@ export class PersonalityService {
     const powerMoves = this.generatePowerMoves(personalityType, impactMetrics, 'Carbon Strategist');
     console.log('Generated power moves:', powerMoves);
 
+    // ================= New Personality Logic (Decision/Action Matrix) =================
+    let newPersonality: string | undefined;
+    let newPersonalityDescription: string | undefined;
+
+    if (responses.personalityTraits) {
+      const { personalityTraits } = responses;
+
+      const decisionCategories = ['analyst', 'intuitive', 'connector'] as const;
+      const actionCategories = ['planner', 'experimenter', 'collaborator'] as const;
+
+      const decisionCounts: Record<string, number> = { analyst: 0, intuitive: 0, connector: 0 };
+      const actionCounts: Record<string, number> = { planner: 0, experimenter: 0, collaborator: 0 };
+
+      Object.entries(personalityTraits).forEach(([key, value]) => {
+        if (key.startsWith('decisionMaking') && decisionCategories.includes(value as any)) {
+          decisionCounts[value as keyof typeof decisionCounts] += 1;
+        }
+        if (key.startsWith('actionTaking') && actionCategories.includes(value as any)) {
+          actionCounts[value as keyof typeof actionCounts] += 1;
+        }
+      });
+
+      // Helper to pick dominant or random
+      const pickDominant = (counts: Record<string, number>, cats: readonly string[]): string => {
+        const max = Math.max(...cats.map(c => counts[c]));
+        if (max === 0) {
+          // All neutral – pick random category
+          return cats[Math.floor(Math.random() * cats.length)];
+        }
+        const winners = cats.filter(c => counts[c] === max);
+        winners.sort();
+        return winners[0];
+      };
+
+      const decisionStyle = pickDominant(decisionCounts, decisionCategories);
+      const actionStyle = pickDominant(actionCounts, actionCategories);
+
+      // Matrix mapping
+      const matrix: Record<string, Record<string, { type: string; desc: string }>> = {
+        analyst: {
+          planner: { type: 'Strategist', desc: 'You like to know the plan before you start. Try mapping out your week’s meals to cut food waste, or setting reminders to switch off lights and unplug chargers when you leave a room. Small routines add up.' },
+          experimenter: { type: 'Trailblazer', desc: 'You jump in and see what sticks. Test out one new swap each month—like swapping bottled water for a refillable bottle—and keep the ones that feel easiest.' },
+          collaborator: { type: 'Coordinator', desc: 'You bring people together for a common goal. Host a mini clothing swap among friends or family—it’s social, fun, and cuts down on impulse buys.' }
+        },
+        intuitive: {
+          planner: { type: 'Visionary', desc: 'You see the big picture and sketch out a brighter future. Turn that into action by dedicating one corner of your home to indoor plants or setting up a small herb garden—green space you can build on over time.' },
+          experimenter: { type: 'Explorer', desc: 'You learn by doing, then share what works. Try biking or walking one errand this week instead of driving, see how it feels, then tell a friend about your experience.' },
+          collaborator: { type: 'Catalyst', desc: 'You spark enthusiasm in others. Start a group chat challenge—like “no-plastic week”—and cheer people on with photos and quick tips each day.' }
+        },
+        connector: {
+          planner: { type: 'Builder', desc: 'You break big goals into steps. Pick one space—your kitchen counter, desk, or balcony—and transform it: add a compost bin, arrange reusable containers, or line up your recycling bins so it’s second nature.' },
+          experimenter: { type: 'Networker', desc: 'You connect dots and share resources. Keep a list of local second-hand shops or repair cafés and pass it along to neighbors or colleagues when they ask where to find sustainable options.' },
+          collaborator: { type: 'Steward', desc: 'You stick with habits that protect what matters. Set a weekly “switch-off hour” where you turn off all non-essential electronics and spend that time reading, cooking, or chatting—no screens, no stress.' }
+        }
+      };
+
+      const resultEntry = matrix[decisionStyle as keyof typeof matrix][actionStyle as keyof typeof matrix[typeof decisionStyle]];
+      newPersonality = resultEntry.type;
+      newPersonalityDescription = resultEntry.desc;
+    }
+
     const response = {
       personalityType,
       description: personalityInfo.description,
@@ -668,6 +729,7 @@ export class PersonalityService {
       impactMetrics,
       finalScore: scores.finalScore,
       powerMoves,
+      ...(newPersonality ? { newPersonality, newPersonalityDescription } : {}),
       // Return personalityTraits if present in input
       ...(responses.personalityTraits ? { personalityTraits: responses.personalityTraits } : {})
     };

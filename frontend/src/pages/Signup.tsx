@@ -197,11 +197,9 @@ const Signup = () => {
       <Layout>
         <div className="min-h-[calc(100vh-160px)] flex items-center justify-center bg-gradient-to-br from-white to-emerald-50 py-12 px-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-8 text-center space-y-6">
-            {/* Success Animation */}
-            <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center animate-pulse">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+            {/* Joyful Panda GIF */}
+            <div className="w-32 h-32 mx-auto rounded-full overflow-hidden shadow-lg mb-2">
+              <img src="/gif/joyful_panda.gif" alt="Joyful Panda" className="w-full h-full object-cover" />
             </div>
             <h1 className="text-3xl font-bold text-amber-800">Congratulations!</h1>
             <p className="text-gray-600 text-lg">
@@ -214,71 +212,23 @@ const Signup = () => {
               </p>
               <p className="text-amber-600 text-sm">We're launching soon!</p>
             </div>
-            {/* Share Buttons */}
+            {/* Follow Buttons */}
             <div className="space-y-3">
-              <p className="text-gray-600 font-medium">Share the good news!</p>
+              <p className="text-gray-600 font-medium">Stay connected!</p>
               <div className="flex gap-3 justify-center">
-                <button 
-                  onClick={() => {
-                    const text = `Just joined the Zerrah waiting list! 🚀 Small actions, big impact. #ClimateAction #Sustainability`;
-                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                <button
+                  onClick={() => window.open('https://www.instagram.com/zerrahworld/', '_blank')}
+                  className="flex items-center gap-2 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
                 >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                  </svg>
-                  Share on Twitter
-                </button>
-                <button 
-                  onClick={() => {
-                    const text = `Just joined the Zerrah waiting list! Small actions, big impact.`;
-                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent('Zerrah - Small actions, big impact')}&summary=${encodeURIComponent(text)}`, '_blank');
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                  Share on LinkedIn
-                </button>
-              </div>
-            </div>
-            {/* Progressive Engagement */}
-            <div className="border-t pt-6 space-y-4">
-              <p className="text-gray-600">Stay connected while you wait:</p>
-              <div className="flex gap-3 justify-center">
-                <button 
-                  onClick={async () => {
-                    const userId = localStorage.getItem('zerrah_user_id');
-                    if (userId) {
-                      try {
-                        await joinCommunity(userId);
-                        alert('Successfully joined the community!');
-                      } catch (error) {
-                        console.error('Error joining community:', error);
-                        alert('Failed to join community. Please try again.');
-                      }
-                    }
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                  Join Community
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.746-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"/>
-                  </svg>
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.35 3.608 1.325.975.975 1.263 2.242 1.325 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.35 2.633-1.325 3.608-.975.975-2.242 1.263-3.608 1.325-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.35-3.608-1.325-.975-.975-1.263-2.242-1.325-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.35-2.633 1.325-3.608C4.533 2.513 5.8 2.225 7.166 2.163 8.432 2.105 8.812 2.093 12 2.093m0-2.163C8.756 0 8.345.012 7.052.07 5.614.133 4.344.42 3.222 1.543 2.1 2.665 1.812 3.935 1.75 5.373.692 6.666.68 7.077.68 12s.012 5.334.07 6.627c.062 1.438.35 2.708 1.472 3.83 1.122 1.122 2.392 1.41 3.83 1.472 1.293.058 1.704.07 6.627.07s5.334-.012 6.627-.07c1.438-.062 2.708-.35 3.83-1.472 1.122-1.122 1.41-2.392 1.472-3.83.058-1.293.07-1.704.07-6.627s-.012-5.334-.07-6.627c-.062-1.438-.35-2.708-1.472-3.83C20.292.42 19.022.133 17.584.07 16.292.012 15.881 0 12 0z"/><path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a3.999 3.999 0 110-7.998 3.999 3.999 0 010 7.998z"/><circle cx="18.406" cy="5.594" r="1.44"/></svg>
                   Follow on Instagram
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M6.194 94.639L19.53 81.105 6.184 67.593l3.007-3.005L24.664 78.1l-15.463 15.544z"/>
-                  </svg>
-                  Join Slack Community
+                <button
+                  onClick={() => window.open('https://www.linkedin.com/company/zerrah/', '_blank')}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.451 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.354V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452z"/></svg>
+                  Follow on LinkedIn
                 </button>
               </div>
             </div>
