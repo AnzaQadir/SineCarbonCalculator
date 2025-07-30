@@ -241,4 +241,59 @@ export class UserController {
       });
     }
   }
+
+  /**
+   * Check if user exists by name or email
+   */
+  static async checkUserExists(req: Request, res: Response): Promise<void> {
+    try {
+      const { identifier } = req.query;
+
+      if (!identifier || typeof identifier !== 'string') {
+        res.status(400).json({
+          success: false,
+          error: 'Identifier is required'
+        });
+        return;
+      }
+
+      // Check by email first, then by firstName
+      const userByEmail = await UserService.getUserByEmail(identifier);
+      if (userByEmail) {
+        res.status(200).json({
+          success: true,
+          exists: true,
+          user: userByEmail,
+          matchType: 'email'
+        });
+        return;
+      }
+
+      // If not found by email, check by firstName
+      const userByName = await UserService.getUserByFirstName(identifier);
+      if (userByName) {
+        res.status(200).json({
+          success: true,
+          exists: true,
+          user: userByName,
+          matchType: 'name'
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        exists: false,
+        user: null,
+        matchType: null
+      });
+
+    } catch (error) {
+      console.error('Error checking user existence:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error'
+      });
+    }
+  }
 } 
