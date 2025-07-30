@@ -390,15 +390,6 @@ function PoeticJourneyQuiz() {
 
   // Combine personality questions and main questions
   const questions: Question[] = [
-    // Username verification question
-    {
-      key: 'username',
-      header: 'Chapter VII: Your Story & Context',
-      icon: '👤',
-      question: 'What name should we use when we chat about your eco-journey?',
-      type: 'text',
-      placeholder: 'Enter your name or email'
-    },
     ...personalityQuestions.map(q => ({
       ...q,
       type: 'personality',
@@ -865,6 +856,15 @@ function PoeticJourneyQuiz() {
       question: 'How many people, including you, share your home?',
       type: 'number',
       placeholder: 'Enter number of people'
+    },
+    // Username verification question (at the end)
+    {
+      key: 'username',
+      header: 'Chapter VII: Your Story & Context',
+      icon: '👤',
+      question: 'What name should we use when we chat about your eco-journey?',
+      type: 'text',
+      placeholder: 'Enter your name or email'
     }
   ];
 
@@ -895,35 +895,7 @@ function PoeticJourneyQuiz() {
     console.log('=== HANDLE SELECT DEBUG ===');
     console.log('Key:', key, 'Value:', value);
     console.log('Current answers before update:', answers);
-    
-    // Special handling for username verification
-    if (key === 'username') {
-      try {
-        const response = await checkUserExists(value);
-        if (response.success && response.exists) {
-          setExistingUser(response.user);
-          setShowExistingUserScreen(true);
-          // Pre-fill answers with existing user data
-          const userData = response.user;
-          const prefilledAnswers = {
-            ...answers,
-            username: value,
-            // Map user data to quiz fields
-            homeSize: userData.household || '2',
-            age: userData.age || '25-30',
-            gender: userData.gender || 'Prefer not to say',
-            profession: userData.profession || 'Student',
-            country: userData.country || 'United States',
-            city: userData.city || 'New York',
-            household: userData.household || '1 person'
-          };
-          setAnswers(prefilledAnswers);
-          return;
-        }
-      } catch (error) {
-        console.error('Error checking user existence:', error);
-      }
-    }
+    console.log('Function called at:', new Date().toISOString());
     
     // If this is a personality question, update personalityTraits
     if (personalityQuestions.some(q => q.key === key)) {
@@ -961,12 +933,50 @@ function PoeticJourneyQuiz() {
     }
   }
 
-  function handleNext() {
+  async function handleNext() {
     // Check if current question is answered
     const currentAnswer = getNestedValue(answers, q.key);
     if (!currentAnswer) {
       console.log('Current question not answered:', q.key);
       return;
+    }
+    
+    // Special handling for username verification on Next button click
+    if (q.key === 'name' || q.key === 'username') {
+      console.log('🎯 Next button clicked for username question:', currentAnswer);
+      if (currentAnswer && currentAnswer.trim()) {
+        try {
+          console.log('🔍 Checking user existence for:', currentAnswer);
+          const response = await checkUserExists(currentAnswer);
+          console.log('📡 User check response:', response);
+          if (response.success && response.exists) {
+            console.log('User found:', response.user);
+            setExistingUser(response.user);
+            setShowExistingUserScreen(true);
+            // Pre-fill answers with existing user data
+            const userData = response.user;
+            const prefilledAnswers = {
+              ...answers,
+              [q.key]: currentAnswer,
+              // Map user data to quiz fields
+              homeSize: userData.household || '2',
+              age: userData.age || '25-30',
+              gender: userData.gender || 'Prefer not to say',
+              profession: userData.profession || 'Student',
+              country: userData.country || 'United States',
+              city: userData.city || 'New York',
+              household: userData.household || '1 person'
+            };
+            setAnswers(prefilledAnswers);
+            return; // Don't proceed to next step, show welcome back screen
+          } else {
+            console.log('User not found, proceeding with quiz');
+          }
+        } catch (error) {
+          console.error('Error checking user existence:', error);
+          // Continue with quiz even if check fails
+        }
+      }
     }
     
     if (step < questions.length - 1) {
@@ -1160,6 +1170,14 @@ function PoeticJourneyQuiz() {
   console.log(`Step ${step + 1}/${questions.length}: ${q.key} - ${q.question}`);
   console.log(`Current answer for ${q.key}:`, getNestedValue(answers, q.key));
   console.log(`All answers so far:`, answers);
+  
+  // Special debug for username question
+  if (q.key === 'username' || q.key === 'name') {
+    console.log('🎯 Username question detected!');
+    console.log('Question type:', q.type);
+    console.log('Question placeholder:', q.placeholder);
+    console.log('Question key:', q.key);
+  }
 
   // Determine background image based on question section
   let backgroundImage = '/images/home_background.png';
@@ -1394,7 +1412,10 @@ function PoeticJourneyQuiz() {
             <input
               type="text"
               value={getNestedValue(answers, q.key) || ''}
-              onChange={e => handleSelect(q.key, e.target.value)}
+              onChange={e => {
+                console.log('Text input onChange triggered:', q.key, e.target.value);
+                handleSelect(q.key, e.target.value);
+              }}
               placeholder={q.placeholder}
               className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md"
             />

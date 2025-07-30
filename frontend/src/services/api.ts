@@ -234,10 +234,13 @@ export const getUserBySession = async (sessionId: string): Promise<any> => {
 // Check if user exists by name/email
 export const checkUserExists = async (identifier: string): Promise<any> => {
   try {
+    console.log('🚀 Making request to check user existence for:', identifier);
+    console.log('🚀 URL:', `/users/check?identifier=${encodeURIComponent(identifier)}`);
     const response = await apiClient.get(`/users/check?identifier=${encodeURIComponent(identifier)}`);
+    console.log('📡 User check response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error checking user existence:', error);
+    console.error('❌ Error checking user existence:', error);
     throw error;
   }
 }; 
