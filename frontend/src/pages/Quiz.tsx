@@ -4,7 +4,7 @@ import { useCalculator } from '@/hooks/useCalculator';
 import { motion } from 'framer-motion';
 import { Leaf } from 'lucide-react';
 import ResultsDisplay from '@/components/ResultsDisplay';
-import { calculatePersonality, logEvent, checkUserExists } from '@/services/api';
+import { calculatePersonality, logEvent, checkUserExists, createSession } from '@/services/api';
 import type { PersonalityResponse } from '@/services/api';
 import type { UserResponses } from '@/services/api';
 import { personalityQuestions } from '@/data/personalityQuestions';
@@ -130,6 +130,9 @@ const Quiz = () => {
   useEffect(() => {
     const trackQuizStart = async () => {
       try {
+        // First create a session if it doesn't exist
+        await createSession();
+        // Then log the quiz start event
         await logEvent('QUIZ_STARTED', {
           quizType: 'carbon-calculator',
           timestamp: new Date().toISOString()
@@ -364,6 +367,25 @@ function PoeticJourneyQuiz() {
       setShowScrollHint(true);
     }, 3000);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Track quiz start and create session
+  useEffect(() => {
+    const trackQuizStart = async () => {
+      try {
+        // First create a session if it doesn't exist
+        await createSession();
+        // Then log the quiz start event
+        await logEvent('QUIZ_STARTED', {
+          quizType: 'personality-assessment',
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error('Error tracking quiz start:', error);
+      }
+    };
+    
+    trackQuizStart();
   }, []);
 
   // Combine personality questions and main questions
@@ -1014,6 +1036,8 @@ function PoeticJourneyQuiz() {
       
       // Track quiz completion
       try {
+        // Ensure session exists before logging event
+        await createSession();
         await logEvent('QUIZ_COMPLETED', {
           quizType: 'personality-assessment',
           answersCount: Object.keys(latestAnswers).length,
