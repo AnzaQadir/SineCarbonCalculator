@@ -213,7 +213,7 @@ export const createSession = async (): Promise<any> => {
 
 export const logEvent = async (eventType: string, payload?: Record<string, any>): Promise<any> => {
   try {
-    const response = await apiClient.post('/events', { eventType, payload });
+    const response = await apiClient.post('/sessions/events', { eventType, payload });
     return response.data;
   } catch (error) {
     console.error('Error logging event:', error);
@@ -227,6 +227,17 @@ export const getUserBySession = async (sessionId: string): Promise<any> => {
     return response.data;
   } catch (error) {
     console.error('Error getting user by session:', error);
+    throw error;
+  }
+};
+
+// Check if user exists by name/email
+export const checkUserExists = async (identifier: string): Promise<any> => {
+  try {
+    const response = await apiClient.get(`/users/check?identifier=${encodeURIComponent(identifier)}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error checking user existence:', error);
     throw error;
   }
 }; 

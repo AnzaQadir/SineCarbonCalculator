@@ -4,7 +4,7 @@ import { useCalculator } from '@/hooks/useCalculator';
 import { motion } from 'framer-motion';
 import { Leaf } from 'lucide-react';
 import ResultsDisplay from '@/components/ResultsDisplay';
-import { calculatePersonality, logEvent } from '@/services/api';
+import { calculatePersonality, logEvent, checkUserExists } from '@/services/api';
 import type { PersonalityResponse } from '@/services/api';
 import type { UserResponses } from '@/services/api';
 import { personalityQuestions } from '@/data/personalityQuestions';
@@ -353,6 +353,9 @@ function PoeticJourneyQuiz() {
   const [showScrollHint, setShowScrollHint] = useState(false);
   // NEW: Collect personality traits in a separate object
   const [personalityTraits, setPersonalityTraits] = useState<any>({});
+  const [existingUser, setExistingUser] = useState<any>(null);
+  const [showExistingUserScreen, setShowExistingUserScreen] = useState(false);
+  const [answers, setAnswers] = useState<Record<string, any>>({});
   const setQuizAnswers = useQuizStore(state => state.setQuizAnswers);
 
   // Show scroll hint after 3 seconds
@@ -365,6 +368,15 @@ function PoeticJourneyQuiz() {
 
   // Combine personality questions and main questions
   const questions: Question[] = [
+    // Username verification question
+    {
+      key: 'username',
+      header: 'Chapter VII: Your Story & Context',
+      icon: '👤',
+      question: 'What name should we use when we chat about your eco-journey?',
+      type: 'text',
+      placeholder: 'Enter your name or email'
+    },
     ...personalityQuestions.map(q => ({
       ...q,
       type: 'personality',
@@ -835,7 +847,6 @@ function PoeticJourneyQuiz() {
   ];
 
   // Store answers in the same structure as CalculatorState
-  const [answers, setAnswers] = useState<any>({});
   const answersRef = useRef<any>({});
 
   // Debug: Track answers state changes
@@ -858,10 +869,39 @@ function PoeticJourneyQuiz() {
     return { ...obj };
   }
 
-  function handleSelect(key: string, value: string) {
+  async function handleSelect(key: string, value: string) {
     console.log('=== HANDLE SELECT DEBUG ===');
     console.log('Key:', key, 'Value:', value);
     console.log('Current answers before update:', answers);
+    
+    // Special handling for username verification
+    if (key === 'username') {
+      try {
+        const response = await checkUserExists(value);
+        if (response.success && response.exists) {
+          setExistingUser(response.user);
+          setShowExistingUserScreen(true);
+          // Pre-fill answers with existing user data
+          const userData = response.user;
+          const prefilledAnswers = {
+            ...answers,
+            username: value,
+            // Map user data to quiz fields
+            homeSize: userData.household || '2',
+            age: userData.age || '25-30',
+            gender: userData.gender || 'Prefer not to say',
+            profession: userData.profession || 'Student',
+            country: userData.country || 'United States',
+            city: userData.city || 'New York',
+            household: userData.household || '1 person'
+          };
+          setAnswers(prefilledAnswers);
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking user existence:', error);
+      }
+    }
     
     // If this is a personality question, update personalityTraits
     if (personalityQuestions.some(q => q.key === key)) {
@@ -994,6 +1034,49 @@ function PoeticJourneyQuiz() {
     }
   }
 
+  // Show existing user screen if user was found
+  if (showExistingUserScreen && existingUser) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F7E8] px-4 py-12">
+        <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] text-center">
+          <div className="mb-6">
+            <img src="/gif/joyful_panda.gif" alt="Joyful Panda" className="w-32 h-32 mx-auto rounded-full shadow-lg" />
+          </div>
+          <h1 className="text-3xl font-serif mb-4 text-[#7A8B7A]">
+            Welcome back, {existingUser.firstName || existingUser.email}!
+          </h1>
+          <p className="text-lg text-[#A08C7D] italic mb-8">
+            We already know a glimpse of your story. Let's see your personalized results.
+          </p>
+          <button 
+            onClick={async () => {
+              setLoadingResults(true);
+              try {
+                // Use the pre-filled answers to calculate personality
+                const apiPayload = {
+                  ...transformStateToApiFormat(answers),
+                  personalityTraits
+                };
+                const apiResults = await calculatePersonality(apiPayload);
+                setResults(apiResults);
+                setShowResults(true);
+                setShowExistingUserScreen(false);
+              } catch (error) {
+                setApiError('Failed to fetch results. Please try again.');
+              } finally {
+                setLoadingResults(false);
+              }
+            }}
+            className="bg-[#A7D58E] text-white px-8 py-4 rounded-xl text-lg font-serif shadow hover:bg-[#7A8B7A] transition"
+            disabled={loadingResults}
+          >
+            {loadingResults ? 'Calculating...' : 'See Results'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (showResults) {
     if (loadingResults) {
       return (
@@ -1031,7 +1114,15 @@ function PoeticJourneyQuiz() {
         categoryEmissions={categoryEmissions}
         recommendations={[]}
         isVisible={true}
-        onReset={() => window.location.reload()}
+        onReset={() => {
+          setShowResults(false);
+          setResults(null);
+          setStep(0);
+          setAnswers({});
+          setPersonalityTraits({});
+          setShowExistingUserScreen(false);
+          setExistingUser(null);
+        }}
         state={answers}
         gender={answers.gender === 'female' ? 'girl' : 'boy'}
       />

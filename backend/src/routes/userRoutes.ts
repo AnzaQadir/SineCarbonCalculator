@@ -9,6 +9,9 @@ router.post('/signup', UserController.signup);
 // Join community
 router.post('/join-community', UserController.joinCommunity);
 
+// Check if user exists
+router.get('/check', UserController.checkUserExists);
+
 // Get user by ID
 router.get('/:id', UserController.getUser);
 

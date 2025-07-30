@@ -1,6 +1,7 @@
 import { SignupUserData, User, UserActivity } from '../types/user';
 import { User as UserModel, UserActivity as UserActivityModel } from '../models';
 import { SessionService } from './sessionService';
+import { Op } from 'sequelize';
 
 export class UserService {
   /**
@@ -109,6 +110,20 @@ export class UserService {
    */
   static async getUserByEmail(email: string): Promise<User | null> {
     const user = await UserModel.findOne({ where: { email: email.toLowerCase() } });
+    if (!user) return null;
+
+    return this.convertUserModelToUser(user);
+  }
+
+  /**
+   * Get user by first name
+   */
+  static async getUserByFirstName(firstName: string): Promise<User | null> {
+    const user = await UserModel.findOne({ 
+      where: { 
+        firstName: firstName 
+      } 
+    });
     if (!user) return null;
 
     return this.convertUserModelToUser(user);
