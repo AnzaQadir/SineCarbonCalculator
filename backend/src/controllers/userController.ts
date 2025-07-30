@@ -30,8 +30,11 @@ export class UserController {
         return;
       }
 
+      // Get session ID from headers
+      const sessionId = req.headers['x-session-id'] as string;
+
       // Create user
-      const user = await UserService.createUser(userData);
+      const user = await UserService.createUser(userData, sessionId);
 
       // Send welcome email
       const emailSent = await EmailService.sendWelcomeEmail(user);

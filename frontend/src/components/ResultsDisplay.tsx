@@ -57,15 +57,39 @@ interface Achievement {
 }
 
 interface State {
+  // Demographics
+  name?: string;
+  email?: string;
+  age?: string;
+  gender?: string;
+  profession?: string;
+  location?: string;
+  country?: string;
+  householdSize?: string;
+  // Home Energy
+  homeSize?: string;
   homeEfficiency: string;
   energyManagement: string;
   homeScale: string;
+  electricityKwh?: string;
+  naturalGasTherm?: string;
+  heatingOilGallons?: string;
+  propaneGallons?: string;
+  usesRenewableEnergy?: boolean;
+  hasEnergyEfficiencyUpgrades?: boolean;
+  hasSmartThermostats?: boolean;
+  hasEnergyStarAppliances?: boolean;
+  // Transportation
   primaryTransportMode: string;
   carProfile: string;
   longDistance: string;
+  weeklyKm?: string;
+  costPerMile?: string;
+  // Food & Diet
   dietType: string;
   plateProfile: string;
   diningStyle: string;
+  monthlyDiningOut?: string;
   buysLocalFood: boolean;
   followsSustainableDiet: boolean;
   growsOwnFood: boolean;
@@ -80,6 +104,10 @@ interface State {
     repairOrReplace: boolean;
   };
   airQuality?: {
+    outdoorAirQuality?: string;
+    aqiMonitoring?: string;
+    indoorAirQuality?: string;
+    airQualityCommuting?: string;
     monitoring: string;
     impact: string;
   };
@@ -602,16 +630,37 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // Function to transform state to API format
   const transformStateToApiFormat = (state: State): UserResponses => {
     return {
+      // Demographics
+      name: state.name,
+      email: state.email,
+      age: state.age,
+      gender: state.gender,
+      profession: state.profession,
+      location: state.location,
+      country: state.country,
+      householdSize: state.householdSize,
       // Home Energy
+      homeSize: state.homeSize as '' | '1' | '2' | '3' | '4' | '5' | '6' | '7+' | undefined,
       homeEfficiency: state.homeEfficiency as '' | 'A' | 'B' | 'C' | undefined,
       energyManagement: state.energyManagement as '' | 'A' | 'B' | 'C' | undefined,
+      electricityKwh: state.electricityKwh,
+      naturalGasTherm: state.naturalGasTherm,
+      heatingOilGallons: state.heatingOilGallons,
+      propaneGallons: state.propaneGallons,
+      usesRenewableEnergy: state.usesRenewableEnergy,
+      hasEnergyEfficiencyUpgrades: state.hasEnergyEfficiencyUpgrades,
+      hasSmartThermostats: state.hasSmartThermostats,
+      hasEnergyStarAppliances: state.hasEnergyStarAppliances,
       // Transportation
       primaryTransportMode: state.primaryTransportMode as '' | 'A' | 'B' | 'C' | 'D' | undefined,
       carProfile: state.carProfile as '' | 'A' | 'B' | 'C' | 'D' | 'E' | undefined,
+      weeklyKm: state.weeklyKm,
+      costPerMile: state.costPerMile,
       longDistanceTravel: state.longDistance as '' | 'A' | 'B' | 'C' | undefined,
       // Food & Diet
       dietType: state.dietType as 'VEGAN' | 'VEGETARIAN' | 'FLEXITARIAN' | 'MEAT_MODERATE' | 'MEAT_HEAVY' | undefined,
       plateProfile: state.plateProfile as '' | 'A' | 'B' | 'C' | undefined,
+      monthlyDiningOut: state.monthlyDiningOut as '' | 'A' | 'B' | 'C' | 'D' | undefined,
       plantBasedMealsPerWeek: state.plantBasedMealsPerWeek,
       // Waste
       waste: state.waste ? {
@@ -623,7 +672,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       } : undefined,
       // Air Quality
       airQuality: state.airQuality ? {
-        aqiMonitoring: state.airQuality.monitoring as '' | 'A' | 'B' | 'C' | 'D' | undefined,
+        outdoorAirQuality: state.airQuality.outdoorAirQuality as '' | 'A' | 'B' | 'C' | 'D' | 'E' | undefined,
+        aqiMonitoring: state.airQuality.aqiMonitoring as '' | 'A' | 'B' | 'C' | undefined,
+        indoorAirQuality: state.airQuality.indoorAirQuality as '' | 'A' | 'B' | 'C' | 'D' | undefined,
+        airQualityCommuting: state.airQuality.airQualityCommuting as '' | 'A' | 'B' | 'C' | 'D' | undefined,
         airQualityImpact: state.airQuality.impact as '' | 'A' | 'B' | 'C' | 'D' | undefined,
       } : undefined,
       // Clothing

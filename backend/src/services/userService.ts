@@ -1,5 +1,6 @@
 import { SignupUserData, User, UserActivity } from '../types/user';
 import { User as UserModel, UserActivity as UserActivityModel } from '../models';
+import { SessionService } from './sessionService';
 
 export class UserService {
   /**
@@ -38,7 +39,7 @@ export class UserService {
   /**
    * Create a new user and track signup activity
    */
-  static async createUser(userData: SignupUserData): Promise<User> {
+  static async createUser(userData: SignupUserData, sessionId?: string): Promise<User> {
     // Get current user count for waitlist position
     const userCount = await UserModel.count();
     const waitlistPosition = userCount + 1;
@@ -70,6 +71,11 @@ export class UserService {
         household: user.household,
       }
     });
+
+    // Link session to user if sessionId provided
+    if (sessionId) {
+      await SessionService.linkSessionToUser(sessionId, user.id);
+    }
 
     // Convert to User interface
     return this.convertUserModelToUser(user);

@@ -1,8 +1,21 @@
 import axios from 'axios';
+import { getSessionHeaders } from './session';
 
 console.log('VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+
+// Create axios instance with session headers
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+// Add session headers to all requests
+apiClient.interceptors.request.use((config) => {
+  const sessionHeaders = getSessionHeaders();
+  Object.assign(config.headers, sessionHeaders);
+  return config;
+});
 
 export interface UserResponses {
   // Demographics
@@ -123,7 +136,7 @@ export interface PersonalityResponse {
 
 export const calculatePersonality = async (responses: UserResponses): Promise<PersonalityResponse> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/personality/calculate`, responses);
+    const response = await apiClient.post('/personality/calculate', responses);
     return response.data;
   } catch (error) {
     console.error('Error calculating personality:', error);
@@ -168,7 +181,7 @@ export interface SignupResponse {
 // User signup
 export const signupUser = async (userData: SignupData): Promise<SignupResponse> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/users/signup`, userData);
+    const response = await apiClient.post('/users/signup', userData);
     return response.data;
   } catch (error) {
     console.error('Error signing up user:', error);
@@ -179,10 +192,41 @@ export const signupUser = async (userData: SignupData): Promise<SignupResponse> 
 // Join community
 export const joinCommunity = async (userId: string): Promise<any> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/users/join-community`, { userId });
+    const response = await apiClient.post('/users/join-community', { userId });
     return response.data;
   } catch (error) {
     console.error('Error joining community:', error);
+    throw error;
+  }
+};
+
+// Session management
+export const createSession = async (): Promise<any> => {
+  try {
+    const response = await apiClient.post('/sessions');
+    return response.data;
+  } catch (error) {
+    console.error('Error creating session:', error);
+    throw error;
+  }
+};
+
+export const logEvent = async (eventType: string, payload?: Record<string, any>): Promise<any> => {
+  try {
+    const response = await apiClient.post('/events', { eventType, payload });
+    return response.data;
+  } catch (error) {
+    console.error('Error logging event:', error);
+    throw error;
+  }
+};
+
+export const getUserBySession = async (sessionId: string): Promise<any> => {
+  try {
+    const response = await apiClient.get(`/sessions/${sessionId}/user`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting user by session:', error);
     throw error;
   }
 }; 
