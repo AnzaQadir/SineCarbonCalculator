@@ -4,11 +4,12 @@ import { useCalculator } from '@/hooks/useCalculator';
 import { motion } from 'framer-motion';
 import { Leaf } from 'lucide-react';
 import ResultsDisplay from '@/components/ResultsDisplay';
-import { calculatePersonality } from '@/services/api';
+import { calculatePersonality, logEvent } from '@/services/api';
 import type { PersonalityResponse } from '@/services/api';
 import type { UserResponses } from '@/services/api';
 import { personalityQuestions } from '@/data/personalityQuestions';
 import { useQuizStore } from '@/stores/quizStore';
+import { getSessionId } from '@/services/session';
 
 // Add a type for questions
 interface Question {
@@ -125,6 +126,22 @@ const Quiz = () => {
   const [started, setStarted] = useState<null | 'A' | 'B'>(null);
   const [notReady, setNotReady] = useState(false);
 
+  // Track quiz start
+  useEffect(() => {
+    const trackQuizStart = async () => {
+      try {
+        await logEvent('QUIZ_STARTED', {
+          quizType: 'carbon-calculator',
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error('Error tracking quiz start:', error);
+      }
+    };
+    
+    trackQuizStart();
+  }, []);
+
   const handleCalculate = () => {
     // Handle calculation completion
     console.log('Calculating results...');
@@ -213,7 +230,11 @@ const Quiz = () => {
 
 // Copy transformStateToApiFormat from ResultsDisplay
 function transformStateToApiFormat(state: any): UserResponses {
-  return {
+  console.log('=== TRANSFORM FUNCTION DEBUG ===');
+  console.log('Input state:', state);
+  console.log('monthlyDiningOut in input:', state.monthlyDiningOut);
+  
+  const result = {
     // Demographics
     name: state.name,
     email: state.email,
@@ -253,6 +274,11 @@ function transformStateToApiFormat(state: any): UserResponses {
     // Clothing
     clothing: state.clothing,
   };
+  
+  console.log('Output result:', result);
+  console.log('monthlyDiningOut in output:', result.monthlyDiningOut);
+  
+  return result;
 }
 
 function getSectionInfo(key: string, type?: string) {
@@ -809,7 +835,16 @@ function PoeticJourneyQuiz() {
   ];
 
   // Store answers in the same structure as CalculatorState
-  const [answers, setAnswers] = useState<any>({ ...state });
+  const [answers, setAnswers] = useState<any>({});
+  const answersRef = useRef<any>({});
+
+  // Debug: Track answers state changes
+  useEffect(() => {
+    console.log('=== ANSWERS STATE CHANGED ===');
+    console.log('New answers state:', answers);
+    console.log('monthlyDiningOut in answers:', answers.monthlyDiningOut);
+    answersRef.current = answers;
+  }, [answers]);
 
   // Helper to set nested value by dot notation
   function setNestedValue(obj: any, path: string, value: any) {
@@ -824,21 +859,54 @@ function PoeticJourneyQuiz() {
   }
 
   function handleSelect(key: string, value: string) {
-    console.log('handleSelect', 'key:', key, 'value:', value);
+    console.log('=== HANDLE SELECT DEBUG ===');
+    console.log('Key:', key, 'Value:', value);
+    console.log('Current answers before update:', answers);
+    
     // If this is a personality question, update personalityTraits
     if (personalityQuestions.some(q => q.key === key)) {
       setPersonalityTraits((prev: any) => ({ ...prev, [key]: value }));
+      console.log('Updated personalityTraits:', { ...personalityTraits, [key]: value });
     }
+    
+    // Update answers state
     if (key.includes('.')) {
-      setAnswers((prev: any) => setNestedValue({ ...prev }, key, value));
+      setAnswers((prev: any) => {
+        const newAnswers = setNestedValue({ ...prev }, key, value);
+        console.log('Updated nested answers:', newAnswers);
+        return newAnswers;
+      });
+    } else {
+      setAnswers((prev: any) => {
+        const newAnswers = { ...prev, [key]: value };
+        console.log('Updated flat answers:', newAnswers);
+        console.log('Previous answers:', prev);
+        console.log('New answers:', newAnswers);
+        return newAnswers;
+      });
+      
+      // Force a re-render to ensure the state is updated
+      setTimeout(() => {
+        console.log('Answers state after timeout:', answers);
+      }, 0);
+    }
+    
+    // Also update the calculator state for compatibility
+    if (key.includes('.')) {
       updateCalculator(setNestedValue({ ...state }, key, value));
     } else {
-      setAnswers((prev: any) => ({ ...prev, [key]: value }));
       updateCalculator({ [key]: value });
     }
   }
 
   function handleNext() {
+    // Check if current question is answered
+    const currentAnswer = getNestedValue(answers, q.key);
+    if (!currentAnswer) {
+      console.log('Current question not answered:', q.key);
+      return;
+    }
+    
     if (step < questions.length - 1) {
       setStep(step + 1);
     } else {
@@ -860,10 +928,61 @@ function PoeticJourneyQuiz() {
     setLoadingResults(true);
     setApiError(null);
     try {
+      // Use the ref to get the latest answers state
+      const latestAnswers = answersRef.current;
+      
+      // Debug: Log the answers state in detail
+      console.log('=== DETAILED ANSWERS DEBUG ===');
+      console.log('Full answers object:', latestAnswers);
+      console.log('monthlyDiningOut value:', latestAnswers.monthlyDiningOut);
+      console.log('homeSize value:', latestAnswers.homeSize);
+      console.log('weeklyKm value:', latestAnswers.weeklyKm);
+      console.log('longDistanceTravel value:', latestAnswers.longDistanceTravel);
+      console.log('airQuality object:', latestAnswers.airQuality);
+      
       const apiPayload = {
-        ...transformStateToApiFormat(answers),
+        ...transformStateToApiFormat(latestAnswers),
         personalityTraits // <-- include the traits in the payload
       };
+      
+      // Debug: Log what's missing
+      console.log('=== API PAYLOAD DEBUG ===');
+      console.log('API Payload:', apiPayload);
+      console.log('monthlyDiningOut in payload:', apiPayload.monthlyDiningOut);
+      console.log('Missing fields:', {
+        homeSize: !latestAnswers.homeSize ? 'MISSING' : 'PRESENT',
+        weeklyKm: !latestAnswers.weeklyKm ? 'MISSING' : 'PRESENT', 
+        longDistanceTravel: !latestAnswers.longDistanceTravel ? 'MISSING' : 'PRESENT',
+        monthlyDiningOut: !latestAnswers.monthlyDiningOut ? 'MISSING' : 'PRESENT',
+        airQuality: Object.keys(latestAnswers.airQuality || {}).length === 0 ? 'EMPTY' : 'HAS DATA'
+      });
+      
+      // Validate that all required fields are present
+      const requiredFields = [
+        'homeSize', 'homeEfficiency', 'energyManagement',
+        'primaryTransportMode', 'carProfile', 'weeklyKm', 'longDistanceTravel',
+        'dietType', 'plateProfile', 'monthlyDiningOut', 'plantBasedMealsPerWeek'
+      ];
+      
+      const missingFields = requiredFields.filter(field => !latestAnswers[field]);
+      if (missingFields.length > 0) {
+        console.error('Missing required fields:', missingFields);
+        setApiError(`Missing required fields: ${missingFields.join(', ')}`);
+        setLoadingResults(false);
+        return;
+      }
+      
+      // Track quiz completion
+      try {
+        await logEvent('QUIZ_COMPLETED', {
+          quizType: 'personality-assessment',
+          answersCount: Object.keys(latestAnswers).length,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error('Error tracking quiz completion:', error);
+      }
+      
       setQuizAnswers(apiPayload); // Persist the full answers in the store
       const apiResults = await calculatePersonality(apiPayload);
       setResults(apiResults);
@@ -921,6 +1040,11 @@ function PoeticJourneyQuiz() {
 
   const q = questions[step];
   const section = getSectionInfo(q.key, q.type);
+
+  // Debug: Log current question
+  console.log(`Step ${step + 1}/${questions.length}: ${q.key} - ${q.question}`);
+  console.log(`Current answer for ${q.key}:`, getNestedValue(answers, q.key));
+  console.log(`All answers so far:`, answers);
 
   // Determine background image based on question section
   let backgroundImage = '/images/home_background.png';
@@ -1194,6 +1318,23 @@ function PoeticJourneyQuiz() {
           >
             Back
           </button>
+          
+          {/* Progress indicator */}
+          <div className="flex items-center gap-2 text-sm text-[#7A8B7A]">
+            <span>Question {step + 1} of {questions.length}</span>
+            <div className="flex gap-1">
+              {questions.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full ${
+                    index < step ? 'bg-[#A7D58E]' : 
+                    index === step ? 'bg-[#A7D58E]' : 'bg-gray-300'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+          
           <button
             onClick={handleNext}
             className="rounded-full px-6 py-2 bg-[#A7D58E] text-white font-serif text-lg shadow hover:bg-[#7A8B7A] transition"

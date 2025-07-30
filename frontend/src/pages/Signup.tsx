@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import { signupUser, joinCommunity, SignupData } from '@/services/api';
+import { signupUser, joinCommunity, SignupData, getUserBySession, createSession } from '@/services/api';
 import ChatSignup from '@/components/ChatSignup';
+import { getSessionId, setUserData } from '@/services/session';
 
 // A/B Test variants
 const CTA_VARIANTS = {
@@ -190,6 +191,26 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [waitlistPosition, setWaitlistPosition] = useState(0);
+  const [returningUser, setReturningUser] = useState(false);
+
+  // Check for returning user on component mount
+  useEffect(() => {
+    const checkReturningUser = async () => {
+      try {
+        const sessionId = getSessionId();
+        const response = await getUserBySession(sessionId);
+        
+        if (response.success && response.session?.userData) {
+          setReturningUser(true);
+          setUserData(response.session.userData);
+        }
+      } catch (error) {
+        console.log('No returning user found or error:', error);
+      }
+    };
+
+    checkReturningUser();
+  }, []);
 
   // Success confirmation screen
   if (isSuccess) {
@@ -241,6 +262,11 @@ const Signup = () => {
   // Conversational signup flow
   return (
     <Layout>
+      {returningUser && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-emerald-100 border border-emerald-300 text-emerald-800 px-4 py-2 rounded-lg shadow-lg">
+          <p className="text-sm">Welcome back! We'll prefill your information.</p>
+        </div>
+      )}
       <ChatSignup
         onComplete={async (data) => {
           setIsLoading(true);

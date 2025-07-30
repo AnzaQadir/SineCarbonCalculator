@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
+import { getUserData } from '@/services/session';
 
 // Avatar image paths
 const pandaSrc = '/images/panda.svg';
@@ -119,6 +120,35 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
   const [finished, setFinished] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Check for existing user data on mount
+  useEffect(() => {
+    const existingUserData = getUserData();
+    if (existingUserData) {
+      // Prefill answers with existing data
+      const prefilledAnswers: Record<string, string> = {};
+      
+      if (existingUserData.firstName) prefilledAnswers.name = existingUserData.firstName;
+      if (existingUserData.email) prefilledAnswers.email = existingUserData.email;
+      if (existingUserData.age) prefilledAnswers.age = existingUserData.age;
+      if (existingUserData.gender) prefilledAnswers.gender = existingUserData.gender;
+      if (existingUserData.profession) prefilledAnswers.profession = existingUserData.profession;
+      if (existingUserData.city && existingUserData.country) {
+        prefilledAnswers.location = `${existingUserData.city}, ${existingUserData.country}`;
+      }
+      if (existingUserData.household) prefilledAnswers.household = existingUserData.household;
+      
+      setAnswers(prefilledAnswers);
+      
+      // Skip to the end if we have all the data
+      if (Object.keys(prefilledAnswers).length >= questions.length - 1) {
+        setStep(questions.length - 1);
+        setMessages([
+          { role: 'bot', text: `🐼 Bobo: "Welcome back! I see you've been here before. Let me just confirm your details..."` },
+        ]);
+      }
+    }
+  }, []);
 
   const current = questions[step];
   const isLast = step === questions.length - 1;

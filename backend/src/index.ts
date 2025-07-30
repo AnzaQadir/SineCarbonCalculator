@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { personalityRoutes } from './routes/personalityRoutes';
 import { recommendationRoutes } from './routes/recommendationRoutes';
 import { userRoutes } from './routes/userRoutes';
+import sessionRoutes from './routes/sessionRoutes';
 import { initializeDatabase } from './models';
 
 // Load environment variables
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use('/api/personality', personalityRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/sessions', sessionRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
