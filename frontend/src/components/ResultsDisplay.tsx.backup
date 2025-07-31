@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
   Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2, Check, BookOpen,
   Book, Star, Sparkles, Trophy, Heart, 
-  Lightbulb, Users, Target, ArrowRight, ShoppingBag, Droplet, Shirt, X, Quote, PenTool, Brain
+  Lightbulb, Users, Target, ArrowRight, ShoppingBag, Droplet, Shirt, X, Quote, PenTool
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
@@ -32,7 +32,6 @@ import { getPersonalityImage, preloadPersonalityImages } from '@/utils/personali
 import { PersonalityType, PersonalityResponse } from '@/types/personality';
 import { useNavigate } from 'react-router-dom';
 import { useQuizStore } from '@/stores/quizStore';
-import { SpeedometerGauge } from '@/components/SpeedometerGauge';
 
 interface CategoryEmissions {
   home: number;
@@ -309,12 +308,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dynamicPersonality, setDynamicPersonality] = useState<PersonalityResponse | null>(null);
-    const [showJourney, setShowJourney] = useState(false);
-  const [showStoryModal, setShowStoryModal] = useState(false);
- 
+  const [showJourney, setShowJourney] = useState(false);
   const journeyRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { setQuizResults, setQuizAnswers } = useQuizStore();
+  const { setQuizResults } = useQuizStore();
   // Always use the persisted quizAnswers from the store
   const quizAnswers = useQuizStore(s => s.quizAnswers);
   const state = quizAnswers || _state;
@@ -720,7 +717,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         impactMetrics: result.impactMetrics,
         finalScore: result.finalScore,
         powerMoves: result.powerMoves,
-        comprehensivePowerMoves: result.comprehensivePowerMoves, // Include comprehensive power moves
         dominantCategory: Object.entries(result.categoryScores)
           .reduce((a, b) => (a[1].score > b[1].score ? a : b))[0],
         emoji: '🌱', // Default emoji
@@ -736,8 +732,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         nextSteps: result.nextSteps,
         categoryScores: result.categoryScores,
         impactMetrics: result.impactMetrics,
-        finalScore: result.finalScore,
-        comprehensivePowerMoves: result.comprehensivePowerMoves
+        finalScore: result.finalScore
       });
     } catch (err) {
       console.error('Error calculating personality:', err);
@@ -758,10 +753,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   useEffect(() => {
     if (dynamicPersonality) {
       setQuizResults(dynamicPersonality);
-      // Also store quiz answers separately for recommendations
-      setQuizAnswers(state);
     }
-  }, [dynamicPersonality, setQuizResults, setQuizAnswers, state]);
+  }, [dynamicPersonality, setQuizResults]);
 
   if (error) {
     return (
@@ -809,7 +802,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="absolute top-40 right-20 w-6 h-6 bg-cream-300/40 rounded-full animate-float-delayed"></div>
           <div className="absolute bottom-40 left-20 w-3 h-3 bg-warm-200/50 rounded-full animate-float"></div>
           <div className="absolute bottom-20 right-10 w-5 h-5 bg-sage-300/30 rounded-full animate-float-delayed"></div>
-            </div>
+        </div>
 
         <div className="max-w-4xl mx-auto px-6 py-12 space-y-16 relative z-10">
           {/* Back Button */}
@@ -823,173 +816,240 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 <ArrowLeft className="h-4 w-4" />
                 Back to Quiz
               </Button>
-          </div>
+            </div>
           )}
           
-           {/* Profile Section */}
-           <div className="flex flex-col items-center justify-center">
-             
-             {/* Main Avatar */}
-             <div className="relative mb-6">
-               <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-sage-200 shadow-lg">
-                 <img
-                   src={profileImage}
-                   alt="Profile Avatar"
-                   className="w-full h-full object-cover"
-                 />
+                     {/* Top Section - Personality Reveal with Testimonial Layout */}
+           <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+             {/* Left Side - Personality Quote/Testimonial */}
+             <div className="flex-1 space-y-6">
+               {/* Large Quote Icon */}
+               <div className="flex items-start gap-4">
+                 <div className="text-6xl text-sage-400 font-serif">"</div>
+                 <div className="flex-1">
+                   <h1 className="text-4xl md:text-5xl font-serif text-sage-800 leading-tight mb-4">
+                     You are the {dynamicPersonality?.personalityType || 'Grounded Optimist'}
+                   </h1>
+                   <p className="text-lg text-sage-600 leading-relaxed">
+                     {dynamicPersonality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
+                   </p>
+                 </div>
+               </div>
+               
+               {/* Power Words */}
+               <div className="flex flex-wrap gap-3 mt-6">
+                 <span className="px-4 py-2 bg-sage-100/80 text-sage-700 rounded-full text-sm font-medium border border-sage-200">
+                   Gentle
+                 </span>
+                 <span className="px-4 py-2 bg-warm-100/80 text-warm-700 rounded-full text-sm font-medium border border-warm-200">
+                   Steady
+                 </span>
+                 <span className="px-4 py-2 bg-cream-100/80 text-cream-700 rounded-full text-sm font-medium border border-cream-200">
+                   Intentional
+                 </span>
                </div>
              </div>
-             
-             {/* Title */}
-             <h1 className="text-3xl md:text-4xl font-bold text-sage-800 mb-4 text-center">
-                               {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Eco in Progress'}
-             </h1>
-             
-             {/* Personality Description */}
-             <div className="text-center max-w-2xl mx-auto mb-6">
-               <p className="text-lg text-sage-600 leading-relaxed">
-                                   {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
-               </p>
-             </div>
-             
 
+             {/* Right Side - Avatar Section */}
+             <div className="flex flex-col items-center space-y-4">
+               {/* Profile Photo */}
+               <div className="relative w-48 h-48">
+                 <div className="absolute inset-0 bg-gradient-to-r from-sage-300 to-warm-300 rounded-full blur-xl opacity-60 animate-pulse"></div>
+                 <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white shadow-2xl">
+                   {profileImage && (
+                     <img
+                       src={profileImage}
+                       alt={`${dynamicPersonality?.personalityType || 'Personality'} Illustration`}
+                       className="w-full h-full object-cover"
+                       loading="eager"
+                       decoding="async"
+                     />
+                   )}
+                 </div>
+               </div>
+               
+               {/* User Info Card */}
+               <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-sage-200 text-center min-w-[200px]">
+                 <div className="text-lg font-semibold text-sage-800 mb-1">
+                   {userName || 'Eco Explorer'}
+                 </div>
+                 <div className="text-sm text-sage-600">
+                   {dynamicPersonality?.personalityType || 'Sustainability Champion'}
+                 </div>
+                 <div className="text-xs text-sage-500 mt-1">
+                   {dynamicPersonality?.impactMetrics?.carbonReduced || '0.0'} tons saved
+                 </div>
+               </div>
+             </div>
            </div>
 
-           {/* Impact Metrics Section - Speedometer Gauge (Hidden) */}
-           {/* <div className="space-y-8">
-             <div className="text-center space-y-4">
-               <h2 className="text-3xl md:text-4xl font-serif text-sage-800">
-                 Your Impact Metrics
-               </h2>
-               <p className="text-lg text-sage-600 max-w-2xl mx-auto">
-                 See how your sustainable choices are making a difference
-               </p>
-             </div>
-             
-             <div className="flex justify-center">
-               <SpeedometerGauge 
-                 value={Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0)} 
-                 max={10} 
-               />
-             </div>
-           </div> */}
 
-           {/* Three Action Buttons */}
+
+             {/* Speedometer Impact Gauge */}
+             <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+               <div className="text-center mb-8">
+                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Your Carbon Impact</h3>
+                 <p className="text-gray-600">CO₂ equivalent to trees saved</p>
+               </div>
+               
+               {/* Speedometer Gauge */}
+               <div className="relative mx-auto w-80 h-40">
+                 {/* Gauge Background */}
+                 <svg className="w-full h-full" viewBox="0 0 320 160">
+                   {/* Gauge Arc */}
+                   <path
+                     d="M 40 140 A 120 120 0 0 1 280 140"
+                     fill="none"
+                     stroke="#e5e7eb"
+                     strokeWidth="20"
+                     strokeLinecap="round"
+                   />
+                   
+                   {/* Gauge Fill */}
+                   <path
+                     d="M 40 140 A 120 120 0 0 1 280 140"
+                     fill="none"
+                     stroke="#22c55e"
+                     strokeWidth="20"
+                     strokeLinecap="round"
+                     strokeDasharray={`${Math.min(Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0) * 20, 240)} 240`}
+                     strokeDashoffset="0"
+                     style={{
+                       transform: 'rotate(-90deg)',
+                       transformOrigin: '160px 160px'
+                     }}
+                   />
+                   
+                   {/* Gauge Labels */}
+                   <text x="60" y="130" className="text-xs font-bold fill-gray-600" style={{ transform: 'rotate(-45deg)', transformOrigin: '60px 130px' }}>
+                     WEAK
+                   </text>
+                   <text x="160" y="120" className="text-xs font-bold fill-gray-600">
+                     FAIR
+                   </text>
+                   <text x="260" y="130" className="text-xs font-bold fill-gray-600" style={{ transform: 'rotate(45deg)', transformOrigin: '260px 130px' }}>
+                     STRONG
+                   </text>
+                   
+                   {/* Leaf Indicator */}
+                   <g transform={`translate(${160 + Math.min(Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0) * 2, 120) * Math.cos((Math.min(Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0) * 2, 120) - 60) * Math.PI / 180)}, ${140 - Math.min(Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0) * 2, 120) * Math.sin((Math.min(Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0) * 2, 120) - 60) * Math.PI / 180)})`}>
+                     <path
+                       d="M 0 -8 L 4 -4 L 8 -8 L 4 -12 Z"
+                       fill="#22c55e"
+                       stroke="#166534"
+                       strokeWidth="1"
+                     />
+                     <line x1="0" y1="-8" x2="0" y2="-12" stroke="#166534" strokeWidth="2" />
+                   </g>
+                 </svg>
+                 
+                 {/* Center Value Display */}
+                 <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center">
+                   <div className="text-3xl font-bold text-green-600">
+                     {Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0).toFixed(1)}
+                   </div>
+                   <div className="text-sm text-gray-600">tons CO₂ saved</div>
+                   <div className="text-xs text-green-600 mt-1">
+                     ≈ {Math.round(Number(dynamicPersonality?.impactMetrics?.carbonReduced || 0) * 50)} trees
+                   </div>
+                 </div>
+               </div>
+               
+               {/* Conversion Info */}
+               <div className="text-center mt-6 text-sm text-gray-500">
+                 <p>1 ton CO₂ ≈ 50 mature trees per year</p>
+               </div>
+             </div>
+           </div>
+
+           {/* Three Action Cards */}
            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-             {/* Generate Your Story Button */}
-             <button 
-               className="group bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 hover:shadow-2xl hover:scale-105 hover:border-gray-300 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95"
-               onClick={async () => {
-                 await generateStory();
-                 setShowStoryModal(true);
-               }}
-               disabled={isGeneratingStory}
-               aria-label="Generate your sustainability story"
-             >
+             {/* Generate Your Story Card */}
+             <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 shadow-lg border border-purple-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
                <div className="text-center space-y-4">
-                 <div className="w-12 h-12 mx-auto bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                   <BookOpen className="h-6 w-6 text-black" />
+                 <div className="w-12 h-12 mx-auto bg-purple-200 rounded-full flex items-center justify-center">
+                   <BookOpen className="h-6 w-6 text-purple-700" />
                  </div>
                  <h3 className="text-lg font-bold text-gray-900">Generate Your Story</h3>
                  <p className="text-sm text-gray-600">Discover your unique sustainability journey and share it with others</p>
                  <div className="mt-4">
                    <div className="w-16 h-16 mx-auto">
                      <svg viewBox="0 0 64 64" className="w-full h-full">
-                       <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300"/>
-                       <circle cx="24" cy="28" r="2" fill="currentColor" className="text-black"/>
-                       <circle cx="40" cy="28" r="2" fill="currentColor" className="text-black"/>
-                       <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-black"/>
+                       <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-300"/>
+                       <circle cx="24" cy="28" r="2" fill="currentColor" className="text-purple-600"/>
+                       <circle cx="40" cy="28" r="2" fill="currentColor" className="text-purple-600"/>
+                       <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-600"/>
                      </svg>
                    </div>
                  </div>
-                 {/* Click indicator */}
-                 <div className="text-xs text-gray-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                   Click to explore →
-                 </div>
                </div>
-             </button>
+             </div>
 
-             {/* Recommendations Button */}
-             <button 
-               className="group bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 hover:shadow-2xl hover:scale-105 hover:border-gray-300 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95"
-               onClick={() => navigate('/recommendations')}
-               aria-label="Get personalized recommendations"
-             >
+             {/* Recommendations Card */}
+             <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
                <div className="text-center space-y-4">
-                 <div className="w-12 h-12 mx-auto bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                   <Lightbulb className="h-6 w-6 text-black" />
+                 <div className="w-12 h-12 mx-auto bg-blue-200 rounded-full flex items-center justify-center">
+                   <Lightbulb className="h-6 w-6 text-blue-700" />
                  </div>
                  <h3 className="text-lg font-bold text-gray-900">Personalized Recommendations</h3>
                  <p className="text-sm text-gray-600">Get tailored suggestions based on your lifestyle and goals</p>
                  <div className="mt-4">
                    <div className="w-16 h-16 mx-auto">
                      <svg viewBox="0 0 64 64" className="w-full h-full">
-                       <rect x="16" y="20" width="32" height="24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300"/>
-                       <line x1="16" y1="28" x2="48" y2="28" stroke="currentColor" strokeWidth="2" className="text-black"/>
-                       <line x1="16" y1="36" x2="48" y2="36" stroke="currentColor" strokeWidth="2" className="text-black"/>
-                       <line x1="16" y1="44" x2="40" y2="44" stroke="currentColor" strokeWidth="2" className="text-black"/>
-                       <circle cx="12" cy="16" r="2" fill="currentColor" className="text-black"/>
-                       <circle cx="20" cy="16" r="2" fill="currentColor" className="text-black"/>
+                       <rect x="16" y="20" width="32" height="24" fill="none" stroke="currentColor" strokeWidth="2" className="text-blue-300"/>
+                       <line x1="16" y1="28" x2="48" y2="28" stroke="currentColor" strokeWidth="2" className="text-blue-600"/>
+                       <line x1="16" y1="36" x2="48" y2="36" stroke="currentColor" strokeWidth="2" className="text-blue-600"/>
+                       <line x1="16" y1="44" x2="40" y2="44" stroke="currentColor" strokeWidth="2" className="text-blue-600"/>
+                       <circle cx="12" cy="16" r="2" fill="currentColor" className="text-blue-600"/>
+                       <circle cx="20" cy="16" r="2" fill="currentColor" className="text-blue-600"/>
                      </svg>
                    </div>
                  </div>
-                 {/* Click indicator */}
-                 <div className="text-xs text-gray-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                   Click to discover →
-                 </div>
                </div>
-             </button>
+             </div>
 
-             {/* Journalize Button */}
-             <button 
-               className="group bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 hover:shadow-2xl hover:scale-105 hover:border-gray-300 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95"
-               onClick={() => console.log('Journalize clicked')}
-               aria-label="Journalize your sustainability journey"
-             >
+             {/* Journalize Card */}
+             <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 shadow-lg border border-green-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
                <div className="text-center space-y-4">
-                 <div className="w-12 h-12 mx-auto bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                   <PenTool className="h-6 w-6 text-black" />
+                 <div className="w-12 h-12 mx-auto bg-green-200 rounded-full flex items-center justify-center">
+                   <PenTool className="h-6 w-6 text-green-700" />
                  </div>
                  <h3 className="text-lg font-bold text-gray-900">Journalize Your Journey</h3>
                  <p className="text-sm text-gray-600">Reflect on your progress and track your sustainability growth</p>
                  <div className="mt-4">
                    <div className="w-16 h-16 mx-auto">
                      <svg viewBox="0 0 64 64" className="w-full h-full">
-                       <rect x="16" y="12" width="32" height="40" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300"/>
-                       <line x1="20" y1="20" x2="44" y2="20" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <line x1="20" y1="24" x2="44" y2="24" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <line x1="20" y1="28" x2="44" y2="28" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <line x1="20" y1="32" x2="44" y2="32" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <line x1="20" y1="36" x2="44" y2="36" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <line x1="20" y1="40" x2="44" y2="40" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <rect x="20" y="44" width="8" height="4" fill="currentColor" className="text-black"/>
-                       <rect x="36" y="44" width="8" height="4" fill="currentColor" className="text-black"/>
-                       <circle cx="12" cy="16" r="1" fill="currentColor" className="text-black"/>
-                       <circle cx="20" cy="16" r="1" fill="currentColor" className="text-black"/>
+                       <rect x="16" y="12" width="32" height="40" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-300"/>
+                       <line x1="20" y1="20" x2="44" y2="20" stroke="currentColor" strokeWidth="1" className="text-green-600"/>
+                       <line x1="20" y1="24" x2="44" y2="24" stroke="currentColor" strokeWidth="1" className="text-green-600"/>
+                       <line x1="20" y1="28" x2="44" y2="28" stroke="currentColor" strokeWidth="1" className="text-green-600"/>
+                       <line x1="20" y1="32" x2="44" y2="32" stroke="currentColor" strokeWidth="1" className="text-green-600"/>
+                       <line x1="20" y1="36" x2="44" y2="36" stroke="currentColor" strokeWidth="1" className="text-green-600"/>
+                       <line x1="20" y1="40" x2="44" y2="40" stroke="currentColor" strokeWidth="1" className="text-green-600"/>
+                       <rect x="20" y="44" width="8" height="4" fill="currentColor" className="text-green-600"/>
+                       <rect x="36" y="44" width="8" height="4" fill="currentColor" className="text-green-600"/>
+                       <circle cx="12" cy="16" r="1" fill="currentColor" className="text-green-600"/>
+                       <circle cx="20" cy="16" r="1" fill="currentColor" className="text-green-600"/>
                      </svg>
                    </div>
                  </div>
-                 {/* Click indicator */}
-                 <div className="text-xs text-gray-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                   Click to reflect →
-                 </div>
                </div>
-             </button>
+             </div>
            </div>
 
-                                      {/* Power Moves Grid - Using New Comprehensive System */}
+                                      {/* Power Moves Grid - Exact Design Match */}
            <div className="space-y-8">
              <div className="text-center space-y-4">
                <h2 className="text-3xl md:text-4xl font-serif text-sage-800">
                  Your Power Moves
-              </h2>
+               </h2>
                <p className="text-lg text-sage-600 max-w-2xl mx-auto">
                  These gentle actions are your superpowers for creating positive change
                </p>
-            </div>
+             </div>
 
              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               {/* Card 1: Power Habit */}
+               {/* Card 1: Understanding client needs - Heart shape */}
                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 shadow-lg border border-green-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
                  <div className="absolute inset-0 opacity-20">
                    <div className="w-full h-full" style={{
@@ -998,17 +1058,20 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                  </div>
                  <div className="relative z-10 space-y-4">
                    <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Heart className="w-12 h-12 text-green-600" />
+                     <svg className="w-12 h-12 text-black" fill="currentColor" viewBox="0 0 24 24">
+                       {/* Heart shape made of diagonal line segments */}
+                       <path d="M12 4c-2-2-4-2-6 0-2 2-2 4 0 6l6 6 6-6c2-2 2-4 0-6-2-2-4-2-6 0z" fill="none" stroke="currentColor" strokeWidth="2"/>
+                       <path d="M8 8l2 2 2-2 2 2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                       <path d="M6 10l2 2 2-2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                       <path d="M14 10l2 2 2-2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                     </svg>
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">Your Power Habit</h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.powerMoves?.powerHabit || 
-                      "You're taking steps toward sustainability — every small action counts and builds momentum."}
-                   </p>
+                   <h3 className="text-lg font-bold text-gray-900 text-center">Understanding Your Needs</h3>
+                   <p className="text-sm text-gray-600 text-center">Deeply researching and analyzing your lifestyle to create tailored and effective sustainability solutions.</p>
                  </div>
                </div>
 
-               {/* Card 2: Power Move */}
+               {/* Card 2: Effective communication - Three arrows */}
                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 shadow-lg border border-purple-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
                  <div className="absolute inset-0 opacity-20">
                    <div className="w-full h-full" style={{
@@ -1017,17 +1080,80 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                  </div>
                  <div className="relative z-10 space-y-4">
                    <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Zap className="w-12 h-12 text-purple-600" />
+                     <svg className="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                       {/* Three arrows pointing diagonally up and right */}
+                       <path d="M4 16l4-4 4 4" stroke="currentColor" strokeWidth="2"/>
+                       <path d="M8 20l4-4 4 4" stroke="currentColor" strokeWidth="2"/>
+                       <path d="M12 24l4-4 4 4" stroke="currentColor" strokeWidth="2"/>
+                     </svg>
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">Your Power Move</h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.powerMoves?.powerMove || 
-                      "Try creating a 7-day visual tracker to improve one small habit. Builders like you thrive on small systems."}
-                   </p>
+                   <h3 className="text-lg font-bold text-gray-900 text-center">Effective Communication</h3>
+                   <p className="text-sm text-gray-600 text-center">Maintaining constant interaction with your sustainability journey to ensure transparency and openness.</p>
                  </div>
                </div>
 
-               {/* Card 3: Stretch CTA */}
+               {/* Card 3: Focus on user experience - Grid with cross */}
+               <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 shadow-lg border border-gray-700 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+                 <div className="absolute inset-0 opacity-20">
+                   <div className="w-full h-full" style={{
+                     backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(255, 255, 255, 0.1) 8px, rgba(255, 255, 255, 0.1) 16px), repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255, 255, 255, 0.1) 8px, rgba(255, 255, 255, 0.1) 16px)`
+                   }}></div>
+                 </div>
+                 <div className="relative z-10 space-y-4">
+                   <div className="w-16 h-16 mx-auto flex items-center justify-center">
+                     <svg className="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1">
+                       {/* Grid with cross in center */}
+                       <path d="M2 2h20v20H2z" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M6 2v20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M10 2v20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M14 2v20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M18 2v20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M2 6h20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M2 10h20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M2 14h20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M2 18h20" stroke="currentColor" strokeWidth="1"/>
+                       {/* Cross in center */}
+                       <path d="M8 8l8 8" stroke="#60A5FA" strokeWidth="2"/>
+                       <path d="M16 8l-8 8" stroke="#60A5FA" strokeWidth="2"/>
+                     </svg>
+                   </div>
+                   <h3 className="text-lg font-bold text-white text-center">Focus on User Experience</h3>
+                   <p className="text-sm text-gray-300 text-center">Prioritizing your experience in sustainable living, ensuring intuitive and user-friendly interaction with eco-friendly choices.</p>
+                 </div>
+               </div>
+
+               {/* Card 4: Quality and attention to detail - Grid with lines */}
+               <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+                 <div className="absolute inset-0 opacity-20">
+                   <div className="w-full h-full" style={{
+                     backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(107, 114, 128, 0.1) 8px, rgba(107, 114, 128, 0.1) 16px), repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(107, 114, 128, 0.1) 8px, rgba(107, 114, 128, 0.1) 16px)`
+                   }}></div>
+                 </div>
+                 <div className="relative z-10 space-y-4">
+                   <div className="w-16 h-16 mx-auto flex items-center justify-center">
+                     <svg className="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1">
+                       {/* Grid with scattered horizontal lines */}
+                       <path d="M2 2h20v20H2z" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M6 2v20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M10 2v20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M14 2v20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M18 2v20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M2 6h20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M2 10h20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M2 14h20" stroke="currentColor" strokeWidth="1"/>
+                       <path d="M2 18h20" stroke="currentColor" strokeWidth="1"/>
+                       {/* Scattered horizontal lines */}
+                       <path d="M4 8h4" stroke="currentColor" strokeWidth="2"/>
+                       <path d="M12 12h6" stroke="currentColor" strokeWidth="2"/>
+                       <path d="M6 16h3" stroke="currentColor" strokeWidth="2"/>
+                     </svg>
+                   </div>
+                   <h3 className="text-lg font-bold text-gray-900 text-center">Quality and Attention to Detail</h3>
+                   <p className="text-sm text-gray-600 text-center">Unwavering attention to detail and a commitment to high quality in every aspect of sustainable living.</p>
+                 </div>
+               </div>
+
+               {/* Card 5: Flexibility and adaptability - Crossing arrows */}
                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 shadow-lg border border-blue-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
                  <div className="absolute inset-0 opacity-20">
                    <div className="w-full h-full" style={{
@@ -1036,79 +1162,44 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                  </div>
                  <div className="relative z-10 space-y-4">
                    <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Target className="w-12 h-12 text-blue-600" />
+                     <svg className="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                       {/* Two crossing arrows */}
+                       <path d="M4 20l8-8 8 8" stroke="currentColor" strokeWidth="2"/>
+                       <path d="M20 4l-8 8-8-8" stroke="currentColor" strokeWidth="2"/>
+                     </svg>
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">Go Further</h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.powerMoves?.stretchCTA || 
-                      "Want to go further? Choose one area to focus on and build sustainable habits over time."}
-                   </p>
+                   <h3 className="text-lg font-bold text-gray-900 text-center">Flexibility and Adaptability</h3>
+                   <p className="text-sm text-gray-600 text-center">Being ready to adapt to changing sustainability requirements and responding flexibly to environmental feedback.</p>
                  </div>
                </div>
 
-               {/* Card 4: Personality Archetype */}
-               <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-6 shadow-lg border border-amber-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+               {/* Card 6: Innovative digital design solutions - Diamond grid */}
+               <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl p-6 shadow-lg border border-yellow-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
                  <div className="absolute inset-0 opacity-20">
                    <div className="w-full h-full" style={{
-                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(245, 158, 11, 0.1) 8px, rgba(245, 158, 11, 0.1) 16px)`
+                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(234, 179, 8, 0.1) 8px, rgba(234, 179, 8, 0.1) 16px)`
                    }}></div>
                  </div>
                  <div className="relative z-10 space-y-4">
                    <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Sparkles className="w-12 h-12 text-amber-600" />
+                     <svg className="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                       {/* Diamond shape made of diagonal line segments */}
+                       <path d="M12 2l8 8-8 8-8-8z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                       <path d="M8 6l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                       <path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                       <path d="M10 8l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                       <path d="M8 10l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                       <path d="M10 10l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                     </svg>
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Your Archetype'}
-                   </h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || 
-                      "You break big goals into steps. You co-create small experiments with others and build lasting systems that grow over time."}
-                   </p>
-                 </div>
-               </div>
-
-               {/* Card 5: Decision Style */}
-               <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 shadow-lg border border-emerald-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
-                 <div className="absolute inset-0 opacity-20">
-                   <div className="w-full h-full" style={{
-                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(16, 185, 129, 0.1) 8px, rgba(16, 185, 129, 0.1) 16px)`
-                   }}></div>
-                 </div>
-                 <div className="relative z-10 space-y-4">
-                   <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Brain className="w-12 h-12 text-emerald-600" />
-                   </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">Decision Style</h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.personality?.decision || 'Connector'}
-                   </p>
-                 </div>
-               </div>
-
-               {/* Card 6: Action Style */}
-               <div className="bg-gradient-to-br from-rose-50 to-rose-100 rounded-2xl p-6 shadow-lg border border-rose-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
-                 <div className="absolute inset-0 opacity-20">
-                   <div className="w-full h-full" style={{
-                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(244, 63, 94, 0.1) 8px, rgba(244, 63, 94, 0.1) 16px)`
-                   }}></div>
-                 </div>
-                 <div className="relative z-10 space-y-4">
-                   <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <ArrowRight className="w-12 h-12 text-rose-600" />
-                   </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">Action Style</h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.personality?.action || 'Experimenter'}
-                   </p>
+                   <h3 className="text-lg font-bold text-gray-900 text-center">Innovative Sustainable Solutions</h3>
+                   <p className="text-sm text-gray-600 text-center">Creating modern sustainable living solutions to develop cutting-edge, user-focused eco-friendly products.</p>
                  </div>
                </div>
              </div>
            </div>
-
-
-
                     {/* Progress Visual - Flower Ring */}
-        <div className="space-y-8">
+          <div className="space-y-8">
             <div className="text-center space-y-4">
               <h2 className="text-3xl md:text-4xl font-serif text-sage-800">
                 🌸 Your Actions Are Blooming
@@ -1215,20 +1306,18 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   {!showStory ? "Generate Story First" : "Generate Wrapped"}
                 </div>
               </Button>
-                                <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowStory(false);
-                      setShowWrapped(false);
-                      setWrappedImage(null);
-                      setCurrentCardIndex(0);
-                      setStoryCards([]);
-                      setNarrativeStory(null);
-                    }}
-                    className="text-green-700 border-green-200"
-                  >
-                    Reset Story
-                  </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowStory(false);
+                  setShowWrapped(false);
+                  setWrappedImage(null);
+                  onReset();
+                }}
+                className="text-green-700 border-green-200"
+              >
+                Reset Story
+              </Button>
             </div>
           </div>
           
@@ -1517,246 +1606,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 >
                   Download
                 </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* Story Modal */}
-        {showStoryModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-            >
-              {/* Close button */}
-              {/* Story Header with Actions */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <div className="flex items-center gap-3">
-                  <BookOpen className="h-6 w-6 text-sage-600" />
-                  <h2 className="text-2xl font-bold text-sage-800">Your Climate Journey Story</h2>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowWrapped(true)}
-                    className={cn(
-                      "text-green-700 border-green-200 px-4 py-2",
-                      !showStory && "opacity-50 cursor-not-allowed"
-                    )}
-                    disabled={!showStory}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="h-4 w-4" />
-                      {!showStory ? "Generate Story First" : "Generate Wrapped"}
-                    </div>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowStory(false);
-                      setShowWrapped(false);
-                      setWrappedImage(null);
-                      setCurrentCardIndex(0);
-                      setStoryCards([]);
-                      setNarrativeStory(null);
-                    }}
-                    className="text-green-700 border-green-200 px-4 py-2"
-                  >
-                    Reset Story
-                  </Button>
-                  <button
-                    onClick={() => setShowStoryModal(false)}
-                    className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors border border-gray-200"
-                  >
-                    <X className="h-5 w-5 text-gray-700" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Story Content */}
-              <div className="p-8">
-                {!showStory ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center space-y-8"
-                  >
-                    <div className="space-y-4">
-                      <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-100 to-blue-100 rounded-full flex items-center justify-center">
-                        <Sparkles className="h-10 w-10 text-purple-600" />
-                      </div>
-                      <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Discover your unique sustainability journey and share it with others
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                      <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Sparkles className="h-5 w-5 text-purple-500" />
-                          <span className="font-medium text-purple-900">Personalized</span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Tailored to your unique sustainability journey and choices
-                        </p>
-                      </div>
-                      <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Share2 className="h-5 w-5 text-blue-500" />
-                          <span className="font-medium text-purple-900">Engaging</span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Interactive storytelling with visual elements and animations
-                        </p>
-                      </div>
-                      <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Share2 className="h-5 w-5 text-blue-500" />
-                          <span className="font-medium text-purple-900">Shareable</span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Easy to share your journey with friends and family
-                        </p>
-                      </div>
-                    </div>
-
-                    <Button
-                      onClick={async () => {
-                        await generateStory();
-                        setShowStory(true);
-                      }}
-                      className={cn(
-                        "w-full text-white py-6 rounded-xl flex items-center justify-center gap-3 text-lg transition-all duration-300",
-                        isGeneratingStory 
-                          ? "bg-purple-500 cursor-not-allowed"
-                          : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:shadow-lg"
-                      )}
-                      disabled={isGeneratingStory}
-                    >
-                      {isGeneratingStory ? (
-                        <>
-                          <Loader2 className="h-6 w-6 animate-spin" />
-                          Crafting Your Story...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="h-6 w-6" />
-                          Generate Your Climate Journey
-                        </>
-                      )}
-                    </Button>
-                  </motion.div>
-                ) : storyCards.length > 0 ? (
-                  <AnimatePresence>
-                    <motion.div 
-                      key={currentCardIndex}
-                      initial={{ opacity: 0, y: 40 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -40 }}
-                      transition={{ duration: 0.5, type: 'spring' }}
-                      className={cn(
-                        'story-card space-y-6 rounded-3xl shadow-2xl border p-10 md:p-14',
-                        combinedStoryCards[currentCardIndex]?.isNarrative
-                          ? 'bg-gradient-to-br from-blue-50 via-white to-green-50 border-blue-100'
-                          : 'bg-gradient-to-br from-green-50 via-white to-purple-50 border-green-100'
-                      )}
-                    >
-                      <div className="flex items-center gap-4 mb-2">
-                        <div className="p-3 bg-gradient-to-br from-green-200 to-green-400 rounded-xl shadow-lg">
-                          {combinedStoryCards[currentCardIndex].emoji && (
-                            <span className="text-3xl drop-shadow-lg">{combinedStoryCards[currentCardIndex].emoji}</span>
-                          )}
-                        </div>
-                        <h3 className={cn(
-                          'font-serif tracking-tight flex-1',
-                          combinedStoryCards[currentCardIndex]?.isNarrative
-                            ? 'text-3xl md:text-4xl font-extrabold text-blue-900'
-                            : 'text-3xl md:text-4xl font-extrabold text-green-900'
-                        )}>
-                          {combinedStoryCards[currentCardIndex].title}
-                        </h3>
-                      </div>
-                      <div className={cn(
-                        'rounded-2xl shadow-md',
-                        combinedStoryCards[currentCardIndex]?.isNarrative
-                          ? 'bg-white/95 p-10 border-l-4 border-blue-300'
-                          : 'bg-white/90 p-8 border-l-4 border-green-300'
-                      )}>
-                        <p className={cn(
-                          'leading-relaxed whitespace-pre-line',
-                          combinedStoryCards[currentCardIndex]?.isNarrative
-                            ? 'text-xl text-blue-900 font-medium italic'
-                            : 'text-lg md:text-xl text-gray-800 font-medium'
-                        )}>
-                          {combinedStoryCards[currentCardIndex].content}
-                        </p>
-                      </div>
-                      {combinedStoryCards[currentCardIndex].stats && (
-                        <div className={cn(
-                          'flex items-center gap-2 font-semibold mt-2',
-                          combinedStoryCards[currentCardIndex]?.isNarrative
-                            ? 'text-blue-700 text-base'
-                            : 'text-green-700 text-base'
-                        )}>
-                          <Info className="h-5 w-5" />
-                          {combinedStoryCards[currentCardIndex].stats}
-                        </div>
-                      )}
-                      <div className="flex items-center justify-between pt-6">
-                        <Button
-                          variant="outline"
-                          onClick={handlePreviousCard}
-                          disabled={currentCardIndex === 0}
-                          className="flex items-center gap-2 text-green-700 border-green-200"
-                        >
-                          <ArrowLeft className="h-4 w-4" />
-                          Previous
-                        </Button>
-                        <div className="flex items-center gap-2">
-                          {combinedStoryCards.map((_, index) => (
-                            <motion.div
-                              key={index}
-                              className={cn(
-                                'h-3 w-3 rounded-full border-2',
-                                currentCardIndex === index
-                                  ? combinedStoryCards[index]?.isNarrative
-                                    ? 'bg-blue-600 border-blue-600 shadow-lg'
-                                    : 'bg-green-600 border-green-600 shadow-lg'
-                                  : combinedStoryCards[index]?.isNarrative
-                                    ? 'bg-blue-100 border-blue-200'
-                                    : 'bg-green-100 border-green-200'
-                              )}
-                              whileHover={{ scale: 1.2 }}
-                              onClick={() => setCurrentCardIndex(index)}
-                              style={{ cursor: 'pointer' }}
-                            />
-                          ))}
-                        </div>
-                        <Button
-                          variant="outline"
-                          onClick={handleNextCard}
-                          disabled={currentCardIndex === combinedStoryCards.length - 1}
-                          className="flex items-center gap-2 text-green-700 border-green-200"
-                        >
-                          Next
-                          <ArrowRight className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-                ) : (
-                  <div className="text-center p-8">
-                    <p className="text-gray-600">Generating your story...</p>
-                  </div>
-                )}
               </div>
             </motion.div>
           </motion.div>

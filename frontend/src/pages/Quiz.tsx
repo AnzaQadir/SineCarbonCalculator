@@ -1157,6 +1157,12 @@ function PoeticJourneyQuiz() {
           setShowExistingUserScreen(false);
           setExistingUser(null);
         }}
+        onBack={() => {
+          setShowResults(false);
+          setResults(null);
+          // Go back to the welcome back screen
+          setShowExistingUserScreen(true);
+        }}
         state={answers}
         gender={answers.gender === 'female' ? 'girl' : 'boy'}
       />
@@ -1235,7 +1241,7 @@ function PoeticJourneyQuiz() {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-12 relative"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundRepeat: 'repeat',
@@ -1295,22 +1301,22 @@ function PoeticJourneyQuiz() {
         </div>
       </div>
       
-      <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] relative z-10">
+      <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-6 mb-6 border border-[#A7D58E22] relative z-10 max-h-[90vh] overflow-y-auto">
         {/* Chapter Title */}
-        <div className="mb-2">
-          <h2 className="text-2xl md:text-3xl font-serif text-[#7A8B7A] text-center mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>{section.title}</h2>
-          <div className="text-base md:text-lg text-[#A08C7D] text-center italic mb-4" style={{ fontFamily: 'Inter, sans-serif', fontStyle: 'italic', fontWeight: 400 }}>{section.sub}</div>
+        <div className="mb-3">
+          <h2 className="text-xl md:text-2xl font-serif text-[#7A8B7A] text-center mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>{section.title}</h2>
+          <div className="text-sm md:text-base text-[#A08C7D] text-center italic mb-3" style={{ fontFamily: 'Inter, sans-serif', fontStyle: 'italic', fontWeight: 400 }}>{section.sub}</div>
         </div>
         {/* Question */}
-        <div className="flex flex-col items-center mb-6">
+        <div className="flex flex-col items-center mb-4">
           {q.type === 'personality' ? (
             <PandaGifWithDelay gifUrl={step % 2 === 0 ? '/gif/joyful_panda.gif' : '/gif/panda.gif'} />
           ) : (
-            <span style={{ fontSize: 48 }}>{q.icon}</span>
+            <span style={{ fontSize: 36 }}>{q.icon}</span>
           )}
-          <div className="text-2xl md:text-3xl font-serif text-[#7A8B7A] text-center mt-4 mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 500 }}>{q.question}</div>
+          <div className="text-lg md:text-xl font-serif text-[#7A8B7A] text-center mt-3 mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 500 }}>{q.question}</div>
         </div>
-        <div className="flex flex-wrap justify-center gap-4 mb-8">
+        <div className="flex flex-wrap justify-center gap-3 mb-6">
           {q.key === 'country' ? (
             <select
               value={getNestedValue(answers, q.key) || ''}
@@ -1446,37 +1452,55 @@ function PoeticJourneyQuiz() {
             </div>
           ) : null}
         </div>
-        <div className="flex justify-between mt-8">
+        <div className="flex justify-between items-center mt-8">
+          {/* Back Button */}
           <button
             onClick={handleBack}
             disabled={step === 0}
-            className="rounded-full px-6 py-2 bg-[#E6E6F7] text-[#7A8B7A] font-serif text-lg shadow hover:bg-[#D6F5E3] transition"
+            className="group flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm border-2 border-sage-200 text-sage-700 font-serif text-base rounded-2xl shadow-lg hover:shadow-xl hover:border-sage-300 hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
+            <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
             Back
           </button>
           
-          {/* Progress indicator */}
-          <div className="flex items-center gap-2 text-sm text-[#7A8B7A]">
-            <span>Question {step + 1} of {questions.length}</span>
-            <div className="flex gap-1">
-              {questions.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full ${
-                    index < step ? 'bg-[#A7D58E]' : 
-                    index === step ? 'bg-[#A7D58E]' : 'bg-gray-300'
-                  }`}
-                />
-              ))}
+          {/* Progress Dots */}
+          <div className="text-center">
+            <div className="flex justify-center gap-1">
+              {Array.from({ length: Math.ceil(questions.length / 2) }, (_, index) => {
+                const startQuestion = index * 2;
+                const endQuestion = Math.min(startQuestion + 1, questions.length - 1);
+                const isCurrentDot = step >= startQuestion && step <= endQuestion;
+                const isCompleted = step > endQuestion;
+                const isHalfDot = questions.length % 2 === 1 && index === Math.ceil(questions.length / 2) - 1;
+                
+                return (
+                  <div
+                    key={index}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      isCompleted 
+                        ? 'bg-sage-600' 
+                        : isCurrentDot 
+                          ? 'bg-sage-400' 
+                          : 'bg-sage-200'
+                    } ${isHalfDot ? 'w-1.5' : 'w-3'}`}
+                  />
+                );
+              })}
             </div>
           </div>
           
+          {/* Next Button */}
           <button
             onClick={handleNext}
-            className="rounded-full px-6 py-2 bg-[#A7D58E] text-white font-serif text-lg shadow hover:bg-[#7A8B7A] transition"
             disabled={!getNestedValue(answers, q.key)}
+            className="group flex items-center gap-3 px-6 py-3 bg-sage-600 text-white font-serif text-base rounded-2xl shadow-lg hover:shadow-xl hover:bg-sage-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {step === questions.length - 1 ? 'See Results' : 'Next'}
+            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
       </div>
