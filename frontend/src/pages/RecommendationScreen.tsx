@@ -27,7 +27,7 @@ const personalityTypeMap: Record<string, string> = {
 const RecommendationScreen: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUserStore();
-  const { quizResults } = useQuizStore();
+  const { quizResults, quizAnswers } = useQuizStore();
   const [isLoading, setIsLoading] = useState(true);
 
   console.log('RecommendationScreen - quizResults:', JSON.stringify(quizResults, null, 2));
@@ -43,6 +43,7 @@ const RecommendationScreen: React.FC = () => {
         ecoPersonality: personalityType,
         personality: personalityType,
         personalityType: personalityType,
+        quizAnswers: quizAnswers, // Include quiz answers for better recommendations
       }
     : {};
 

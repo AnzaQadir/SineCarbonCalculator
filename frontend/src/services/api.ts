@@ -119,6 +119,22 @@ export interface PersonalityResponse {
   };
   finalScore: number;
   powerMoves: string[];
+  comprehensivePowerMoves?: {
+    personality: {
+      archetype: string;
+      decision: string;
+      action: string;
+      description: string;
+    };
+    powerMoves: {
+      powerHabit: string;
+      powerMove: string;
+      stretchCTA: string;
+    };
+    tone: string;
+  };
+  newPersonality?: string;
+  newPersonalityDescription?: string;
   personalityTraits?: {
     relationshipWithChange?: string;
     decisionMaking?: string;

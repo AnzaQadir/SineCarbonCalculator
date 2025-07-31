@@ -7,6 +7,21 @@ export type PersonalityType =
   | 'Doing Nothing for the Planet'
   | 'Certified Climate Snoozer';
 
+export interface ComprehensivePowerMoves {
+  personality: {
+    archetype: string;
+    decision: string;
+    action: string;
+    description: string;
+  };
+  powerMoves: {
+    powerHabit: string;
+    powerMove: string;
+    stretchCTA: string;
+  };
+  tone: string;
+}
+
 export interface PersonalityResponse {
   personalityType: PersonalityType;
   description: string;
@@ -25,9 +40,13 @@ export interface PersonalityResponse {
   };
   finalScore: number;
   powerMoves: string[];
+  comprehensivePowerMoves?: ComprehensivePowerMoves;
   dominantCategory?: string;
   emoji?: string;
   badge?: string;
   story?: string;
   nextAction?: string;
+  quizAnswers?: any; // Include quiz answers for recommendations
+  newPersonality?: string; // New personality type from API
+  newPersonalityDescription?: string; // New personality description from API
 } 
