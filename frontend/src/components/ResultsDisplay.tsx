@@ -137,6 +137,21 @@ interface ResultsDisplayProps {
   onBack?: () => void; // Add back function prop
   state: any;
   gender: 'boy' | 'girl';
+  comprehensivePowerMoves?: {
+    personality: {
+      archetype: string;
+      decision: string;
+      action: string;
+      description: string;
+      hookLine: string;
+    };
+    powerMoves: {
+      powerHabit: string;
+      powerMove: string;
+      stretchCTA: string;
+    };
+    tone: string;
+  };
 }
 
 const getAchievements = (state: any, categoryEmissions: CategoryEmissions): Achievement[] => {
@@ -288,7 +303,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   onReset,
   onBack,
   state: _state,
-  gender
+  gender,
+  comprehensivePowerMoves
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isPersonalityLoading, setIsPersonalityLoading] = useState(true);
@@ -321,6 +337,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // Debug: Log all props and key state
   console.log('ResultsDisplay props:', { score, emissions, categoryEmissions, recommendations, isVisible, state });
   console.log('DynamicPersonality at top of render:', dynamicPersonality);
+
 
   // Add a ref to track if calculation has been attempted
   const hasAttemptedCalculation = useRef(false);
@@ -423,8 +440,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     return impacts[step] || 'Medium Impact';
   };
 
-  // Update the profile image logic to use the mapped image for the personality name
-  const profileImage = dynamicPersonality ? getPersonalityImage(personalityType, gender) : '';
+  // Update the profile image logic to use the new archetype from comprehensivePowerMoves
+  const archetype = dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype;
+  const profileImage = dynamicPersonality && archetype ? 
+    getPersonalityImage(archetype as PersonalityType, gender) : 
+    (dynamicPersonality ? getPersonalityImage(personalityType, gender) : '');
 
   // Update generateStory to use backend data everywhere
   const generateStory = async () => {
@@ -703,41 +723,83 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       setIsLoading(true);
       setError(null);
 
-      const apiResponses = transformStateToApiFormat(state);
-      // If quizAnswers includes personalityTraits, include them in the payload
-      const payload = quizAnswers && quizAnswers.personalityTraits
-        ? { ...apiResponses, personalityTraits: quizAnswers.personalityTraits }
-        : apiResponses;
-      const result = await calculatePersonality(payload);
+      // Use the comprehensivePowerMoves prop if available, otherwise use fallback
+      if (comprehensivePowerMoves) {
+        // Use the data passed from Quiz.tsx
+        setDynamicPersonality({
+          personalityType: comprehensivePowerMoves.personality?.archetype || 'Eco in Progress',
+          description: comprehensivePowerMoves.personality?.description || 'Your unique approach to sustainability combines awareness with action.',
+          strengths: [],
+          nextSteps: [],
+          categoryScores: {
+            home: { score: categoryEmissions.home, percentage: 0, maxPossible: 10, maxPossibleScore: 10 },
+            transport: { score: categoryEmissions.transport, percentage: 0, maxPossible: 10, maxPossibleScore: 10 },
+            food: { score: categoryEmissions.food, percentage: 0, maxPossible: 10, maxPossibleScore: 10 },
+            waste: { score: categoryEmissions.waste, percentage: 0, maxPossible: 10, maxPossibleScore: 10 }
+          },
+          impactMetrics: {
+            carbonReduced: emissions.toString(),
+            treesPlanted: Math.round(emissions / 0.02),
+            communityImpact: Math.round(emissions * 10)
+          },
+          finalScore: score,
+          powerMoves: [],
+          comprehensivePowerMoves: comprehensivePowerMoves,
+          dominantCategory: Object.entries(categoryEmissions)
+            .reduce((a, b) => (a[1] > b[1] ? a : b))[0],
+          emoji: '🌱',
+          badge: 'Eco Explorer',
+          story: comprehensivePowerMoves.personality?.description || 'Your sustainability journey is unique and meaningful.',
+          nextAction: 'Start your journey'
+        });
+      } else {
+        // Fallback: Make API call only if no comprehensivePowerMoves are provided
+        const apiResponses = transformStateToApiFormat(state);
+        const payload = quizAnswers && quizAnswers.personalityTraits
+          ? { ...apiResponses, personalityTraits: quizAnswers.personalityTraits }
+          : apiResponses;
+        const result = await calculatePersonality(payload) as any;
 
-      // Map the API response to the expected format
-      setDynamicPersonality({
-        personalityType: isPersonalityType(result.personalityType) ? result.personalityType : 'Eco in Progress',
-        description: result.description,
-        strengths: result.strengths,
-        nextSteps: result.nextSteps,
-        categoryScores: result.categoryScores,
-        impactMetrics: result.impactMetrics,
-        finalScore: result.finalScore,
-        powerMoves: result.powerMoves,
-        comprehensivePowerMoves: result.comprehensivePowerMoves, // Include comprehensive power moves
-        dominantCategory: Object.entries(result.categoryScores)
-          .reduce((a, b) => (a[1].score > b[1].score ? a : b))[0],
-        emoji: '🌱', // Default emoji
-        badge: 'Eco Explorer', // Default badge
-        story: result.description,
-        nextAction: result.nextSteps[0] || 'Start your journey'
-      });
+        setDynamicPersonality({
+          personalityType: isPersonalityType(result.personalityType) ? result.personalityType : 'Eco in Progress',
+          description: result.description,
+          strengths: result.strengths,
+          nextSteps: result.nextSteps,
+          categoryScores: result.categoryScores,
+          impactMetrics: result.impactMetrics,
+          finalScore: result.finalScore,
+          powerMoves: result.powerMoves,
+          comprehensivePowerMoves: result.comprehensivePowerMoves || {
+            personality: {
+              archetype: 'Eco in Progress',
+              decision: 'Analyst',
+              action: 'Planner',
+              description: 'Your unique approach to sustainability combines awareness with action.',
+              hookLine: 'You combine awareness with action.'
+            },
+            powerMoves: {
+              powerHabit: 'You already practice sustainable habits.',
+              powerMove: 'Start with one small change this week.',
+              stretchCTA: 'Want to go further? Try one new sustainable habit.'
+            },
+            tone: 'supportive, intelligent, honest, warm'
+          },
+          dominantCategory: Object.entries(result.categoryScores)
+            .reduce((a, b) => (a[1].score > b[1].score ? a : b))[0],
+          emoji: '🌱',
+          badge: 'Eco Explorer',
+          story: result.description,
+          nextAction: result.nextSteps[0] || 'Start your journey'
+        });
+      }
 
-      console.log('Set dynamic personality:', {
-        personalityType: result.personalityType,
-        description: result.description,
-        strengths: result.strengths,
-        nextSteps: result.nextSteps,
-        categoryScores: result.categoryScores,
-        impactMetrics: result.impactMetrics,
-        finalScore: result.finalScore,
-        comprehensivePowerMoves: result.comprehensivePowerMoves
+      console.log('Set dynamic personality from props:', {
+        score,
+        emissions,
+        categoryEmissions,
+        hasComprehensivePowerMoves: !!comprehensivePowerMoves,
+        archetype: comprehensivePowerMoves?.personality?.archetype,
+        hookLine: comprehensivePowerMoves?.personality?.hookLine
       });
     } catch (err) {
       console.error('Error calculating personality:', err);
@@ -840,17 +902,33 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                </div>
              </div>
              
-             {/* Title */}
+             {/* Personality Name */}
              <h1 className="text-3xl md:text-4xl font-bold text-sage-800 mb-4 text-center">
-                               {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Eco in Progress'}
+               {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Eco in Progress'}
              </h1>
              
-             {/* Personality Description */}
-             <div className="text-center max-w-2xl mx-auto mb-6">
-               <p className="text-lg text-sage-600 leading-relaxed">
-                                   {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
+
+             
+             {/* Hook Line */}
+             <div className="text-center max-w-2xl mx-auto mb-4">
+               <p className="text-lg font-medium text-sage-700 italic">
+                 {dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}
                </p>
              </div>
+             
+             {/* Detailed Personality Description */}
+             <div className="text-center max-w-2xl mx-auto mb-6">
+               <p className="text-base text-sage-600 leading-relaxed">
+                 {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
+               </p>
+             </div>
+             
+             {/* Debug Info */}
+             {process.env.NODE_ENV === 'development' && (
+               <div className="text-xs text-gray-500 mt-2">
+                 API Description: {dynamicPersonality?.comprehensivePowerMoves?.personality?.description?.substring(0, 100)}...
+               </div>
+             )}
              
 
            </div>

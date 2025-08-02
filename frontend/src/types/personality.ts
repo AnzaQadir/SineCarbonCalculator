@@ -5,7 +5,17 @@ export type PersonalityType =
   | 'Kind of Conscious, Kind of Confused'
   | 'Eco in Progress'
   | 'Doing Nothing for the Planet'
-  | 'Certified Climate Snoozer';
+  | 'Certified Climate Snoozer'
+  // New archetypes from comprehensivePowerMoves
+  | 'Strategist'
+  | 'Trailblazer'
+  | 'Coordinator'
+  | 'Visionary'
+  | 'Explorer'
+  | 'Catalyst'
+  | 'Builder'
+  | 'Networker'
+  | 'Steward';
 
 export interface ComprehensivePowerMoves {
   personality: {
@@ -13,6 +23,7 @@ export interface ComprehensivePowerMoves {
     decision: string;
     action: string;
     description: string;
+    hookLine: string;
   };
   powerMoves: {
     powerHabit: string;

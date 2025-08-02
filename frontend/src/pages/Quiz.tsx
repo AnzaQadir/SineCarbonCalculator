@@ -1140,6 +1140,16 @@ function PoeticJourneyQuiz() {
       food: results?.categoryScores?.food?.score || 0,
       waste: results?.categoryScores?.waste?.score || 0,
     };
+    
+    // Debug: Log the API results to see what we're getting
+    console.log('API Results passed to ResultsDisplay:', {
+      comprehensivePowerMoves: results?.comprehensivePowerMoves,
+      personality: results?.comprehensivePowerMoves?.personality,
+      archetype: results?.comprehensivePowerMoves?.personality?.archetype,
+      hookLine: results?.comprehensivePowerMoves?.personality?.hookLine,
+      description: results?.comprehensivePowerMoves?.personality?.description
+    });
+    
     // For recommendations, pass an empty array (or map if you have Recommendation[])
     return (
       <ResultsDisplay
@@ -1165,6 +1175,8 @@ function PoeticJourneyQuiz() {
         }}
         state={answers}
         gender={answers.gender === 'female' ? 'girl' : 'boy'}
+        // Pass the comprehensivePowerMoves data directly
+        comprehensivePowerMoves={results?.comprehensivePowerMoves}
       />
     );
   }
