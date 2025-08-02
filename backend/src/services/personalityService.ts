@@ -149,6 +149,7 @@ interface PowerMovesResponse {
     decision: string;
     action: string;
     description: string;
+    hookLine: string;
   };
   powerMoves: {
     powerHabit: string;
@@ -665,6 +666,7 @@ export class PersonalityService {
     decision: string;
     action: string;
     description: string;
+    hookLine: string;
   } {
     const decisionCategories = ['analyst', 'intuitive', 'connector'] as const;
     const actionCategories = ['planner', 'experimenter', 'collaborator'] as const;
@@ -697,47 +699,56 @@ export class PersonalityService {
     const actionStyle = pickDominant(actionCounts, actionCategories);
 
     // Matrix mapping
-    const matrix: Record<string, Record<string, { type: string; desc: string }>> = {
+    const matrix: Record<string, Record<string, { type: string; desc: string; hookLine: string }>> = {
       analyst: {
         planner: { 
           type: 'Strategist', 
-          desc: 'You like to know the plan before you start. You analyze data, create systems, and build sustainable habits through careful planning and measurement.' 
+          desc: 'You like a plan. Lists are your love language and you probably get a little thrill from checking things off. You\'re not one to wing it—you\'d rather figure out what works, build a system around it, and stick to it. Whether it\'s organizing your fridge to reduce food waste or tracking your energy usage, you\'re all about efficient, repeatable habits. In the climate space, you shine when you turn everyday routines into impact. You don\'t need a rooftop garden (yet)—you\'re the one who actually sets the reminder to bring a tote bag or checks the electricity bill just to see the change. People around you learn from your consistency—so keep showing how structure can lead to sustainability.',
+          hookLine: 'You love a plan and turn small routines into big impact.'
         },
         experimenter: { 
           type: 'Trailblazer', 
-          desc: 'You jump in and see what sticks. You test new approaches, measure results, and optimize based on what works best for your lifestyle.' 
+          desc: 'You\'re all about diving in and figuring it out later. You love testing new ideas, trying new swaps, and seeing what sticks. Composting? You\'ll give it a shot. Switching up your shampoo bar? Why not. Some things will work, some won\'t—and that\'s the whole point. You don\'t wait for a perfect plan, which is exactly what makes you powerful. Your climate journey is built on curiosity, not pressure. And every time you try something new—no matter how small—you make it easier for the next person to try too. You\'re the reason someone else says, "Huh, maybe I can do that too."',
+          hookLine: 'You dive in, try things out, and figure it out as you go.'
         },
         collaborator: { 
           type: 'Coordinator', 
-          desc: 'You bring people together for a common goal. You analyze group dynamics, create shared systems, and coordinate collective climate action.' 
+          desc: 'You\'re a behind-the-scenes powerhouse. You love bringing people together to get things done, whether it\'s planning a potluck or getting your group to split a bulk grocery order. You\'ve got the social touch and the steady hand—it\'s a winning combo. When it comes to climate action, you make it communal. You\'re the one starting the group chat for a clothing swap or helping your friend figure out what goes in the recycling bin. You remind people that sustainability isn\'t just about what *you* do—it\'s about what *we* build together. Keep leading the way, one shared effort at a time.',
+          hookLine: 'You bring people together to make things happen—collaboratively.'
         }
       },
       intuitive: {
         planner: { 
           type: 'Visionary', 
-          desc: 'You see the big picture and sketch out a brighter future. You plan with intuition, create inspiring visions, and build sustainable systems that feel right.' 
+          desc: 'You see the world not just as it is—but as it could be. You\'re thoughtful, creative, and full of quiet hope. Your imagination fuels your actions: maybe you dream about green cities, cozy neighborhoods, or homes that breathe with nature. In practice, that might look like turning a corner of your space into a plant haven, journaling about future lifestyles, or slowly swapping out your habits to reflect your values. You don\'t rush change—you nurture it. Your role in the climate movement is to remind us that small seeds can grow into something beautiful. Keep sketching that future—we need it.',
+          hookLine: 'You dream big and act small, building the future one idea at a time.'
         },
         experimenter: { 
           type: 'Explorer', 
-          desc: 'You learn by doing, then share what works. You trust your instincts, try new things, and discover sustainable solutions through hands-on experience.' 
+          desc: 'You like to learn by doing. You\'re not here for long-winded lectures—you want to test things out, see how it feels, and then tell your friends about it. Maybe you try biking to work, growing herbs on your windowsill, or skipping takeout for a week—just to see. You thrive when you\'re in motion, adjusting as you go. Climate action, for you, is less about perfection and more about momentum. Your honest feedback and real-world experiments help others figure out what works for *them*, too. So keep exploring—your journey is full of insight (and great stories).',
+          hookLine: 'You learn by doing and share what works—no fuss, just flow.'
         },
         collaborator: { 
           type: 'Catalyst', 
-          desc: 'You spark enthusiasm in others. You intuitively understand what motivates people and create contagious energy for climate action.' 
+          desc: 'You\'re the spark that gets things moving. Your enthusiasm is magnetic—when you care about something, it shows, and people notice. You\'re the one who turns a random thought into a group challenge, or who convinces your friend to finally try a tote bag with a "come on, just try it!" In the climate space, your energy creates momentum. You may not have all the answers (who does?), but you know how to make things feel doable—and maybe even fun. You bring the memes, the energy, the group selfies. And in a world full of overwhelm, that\'s exactly what people need more of.',
+          hookLine: 'You spark action in others with your energy and enthusiasm.'
         }
       },
       connector: {
         planner: { 
           type: 'Builder', 
-          desc: 'You break big goals into steps. You connect ideas, build bridges between people, and create sustainable systems that grow over time.' 
+          desc: 'You love turning ideas into action. Big visions are cool, but you\'re here to break them into steps. You\'re the type to transform a junk drawer into a reusables station or to figure out a system for sorting your recycling that even guests understand. In climate work, your gift is turning intention into infrastructure—even if it\'s just in your home or workplace. You make change feel achievable because you don\'t just talk about it—you *build* it, one drawer, bin, or corner at a time. Keep constructing your climate-friendly life—it adds up fast.',
+          hookLine: 'You break goals into steps and create systems that stick.'
         },
         experimenter: { 
           type: 'Networker', 
-          desc: 'You connect dots and share resources. You build relationships, share knowledge, and create networks that amplify climate impact.' 
+          desc: 'You\'re the person everyone asks for recommendations—and you *always* have the list. You\'re naturally resourceful and generous with what you know, whether it\'s sharing the name of a good repair café or reminding your group where to get second-hand furniture. You help create bridges. You may not always be in the spotlight, but your quiet knowledge-sharing keeps the climate movement grounded and growing. You\'re not just building habits—you\'re building community resilience. Keep passing it on—you never know who it\'ll help.',
+          hookLine: 'You connect the dots and love sharing what you\'ve learned.'
         },
         collaborator: { 
           type: 'Steward', 
-          desc: 'You stick with habits that protect what matters. You nurture relationships, maintain sustainable practices, and care for your community and environment.' 
+          desc: 'You care deeply and stick to what matters. You don\'t need loud gestures—you\'re guided by values, by care, and by quiet consistency. You\'re the person who\'s always reused glass jars or who reminds everyone to switch off the lights when leaving a room. In a world full of burnout and fast fixes, you offer something rare: steadiness. You show that climate action can be small, deliberate, and full of heart. And even if you don\'t always feel like a "climate person," your habits are a form of love—for your space, your people, and the future. Keep showing up—you\'re already making a difference.',
+          hookLine: 'You quietly stick to what matters and lead by thoughtful example.'
         }
       }
     };
@@ -748,7 +759,8 @@ export class PersonalityService {
       archetype: resultEntry.type,
       decision: decisionStyle.charAt(0).toUpperCase() + decisionStyle.slice(1),
       action: actionStyle.charAt(0).toUpperCase() + actionStyle.slice(1),
-      description: resultEntry.desc
+      description: resultEntry.desc,
+      hookLine: resultEntry.hookLine
     };
   }
 
@@ -945,7 +957,8 @@ export class PersonalityService {
       archetype: 'Builder',
       decision: 'Connector',
       action: 'Experimenter',
-      description: 'You break big goals into steps. You co-create small experiments with others and build lasting systems that grow over time.'
+      description: 'You break big goals into steps. You co-create small experiments with others and build lasting systems that grow over time.',
+      hookLine: 'You break goals into steps and create systems that stick.'
     };
 
     if (responses.personalityTraits) {

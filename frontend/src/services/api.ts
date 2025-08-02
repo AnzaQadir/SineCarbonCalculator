@@ -125,6 +125,7 @@ export interface PersonalityResponse {
       decision: string;
       action: string;
       description: string;
+      hookLine: string;
     };
     powerMoves: {
       powerHabit: string;

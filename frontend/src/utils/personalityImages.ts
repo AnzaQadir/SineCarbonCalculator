@@ -31,6 +31,43 @@ const personalityImageMap: Record<PersonalityType, Record<Gender, string>> = {
   'Certified Climate Snoozer': {
     boy: '/images/Certified-Climate-Snoozer-Boy.png',
     girl: '/images/Certified-Climate-Snoozer-Girl.png'
+  },
+  // New archetypes from comprehensivePowerMoves
+  'Strategist': {
+    boy: '/images/Sustainability-Slayer-Boy.png', // Using existing image as fallback
+    girl: '/images/Sustainability-Slayer-Girl.png'
+  },
+  'Trailblazer': {
+    boy: '/images/Planets-Main-Character-Boy.png',
+    girl: '/images/Planets-Main-Character-Girl.png'
+  },
+  'Coordinator': {
+    boy: '/images/Sustainability-Soft-Launch-Boy.png',
+    girl: '/images/Sustainability-Soft-Launch-Girl.png'
+  },
+  'Visionary': {
+    boy: '/images/Eco-in-Progres-Boy.png',
+    girl: '/images/Eco-In-Progress-Girl.png'
+  },
+  'Explorer': {
+    boy: '/images/Kind-of-Conscious-Boy.png',
+    girl: '/images/Kind-of-Conscious-Girl.png'
+  },
+  'Catalyst': {
+    boy: '/images/Doing-Nothing-Boy.png',
+    girl: '/images/Doing-Nothing-Girl.png'
+  },
+  'Builder': {
+    boy: '/images/Certified-Climate-Snoozer-Boy.png',
+    girl: '/images/Certified-Climate-Snoozer-Girl.png'
+  },
+  'Networker': {
+    boy: '/images/Sustainability-Slayer-Boy.png',
+    girl: '/images/Sustainability-Slayer-Girl.png'
+  },
+  'Steward': {
+    boy: '/images/Planets-Main-Character-Boy.png',
+    girl: '/images/Planets-Main-Character-Girl.png'
   }
 };
 
