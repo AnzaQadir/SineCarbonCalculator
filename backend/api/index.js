@@ -11,6 +11,8 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const personalityRoutes_1 = require("./routes/personalityRoutes");
 const recommendationRoutes_1 = require("./routes/recommendationRoutes");
 const userRoutes_1 = require("./routes/userRoutes");
+const sessionRoutes_1 = __importDefault(require("./routes/sessionRoutes"));
+const models_1 = require("./models");
 // Load environment variables
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -24,6 +26,7 @@ app.use(express_1.default.json());
 app.use('/api/personality', personalityRoutes_1.personalityRoutes);
 app.use('/api/recommendations', recommendationRoutes_1.recommendationRoutes);
 app.use('/api/users', userRoutes_1.userRoutes);
+app.use('/api/sessions', sessionRoutes_1.default);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -39,8 +42,20 @@ app.use((err, req, res, next) => {
         message: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
 });
-// Start server
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+// Initialize database and start server
+const startServer = async () => {
+    try {
+        // Initialize database
+        await (0, models_1.initializeDatabase)();
+        // Start server
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port}`);
+        });
+    }
+    catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+startServer();
 exports.default = app;

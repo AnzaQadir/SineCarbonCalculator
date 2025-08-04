@@ -675,11 +675,16 @@ export class PersonalityService {
     const actionCounts: Record<string, number> = { planner: 0, experimenter: 0, collaborator: 0 };
 
     Object.entries(personalityTraits).forEach(([key, value]) => {
-      if (key.startsWith('decisionMaking') && decisionCategories.includes(value as any)) {
-        decisionCounts[value as keyof typeof decisionCounts] += 1;
+      // Map personality traits to decision and action categories
+      if (['relationshipWithChange', 'decisionMaking', 'motivation', 'ecoIdentity', 'opennessToLearning'].includes(key)) {
+        if (decisionCategories.includes(value as any)) {
+          decisionCounts[value as keyof typeof decisionCounts] += 1;
+        }
       }
-      if (key.startsWith('actionTaking') && actionCategories.includes(value as any)) {
-        actionCounts[value as keyof typeof actionCounts] += 1;
+      if (['socialInfluence', 'emotionalConnection', 'barriers', 'goalSetting', 'selfEfficacy'].includes(key)) {
+        if (actionCategories.includes(value as any)) {
+          actionCounts[value as keyof typeof actionCounts] += 1;
+        }
       }
     });
 
