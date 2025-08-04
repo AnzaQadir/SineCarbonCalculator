@@ -1,20 +1,50 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
-// In-memory storage for demo purposes
-// In production, this would be replaced with a real database
-const users = [];
-const userActivities = [];
+const models_1 = require("../models");
+const sessionService_1 = require("./sessionService");
 class UserService {
+    /**
+     * Helper function to convert UserModel to User interface
+     */
+    static convertUserModelToUser(user) {
+        return {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            age: user.age,
+            gender: user.gender,
+            profession: user.profession,
+            country: user.country,
+            city: user.city,
+            household: user.household,
+            waitlistPosition: user.waitlistPosition,
+            ctaVariant: (user.ctaVariant || 'A'),
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        };
+    }
+    /**
+     * Helper function to convert UserActivityModel to UserActivity interface
+     */
+    static convertActivityModelToActivity(activity) {
+        return {
+            id: activity.id,
+            userId: activity.userId,
+            activityType: activity.activityType,
+            metadata: activity.metadata,
+            createdAt: activity.createdAt,
+        };
+    }
     /**
      * Create a new user and track signup activity
      */
-    static async createUser(userData) {
-        // Generate waitlist position based on current user count
-        const waitlistPosition = users.length + 1;
-        // Create user object
-        const user = {
-            id: this.generateUserId(),
+    static async createUser(userData, sessionId) {
+        // Get current user count for waitlist position
+        const userCount = await models_1.User.count();
+        const waitlistPosition = userCount + 1;
+        // Create user in database
+        const user = await models_1.User.create({
             email: userData.email.toLowerCase(),
             firstName: userData.firstName,
             age: userData.age,
@@ -24,12 +54,8 @@ class UserService {
             city: userData.city,
             household: userData.household,
             waitlistPosition,
-            ctaVariant: userData.ctaVariant || 'A',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        };
-        // Store user
-        users.push(user);
+            ctaVariant: (userData.ctaVariant || 'A'),
+        });
         // Track signup activity
         await this.trackUserActivity(user.id, 'SIGNUP', {
             waitlistPosition,
@@ -43,67 +69,97 @@ class UserService {
                 household: user.household,
             }
         });
-        return user;
+        // Link session to user if sessionId provided
+        if (sessionId) {
+            await sessionService_1.SessionService.linkSessionToUser(sessionId, user.id);
+        }
+        // Convert to User interface
+        return this.convertUserModelToUser(user);
     }
     /**
      * Track user activity
      */
     static async trackUserActivity(userId, activityType, metadata) {
-        const activity = {
-            id: this.generateActivityId(),
+        const activity = await models_1.UserActivity.create({
             userId,
             activityType,
             metadata,
-            createdAt: new Date(),
+        });
+        return {
+            id: activity.id,
+            userId: activity.userId,
+            activityType: activity.activityType,
+            metadata: activity.metadata,
+            createdAt: activity.createdAt,
         };
-        userActivities.push(activity);
-        return activity;
     }
     /**
      * Get user by email
      */
     static async getUserByEmail(email) {
-        return users.find(user => user.email === email.toLowerCase()) || null;
+        const user = await models_1.User.findOne({ where: { email: email.toLowerCase() } });
+        if (!user)
+            return null;
+        return this.convertUserModelToUser(user);
+    }
+    /**
+     * Get user by first name
+     */
+    static async getUserByFirstName(firstName) {
+        const user = await models_1.User.findOne({
+            where: {
+                firstName: firstName
+            }
+        });
+        if (!user)
+            return null;
+        return this.convertUserModelToUser(user);
     }
     /**
      * Get user by ID
      */
     static async getUserById(id) {
-        return users.find(user => user.id === id) || null;
+        const user = await models_1.User.findByPk(id);
+        if (!user)
+            return null;
+        return this.convertUserModelToUser(user);
     }
     /**
      * Get all users (for admin purposes)
      */
     static async getAllUsers() {
-        return [...users];
+        const users = await models_1.User.findAll({
+            order: [['createdAt', 'DESC']],
+        });
+        return users.map(user => this.convertUserModelToUser(user));
     }
     /**
      * Get user activities
      */
     static async getUserActivities(userId) {
-        return userActivities.filter(activity => activity.userId === userId);
+        const activities = await models_1.UserActivity.findAll({
+            where: { userId },
+            order: [['createdAt', 'DESC']],
+        });
+        return activities.map(activity => this.convertActivityModelToActivity(activity));
     }
     /**
      * Get total user count
      */
     static async getUserCount() {
-        return users.length;
+        return await models_1.User.count();
     }
     /**
      * Update user profile
      */
     static async updateUser(id, updates) {
-        const userIndex = users.findIndex(user => user.id === id);
-        if (userIndex === -1)
+        const user = await models_1.User.findByPk(id);
+        if (!user)
             return null;
-        users[userIndex] = {
-            ...users[userIndex],
-            ...updates,
-            updatedAt: new Date(),
-        };
+        await user.update(updates);
         // Track profile update activity
         await this.trackUserActivity(id, 'PROFILE_UPDATED', { updates });
-        return users[userIndex];
+        return this.convertUserModelToUser(user);
     }
     /**
      * Join community (track community join activity)
@@ -121,18 +177,6 @@ class UserService {
             emailType,
             sentAt: new Date().toISOString(),
         });
-    }
-    /**
-     * Generate unique user ID
-     */
-    static generateUserId() {
-        return `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
-    /**
-     * Generate unique activity ID
-     */
-    static generateActivityId() {
-        return `activity_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
 }
 exports.UserService = UserService;

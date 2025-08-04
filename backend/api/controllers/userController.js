@@ -27,8 +27,10 @@ class UserController {
                 });
                 return;
             }
+            // Get session ID from headers
+            const sessionId = req.headers['x-session-id'];
             // Create user
-            const user = await userService_1.UserService.createUser(userData);
+            const user = await userService_1.UserService.createUser(userData, sessionId);
             // Send welcome email
             const emailSent = await emailService_1.EmailService.sendWelcomeEmail(user);
             // Track email activity
@@ -204,6 +206,56 @@ class UserController {
         }
         catch (error) {
             console.error('Error updating user:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Internal server error'
+            });
+        }
+    }
+    /**
+     * Check if user exists by name or email
+     */
+    static async checkUserExists(req, res) {
+        try {
+            const { identifier } = req.query;
+            if (!identifier || typeof identifier !== 'string') {
+                res.status(400).json({
+                    success: false,
+                    error: 'Identifier is required'
+                });
+                return;
+            }
+            // Check by email first, then by firstName
+            const userByEmail = await userService_1.UserService.getUserByEmail(identifier);
+            if (userByEmail) {
+                res.status(200).json({
+                    success: true,
+                    exists: true,
+                    user: userByEmail,
+                    matchType: 'email'
+                });
+                return;
+            }
+            // If not found by email, check by firstName
+            const userByName = await userService_1.UserService.getUserByFirstName(identifier);
+            if (userByName) {
+                res.status(200).json({
+                    success: true,
+                    exists: true,
+                    user: userByName,
+                    matchType: 'name'
+                });
+                return;
+            }
+            res.status(200).json({
+                success: true,
+                exists: false,
+                user: null,
+                matchType: null
+            });
+        }
+        catch (error) {
+            console.error('Error checking user existence:', error);
             res.status(500).json({
                 success: false,
                 error: 'Internal server error'

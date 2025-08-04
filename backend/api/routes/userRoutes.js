@@ -9,6 +9,8 @@ exports.userRoutes = router;
 router.post('/signup', userController_1.UserController.signup);
 // Join community
 router.post('/join-community', userController_1.UserController.joinCommunity);
+// Check if user exists
+router.get('/check', userController_1.UserController.checkUserExists);
 // Get user by ID
 router.get('/:id', userController_1.UserController.getUser);
 // Get user activities

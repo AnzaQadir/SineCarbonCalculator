@@ -410,150 +410,83 @@ class PersonalityService {
         };
         return templates[personality] || templates["Eco in Progress"];
     }
-    generatePowerMoves(personality, impactMetrics, badge) {
-        const trees = impactMetrics.treesPlanted;
-        const co2 = impactMetrics.carbonReduced;
-        const nextBadge = "Carbon Strategist"; // You can make this dynamic if you have a badge engine
-        const templates = {
-            "Sustainability Slayer": [
-                `✅ <b>Your Slayer Signature:</b><br>You've mastered sustainable fashion. <b>${trees} trees' worth of CO₂ saved?</b> Iconic.`,
-                `🔥 <b>Next Move:</b><br>Challenge a friend to a zero-waste week. Sustainability spreads faster with community.`,
-                `🌐 <b>Amplify Your Impact:</b><br>If just 3 friends follow your lead, that's <b>${trees * 3} more trees planted</b> and <b>${(Number(co2) * 0.25).toFixed(1)} tons of CO₂</b> gone.`,
-                `🌳 <b>Next Move:</b><br>Plant a tree. It's a small act, but it adds up.`,
-                `🌍 <b>Global Impact:</b><br>Your actions are making a difference. Keep it up!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
-            ],
-            "Planet's Main Character": [
-                `🌍 <b>Global Impact:</b><br>You're making a significant impact on the planet. Keep it up!`,
-                `🌳 <b>Next Move:</b><br>Plant a tree. It's a small act, but it adds up.`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
-            ],
-            "Sustainability Soft Launch": [
-                `🌳 <b>Next Move:</b><br>Plant a tree. It's a small act, but it adds up.`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
-            ],
-            "Kind of Conscious, Kind of Confused": [
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
-            ],
-            "Eco in Progress": [
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
-            ],
-            "Doing Nothing for the Planet": [
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
-            ],
-            "Certified Climate Snoozer": [
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
-                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
-            ]
-        };
-        return templates[personality] || templates["Eco in Progress"];
-    }
     analyzeBehavioralPatterns(responses) {
         const habitTags = {};
         const goodHabits = [];
         const stretchAreas = [];
-
         // Transport Analysis
         if (responses.primaryTransportMode === 'A') {
             habitTags.lowCarbonTransport = true;
             goodHabits.push('lowCarbonTransport');
-        } else if (responses.primaryTransportMode === 'D') {
+        }
+        else if (responses.primaryTransportMode === 'D') {
             stretchAreas.push('transport');
         }
-
         if (responses.carProfile === 'A' || responses.carProfile === 'B') {
             habitTags.efficientVehicle = true;
             goodHabits.push('efficientVehicle');
         }
-
         // Clothing Analysis
         if (responses.clothing?.wardrobeImpact === 'A') {
             habitTags.ethicalFashion = true;
             goodHabits.push('ethicalFashion');
-        } else if (responses.clothing?.consumptionFrequency === 'D') {
+        }
+        else if (responses.clothing?.consumptionFrequency === 'D') {
             stretchAreas.push('clothing');
         }
-
         // Waste Analysis
         if (responses.waste?.repairOrReplace === 'A') {
             habitTags.circularMindset = true;
             goodHabits.push('circularMindset');
         }
-
         if (responses.waste?.prevention === 'A' || responses.waste?.prevention === 'B') {
             habitTags.wasteAware = true;
             goodHabits.push('wasteAware');
-        } else if (responses.waste?.prevention === 'D') {
+        }
+        else if (responses.waste?.prevention === 'D') {
             stretchAreas.push('waste');
         }
-
         // Air Quality Analysis
         if (responses.airQuality?.aqiMonitoring === 'A' || responses.airQuality?.aqiMonitoring === 'B') {
             habitTags.airAware = true;
             goodHabits.push('airAware');
         }
-
         // Energy Analysis
         if (responses.homeEfficiency === 'A') {
             habitTags.energyEfficient = true;
             goodHabits.push('energyEfficient');
-        } else if (responses.energyManagement === 'C') {
+        }
+        else if (responses.energyManagement === 'C') {
             stretchAreas.push('energy');
         }
-
         // Diet Analysis
         if (responses.dietType === 'VEGAN' || responses.dietType === 'VEGETARIAN') {
             habitTags.plantBasedDiet = true;
             goodHabits.push('plantBasedDiet');
-        } else if (responses.dietType === 'MEAT_HEAVY') {
+        }
+        else if (responses.dietType === 'MEAT_HEAVY') {
             stretchAreas.push('diet');
         }
-
         return { goodHabits, stretchAreas, habitTags };
     }
-
     determinePersonalityArchetype(personalityTraits) {
         const decisionCategories = ['analyst', 'intuitive', 'connector'];
         const actionCategories = ['planner', 'experimenter', 'collaborator'];
-
         const decisionCounts = { analyst: 0, intuitive: 0, connector: 0 };
         const actionCounts = { planner: 0, experimenter: 0, collaborator: 0 };
-
         Object.entries(personalityTraits).forEach(([key, value]) => {
-            if (key.startsWith('decisionMaking') && decisionCategories.includes(value)) {
-                decisionCounts[value] += 1;
+            // Map personality traits to decision and action categories
+            if (['relationshipWithChange', 'decisionMaking', 'motivation', 'ecoIdentity', 'opennessToLearning'].includes(key)) {
+                if (decisionCategories.includes(value)) {
+                    decisionCounts[value] += 1;
+                }
             }
-            if (key.startsWith('actionTaking') && actionCategories.includes(value)) {
-                actionCounts[value] += 1;
+            if (['socialInfluence', 'emotionalConnection', 'barriers', 'goalSetting', 'selfEfficacy'].includes(key)) {
+                if (actionCategories.includes(value)) {
+                    actionCounts[value] += 1;
+                }
             }
         });
-
         // Helper to pick dominant or random
         const pickDominant = (counts, cats) => {
             const max = Math.max(...cats.map(c => counts[c]));
@@ -565,70 +498,74 @@ class PersonalityService {
             winners.sort();
             return winners[0];
         };
-
         const decisionStyle = pickDominant(decisionCounts, decisionCategories);
         const actionStyle = pickDominant(actionCounts, actionCategories);
-
         // Matrix mapping
         const matrix = {
             analyst: {
-                planner: { 
-                    type: 'Strategist', 
-                    desc: 'You like to know the plan before you start. You analyze data, create systems, and build sustainable habits through careful planning and measurement.' 
+                planner: {
+                    type: 'Strategist',
+                    desc: 'You like a plan. Lists are your love language and you probably get a little thrill from checking things off. You\'re not one to wing it—you\'d rather figure out what works, build a system around it, and stick to it. Whether it\'s organizing your fridge to reduce food waste or tracking your energy usage, you\'re all about efficient, repeatable habits. In the climate space, you shine when you turn everyday routines into impact. You don\'t need a rooftop garden (yet)—you\'re the one who actually sets the reminder to bring a tote bag or checks the electricity bill just to see the change. People around you learn from your consistency—so keep showing how structure can lead to sustainability.',
+                    hookLine: 'You love a plan and turn small routines into big impact.'
                 },
-                experimenter: { 
-                    type: 'Trailblazer', 
-                    desc: 'You jump in and see what sticks. You test new approaches, measure results, and optimize based on what works best for your lifestyle.' 
+                experimenter: {
+                    type: 'Trailblazer',
+                    desc: 'You\'re all about diving in and figuring it out later. You love testing new ideas, trying new swaps, and seeing what sticks. Composting? You\'ll give it a shot. Switching up your shampoo bar? Why not. Some things will work, some won\'t—and that\'s the whole point. You don\'t wait for a perfect plan, which is exactly what makes you powerful. Your climate journey is built on curiosity, not pressure. And every time you try something new—no matter how small—you make it easier for the next person to try too. You\'re the reason someone else says, "Huh, maybe I can do that too."',
+                    hookLine: 'You dive in, try things out, and figure it out as you go.'
                 },
-                collaborator: { 
-                    type: 'Coordinator', 
-                    desc: 'You bring people together for a common goal. You analyze group dynamics, create shared systems, and coordinate collective climate action.' 
+                collaborator: {
+                    type: 'Coordinator',
+                    desc: 'You\'re a behind-the-scenes powerhouse. You love bringing people together to get things done, whether it\'s planning a potluck or getting your group to split a bulk grocery order. You\'ve got the social touch and the steady hand—it\'s a winning combo. When it comes to climate action, you make it communal. You\'re the one starting the group chat for a clothing swap or helping your friend figure out what goes in the recycling bin. You remind people that sustainability isn\'t just about what *you* do—it\'s about what *we* build together. Keep leading the way, one shared effort at a time.',
+                    hookLine: 'You bring people together to make things happen—collaboratively.'
                 }
             },
             intuitive: {
-                planner: { 
-                    type: 'Visionary', 
-                    desc: 'You see the big picture and sketch out a brighter future. You plan with intuition, create inspiring visions, and build sustainable systems that feel right.' 
+                planner: {
+                    type: 'Visionary',
+                    desc: 'You see the world not just as it is—but as it could be. You\'re thoughtful, creative, and full of quiet hope. Your imagination fuels your actions: maybe you dream about green cities, cozy neighborhoods, or homes that breathe with nature. In practice, that might look like turning a corner of your space into a plant haven, journaling about future lifestyles, or slowly swapping out your habits to reflect your values. You don\'t rush change—you nurture it. Your role in the climate movement is to remind us that small seeds can grow into something beautiful. Keep sketching that future—we need it.',
+                    hookLine: 'You dream big and act small, building the future one idea at a time.'
                 },
-                experimenter: { 
-                    type: 'Explorer', 
-                    desc: 'You learn by doing, then share what works. You trust your instincts, try new things, and discover sustainable solutions through hands-on experience.' 
+                experimenter: {
+                    type: 'Explorer',
+                    desc: 'You like to learn by doing. You\'re not here for long-winded lectures—you want to test things out, see how it feels, and then tell your friends about it. Maybe you try biking to work, growing herbs on your windowsill, or skipping takeout for a week—just to see. You thrive when you\'re in motion, adjusting as you go. Climate action, for you, is less about perfection and more about momentum. Your honest feedback and real-world experiments help others figure out what works for *them*, too. So keep exploring—your journey is full of insight (and great stories).',
+                    hookLine: 'You learn by doing and share what works—no fuss, just flow.'
                 },
-                collaborator: { 
-                    type: 'Catalyst', 
-                    desc: 'You spark enthusiasm in others. You intuitively understand what motivates people and create contagious energy for climate action.' 
+                collaborator: {
+                    type: 'Catalyst',
+                    desc: 'You\'re the spark that gets things moving. Your enthusiasm is magnetic—when you care about something, it shows, and people notice. You\'re the one who turns a random thought into a group challenge, or who convinces your friend to finally try a tote bag with a "come on, just try it!" In the climate space, your energy creates momentum. You may not have all the answers (who does?), but you know how to make things feel doable—and maybe even fun. You bring the memes, the energy, the group selfies. And in a world full of overwhelm, that\'s exactly what people need more of.',
+                    hookLine: 'You spark action in others with your energy and enthusiasm.'
                 }
             },
             connector: {
-                planner: { 
-                    type: 'Builder', 
-                    desc: 'You break big goals into steps. You connect ideas, build bridges between people, and create sustainable systems that grow over time.' 
+                planner: {
+                    type: 'Builder',
+                    desc: 'You love turning ideas into action. Big visions are cool, but you\'re here to break them into steps. You\'re the type to transform a junk drawer into a reusables station or to figure out a system for sorting your recycling that even guests understand. In climate work, your gift is turning intention into infrastructure—even if it\'s just in your home or workplace. You make change feel achievable because you don\'t just talk about it—you *build* it, one drawer, bin, or corner at a time. Keep constructing your climate-friendly life—it adds up fast.',
+                    hookLine: 'You break goals into steps and create systems that stick.'
                 },
-                experimenter: { 
-                    type: 'Networker', 
-                    desc: 'You connect dots and share resources. You build relationships, share knowledge, and create networks that amplify climate impact.' 
+                experimenter: {
+                    type: 'Networker',
+                    desc: 'You\'re the person everyone asks for recommendations—and you *always* have the list. You\'re naturally resourceful and generous with what you know, whether it\'s sharing the name of a good repair café or reminding your group where to get second-hand furniture. You help create bridges. You may not always be in the spotlight, but your quiet knowledge-sharing keeps the climate movement grounded and growing. You\'re not just building habits—you\'re building community resilience. Keep passing it on—you never know who it\'ll help.',
+                    hookLine: 'You connect the dots and love sharing what you\'ve learned.'
                 },
-                collaborator: { 
-                    type: 'Steward', 
-                    desc: 'You stick with habits that protect what matters. You nurture relationships, maintain sustainable practices, and care for your community and environment.' 
+                collaborator: {
+                    type: 'Steward',
+                    desc: 'You care deeply and stick to what matters. You don\'t need loud gestures—you\'re guided by values, by care, and by quiet consistency. You\'re the person who\'s always reused glass jars or who reminds everyone to switch off the lights when leaving a room. In a world full of burnout and fast fixes, you offer something rare: steadiness. You show that climate action can be small, deliberate, and full of heart. And even if you don\'t always feel like a "climate person," your habits are a form of love—for your space, your people, and the future. Keep showing up—you\'re already making a difference.',
+                    hookLine: 'You quietly stick to what matters and lead by thoughtful example.'
                 }
             }
         };
-
         const resultEntry = matrix[decisionStyle][actionStyle];
-        
         return {
             archetype: resultEntry.type,
             decision: decisionStyle.charAt(0).toUpperCase() + decisionStyle.slice(1),
             action: actionStyle.charAt(0).toUpperCase() + actionStyle.slice(1),
-            description: resultEntry.desc
+            description: resultEntry.desc,
+            hookLine: resultEntry.hookLine
         };
     }
-
     generatePowerMovesBasedOnBehavior(personality, behavioralPatterns, responses) {
         const { goodHabits, stretchAreas, habitTags } = behavioralPatterns;
         const { archetype } = personality;
-
         // Power Habit Generation
         let powerHabit = '';
         if (goodHabits.length >= 2) {
@@ -641,17 +578,15 @@ class PersonalityService {
                 energyEfficient: 'You prioritize energy efficiency in your home',
                 plantBasedDiet: 'You choose plant-based meals regularly'
             };
-
             const selectedHabit = goodHabits[0]; // Pick the first good habit to highlight
             powerHabit = `${habitDescriptions[selectedHabit] || 'You already practice sustainable habits'} — that's the quiet kind of climate leadership we love.`;
-        } else {
+        }
+        else {
             powerHabit = "You're taking steps toward sustainability — every small action counts and builds momentum.";
         }
-
         // Power Move Generation based on personality and stretch areas
         let powerMove = '';
         let stretchCTA = '';
-
         const personalityPowerMoves = {
             Strategist: {
                 energy: 'Create a 7-day energy tracking system. Monitor one appliance or routine for a week, then optimize based on your data.',
@@ -717,15 +652,14 @@ class PersonalityService {
                 waste: 'Establish daily waste reduction habits that become automatic over time.'
             }
         };
-
         // Select the most relevant stretch area and generate appropriate power move
         if (stretchAreas.length > 0) {
             const primaryStretchArea = stretchAreas[0];
             const personalityMoves = personalityPowerMoves[archetype];
-            
             if (personalityMoves && personalityMoves[primaryStretchArea]) {
                 powerMove = personalityMoves[primaryStretchArea];
-            } else {
+            }
+            else {
                 // Fallback for areas not covered by personality-specific moves
                 const fallbackMoves = {
                     energy: 'Try creating a simple energy tracking system for one week to understand your usage patterns.',
@@ -736,11 +670,11 @@ class PersonalityService {
                 };
                 powerMove = fallbackMoves[primaryStretchArea] || 'Choose one small sustainable action to try this week.';
             }
-        } else {
+        }
+        else {
             // If no clear stretch areas, suggest a general improvement
             powerMove = `Try creating a 7-day visual tracker to improve one small habit. ${archetype}s like you thrive on small systems.`;
         }
-
         // Stretch CTA Generation
         const stretchCTAs = {
             Strategist: 'Want to go further? Create a detailed sustainability plan for the next 30 days and track your progress.',
@@ -753,61 +687,148 @@ class PersonalityService {
             Networker: 'Want to go further? Connect with 3 new people who share your sustainability interests.',
             Steward: 'Want to go further? Establish a sustainable routine that becomes a lasting habit.'
         };
-
         stretchCTA = stretchCTAs[archetype] || 'Want to go further? Choose one area to focus on and build sustainable habits over time.';
-
         return { powerHabit, powerMove, stretchCTA };
     }
-
+    generatePowerMoves(personality, impactMetrics, badge) {
+        // This method is now deprecated in favor of the new comprehensive approach
+        // Keeping for backward compatibility
+        const trees = impactMetrics.treesPlanted;
+        const co2 = impactMetrics.carbonReduced;
+        const templates = {
+            "Sustainability Slayer": [
+                `✅ <b>Your Slayer Signature:</b><br>You've mastered sustainable fashion. <b>${trees} trees' worth of CO₂ saved?</b> Iconic.`,
+                `🔥 <b>Next Move:</b><br>Challenge a friend to a zero-waste week. Sustainability spreads faster with community.`,
+                `🌐 <b>Amplify Your Impact:</b><br>If just 3 friends follow your lead, that's <b>${trees * 3} more trees planted</b> and <b>${(Number(co2) * 0.25).toFixed(1)} tons of CO₂</b> gone.`
+            ],
+            "Planet's Main Character": [
+                `🌍 <b>Global Impact:</b><br>You're making a significant impact on the planet. Keep it up!`,
+                `🌳 <b>Next Move:</b><br>Plant a tree. It's a small act, but it adds up.`,
+                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
+            ],
+            "Sustainability Soft Launch": [
+                `🌳 <b>Next Move:</b><br>Plant a tree. It's a small act, but it adds up.`,
+                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
+                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`
+            ],
+            "Kind of Conscious, Kind of Confused": [
+                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
+                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`,
+                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
+            ],
+            "Eco in Progress": [
+                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
+                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`,
+                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
+            ],
+            "Doing Nothing for the Planet": [
+                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
+                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`,
+                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
+            ],
+            "Certified Climate Snoozer": [
+                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`,
+                `🌟 <b>Next Move:</b><br>You're making a difference. Keep it up!`,
+                `🌟 <b>Power Move:</b><br>You're a true sustainability hero. Keep leading the way!`
+            ]
+        };
+        return templates[personality] || templates["Eco in Progress"];
+    }
     generateComprehensivePowerMoves(responses) {
         // Analyze behavioral patterns
         const behavioralPatterns = this.analyzeBehavioralPatterns(responses);
-        
         // Determine personality archetype if personality traits are available
         let personality = {
             archetype: 'Builder',
             decision: 'Connector',
             action: 'Experimenter',
-            description: 'You break big goals into steps. You co-create small experiments with others and build lasting systems that grow over time.'
+            description: 'You break big goals into steps. You co-create small experiments with others and build lasting systems that grow over time.',
+            hookLine: 'You break goals into steps and create systems that stick.'
         };
-
         if (responses.personalityTraits) {
             personality = this.determinePersonalityArchetype(responses.personalityTraits);
         }
-
         // Generate power moves based on behavior and personality
         const powerMoves = this.generatePowerMovesBasedOnBehavior(personality, behavioralPatterns, responses);
-
         return {
             personality,
             powerMoves,
             tone: 'supportive, intelligent, honest, warm'
         };
     }
-
     async calculatePersonality(responses) {
         console.log('Calculating personality for responses:', responses);
-        
         const scores = this.calculatePersonalityScores(responses);
         console.log('Calculated scores:', scores);
-        
         const impactMetrics = this.calculateImpactMetrics(responses);
         console.log('Calculated impact metrics:', impactMetrics);
-        
         const personalityType = scores.personalityType;
         console.log('Determined personality type:', personalityType);
-        
         const personalityInfo = ecoPersonality_1.EcoPersonalityTypes[personalityType];
         console.log('Retrieved personality info:', personalityInfo);
-
+        // Generate power moves
+        const powerMoves = this.generatePowerMoves(personalityType, impactMetrics, 'Carbon Strategist');
+        console.log('Generated power moves:', powerMoves);
+        // ================= New Personality Logic (Decision/Action Matrix) =================
+        let newPersonality;
+        let newPersonalityDescription;
+        if (responses.personalityTraits) {
+            const { personalityTraits } = responses;
+            const decisionCategories = ['analyst', 'intuitive', 'connector'];
+            const actionCategories = ['planner', 'experimenter', 'collaborator'];
+            const decisionCounts = { analyst: 0, intuitive: 0, connector: 0 };
+            const actionCounts = { planner: 0, experimenter: 0, collaborator: 0 };
+            Object.entries(personalityTraits).forEach(([key, value]) => {
+                if (key.startsWith('decisionMaking') && decisionCategories.includes(value)) {
+                    decisionCounts[value] += 1;
+                }
+                if (key.startsWith('actionTaking') && actionCategories.includes(value)) {
+                    actionCounts[value] += 1;
+                }
+            });
+            // Helper to pick dominant or random
+            const pickDominant = (counts, cats) => {
+                const max = Math.max(...cats.map(c => counts[c]));
+                if (max === 0) {
+                    // All neutral – pick random category
+                    return cats[Math.floor(Math.random() * cats.length)];
+                }
+                const winners = cats.filter(c => counts[c] === max);
+                winners.sort();
+                return winners[0];
+            };
+            const decisionStyle = pickDominant(decisionCounts, decisionCategories);
+            const actionStyle = pickDominant(actionCounts, actionCategories);
+            // Matrix mapping
+            const matrix = {
+                analyst: {
+                    planner: { type: 'Strategist', desc: 'You like to know the plan before you start. Try mapping out your week’s meals to cut food waste, or setting reminders to switch off lights and unplug chargers when you leave a room. Small routines add up.' },
+                    experimenter: { type: 'Trailblazer', desc: 'You jump in and see what sticks. Test out one new swap each month—like swapping bottled water for a refillable bottle—and keep the ones that feel easiest.' },
+                    collaborator: { type: 'Coordinator', desc: 'You bring people together for a common goal. Host a mini clothing swap among friends or family—it’s social, fun, and cuts down on impulse buys.' }
+                },
+                intuitive: {
+                    planner: { type: 'Visionary', desc: 'You see the big picture and sketch out a brighter future. Turn that into action by dedicating one corner of your home to indoor plants or setting up a small herb garden—green space you can build on over time.' },
+                    experimenter: { type: 'Explorer', desc: 'You learn by doing, then share what works. Try biking or walking one errand this week instead of driving, see how it feels, then tell a friend about your experience.' },
+                    collaborator: { type: 'Catalyst', desc: 'You spark enthusiasm in others. Start a group chat challenge—like “no-plastic week”—and cheer people on with photos and quick tips each day.' }
+                },
+                connector: {
+                    planner: { type: 'Builder', desc: 'You break big goals into steps. Pick one space—your kitchen counter, desk, or balcony—and transform it: add a compost bin, arrange reusable containers, or line up your recycling bins so it’s second nature.' },
+                    experimenter: { type: 'Networker', desc: 'You connect dots and share resources. Keep a list of local second-hand shops or repair cafés and pass it along to neighbors or colleagues when they ask where to find sustainable options.' },
+                    collaborator: { type: 'Steward', desc: 'You stick with habits that protect what matters. Set a weekly “switch-off hour” where you turn off all non-essential electronics and spend that time reading, cooking, or chatting—no screens, no stress.' }
+                }
+            };
+            const resultEntry = matrix[decisionStyle][actionStyle];
+            newPersonality = resultEntry.type;
+            newPersonalityDescription = resultEntry.desc;
+        }
         // Generate comprehensive power moves using new system
         const comprehensivePowerMoves = this.generateComprehensivePowerMoves(responses);
         console.log('Generated comprehensive power moves:', comprehensivePowerMoves);
-
-        // Legacy power moves for backward compatibility
-        const legacyPowerMoves = this.generatePowerMoves(personalityType, impactMetrics, 'Carbon Strategist');
-        console.log('Generated legacy power moves:', legacyPowerMoves);
-
+        // Fallback for newPersonality if not calculated from traits
+        if (!newPersonality) {
+            newPersonality = personalityType;
+            newPersonalityDescription = personalityInfo.description;
+        }
         const response = {
             personalityType,
             description: personalityInfo.description,
@@ -816,12 +837,13 @@ class PersonalityService {
             categoryScores: scores.categoryScores,
             impactMetrics,
             finalScore: scores.finalScore,
-            powerMoves: legacyPowerMoves, // Keep legacy for backward compatibility
+            powerMoves,
             comprehensivePowerMoves, // New comprehensive power moves structure
+            newPersonality,
+            newPersonalityDescription,
             // Return personalityTraits if present in input
             ...(responses.personalityTraits ? { personalityTraits: responses.personalityTraits } : {})
         };
-        
         console.log('Final response:', response);
         return response;
     }
