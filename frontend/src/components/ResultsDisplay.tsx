@@ -727,7 +727,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       if (comprehensivePowerMoves) {
         // Use the data passed from Quiz.tsx
         setDynamicPersonality({
-          personalityType: comprehensivePowerMoves.personality?.archetype || 'Eco in Progress',
+          personalityType: (comprehensivePowerMoves.personality?.archetype || 'Eco in Progress') as PersonalityType,
           description: comprehensivePowerMoves.personality?.description || 'Your unique approach to sustainability combines awareness with action.',
           strengths: [],
           nextSteps: [],
@@ -758,10 +758,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         const payload = quizAnswers && quizAnswers.personalityTraits
           ? { ...apiResponses, personalityTraits: quizAnswers.personalityTraits }
           : apiResponses;
-        const result = await calculatePersonality(payload) as any;
+        const result = await calculatePersonality(payload) as PersonalityResponse;
 
         setDynamicPersonality({
-          personalityType: isPersonalityType(result.personalityType) ? result.personalityType : 'Eco in Progress',
+          personalityType: (result.personalityType && isPersonalityType(result.personalityType) ? result.personalityType : 'Eco in Progress') as PersonalityType,
           description: result.description,
           strengths: result.strengths,
           nextSteps: result.nextSteps,
@@ -784,6 +784,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             },
             tone: 'supportive, intelligent, honest, warm'
           },
+          highlights: result.highlights,
           dominantCategory: Object.entries(result.categoryScores)
             .reduce((a, b) => (a[1].score > b[1].score ? a : b))[0],
           emoji: '🌱',
@@ -923,12 +924,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                </p>
              </div>
              
-             {/* Debug Info */}
-             {process.env.NODE_ENV === 'development' && (
-               <div className="text-xs text-gray-500 mt-2">
-                 API Description: {dynamicPersonality?.comprehensivePowerMoves?.personality?.description?.substring(0, 100)}...
-               </div>
-             )}
+
              
 
            </div>
@@ -966,12 +962,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
              >
                <div className="text-center space-y-4">
                  <div className="w-12 h-12 mx-auto bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                   <BookOpen className="h-6 w-6 text-black" />
+                   <BookOpen className="h-8 w-8 text-black" />
                  </div>
                  <h3 className="text-lg font-bold text-gray-900">Generate Your Story</h3>
                  <p className="text-sm text-gray-600">Discover your unique sustainability journey and share it with others</p>
                  <div className="mt-4">
-                   <div className="w-16 h-16 mx-auto">
+                   <div className="w-20 h-20 mx-auto">
                      <svg viewBox="0 0 64 64" className="w-full h-full">
                        <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300"/>
                        <circle cx="24" cy="28" r="2" fill="currentColor" className="text-black"/>
@@ -980,9 +976,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      </svg>
                    </div>
                  </div>
-                 {/* Click indicator */}
-                 <div className="text-xs text-gray-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                   Click to explore →
+                 {/* Get Started Button */}
+                 <div className="flex items-center justify-center mt-4">
+                   <div className="relative overflow-hidden bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-gray-200 transition-all duration-300 cursor-pointer flex items-center gap-2">
+                     <span className="relative z-10">Get Started</span>
+                     <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                     <div className="absolute inset-0 bg-gray-200 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                   </div>
                  </div>
                </div>
              </button>
@@ -995,12 +995,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
              >
                <div className="text-center space-y-4">
                  <div className="w-12 h-12 mx-auto bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                   <Lightbulb className="h-6 w-6 text-black" />
+                   <Lightbulb className="h-8 w-8 text-black" />
                  </div>
                  <h3 className="text-lg font-bold text-gray-900">Personalized Recommendations</h3>
                  <p className="text-sm text-gray-600">Get tailored suggestions based on your lifestyle and goals</p>
                  <div className="mt-4">
-                   <div className="w-16 h-16 mx-auto">
+                   <div className="w-20 h-20 mx-auto">
                      <svg viewBox="0 0 64 64" className="w-full h-full">
                        <rect x="16" y="20" width="32" height="24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300"/>
                        <line x1="16" y1="28" x2="48" y2="28" stroke="currentColor" strokeWidth="2" className="text-black"/>
@@ -1011,9 +1011,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      </svg>
                    </div>
                  </div>
-                 {/* Click indicator */}
-                 <div className="text-xs text-gray-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                   Click to discover →
+                 {/* Get Started Button */}
+                 <div className="flex items-center justify-center mt-4">
+                   <div className="relative overflow-hidden bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-gray-200 transition-all duration-300 cursor-pointer flex items-center gap-2">
+                     <span className="relative z-10">Get Started</span>
+                     <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                     <div className="absolute inset-0 bg-gray-200 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                   </div>
                  </div>
                </div>
              </button>
@@ -1026,12 +1030,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
              >
                <div className="text-center space-y-4">
                  <div className="w-12 h-12 mx-auto bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                   <PenTool className="h-6 w-6 text-black" />
+                   <PenTool className="h-8 w-8 text-black" />
                  </div>
                  <h3 className="text-lg font-bold text-gray-900">Journalize Your Journey</h3>
                  <p className="text-sm text-gray-600">Reflect on your progress and track your sustainability growth</p>
                  <div className="mt-4">
-                   <div className="w-16 h-16 mx-auto">
+                   <div className="w-20 h-20 mx-auto">
                      <svg viewBox="0 0 64 64" className="w-full h-full">
                        <rect x="16" y="12" width="32" height="40" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300"/>
                        <line x1="20" y1="20" x2="44" y2="20" stroke="currentColor" strokeWidth="1" className="text-black"/>
@@ -1047,22 +1051,26 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      </svg>
                    </div>
                  </div>
-                 {/* Click indicator */}
-                 <div className="text-xs text-gray-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                   Click to reflect →
+                 {/* Get Started Button */}
+                 <div className="flex items-center justify-center mt-4">
+                   <div className="relative overflow-hidden bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-gray-200 transition-all duration-300 cursor-pointer flex items-center gap-2">
+                     <span className="relative z-10">Get Started</span>
+                     <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                     <div className="absolute inset-0 bg-gray-200 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                   </div>
                  </div>
                </div>
              </button>
            </div>
 
-                                      {/* Power Moves Grid - Using New Comprehensive System */}
+                                      {/* Power Moves Grid - Using Highlights from API */}
            <div className="space-y-8">
-             <div className="text-center space-y-4">
+             <div className="text-left space-y-4">
                <h2 className="text-3xl md:text-4xl font-serif text-sage-800">
-                 Your Power Moves
+                 Your Climate Signature
               </h2>
-               <p className="text-lg text-sage-600 max-w-2xl mx-auto">
-                 These gentle actions are your superpowers for creating positive change
+               <p className="text-lg text-sage-600 max-w-2xl">
+                 These quiet patterns reveal where you already lead with care—and where small changes can ripple outward
                </p>
             </div>
 
@@ -1076,11 +1084,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                  </div>
                  <div className="relative z-10 space-y-4">
                    <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Heart className="w-12 h-12 text-green-600" />
+                     <Lightbulb className="w-12 h-12 text-green-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">Your Power Habit</h3>
+                   <h3 className="text-lg font-bold text-gray-900 text-center">
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-habit')?.title || 'Your Power Habit'}
+                   </h3>
                    <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.powerMoves?.powerHabit || 
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-habit')?.subtext || 
                       "You're taking steps toward sustainability — every small action counts and builds momentum."}
                    </p>
                  </div>
@@ -1097,15 +1107,17 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    <div className="w-16 h-16 mx-auto flex items-center justify-center">
                      <Zap className="w-12 h-12 text-purple-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">Your Power Move</h3>
+                   <h3 className="text-lg font-bold text-gray-900 text-center">
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-move')?.title || 'Your Power Move'}
+                   </h3>
                    <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.powerMoves?.powerMove || 
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-move')?.subtext || 
                       "Try creating a 7-day visual tracker to improve one small habit. Builders like you thrive on small systems."}
                    </p>
                  </div>
                </div>
 
-               {/* Card 3: Stretch CTA */}
+               {/* Card 3: Go Further */}
                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 shadow-lg border border-blue-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
                  <div className="absolute inset-0 opacity-20">
                    <div className="w-full h-full" style={{
@@ -1116,15 +1128,17 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    <div className="w-16 h-16 mx-auto flex items-center justify-center">
                      <Target className="w-12 h-12 text-blue-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">Go Further</h3>
+                   <h3 className="text-lg font-bold text-gray-900 text-center">
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'go-further')?.title || 'Go Further'}
+                   </h3>
                    <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.powerMoves?.stretchCTA || 
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'go-further')?.subtext || 
                       "Want to go further? Choose one area to focus on and build sustainable habits over time."}
                    </p>
                  </div>
                </div>
 
-               {/* Card 4: Personality Archetype */}
+               {/* Card 4: Your Spark */}
                <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-6 shadow-lg border border-amber-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
                  <div className="absolute inset-0 opacity-20">
                    <div className="w-full h-full" style={{
@@ -1136,11 +1150,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      <Sparkles className="w-12 h-12 text-amber-600" />
                    </div>
                    <h3 className="text-lg font-bold text-gray-900 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Your Archetype'}
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'spark')?.title || 'Your Spark'}
                    </h3>
                    <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || 
-                      "You break big goals into steps. You co-create small experiments with others and build lasting systems that grow over time."}
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'spark')?.summary || 
+                      "You see the big picture and inspire others. Your vision creates lasting change."}
                    </p>
                  </div>
                </div>
@@ -1156,9 +1170,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    <div className="w-16 h-16 mx-auto flex items-center justify-center">
                      <Brain className="w-12 h-12 text-emerald-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">Decision Style</h3>
+                   <h3 className="text-lg font-bold text-gray-900 text-center">
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'decision-style')?.title || 'Decision Style'}
+                   </h3>
                    <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.personality?.decision || 'Connector'}
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'decision-style')?.summary || 
+                      dynamicPersonality?.highlights?.personalityInsights?.decisionStyle || 'Intuitive'}
                    </p>
                  </div>
                </div>
@@ -1174,9 +1191,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    <div className="w-16 h-16 mx-auto flex items-center justify-center">
                      <ArrowRight className="w-12 h-12 text-rose-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">Action Style</h3>
+                   <h3 className="text-lg font-bold text-gray-900 text-center">
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'action-style')?.title || 'Action Style'}
+                   </h3>
                    <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.comprehensivePowerMoves?.personality?.action || 'Experimenter'}
+                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'action-style')?.summary || 
+                      dynamicPersonality?.highlights?.personalityInsights?.actionStyle || 'Planner'}
                    </p>
                  </div>
                </div>
@@ -1240,258 +1260,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
             </div>
 
-            {/* Reflection Prompt */}
-            <div className="text-center space-y-6">
-              <h3 className="text-xl font-serif text-sage-800">
-                How did this feel?
-              </h3>
-              
-              {/* Mood Buttons */}
-              <div className="flex justify-center gap-4">
-                {['😊', '🧘‍♀️', '🌱', '😌', '😢'].map((emoji, index) => (
-                  <button
-                    key={index}
-                    className="w-12 h-12 rounded-full bg-white border-2 border-sage-200 hover:border-sage-400 hover:scale-110 transition-all duration-200 text-2xl"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
 
-              {/* Micro-journaling */}
-              <div className="max-w-md mx-auto">
-                <textarea
-                  placeholder="Write one word for your future self..."
-                  className="w-full p-4 border-2 border-sage-200 rounded-xl bg-white/80 text-sage-700 placeholder-sage-400 resize-none focus:border-sage-400 focus:outline-none transition-colors"
-                  rows={3}
-                ></textarea>
-              </div>
-            </div>
           </div>
 
         </div>
 
-        {/* Story Generation Section - Keep Exactly As Is */}
-        <div className="space-y-8 mt-16">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <BookOpen className="h-8 w-8 text-green-600" />
-              <h2 className="text-3xl font-serif text-gray-800">Your Climate Journey Story</h2>
-            </div>
-            <div className="flex gap-2 justify-end mb-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowWrapped(true)}
-                className={cn(
-                  "text-green-700 border-green-200",
-                  !showStory && "opacity-50 cursor-not-allowed"
-                )}
-                disabled={!showStory}
-              >
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4" />
-                  {!showStory ? "Generate Story First" : "Generate Wrapped"}
-                </div>
-              </Button>
-                                <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowStory(false);
-                      setShowWrapped(false);
-                      setWrappedImage(null);
-                      setCurrentCardIndex(0);
-                      setStoryCards([]);
-                      setNarrativeStory(null);
-                    }}
-                    className="text-green-700 border-green-200"
-                  >
-                    Reset Story
-                  </Button>
-            </div>
-          </div>
-          
-          {!showStory ? (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-purple-50 to-green-50 rounded-xl p-8 border border-purple-100 shadow-lg"
-            >
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-purple-100 rounded-xl">
-                    <Sparkles className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-purple-900 mb-2">
-                      Generate Your Unique Climate Story
-                    </h3>
-                    <p className="text-gray-600">
-                      Let's transform your sustainable choices into an inspiring narrative. Your story could motivate others to join the climate action movement.
-                    </p>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-6">
-                  <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Star className="h-5 w-5 text-yellow-500" />
-                      <span className="font-medium text-purple-900">Personalized</span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Story tailored to your unique eco-personality and achievements
-                    </p>
-                  </div>
-                  <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Heart className="h-5 w-5 text-red-500" />
-                      <span className="font-medium text-purple-900">Engaging</span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Interactive storytelling with visual elements and animations
-                    </p>
-                  </div>
-                  <div className="bg-white/80 rounded-xl p-4 border border-purple-100">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Share2 className="h-5 w-5 text-blue-500" />
-                      <span className="font-medium text-purple-900">Shareable</span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Easy to share your journey with friends and family
-                    </p>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={async () => {
-                    await generateStory();
-                    setShowStory(true);
-                  }}
-                  className={cn(
-                    "w-full text-white py-6 rounded-xl flex items-center justify-center gap-3 text-lg transition-all duration-300",
-                    isGeneratingStory 
-                      ? "bg-purple-500 cursor-not-allowed"
-                      : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:shadow-lg"
-                  )}
-                  disabled={isGeneratingStory}
-                >
-                  {isGeneratingStory ? (
-                    <>
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                      Crafting Your Story...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-6 w-6" />
-                      Generate Your Climate Journey
-                    </>
-                  )}
-                </Button>
-              </div>
-            </motion.div>
-          ) : storyCards.length > 0 ? (
-            <AnimatePresence>
-              <motion.div 
-                key={currentCardIndex}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.5, type: 'spring' }}
-                className={cn(
-                  'story-card space-y-6 rounded-3xl shadow-2xl border p-10 md:p-14',
-                  combinedStoryCards[currentCardIndex]?.isNarrative
-                    ? 'bg-gradient-to-br from-blue-50 via-white to-green-50 border-blue-100'
-                    : 'bg-gradient-to-br from-green-50 via-white to-purple-50 border-green-100'
-                )}
-              >
-                <div className="flex items-center gap-4 mb-2">
-                  <div className="p-3 bg-gradient-to-br from-green-200 to-green-400 rounded-xl shadow-lg">
-                    {combinedStoryCards[currentCardIndex].emoji && (
-                      <span className="text-3xl drop-shadow-lg">{combinedStoryCards[currentCardIndex].emoji}</span>
-                    )}
-                  </div>
-                  <h3 className={cn(
-                    'font-serif tracking-tight flex-1',
-                    combinedStoryCards[currentCardIndex]?.isNarrative
-                      ? 'text-3xl md:text-4xl font-extrabold text-blue-900'
-                      : 'text-3xl md:text-4xl font-extrabold text-green-900'
-                  )}>
-                    {combinedStoryCards[currentCardIndex].title}
-                  </h3>
-                </div>
-                <div className={cn(
-                  'rounded-2xl shadow-md',
-                  combinedStoryCards[currentCardIndex]?.isNarrative
-                    ? 'bg-white/95 p-10 border-l-4 border-blue-300'
-                    : 'bg-white/90 p-8 border-l-4 border-green-300'
-                )}>
-                  <p className={cn(
-                    'leading-relaxed whitespace-pre-line',
-                    combinedStoryCards[currentCardIndex]?.isNarrative
-                      ? 'text-xl text-blue-900 font-medium italic'
-                      : 'text-lg md:text-xl text-gray-800 font-medium'
-                  )}>
-                    {combinedStoryCards[currentCardIndex].content}
-                  </p>
-                </div>
-                {combinedStoryCards[currentCardIndex].stats && (
-                  <div className={cn(
-                    'flex items-center gap-2 font-semibold mt-2',
-                    combinedStoryCards[currentCardIndex]?.isNarrative
-                      ? 'text-blue-700 text-base'
-                      : 'text-green-700 text-base'
-                  )}>
-                    <Info className="h-5 w-5" />
-                    {combinedStoryCards[currentCardIndex].stats}
-                  </div>
-                )}
-                <div className="flex items-center justify-between pt-6">
-                  <Button
-                    variant="outline"
-                    onClick={handlePreviousCard}
-                    disabled={currentCardIndex === 0}
-                    className="flex items-center gap-2 text-green-700 border-green-200"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    Previous
-                  </Button>
-                  <div className="flex items-center gap-2">
-                    {combinedStoryCards.map((_, index) => (
-                      <motion.div
-                        key={index}
-                        className={cn(
-                          'h-3 w-3 rounded-full border-2',
-                          currentCardIndex === index
-                            ? combinedStoryCards[index]?.isNarrative
-                              ? 'bg-blue-600 border-blue-600 shadow-lg'
-                              : 'bg-green-600 border-green-600 shadow-lg'
-                            : combinedStoryCards[index]?.isNarrative
-                              ? 'bg-blue-100 border-blue-200'
-                              : 'bg-green-100 border-green-200'
-                        )}
-                        whileHover={{ scale: 1.2 }}
-                        onClick={() => setCurrentCardIndex(index)}
-                        style={{ cursor: 'pointer' }}
-                      />
-                    ))}
-                  </div>
-                  <Button
-                    variant="outline"
-                    onClick={handleNextCard}
-                    disabled={currentCardIndex === combinedStoryCards.length - 1}
-                    className="flex items-center gap-2 text-green-700 border-green-200"
-                  >
-                    Next
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          ) : (
-            <div className="text-center p-8">
-              <p className="text-gray-600">Generating your story...</p>
-            </div>
-          )}
-        </div>
 
 
 

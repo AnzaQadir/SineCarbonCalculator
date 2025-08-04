@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PersonalityService = void 0;
 const ecoPersonality_1 = require("../types/ecoPersonality");
+const powerMovesService_1 = require("./powerMovesService");
+const highlightsService_1 = require("./highlightsService");
 class PersonalityService {
     constructor() {
         this.CATEGORY_WEIGHTS = {
@@ -824,6 +826,12 @@ class PersonalityService {
         // Generate comprehensive power moves using new system
         const comprehensivePowerMoves = this.generateComprehensivePowerMoves(responses);
         console.log('Generated comprehensive power moves:', comprehensivePowerMoves);
+        // Generate personalized power moves using new system
+        const personalizedPowerMoves = powerMovesService_1.PowerMovesService.detectPowerMoves(responses);
+        console.log('Generated personalized power moves:', personalizedPowerMoves);
+        // Generate highlights using new system
+        const highlights = highlightsService_1.HighlightsService.generateHighlights(responses);
+        console.log('Generated highlights:', highlights);
         // Fallback for newPersonality if not calculated from traits
         if (!newPersonality) {
             newPersonality = personalityType;
@@ -839,6 +847,8 @@ class PersonalityService {
             finalScore: scores.finalScore,
             powerMoves,
             comprehensivePowerMoves, // New comprehensive power moves structure
+            personalizedPowerMoves, // New personalized power moves structure
+            highlights, // New highlights structure
             newPersonality,
             newPersonalityDescription,
             // Return personalityTraits if present in input
