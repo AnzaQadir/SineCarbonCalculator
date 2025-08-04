@@ -1,4 +1,6 @@
 import { EcoPersonalityType, EcoPersonalityTypes, personalityMappings, personalityHierarchy } from '../types/ecoPersonality';
+import { PowerMovesService, PersonalizedPowerMovesResponse } from './powerMovesService';
+import { HighlightsService, HighlightsResponse } from './highlightsService';
 
 interface UserResponses {
   // Demographics
@@ -126,6 +128,8 @@ interface PersonalityResponse {
   finalScore: number;
   powerMoves: string[];
   comprehensivePowerMoves?: PowerMovesResponse;
+  personalizedPowerMoves?: PersonalizedPowerMovesResponse;
+  highlights?: HighlightsResponse;
   newPersonality?: string;
   newPersonalityDescription?: string;
   personalityTraits?: {
@@ -1064,6 +1068,14 @@ export class PersonalityService {
     const comprehensivePowerMoves = this.generateComprehensivePowerMoves(responses);
     console.log('Generated comprehensive power moves:', comprehensivePowerMoves);
 
+    // Generate personalized power moves using new system
+    const personalizedPowerMoves = PowerMovesService.detectPowerMoves(responses);
+    console.log('Generated personalized power moves:', personalizedPowerMoves);
+
+    // Generate highlights using new system
+    const highlights = HighlightsService.generateHighlights(responses);
+    console.log('Generated highlights:', highlights);
+
     // Fallback for newPersonality if not calculated from traits
     if (!newPersonality) {
       newPersonality = personalityType;
@@ -1080,6 +1092,8 @@ export class PersonalityService {
       finalScore: scores.finalScore,
       powerMoves,
       comprehensivePowerMoves, // New comprehensive power moves structure
+      personalizedPowerMoves, // New personalized power moves structure
+      highlights, // New highlights structure
       newPersonality,
       newPersonalityDescription,
       // Return personalityTraits if present in input

@@ -33,6 +33,27 @@ export interface ComprehensivePowerMoves {
   tone: string;
 }
 
+export interface Highlight {
+  id: string;
+  title: string;
+  icon: string;
+  category: string;
+  summary: string;
+  subtext: string;
+  cta?: string;
+}
+
+export interface PersonalityInsights {
+  decisionStyle: string;
+  actionStyle: string;
+  spark: string;
+}
+
+export interface Highlights {
+  highlights: Highlight[];
+  personalityInsights: PersonalityInsights;
+}
+
 export interface PersonalityResponse {
   personalityType: PersonalityType;
   description: string;
@@ -52,6 +73,7 @@ export interface PersonalityResponse {
   finalScore: number;
   powerMoves: string[];
   comprehensivePowerMoves?: ComprehensivePowerMoves;
+  highlights?: Highlights;
   dominantCategory?: string;
   emoji?: string;
   badge?: string;
