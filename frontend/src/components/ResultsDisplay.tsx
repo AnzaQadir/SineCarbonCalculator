@@ -327,7 +327,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [dynamicPersonality, setDynamicPersonality] = useState<PersonalityResponse | null>(null);
     const [showJourney, setShowJourney] = useState(false);
   const [showStoryModal, setShowStoryModal] = useState(false);
-  const [activeSection, setActiveSection] = useState<'climate-self' | 'climate-signature'>('climate-self');
+  const [activeSection, setActiveSection] = useState<'climate-self' | 'climate-signature' | 'take-action'>('climate-self');
   const [showActionDrawer, setShowActionDrawer] = useState(false);
  
   const journeyRef = useRef<HTMLDivElement>(null);
@@ -944,9 +944,16 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 }}></div>
                 
                 {/* Enhanced Animated Slider */}
-                <div className={`absolute top-3 bottom-3 w-[calc(50%-6px)] bg-gradient-to-r from-sage-500 via-emerald-500 to-sage-600 rounded-2xl shadow-xl transition-all duration-1000 ease-out ${
-                  activeSection === 'climate-self' ? 'left-3' : 'left-[calc(50%+3px)]'
-                }`}>
+                <div className={`absolute top-3 bottom-3 bg-gradient-to-r from-sage-500 via-emerald-500 to-sage-600 rounded-2xl shadow-xl transition-all duration-1000 ease-out ${
+                  activeSection === 'climate-self' ? 'left-3' : 
+                  activeSection === 'climate-signature' ? 'left-[calc(33.33%+3px)]' : 
+                  'left-[calc(66.66%+3px)]'
+                }`} style={{
+                  width: 'calc(33.33% - 6px)',
+                  left: activeSection === 'climate-self' ? '3px' : 
+                         activeSection === 'climate-signature' ? 'calc(33.33% + 3px)' : 
+                         'calc(66.66% + 3px)'
+                }}>
                   {/* Slider Glow */}
                   <div className="absolute inset-0 bg-gradient-to-r from-sage-400/40 to-emerald-400/40 rounded-2xl blur-md"></div>
                   {/* Inner Glow */}
@@ -956,7 +963,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 <div className="relative flex">
                   <button
                     onClick={() => setActiveSection('climate-self')}
-                    className={`relative px-10 py-5 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out flex items-center gap-4 ${
+                    className={`relative px-6 py-5 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out flex items-center gap-4 ${
                       activeSection === 'climate-self'
                         ? 'text-white'
                         : 'text-sage-600 hover:text-sage-700'
@@ -978,7 +985,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   
                   <button
                     onClick={() => setActiveSection('climate-signature')}
-                    className={`relative px-10 py-5 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out flex items-center gap-4 ${
+                    className={`relative px-6 py-5 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out flex items-center gap-4 ${
                       activeSection === 'climate-signature'
                         ? 'text-white'
                         : 'text-sage-600 hover:text-sage-700'
@@ -996,6 +1003,28 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </div>
                     
                     <span className="relative z-10 text-base">Your Climate Signature</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveSection('take-action')}
+                    className={`relative px-6 py-5 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out flex items-center gap-4 ${
+                      activeSection === 'take-action'
+                        ? 'text-white'
+                        : 'text-sage-600 hover:text-sage-700'
+                    }`}
+                  >
+                    {/* Enhanced Active Indicator */}
+                    <div className={`w-4 h-4 rounded-full transition-all duration-700 ${
+                      activeSection === 'take-action' 
+                        ? 'bg-white shadow-xl scale-125' 
+                        : 'bg-sage-300 group-hover:bg-sage-400'
+                    }`}>
+                      {activeSection === 'take-action' && (
+                        <div className="absolute inset-0 bg-white/30 rounded-full animate-ping"></div>
+                      )}
+                    </div>
+                    
+                    <span className="relative z-10 text-base">Take Action</span>
                   </button>
                 </div>
                 
@@ -1293,202 +1322,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
              </div>
            </div> */}
 
-           {/* Three Action Buttons */}
-           {activeSection === 'climate-self' && (
-           <div className="space-y-8">
-             {/* Enhanced Section Header */}
-             <div className="text-center space-y-6">
-               <div className="relative">
-                 {/* Background Glow */}
-                 <div className="absolute -inset-4 bg-gradient-to-r from-sage-400/10 via-sage-500/10 to-sage-600/10 rounded-3xl blur-xl"></div>
-                 
-                 <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-sage-200/50">
-                   <div className="flex items-center justify-center gap-4 mb-4">
-                     <div className="w-12 h-12 bg-gradient-to-br from-sage-500 to-sage-600 rounded-2xl flex items-center justify-center shadow-lg">
-                       <Zap className="w-6 h-6 text-white" />
-                     </div>
-                     <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent">
-                       Ready to Make a Difference?
-                     </h2>
-                   </div>
-                   <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-medium">
-                     Your climate journey doesn't end here. Choose your next powerful step and start creating real impact today.
-                   </p>
-                   <div className="w-32 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mx-auto mt-6 rounded-full"></div>
-                 </div>
-               </div>
-             </div>
-             
-             {/* Cards Grid */}
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-             {/* Generate Your Story Button */}
-                <div className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-orange-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-             <button 
-                    className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-red-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-red-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
-               onClick={async () => {
-                 await generateStory();
-                 setShowStoryModal(true);
-               }}
-               disabled={isGeneratingStory}
-               aria-label="Generate your sustainability story"
-             >
-                    <div className="text-center space-y-6">
-                      {/* Top Icon with Enhanced Styling */}
-                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-red-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg">
-                        <BookOpen className="h-10 w-10 text-red-600" />
-                 </div>
-                      
-                      {/* Title with Gradient */}
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">Generate Your Story</h3>
-                      
-                      {/* Enhanced Description */}
-                      <p className="text-sm text-gray-600 leading-relaxed">Transform your climate journey into an inspiring story that motivates others to join the movement</p>
-                      
-                      {/* Impact Badge */}
-                      <div className="flex items-center justify-center gap-2 mt-2">
-                        <div className="px-3 py-1 bg-red-100 rounded-full">
-                          <span className="text-xs font-semibold text-red-600">High Impact</span>
-                        </div>
-                      </div>
-                      
-                      {/* Central Icon with Animation */}
-                      <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
-                        <div className="w-24 h-24 mx-auto">
-                     <svg viewBox="0 0 64 64" className="w-full h-full">
-                            <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-200"/>
-                            <circle cx="24" cy="28" r="2" fill="currentColor" className="text-red-600"/>
-                            <circle cx="40" cy="28" r="2" fill="currentColor" className="text-red-600"/>
-                            <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"/>
-                     </svg>
-                   </div>
-                 </div>
-                      
-                      {/* Enhanced Get Started Button */}
-                      <div className="flex items-center justify-center mt-6">
-                        <div className="relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-red-600 group-hover:to-orange-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
-                          <span className="relative z-10">Start Creating Impact</span>
-                          <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                        </div>
-                 </div>
-               </div>
-             </button>
-                </div>
 
-             {/* Recommendations Button */}
-                <div className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-             <button 
-                    className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-yellow-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
-               onClick={() => navigate('/recommendations')}
-               aria-label="Get personalized recommendations"
-             >
-                    <div className="text-center space-y-6">
-                      {/* Top Icon with Enhanced Styling */}
-                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-yellow-100 to-amber-100 rounded-2xl flex items-center justify-center group-hover:from-yellow-200 group-hover:to-amber-200 transition-all duration-300 shadow-lg">
-                        <Lightbulb className="h-10 w-10 text-yellow-600" />
-                 </div>
-                      
-                      {/* Title with Gradient */}
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">Personalized Recommendations</h3>
-                      
-                      {/* Enhanced Description */}
-                      <p className="text-sm text-gray-600 leading-relaxed">Get actionable steps tailored to your unique lifestyle that will maximize your climate impact</p>
-                      
-                      {/* Impact Badge */}
-                      <div className="flex items-center justify-center gap-2 mt-2">
-                        <div className="px-3 py-1 bg-yellow-100 rounded-full">
-                          <span className="text-xs font-semibold text-yellow-600">Smart Action</span>
-                        </div>
-                      </div>
-                      
-                      {/* Central Icon with Animation */}
-                      <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
-                        <div className="w-24 h-24 mx-auto">
-                     <svg viewBox="0 0 64 64" className="w-full h-full">
-                            <rect x="16" y="20" width="32" height="24" fill="none" stroke="currentColor" strokeWidth="2" className="text-yellow-200"/>
-                            <line x1="16" y1="28" x2="48" y2="28" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
-                            <line x1="16" y1="36" x2="48" y2="36" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
-                            <line x1="16" y1="44" x2="40" y2="44" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
-                            <circle cx="12" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
-                            <circle cx="20" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
-                     </svg>
-                   </div>
-                 </div>
-                      
-                      {/* Enhanced Get Started Button */}
-                      <div className="flex items-center justify-center mt-6">
-                        <div className="relative overflow-hidden bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-yellow-600 group-hover:to-amber-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
-                          <span className="relative z-10">Discover Your Path</span>
-                          <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                        </div>
-                 </div>
-               </div>
-             </button>
-                </div>
-
-             {/* Journalize Button */}
-                <div className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-sage-100 to-blue-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-             <button 
-                    className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-sage-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-sage-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
-               onClick={() => console.log('Journalize clicked')}
-               aria-label="Journalize your sustainability journey"
-             >
-                    <div className="text-center space-y-6">
-                      {/* Top Icon with Enhanced Styling */}
-                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-sage-100 to-blue-100 rounded-2xl flex items-center justify-center group-hover:from-sage-200 group-hover:to-blue-200 transition-all duration-300 shadow-lg">
-                        <PenTool className="h-10 w-10 text-sage-600" />
-                 </div>
-                      
-                      {/* Title with Gradient */}
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-sage-600 to-blue-600 bg-clip-text text-transparent">Journalize Your Journey</h3>
-                      
-                      {/* Enhanced Description */}
-                      <p className="text-sm text-gray-600 leading-relaxed">Track your progress, celebrate wins, and build lasting sustainable habits through mindful reflection</p>
-                      
-                      {/* Impact Badge */}
-                      <div className="flex items-center justify-center gap-2 mt-2">
-                        <div className="px-3 py-1 bg-sage-100 rounded-full">
-                          <span className="text-xs font-semibold text-sage-600">Mindful Growth</span>
-                        </div>
-                      </div>
-                      
-                      {/* Central Icon with Animation */}
-                      <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
-                        <div className="w-24 h-24 mx-auto">
-                     <svg viewBox="0 0 64 64" className="w-full h-full">
-                            <rect x="16" y="12" width="32" height="40" fill="none" stroke="currentColor" strokeWidth="2" className="text-sage-200"/>
-                            <line x1="20" y1="20" x2="44" y2="20" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
-                            <line x1="20" y1="24" x2="44" y2="24" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
-                            <line x1="20" y1="28" x2="44" y2="28" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
-                            <line x1="20" y1="32" x2="44" y2="32" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
-                            <line x1="20" y1="36" x2="44" y2="36" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
-                            <line x1="20" y1="40" x2="44" y2="40" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
-                            <rect x="20" y="44" width="8" height="4" fill="currentColor" className="text-sage-600"/>
-                            <rect x="36" y="44" width="8" height="4" fill="currentColor" className="text-sage-600"/>
-                            <circle cx="12" cy="16" r="1" fill="currentColor" className="text-sage-600"/>
-                            <circle cx="20" cy="16" r="1" fill="currentColor" className="text-sage-600"/>
-                     </svg>
-                   </div>
-                 </div>
-                      
-                      {/* Enhanced Get Started Button */}
-                      <div className="flex items-center justify-center mt-6">
-                        <div className="relative overflow-hidden bg-gradient-to-r from-sage-500 to-blue-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-sage-600 group-hover:to-blue-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
-                          <span className="relative z-10">Track Your Growth</span>
-                          <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                        </div>
-                 </div>
-               </div>
-             </button>
-           </div>
-             </div>
-           </div>
-           )}
 
                                       {/* Power Moves Grid - Using Highlights from API */}
            {activeSection === 'climate-signature' && (
@@ -1873,82 +1707,84 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      </div> 
          */}
 
-         {/* Take Action Section for Climate Signature */}
-         {activeSection === 'climate-signature' && (
-           <div className="space-y-8 mt-12">
-             {/* Enhanced Section Header */}
-            <div className="text-center space-y-6">
-               <div className="relative">
-                 {/* Background Glow */}
-                 <div className="absolute -inset-4 bg-gradient-to-r from-sage-400/10 via-sage-500/10 to-sage-600/10 rounded-3xl blur-xl"></div>
-                 
-                 <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-sage-200/50">
-                   <div className="flex items-center justify-center gap-4 mb-4">
-                     <div className="w-12 h-12 bg-gradient-to-br from-sage-500 to-sage-600 rounded-2xl flex items-center justify-center shadow-lg">
-                       <Zap className="w-6 h-6 text-white" />
-                     </div>
-                     <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent">
-                       Ready to Make a Difference?
-                     </h2>
-                   </div>
-                   <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-medium">
-                     Your climate journey doesn't end here. Choose your next powerful step and start creating real impact today.
-                   </p>
-                   <div className="w-32 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mx-auto mt-6 rounded-full"></div>
-                 </div>
-               </div>
-             </div>
-             
-             {/* Cards Grid */}
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-               {/* Generate Your Story Button */}
-               <div className="group relative">
-                 <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-orange-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <button
-                   className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-red-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-red-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
-                   onClick={async () => {
-                     await generateStory();
-                     setShowStoryModal(true);
-                   }}
-                   disabled={isGeneratingStory}
-                   aria-label="Generate your sustainability story"
-                 >
-                   <div className="text-center space-y-6">
-                     {/* Top Icon with Enhanced Styling */}
-                     <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-red-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg">
-                       <BookOpen className="h-10 w-10 text-red-600" />
+
+
+          {/* Take Action Section - Reuse existing section */}
+          {activeSection === 'take-action' && (
+            <div className="space-y-8 mt-12">
+              {/* Enhanced Section Header */}
+              <div className="text-center space-y-6">
+                <div className="relative">
+                  {/* Background Glow */}
+                  <div className="absolute -inset-4 bg-gradient-to-r from-sage-400/10 via-sage-500/10 to-sage-600/10 rounded-3xl blur-xl"></div>
+                  
+                  <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-sage-200/50">
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-sage-500 to-sage-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <Zap className="w-6 h-6 text-white" />
+                      </div>
+                      <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent">
+                        Ready to Make a Difference?
+                      </h2>
+                    </div>
+                    <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-medium">
+                      Your climate journey doesn't end here. Choose your next powerful step and start creating real impact today.
+                    </p>
+                    <div className="w-32 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mx-auto mt-6 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                {/* Generate Your Story Button */}
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-orange-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                   <button
+                    className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-red-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-red-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
+                    onClick={async () => {
+                      await generateStory();
+                      setShowStoryModal(true);
+                    }}
+                    disabled={isGeneratingStory}
+                    aria-label="Generate your sustainability story"
+                  >
+                    <div className="text-center space-y-6">
+                      {/* Top Icon with Enhanced Styling */}
+                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-red-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg">
+                        <BookOpen className="h-10 w-10 text-red-600" />
               </div>
 
-                     {/* Title with Gradient */}
-                     <h3 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">Generate Your Story</h3>
-                     
-                     {/* Enhanced Description */}
-                     <p className="text-sm text-gray-600 leading-relaxed">Transform your climate journey into an inspiring story that motivates others to join the movement</p>
-                     
-                     {/* Impact Badge */}
-                     <div className="flex items-center justify-center gap-2 mt-2">
-                       <div className="px-3 py-1 bg-red-100 rounded-full">
-                         <span className="text-xs font-semibold text-red-600">High Impact</span>
+                      {/* Title with Gradient */}
+                      <h3 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">Generate Your Story</h3>
+                      
+                      {/* Enhanced Description */}
+                      <p className="text-sm text-gray-600 leading-relaxed">Transform your climate journey into an inspiring story that motivates others to join the movement</p>
+                      
+                      {/* Impact Badge */}
+                      <div className="flex items-center justify-center gap-2 mt-2">
+                        <div className="px-3 py-1 bg-red-100 rounded-full">
+                          <span className="text-xs font-semibold text-red-600">High Impact</span>
             </div>
           </div>
 
-                     {/* Central Icon with Animation */}
-                     <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
-                       <div className="w-24 h-24 mx-auto">
-                         <svg viewBox="0 0 64 64" className="w-full h-full">
-                           <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-200"/>
-                           <circle cx="24" cy="28" r="2" fill="currentColor" className="text-red-600"/>
-                           <circle cx="40" cy="28" r="2" fill="currentColor" className="text-red-600"/>
-                           <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"/>
-                         </svg>
-                       </div>
+                      {/* Central Icon with Animation */}
+                      <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
+                        <div className="w-24 h-24 mx-auto">
+                          <svg viewBox="0 0 64 64" className="w-full h-full">
+                            <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-200"/>
+                            <circle cx="24" cy="28" r="2" fill="currentColor" className="text-red-600"/>
+                            <circle cx="40" cy="28" r="2" fill="currentColor" className="text-red-600"/>
+                            <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"/>
+                          </svg>
+                        </div>
         </div>
 
-                     {/* Enhanced Get Started Button */}
+                      {/* Enhanced Get Started Button */}
                                             <div className="flex items-center justify-center mt-6">
-                         <div className="relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-red-600 group-hover:to-orange-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
-                           <span className="relative z-10">Start Creating Impact</span>
-                           <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                        <div className="relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-red-600 group-hover:to-orange-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
+                          <span className="relative z-10">Start Creating Impact</span>
+                          <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
             </div>
                 </div>
@@ -1956,9 +1792,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                  </button>
           </div>
           
-               {/* Recommendations Button */}
-               <div className="group relative">
-                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                {/* Recommendations Button */}
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                     <button 
                      className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-yellow-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
                    onClick={() => navigate('/recommendations')}
