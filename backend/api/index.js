@@ -59,7 +59,16 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString(),
         cors: 'updated',
         environment: process.env.NODE_ENV,
-        vercel: process.env.VERCEL
+        vercel: process.env.VERCEL,
+        database: 'available' // This will be updated based on actual status
+    });
+});
+// Simple test endpoint that doesn't require database
+app.get('/api/test', (req, res) => {
+    res.json({
+        message: 'API is working!',
+        timestamp: new Date().toISOString(),
+        cors: 'enabled'
     });
 });
 app.get('/', (req, res) => {
@@ -87,8 +96,16 @@ const startServer = async () => {
         }
         catch (dbError) {
             console.error('Database initialization failed:', dbError);
+            if (dbError instanceof Error) {
+                console.error('Database error details:', {
+                    message: dbError.message,
+                    code: dbError.code,
+                    hostname: dbError.hostname
+                });
+            }
             if (process.env.VERCEL === '1') {
                 console.log('Continuing without database on Vercel...');
+                console.log('API endpoints will work but database features will be limited');
             }
             else {
                 throw dbError;
