@@ -75,19 +75,25 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// Initialize database and start server
+// Initialize database and conditionally start server
 const startServer = async () => {
   try {
     // Initialize database
     await initializeDatabase();
     
-    // Start server
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
+    // Only start the server if not on Vercel
+    if (process.env.VERCEL !== '1') {
+      app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+      });
+    } else {
+      console.log('Running on Vercel - server not started');
+    }
   } catch (error) {
     console.error('Failed to start server:', error);
-    process.exit(1);
+    if (process.env.VERCEL !== '1') {
+      process.exit(1);
+    }
   }
 };
 

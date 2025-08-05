@@ -1,18 +1,13 @@
 {
   "version": 2,
   "builds": [
-    { 
-      "src": "api/index.js", 
-      "use": "@vercel/node@latest",
-      "config": {
-        "includeFiles": ["api/**/*", "src/**/*"],
-        "maxDuration": 30
-      }
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.js" },
-    { "src": "/(.*)", "dest": "/api/index.js" }
+    { "src": "/api/(.*)", "dest": "/api/index.js" }
   ],
   "headers": [
     {
@@ -35,14 +30,5 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "buildCommand": "npm run vercel-build",
-  "outputDirectory": "api",
-  "installCommand": "npm install",
-  "framework": null,
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
-    }
   }
-} 
+}
