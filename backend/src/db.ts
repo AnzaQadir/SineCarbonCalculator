@@ -1,14 +1,14 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
-// Load environment variables (only in development)
+// Load environment variables
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
 
-// Check if DATABASE_URL is available
+// Check if DATABASE_URL exists
 if (!process.env.DATABASE_URL) {
-  console.error('DATABASE_URL environment variable is not set');
+  console.error('❌ DATABASE_URL is not set');
   throw new Error('DATABASE_URL is required');
 }
 
@@ -20,39 +20,63 @@ try {
   require('pg');
   console.log('pg module is available');
 } catch (error) {
-  console.error('pg module not found:', error);
-  throw new Error('pg module is required for PostgreSQL connection');
+  console.error('❌ pg module not found. Please install it manually.');
+  throw new Error('Please install pg package manually');
 }
 
-// Test database connection
-const testDbConnection = async () => {
+// Parse DATABASE_URL manually to handle URL encoding issues
+function parseDatabaseUrl(url: string) {
   try {
-    await sequelize.authenticate();
-    console.log('Database connection successful');
+    // Handle URL encoding issues by manually parsing
+    const match = url.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
+    if (!match) {
+      throw new Error('Invalid DATABASE_URL format');
+    }
+    
+    const [, username, password, host, port, database] = match;
+    
+    // Decode the password (handle %23 -> #)
+    const decodedPassword = decodeURIComponent(password);
+    
+    return {
+      username,
+      password: decodedPassword,
+      host,
+      port: parseInt(port),
+      database
+    };
   } catch (error) {
-    console.error('Database connection failed:', error);
-    console.error('Connection details:', {
-      host: process.env.DATABASE_URL?.split('@')[1]?.split(':')[0],
-      port: process.env.DATABASE_URL?.split(':')[2]?.split('/')[0],
-      database: process.env.DATABASE_URL?.split('/').pop()
-    });
+    console.error('❌ Error parsing DATABASE_URL:', error);
+    throw error;
   }
-};
+}
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+const dbConfig = parseDatabaseUrl(process.env.DATABASE_URL);
+
+console.log('Parsed database config:', {
+  username: dbConfig.username,
+  host: dbConfig.host,
+  port: dbConfig.port,
+  database: dbConfig.database,
+  passwordLength: dbConfig.password.length
+});
+
+const sequelize = new Sequelize({
   dialect: 'postgres',
-  protocol: 'postgres',
-  logging: process.env.NODE_ENV === 'development' ? console.log : false,
+  host: dbConfig.host,
+  port: dbConfig.port,
+  database: dbConfig.database,
+  username: dbConfig.username,
+  password: dbConfig.password,
+  logging: false,
   dialectOptions: {
-    ssl: process.env.NODE_ENV === 'production'
-      ? { 
-          require: true, 
-          rejectUnauthorized: false,
-          ca: undefined,
-          key: undefined,
-          cert: undefined
-        }
-      : false,
+    ssl: process.env.NODE_ENV === 'production' ? {
+      require: true,
+      rejectUnauthorized: false,
+      ca: undefined,
+      key: undefined,
+      cert: undefined
+    } : false
   },
   pool: {
     max: 5,
@@ -66,14 +90,35 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   }
 });
 
-// Test the connection
-export const testConnection = async () => {
+// Test database connection
+export async function testDbConnection() {
   try {
     await sequelize.authenticate();
-    console.log('Database connection has been established successfully.');
+    console.log('✅ Database connection established successfully.');
+    return true;
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error('❌ Database connection failed:', error);
+    return false;
   }
-};
+}
+
+// Initialize database
+export async function initializeDatabase() {
+  try {
+    console.log('Initializing database...');
+    await sequelize.authenticate();
+    console.log('Database connection established successfully.');
+    
+    // Sync models with database
+    await sequelize.sync({ alter: true });
+    console.log('Database synchronized successfully');
+    
+    console.log('✅ Database initialized successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    throw error;
+  }
+}
 
 export default sequelize; 

@@ -67,7 +67,7 @@ app.get('/api/health', (req, res) => {
     cors: 'updated',
     environment: process.env.NODE_ENV,
     vercel: process.env.VERCEL,
-    database: 'available' // This will be updated based on actual status
+    database: process.env.VERCEL === '1' ? 'unavailable (graceful fallback)' : 'available'
   });
 });
 
@@ -78,6 +78,29 @@ app.get('/api/test', (req, res) => {
     timestamp: new Date().toISOString(),
     cors: 'enabled'
   });
+});
+
+// Database test endpoint
+app.get('/api/db-test', async (req, res) => {
+  try {
+    const { testDbConnection } = await import('./db');
+    const success = await testDbConnection();
+    if (!success) {
+      throw new Error('Database connection test failed');
+    }
+    res.json({ 
+      status: 'success',
+      message: 'Database connection successful',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.json({ 
+      status: 'error',
+      message: 'Database connection failed',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 app.get('/', (req, res) => {
