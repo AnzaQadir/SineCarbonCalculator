@@ -15,9 +15,9 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors({
-  origin: [
+// CORS middleware for Vercel
+app.use((req, res, next) => {
+  const allowedOrigins = [
     'https://zerrah-backend.vercel.app',
     'https://zerrah.vercel.app',
     'https://www.zerrah.com',
@@ -25,17 +25,31 @@ app.use(cors({
     'http://localhost:5173',
     'http://localhost:4173',
     'http://localhost:8080'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Session-Id']
-}));
+  ];
+  
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Session-Id');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  next();
+});
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Handle preflight OPTIONS requests
-app.options('*', cors());
+// Handle preflight OPTIONS requests explicitly for Vercel
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Session-Id');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(200).end();
+});
 
 // Routes
 app.use('/api/personality', personalityRoutes);

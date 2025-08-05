@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -17,9 +16,9 @@ const models_1 = require("./models");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
-// Middleware
-app.use((0, cors_1.default)({
-    origin: [
+// CORS middleware for Vercel
+app.use((req, res, next) => {
+    const allowedOrigins = [
         'https://zerrah-backend.vercel.app',
         'https://zerrah.vercel.app',
         'https://www.zerrah.com',
@@ -27,16 +26,27 @@ app.use((0, cors_1.default)({
         'http://localhost:5173',
         'http://localhost:4173',
         'http://localhost:8080'
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Session-Id']
-}));
+    ];
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin);
+    }
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Session-Id');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 app.use((0, helmet_1.default)());
 app.use((0, morgan_1.default)('dev'));
 app.use(express_1.default.json());
-// Handle preflight OPTIONS requests
-app.options('*', (0, cors_1.default)());
+// Handle preflight OPTIONS requests explicitly for Vercel
+app.options('*', (req, res) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Session-Id');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.status(200).end();
+});
 // Routes
 app.use('/api/personality', personalityRoutes_1.personalityRoutes);
 app.use('/api/recommendations', recommendationRoutes_1.recommendationRoutes);
