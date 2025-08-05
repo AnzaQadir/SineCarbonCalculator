@@ -8,6 +8,13 @@ const sequelize_1 = require("sequelize");
 const dotenv_1 = __importDefault(require("dotenv"));
 // Load environment variables
 dotenv_1.default.config();
+// Check if DATABASE_URL is available
+if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL environment variable is not set');
+    throw new Error('DATABASE_URL is required');
+}
+console.log('Initializing database connection...');
+console.log('DATABASE_URL length:', process.env.DATABASE_URL.length);
 const sequelize = new sequelize_1.Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     protocol: 'postgres',

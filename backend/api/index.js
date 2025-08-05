@@ -79,10 +79,21 @@ const startServer = async () => {
         console.log('Starting server initialization...');
         console.log('Environment:', process.env.NODE_ENV);
         console.log('VERCEL:', process.env.VERCEL);
-        // Initialize database
+        // Initialize database (with fallback)
         console.log('Initializing database...');
-        await (0, models_1.initializeDatabase)();
-        console.log('Database initialized successfully');
+        try {
+            await (0, models_1.initializeDatabase)();
+            console.log('Database initialized successfully');
+        }
+        catch (dbError) {
+            console.error('Database initialization failed:', dbError);
+            if (process.env.VERCEL === '1') {
+                console.log('Continuing without database on Vercel...');
+            }
+            else {
+                throw dbError;
+            }
+        }
         // Only start the server if not on Vercel
         if (process.env.VERCEL !== '1') {
             app.listen(port, () => {
