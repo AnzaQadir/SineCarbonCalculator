@@ -5,7 +5,8 @@
       "src": "api/index.js", 
       "use": "@vercel/node@latest",
       "config": {
-        "includeFiles": ["api/**/*", "src/**/*"]
+        "includeFiles": ["api/**/*", "src/**/*"],
+        "maxDuration": 30
       }
     }
   ],
@@ -15,11 +16,6 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 30
-    }
   },
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "api",
