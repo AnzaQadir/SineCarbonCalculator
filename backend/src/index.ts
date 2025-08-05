@@ -16,7 +16,20 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://zerrah-backend.vercel.app',
+    'https://zerrah.vercel.app',
+    'https://www.zerrah.com',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'http://localhost:8080'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Session-Id']
+}));
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
