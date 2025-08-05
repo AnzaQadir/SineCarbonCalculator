@@ -1,8 +1,10 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 // Check if DATABASE_URL is available
 if (!process.env.DATABASE_URL) {

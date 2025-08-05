@@ -6,8 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.testConnection = void 0;
 const sequelize_1 = require("sequelize");
 const dotenv_1 = __importDefault(require("dotenv"));
-// Load environment variables
-dotenv_1.default.config();
+// Load environment variables (only in development)
+if (process.env.NODE_ENV !== 'production') {
+    dotenv_1.default.config();
+}
 // Check if DATABASE_URL is available
 if (!process.env.DATABASE_URL) {
     console.error('DATABASE_URL environment variable is not set');

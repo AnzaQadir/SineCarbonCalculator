@@ -12,8 +12,10 @@ const recommendationRoutes_1 = require("./routes/recommendationRoutes");
 const userRoutes_1 = require("./routes/userRoutes");
 const sessionRoutes_1 = __importDefault(require("./routes/sessionRoutes"));
 const models_1 = require("./models");
-// Load environment variables
-dotenv_1.default.config();
+// Load environment variables (only in development)
+if (process.env.NODE_ENV !== 'production') {
+    dotenv_1.default.config();
+}
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 // CORS middleware for Vercel
