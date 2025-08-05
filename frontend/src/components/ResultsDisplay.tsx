@@ -1711,80 +1711,80 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
           {/* Take Action Section - Reuse existing section */}
           {activeSection === 'take-action' && (
-            <div className="space-y-8 mt-12">
-              {/* Enhanced Section Header */}
-              <div className="text-center space-y-6">
-                <div className="relative">
-                  {/* Background Glow */}
-                  <div className="absolute -inset-4 bg-gradient-to-r from-sage-400/10 via-sage-500/10 to-sage-600/10 rounded-3xl blur-xl"></div>
-                  
-                  <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-sage-200/50">
-                    <div className="flex items-center justify-center gap-4 mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-sage-500 to-sage-600 rounded-2xl flex items-center justify-center shadow-lg">
-                        <Zap className="w-6 h-6 text-white" />
-                      </div>
-                      <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent">
-                        Ready to Make a Difference?
-                      </h2>
-                    </div>
-                    <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-medium">
-                      Your climate journey doesn't end here. Choose your next powerful step and start creating real impact today.
-                    </p>
-                    <div className="w-32 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mx-auto mt-6 rounded-full"></div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                {/* Generate Your Story Button */}
-                <div className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-orange-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                   <button
-                    className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-red-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-red-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
-                    onClick={async () => {
-                      await generateStory();
-                      setShowStoryModal(true);
-                    }}
-                    disabled={isGeneratingStory}
-                    aria-label="Generate your sustainability story"
-                  >
-                    <div className="text-center space-y-6">
-                      {/* Top Icon with Enhanced Styling */}
-                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-red-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg">
-                        <BookOpen className="h-10 w-10 text-red-600" />
+           <div className="space-y-8 mt-12">
+             {/* Enhanced Section Header */}
+            <div className="text-center space-y-6">
+               <div className="relative">
+                 {/* Background Glow */}
+                 <div className="absolute -inset-4 bg-gradient-to-r from-sage-400/10 via-sage-500/10 to-sage-600/10 rounded-3xl blur-xl"></div>
+                 
+                 <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-sage-200/50">
+                   <div className="flex items-center justify-center gap-4 mb-4">
+                     <div className="w-12 h-12 bg-gradient-to-br from-sage-500 to-sage-600 rounded-2xl flex items-center justify-center shadow-lg">
+                       <Zap className="w-6 h-6 text-white" />
+                     </div>
+                     <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent">
+                       Ready to Make a Difference?
+                     </h2>
+                   </div>
+                   <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-medium">
+                     Your climate journey doesn't end here. Choose your next powerful step and start creating real impact today.
+                   </p>
+                   <div className="w-32 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mx-auto mt-6 rounded-full"></div>
+                 </div>
+               </div>
+             </div>
+             
+             {/* Cards Grid */}
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+               {/* Generate Your Story Button */}
+               <div className="group relative">
+                 <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-orange-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <button
+                   className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-red-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-red-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
+                   onClick={async () => {
+                     await generateStory();
+                     setShowStoryModal(true);
+                   }}
+                   disabled={isGeneratingStory}
+                   aria-label="Generate your sustainability story"
+                 >
+                   <div className="text-center space-y-6">
+                     {/* Top Icon with Enhanced Styling */}
+                     <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-red-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg">
+                       <BookOpen className="h-10 w-10 text-red-600" />
               </div>
 
-                      {/* Title with Gradient */}
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">Generate Your Story</h3>
-                      
-                      {/* Enhanced Description */}
-                      <p className="text-sm text-gray-600 leading-relaxed">Transform your climate journey into an inspiring story that motivates others to join the movement</p>
-                      
-                      {/* Impact Badge */}
-                      <div className="flex items-center justify-center gap-2 mt-2">
-                        <div className="px-3 py-1 bg-red-100 rounded-full">
-                          <span className="text-xs font-semibold text-red-600">High Impact</span>
+                     {/* Title with Gradient */}
+                     <h3 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">Generate Your Story</h3>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 leading-relaxed">Transform your climate journey into an inspiring story that motivates others to join the movement</p>
+                     
+                     {/* Impact Badge */}
+                     <div className="flex items-center justify-center gap-2 mt-2">
+                       <div className="px-3 py-1 bg-red-100 rounded-full">
+                         <span className="text-xs font-semibold text-red-600">High Impact</span>
             </div>
           </div>
 
-                      {/* Central Icon with Animation */}
-                      <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
-                        <div className="w-24 h-24 mx-auto">
-                          <svg viewBox="0 0 64 64" className="w-full h-full">
-                            <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-200"/>
-                            <circle cx="24" cy="28" r="2" fill="currentColor" className="text-red-600"/>
-                            <circle cx="40" cy="28" r="2" fill="currentColor" className="text-red-600"/>
-                            <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"/>
-                          </svg>
-                        </div>
+                     {/* Central Icon with Animation */}
+                     <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
+                       <div className="w-24 h-24 mx-auto">
+                         <svg viewBox="0 0 64 64" className="w-full h-full">
+                           <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-200"/>
+                           <circle cx="24" cy="28" r="2" fill="currentColor" className="text-red-600"/>
+                           <circle cx="40" cy="28" r="2" fill="currentColor" className="text-red-600"/>
+                           <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"/>
+                         </svg>
+                       </div>
         </div>
 
-                      {/* Enhanced Get Started Button */}
+                     {/* Enhanced Get Started Button */}
                                             <div className="flex items-center justify-center mt-6">
-                        <div className="relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-red-600 group-hover:to-orange-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
-                          <span className="relative z-10">Start Creating Impact</span>
-                          <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                         <div className="relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-red-600 group-hover:to-orange-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
+                           <span className="relative z-10">Start Creating Impact</span>
+                           <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
             </div>
                 </div>
@@ -1792,9 +1792,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                  </button>
           </div>
           
-                {/* Recommendations Button */}
-                <div className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+               {/* Recommendations Button */}
+               <div className="group relative">
+                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                     <button 
                      className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-yellow-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
                    onClick={() => navigate('/recommendations')}
