@@ -42,7 +42,7 @@ app.use('/api/users', userRoutes_1.userRoutes);
 app.use('/api/sessions', sessionRoutes_1.default);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), cors: 'updated' });
 });
 app.get('/', (req, res) => {
     res.status(200).json({ message: 'Welcome to the API' });
