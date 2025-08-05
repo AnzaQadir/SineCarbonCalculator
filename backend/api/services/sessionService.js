@@ -32,6 +32,15 @@ class SessionService {
         }
         catch (error) {
             console.error('Error creating/updating session:', error);
+            // If on Vercel and database is unavailable, return a mock session
+            if (process.env.VERCEL === '1') {
+                console.log('Database unavailable on Vercel, returning mock session');
+                return {
+                    sessionId,
+                    lastSeen: new Date(),
+                    metadata,
+                };
+            }
             throw error;
         }
     }
@@ -67,6 +76,15 @@ class SessionService {
         }
         catch (error) {
             console.error('Error logging event:', error);
+            // If on Vercel and database is unavailable, return a mock event
+            if (process.env.VERCEL === '1') {
+                console.log('Database unavailable on Vercel, returning mock event');
+                return {
+                    eventType,
+                    payload,
+                    timestamp: new Date(),
+                };
+            }
             throw error;
         }
     }
@@ -115,6 +133,11 @@ class SessionService {
         }
         catch (error) {
             console.error('Error getting user by session:', error);
+            // If on Vercel and database is unavailable, return null
+            if (process.env.VERCEL === '1') {
+                console.log('Database unavailable on Vercel, returning null for user session');
+                return null;
+            }
             throw error;
         }
     }
