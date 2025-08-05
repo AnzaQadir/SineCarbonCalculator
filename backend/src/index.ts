@@ -9,8 +9,10 @@ import { userRoutes } from './routes/userRoutes';
 import sessionRoutes from './routes/sessionRoutes';
 import { initializeDatabase } from './models';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 const app = express();
 const port = process.env.PORT || 3000;

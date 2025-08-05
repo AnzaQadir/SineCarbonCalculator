@@ -6,7 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateRecommendations = generateRecommendations;
 const openai_1 = __importDefault(require("openai"));
 const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
+// Load environment variables (only in development)
+if (process.env.NODE_ENV !== 'production') {
+    dotenv_1.default.config();
+}
 const openai = new openai_1.default({
     apiKey: process.env.OPENAI_API_KEY,
 });
