@@ -1280,38 +1280,9 @@ function PoeticJourneyQuiz() {
         }}
       />
       
-      {/* Animated down arrow */}
-      <div className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 pointer-events-none transition-opacity duration-1000 ${showScrollHint ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="flex flex-col items-center">
-          <div className="text-sm text-[#7A8B7A] opacity-70 mb-2 font-serif italic scroll-hint-text">
-            More questions await...
-          </div>
-          <div className="scroll-hint-arrow">
-            <svg 
-              className="w-6 h-6 text-[#A7D58E] opacity-80" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M19 14l-7 7m0 0l-7-7m7 7V3" 
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
+
       
-      {/* Mobile swipe hint */}
-      <div className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 pointer-events-none md:hidden transition-opacity duration-1000 ${showScrollHint ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="flex items-center gap-2 opacity-60">
-          <div className="w-8 h-0.5 bg-[#A7D58E] rounded-full scroll-hint-line"></div>
-          <span className="text-xs text-[#7A8B7A] font-serif scroll-hint-text">Swipe up</span>
-          <div className="w-8 h-0.5 bg-[#A7D58E] rounded-full scroll-hint-line"></div>
-        </div>
-      </div>
+
       
       <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-6 mb-6 border border-[#A7D58E22] relative z-10 max-h-[90vh] overflow-y-auto">
         {/* Chapter Title */}
