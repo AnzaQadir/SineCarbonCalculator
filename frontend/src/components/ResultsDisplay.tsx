@@ -980,7 +980,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                       )}
                     </div>
                     
-                    <span className="relative z-10 text-base">Your Climate Self</span>
+                    <span className="relative z-10 text-base">Your Self</span>
                   </button>
                   
                   <button
@@ -1002,7 +1002,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                       )}
                     </div>
                     
-                    <span className="relative z-10 text-base">Your Climate Signature</span>
+                    <span className="relative z-10 text-base">Your Signature</span>
                   </button>
                   
                   <button
