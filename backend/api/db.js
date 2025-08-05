@@ -24,13 +24,34 @@ catch (error) {
     console.error('pg module not found:', error);
     throw new Error('pg module is required for PostgreSQL connection');
 }
+// Test database connection
+const testDbConnection = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('Database connection successful');
+    }
+    catch (error) {
+        console.error('Database connection failed:', error);
+        console.error('Connection details:', {
+            host: process.env.DATABASE_URL?.split('@')[1]?.split(':')[0],
+            port: process.env.DATABASE_URL?.split(':')[2]?.split('/')[0],
+            database: process.env.DATABASE_URL?.split('/').pop()
+        });
+    }
+};
 const sequelize = new sequelize_1.Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     protocol: 'postgres',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     dialectOptions: {
         ssl: process.env.NODE_ENV === 'production'
-            ? { require: true, rejectUnauthorized: false }
+            ? {
+                require: true,
+                rejectUnauthorized: false,
+                ca: undefined,
+                key: undefined,
+                cert: undefined
+            }
             : false,
     },
     pool: {
@@ -38,6 +59,10 @@ const sequelize = new sequelize_1.Sequelize(process.env.DATABASE_URL, {
         min: 0,
         acquire: 30000,
         idle: 10000
+    },
+    retry: {
+        max: 3,
+        timeout: 10000
     }
 });
 // Test the connection
