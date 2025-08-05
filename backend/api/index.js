@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -62,7 +95,7 @@ app.get('/api/health', (req, res) => {
         cors: 'updated',
         environment: process.env.NODE_ENV,
         vercel: process.env.VERCEL,
-        database: 'available' // This will be updated based on actual status
+        database: process.env.VERCEL === '1' ? 'unavailable (graceful fallback)' : 'available'
     });
 });
 // Simple test endpoint that doesn't require database
@@ -72,6 +105,29 @@ app.get('/api/test', (req, res) => {
         timestamp: new Date().toISOString(),
         cors: 'enabled'
     });
+});
+// Database test endpoint
+app.get('/api/db-test', async (req, res) => {
+    try {
+        const { testDbConnection } = await Promise.resolve().then(() => __importStar(require('./db')));
+        const success = await testDbConnection();
+        if (!success) {
+            throw new Error('Database connection test failed');
+        }
+        res.json({
+            status: 'success',
+            message: 'Database connection successful',
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        res.json({
+            status: 'error',
+            message: 'Database connection failed',
+            error: error instanceof Error ? error.message : 'Unknown error',
+            timestamp: new Date().toISOString()
+        });
+    }
 });
 app.get('/', (req, res) => {
     res.status(200).json({ message: 'Welcome to the API' });
