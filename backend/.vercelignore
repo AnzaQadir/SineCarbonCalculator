@@ -96,4 +96,45 @@ test-*.ts
 *.spec.ts
 
 # Documentation
-*.md 
+*.md
+
+# Frontend files (to prevent Vercel from detecting as frontend)
+index.html
+*.html
+*.css
+*.jsx
+*.tsx
+main.tsx
+main.jsx
+App.tsx
+App.jsx
+vite.config.*
+next.config.*
+nuxt.config.*
+angular.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Frontend directories
+public/
+static/
+assets/
+images/
+icons/
+fonts/
+
+# Frontend build outputs
+dist/
+build/
+.next/
+.nuxt/
+.vuepress/dist/
+
+# Frontend frameworks
+node_modules/vite/
+node_modules/@vitejs/
+node_modules/next/
+node_modules/nuxt/
+node_modules/react/
+node_modules/react-dom/ 
