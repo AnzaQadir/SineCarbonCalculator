@@ -35,6 +35,8 @@ app.use((0, cors_1.default)({
 app.use((0, helmet_1.default)());
 app.use((0, morgan_1.default)('dev'));
 app.use(express_1.default.json());
+// Handle preflight OPTIONS requests
+app.options('*', (0, cors_1.default)());
 // Routes
 app.use('/api/personality', personalityRoutes_1.personalityRoutes);
 app.use('/api/recommendations', recommendationRoutes_1.recommendationRoutes);
