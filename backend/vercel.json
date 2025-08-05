@@ -9,7 +9,6 @@
   "routes": [
     { "src": "/(.*)", "dest": "api/index.js" }
   ],
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": ".",
-  "installCommand": ""
+  "installCommand": "npm install",
+  "buildCommand": "npm run build"
 }

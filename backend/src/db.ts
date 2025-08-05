@@ -13,6 +13,15 @@ if (!process.env.DATABASE_URL) {
 console.log('Initializing database connection...');
 console.log('DATABASE_URL length:', process.env.DATABASE_URL.length);
 
+// Check if pg module is available
+try {
+  require('pg');
+  console.log('pg module is available');
+} catch (error) {
+  console.error('pg module not found:', error);
+  throw new Error('pg module is required for PostgreSQL connection');
+}
+
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   protocol: 'postgres',
