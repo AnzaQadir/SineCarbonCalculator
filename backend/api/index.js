@@ -54,7 +54,13 @@ app.use('/api/users', userRoutes_1.userRoutes);
 app.use('/api/sessions', sessionRoutes_1.default);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString(), cors: 'updated' });
+    res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        cors: 'updated',
+        environment: process.env.NODE_ENV,
+        vercel: process.env.VERCEL
+    });
 });
 app.get('/', (req, res) => {
     res.status(200).json({ message: 'Welcome to the API' });
@@ -70,8 +76,13 @@ app.use((err, req, res, next) => {
 // Initialize database and conditionally start server
 const startServer = async () => {
     try {
+        console.log('Starting server initialization...');
+        console.log('Environment:', process.env.NODE_ENV);
+        console.log('VERCEL:', process.env.VERCEL);
         // Initialize database
+        console.log('Initializing database...');
         await (0, models_1.initializeDatabase)();
+        console.log('Database initialized successfully');
         // Only start the server if not on Vercel
         if (process.env.VERCEL !== '1') {
             app.listen(port, () => {
@@ -84,10 +95,22 @@ const startServer = async () => {
     }
     catch (error) {
         console.error('Failed to start server:', error);
+        if (error instanceof Error) {
+            console.error('Error stack:', error.stack);
+        }
         if (process.env.VERCEL !== '1') {
             process.exit(1);
         }
     }
 };
-startServer();
+// Wrap in try-catch for better error handling
+try {
+    startServer();
+}
+catch (error) {
+    console.error('Critical error during startup:', error);
+    if (error instanceof Error) {
+        console.error('Error stack:', error.stack);
+    }
+}
 exports.default = app;
