@@ -1284,11 +1284,11 @@ function PoeticJourneyQuiz() {
       
 
       
-      <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-6 mb-6 border border-[#A7D58E22] relative z-10 max-h-[90vh] overflow-y-auto">
+      <div className="max-w-3xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-6 mb-6 border border-[#A7D58E22] relative z-10 max-h-[90vh] overflow-y-auto">
         {/* Chapter Title */}
-        <div className="mb-3">
-          <h2 className="text-xl md:text-2xl font-serif text-[#7A8B7A] text-center mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>{section.title}</h2>
-          <div className="text-sm md:text-base text-[#A08C7D] text-center italic mb-3" style={{ fontFamily: 'Inter, sans-serif', fontStyle: 'italic', fontWeight: 400 }}>{section.sub}</div>
+        <div className="mb-6">
+          <h2 className="text-2xl md:text-3xl font-serif text-sage-800 text-center mb-2 tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700 }}>{section.title}</h2>
+          <div className="text-base md:text-lg text-sage-600 text-center italic mb-4 leading-relaxed" style={{ fontFamily: 'Inter, sans-serif', fontStyle: 'italic', fontWeight: 400 }}>{section.sub}</div>
         </div>
         {/* Question */}
         <div className="flex flex-col items-center mb-4">
@@ -1297,15 +1297,15 @@ function PoeticJourneyQuiz() {
           ) : (
             <span style={{ fontSize: 36 }}>{q.icon}</span>
           )}
-          <div className="text-lg md:text-xl font-serif text-[#7A8B7A] text-center mt-3 mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 500 }}>{q.question}</div>
+          <div className="text-xl md:text-2xl font-serif text-sage-800 text-center mt-4 mb-6 leading-tight" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>{q.question}</div>
         </div>
         <div className="flex flex-wrap justify-center gap-3 mb-6">
           {q.key === 'country' ? (
             <select
               value={getNestedValue(answers, q.key) || ''}
               onChange={e => handleSelect(q.key, e.target.value)}
-              className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md bg-white appearance-none transition-colors duration-200 hover:border-[#A7D58E]"
-              style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.25rem 1.25rem', paddingRight: '3rem' }}
+              className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-md bg-white appearance-none transition-colors duration-200 hover:border-sage-300 text-sage-800"
+              style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.25rem 1.25rem', paddingRight: '3rem', fontFamily: 'Inter, sans-serif' }}
             >
               <option value="" disabled>Enter your country</option>
               <option value="United States">United States</option>
@@ -1342,7 +1342,8 @@ function PoeticJourneyQuiz() {
                 return (
                   <select
                     disabled
-                    className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] bg-gray-100 text-gray-400 shadow w-full max-w-md appearance-none"
+                    className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 bg-gray-100 text-gray-400 shadow-lg w-full max-w-md appearance-none"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     <option value="">Select a country first</option>
                   </select>
@@ -1352,8 +1353,8 @@ function PoeticJourneyQuiz() {
                   <select
                     value={getNestedValue(answers, q.key) || ''}
                     onChange={e => handleSelect(q.key, e.target.value)}
-                    className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md bg-white appearance-none transition-colors duration-200 hover:border-[#A7D58E]"
-                    style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.25rem 1.25rem', paddingRight: '3rem' }}
+                    className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-md bg-white appearance-none transition-colors duration-200 hover:border-sage-300 text-sage-800"
+                    style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.25rem 1.25rem', paddingRight: '3rem', fontFamily: 'Inter, sans-serif' }}
                   >
                     <option value="" disabled>Select your city</option>
                     {cities.map(city => (
@@ -1368,7 +1369,8 @@ function PoeticJourneyQuiz() {
                     value={getNestedValue(answers, q.key) || ''}
                     onChange={e => handleSelect(q.key, e.target.value)}
                     placeholder="Enter your city"
-                    className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md"
+                    className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-md text-sage-800 placeholder-sage-400"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
                   />
                 );
               }
@@ -1379,8 +1381,8 @@ function PoeticJourneyQuiz() {
                 <button
                   key={opt.value}
                   onClick={() => handleSelect(q.key, opt.value)}
-                  className={`rounded-xl px-8 py-4 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
-                  style={{ minWidth: 140 }}
+                  className={`rounded-xl px-8 py-4 text-base font-medium shadow-lg transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-sage-600 text-white border-sage-600 shadow-sage-200' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-300 hover:shadow-md'}`}
+                  style={{ minWidth: 140, fontFamily: 'Inter, sans-serif' }}
                 >
                   {opt.label}
                 </button>
@@ -1391,8 +1393,8 @@ function PoeticJourneyQuiz() {
               <button
                 key={opt.value}
                 onClick={() => handleSelect(q.key, opt.value)}
-                className={`rounded-xl px-8 py-4 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
-                style={{ minWidth: 140 }}
+                className={`rounded-xl px-8 py-4 text-base font-medium shadow-lg transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-sage-600 text-white border-sage-600 shadow-sage-200' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-300 hover:shadow-md'}`}
+                style={{ minWidth: 140, fontFamily: 'Inter, sans-serif' }}
               >
                 {opt.label}
               </button>
@@ -1406,7 +1408,8 @@ function PoeticJourneyQuiz() {
                 handleSelect(q.key, e.target.value);
               }}
               placeholder={q.placeholder}
-              className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md"
+              className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-md text-sage-800 placeholder-sage-400"
+              style={{ fontFamily: 'Inter, sans-serif' }}
             />
           ) : q.type === 'number' ? (
             <input
@@ -1414,42 +1417,51 @@ function PoeticJourneyQuiz() {
               value={getNestedValue(answers, q.key) || ''}
               onChange={e => handleSelect(q.key, e.target.value)}
               placeholder={q.placeholder}
-              className="rounded-xl px-6 py-4 text-lg font-serif border-2 border-[#E6E6F7] focus:border-[#A7D58E] focus:outline-none shadow w-full max-w-md"
+              className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-md text-sage-800 placeholder-sage-400"
+              style={{ fontFamily: 'Inter, sans-serif' }}
             />
           ) : q.type === 'yesno' ? (
             <div className="flex gap-4">
               <button
                 onClick={() => handleSelect(q.key, 'yes')}
-                className={`rounded-xl px-8 py-4 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) === 'yes' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
-                style={{ minWidth: 140 }}
+                className={`rounded-xl px-8 py-4 text-base font-medium shadow-lg transition-all border-2 ${getNestedValue(answers, q.key) === 'yes' ? 'bg-sage-600 text-white border-sage-600 shadow-sage-200' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-300 hover:shadow-md'}`}
+                style={{ minWidth: 140, fontFamily: 'Inter, sans-serif' }}
               >
                 Yes
               </button>
               <button
                 onClick={() => handleSelect(q.key, 'no')}
-                className={`rounded-xl px-8 py-4 text-lg font-serif shadow transition-all border-2 ${getNestedValue(answers, q.key) === 'no' ? 'bg-[#A7D58E] text-white border-[#A7D58E]' : 'bg-white text-[#7A8B7A] border-[#E6E6F7]'}`}
-                style={{ minWidth: 140 }}
+                className={`rounded-xl px-8 py-4 text-base font-medium shadow-lg transition-all border-2 ${getNestedValue(answers, q.key) === 'no' ? 'bg-sage-600 text-white border-sage-600 shadow-sage-200' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-300 hover:shadow-md'}`}
+                style={{ minWidth: 300, fontFamily: 'Inter, sans-serif' }}
               >
                 No
               </button>
             </div>
           ) : null}
         </div>
-        <div className="flex justify-between items-center mt-8">
+        <div className="flex justify-between items-center mt-8 max-w-4xl mx-auto">
           {/* Back Button */}
           <button
             onClick={handleBack}
             disabled={step === 0}
-            className="group flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm border-2 border-sage-200 text-sage-700 font-serif text-base rounded-2xl shadow-lg hover:shadow-xl hover:border-sage-300 hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-white to-sage-50 border-2 border-sage-200 text-sage-700 font-serif text-base rounded-2xl shadow-lg hover:shadow-xl hover:border-sage-300 hover:from-white hover:to-sage-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
           >
-            <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back
+            {/* Background glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-sage-100/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            {/* Icon with enhanced animation */}
+            <div className="relative z-10 flex items-center justify-center w-6 h-6 bg-sage-100 rounded-full group-hover:bg-sage-200 transition-colors duration-300">
+              <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </div>
+            
+            {/* Text */}
+            <span className="relative z-10 font-semibold">Back</span>
           </button>
           
           {/* Progress Dots */}
-          <div className="text-center">
+          <div className="text-center mx-8">
             <div className="flex justify-center gap-1">
               {Array.from({ length: Math.ceil(questions.length / 2) }, (_, index) => {
                 const startQuestion = index * 2;
@@ -1478,12 +1490,20 @@ function PoeticJourneyQuiz() {
           <button
             onClick={handleNext}
             disabled={!getNestedValue(answers, q.key)}
-            className="group flex items-center gap-3 px-6 py-3 bg-sage-600 text-white font-serif text-base rounded-2xl shadow-lg hover:shadow-xl hover:bg-sage-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-sage-500 to-sage-600 text-white font-serif text-base rounded-2xl shadow-lg hover:shadow-xl hover:from-sage-600 hover:to-sage-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
           >
-            {step === questions.length - 1 ? 'See Results' : 'Next'}
-            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            {/* Background glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            {/* Text */}
+            <span className="relative z-10 font-semibold">{step === questions.length - 1 ? 'See Results' : 'Next'}</span>
+            
+            {/* Icon with enhanced animation */}
+            <div className="relative z-10 flex items-center justify-center w-6 h-6 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors duration-300">
+              <svg className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           </button>
         </div>
       </div>
