@@ -1071,41 +1071,260 @@ function PoeticJourneyQuiz() {
   // Show existing user screen if user was found
   if (showExistingUserScreen && existingUser) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F7E8] px-4 py-12">
-        <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] text-center">
-          <div className="mb-6">
-            <img src="/gif/joyful_panda.gif" alt="Joyful Panda" className="w-32 h-32 mx-auto rounded-full shadow-lg" />
-          </div>
-          <h1 className="text-3xl font-serif mb-4 text-[#7A8B7A]">
-            Welcome back, {existingUser.firstName || existingUser.email}!
-          </h1>
-          <p className="text-lg text-[#A08C7D] italic mb-8">
-            We already know a glimpse of your story. Let's see your personalized results.
-          </p>
-          <button 
-            onClick={async () => {
-              setLoadingResults(true);
-              try {
-                // Use the pre-filled answers to calculate personality
-                const apiPayload = {
-                  ...transformStateToApiFormat(answers),
-                  personalityTraits
-                };
-                const apiResults = await calculatePersonality(apiPayload);
-                setResults(apiResults);
-                setShowResults(true);
-                setShowExistingUserScreen(false);
-              } catch (error) {
-                setApiError('Failed to fetch results. Please try again.');
-              } finally {
-                setLoadingResults(false);
-              }
-            }}
-            className="bg-[#A7D58E] text-white px-8 py-4 rounded-xl text-lg font-serif shadow hover:bg-[#7A8B7A] transition"
-            disabled={loadingResults}
+      <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+        {/* Enhanced animated background with floating elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-green-50 to-emerald-50">
+          {/* Animated gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-green-100/20 via-transparent to-amber-100/20 animate-pulse"></div>
+          
+          {/* Floating leaves with better positioning and timing */}
+          <motion.div 
+            animate={{ y: [-10, 10, -10] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-20 left-10 w-8 h-8 bg-green-200 rounded-full opacity-40"
+          ></motion.div>
+          <motion.div 
+            animate={{ y: [10, -10, 10] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute top-40 right-20 w-6 h-6 bg-amber-200 rounded-full opacity-50"
+          ></motion.div>
+          <motion.div 
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            className="absolute bottom-32 left-1/4 w-4 h-4 bg-emerald-200 rounded-full opacity-60"
+          ></motion.div>
+          <motion.div 
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-20 right-1/3 w-10 h-10 bg-green-100 rounded-full opacity-30"
+          ></motion.div>
+          
+          {/* Additional floating elements */}
+          <motion.div 
+            animate={{ x: [-5, 5, -5] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/3 left-1/4 w-3 h-3 bg-yellow-200 rounded-full opacity-40"
+          ></motion.div>
+          <motion.div 
+            animate={{ opacity: [0.3, 0.8, 0.3] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            className="absolute top-2/3 right-1/4 w-5 h-5 bg-emerald-100 rounded-full"
+          ></motion.div>
+          
+          {/* Subtle pattern overlay with better opacity */}
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}></div>
+        </div>
+
+        {/* Main content container */}
+        <div className="relative z-10 max-w-4xl w-full mx-auto px-8 py-16">
+          {/* Card with enhanced styling */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-12 border border-green-100/50 relative overflow-hidden"
           >
-            {loadingResults ? 'Calculating...' : 'See Results'}
-          </button>
+            {/* Enhanced decorative corner elements */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 0.4, scale: 1 }}
+              transition={{ duration: 1, delay: 0.3 }}
+              className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-green-300 to-transparent rounded-br-3xl"
+            ></motion.div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 0.4, scale: 1 }}
+              transition={{ duration: 1, delay: 0.5 }}
+              className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-amber-300 to-transparent rounded-tl-3xl"
+            ></motion.div>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.2 }}
+              transition={{ duration: 1.5, delay: 0.7 }}
+              className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-emerald-200 to-transparent rounded-bl-3xl"
+            ></motion.div>
+            
+            {/* Panda container with enhanced styling */}
+            <motion.div 
+              initial={{ scale: 0.8, rotate: -5 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative mb-8"
+            >
+                             {/* Enhanced glowing background circle */}
+               <motion.div 
+                 animate={{ 
+                   scale: [1, 1.1, 1],
+                   opacity: [0.3, 0.6, 0.3]
+                 }}
+                 transition={{ 
+                   duration: 3, 
+                   repeat: Infinity, 
+                   ease: "easeInOut" 
+                 }}
+                 className="absolute inset-0 bg-gradient-to-r from-green-200 via-amber-200 to-emerald-200 rounded-full blur-2xl"
+               ></motion.div>
+               
+               {/* Panda image with enhanced border and glow */}
+               <div className="relative">
+                 <motion.img 
+                   src="/gif/joyful_panda.gif" 
+                   alt="Joyful Panda" 
+                   className="w-48 h-48 mx-auto rounded-full shadow-2xl border-4 border-white/90 relative z-10"
+                   whileHover={{ scale: 1.05 }}
+                   transition={{ duration: 0.3 }}
+                 />
+                 
+                 {/* Enhanced floating sparkles around panda */}
+                 <motion.div 
+                   animate={{ 
+                     scale: [1, 1.3, 1],
+                     opacity: [0.6, 1, 0.6]
+                   }}
+                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                   className="absolute -top-2 -left-2 w-4 h-4 bg-yellow-300 rounded-full shadow-lg"
+                 ></motion.div>
+                 <motion.div 
+                   animate={{ 
+                     scale: [1, 1.2, 1],
+                     opacity: [0.7, 1, 0.7]
+                   }}
+                   transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                   className="absolute -top-1 -right-1 w-3 h-3 bg-green-300 rounded-full shadow-lg"
+                 ></motion.div>
+                 <motion.div 
+                   animate={{ 
+                     scale: [1, 1.4, 1],
+                     opacity: [0.5, 1, 0.5]
+                   }}
+                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                   className="absolute -bottom-1 -left-3 w-3 h-3 bg-amber-300 rounded-full shadow-lg"
+                 ></motion.div>
+                 
+                 {/* Additional sparkles */}
+                 <motion.div 
+                   animate={{ 
+                     rotate: [0, 360],
+                     opacity: [0.3, 0.8, 0.3]
+                   }}
+                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                   className="absolute -top-3 right-2 w-2 h-2 bg-blue-300 rounded-full"
+                 ></motion.div>
+               </div>
+            </motion.div>
+
+            {/* Welcome text with enhanced typography */}
+                         <motion.div
+               initial={{ opacity: 0, y: 10 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.6, delay: 0.4 }}
+               className="text-center mb-12"
+             >
+               <motion.h1 
+                 initial={{ opacity: 0, scale: 0.9 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 transition={{ duration: 0.8, delay: 0.6 }}
+                 className="text-5xl md:text-7xl font-serif mb-6 text-sage-900 leading-tight" 
+                 style={{ 
+                   fontFamily: 'Cormorant Garamond, serif',
+                   fontWeight: 800,
+                   background: 'linear-gradient(135deg, #2D5016 0%, #4A7C59 50%, #7A8B7A 100%)',
+                   WebkitBackgroundClip: 'text',
+                   WebkitTextFillColor: 'transparent',
+                   backgroundClip: 'text'
+                 }}
+               >
+                 Welcome back, {existingUser.firstName || existingUser.email}!
+               </motion.h1>
+               
+               <motion.p 
+                 initial={{ opacity: 0, y: 5 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ duration: 1, delay: 0.8 }}
+                 className="text-2xl md:text-3xl text-sage-700 italic leading-relaxed max-w-2xl mx-auto font-medium"
+                 style={{ fontFamily: 'Inter, sans-serif', fontStyle: 'italic' }}
+               >
+                 We already know a glimpse of your story. Let's see your personalized results.
+               </motion.p>
+               
+               {/* Decorative line */}
+               <motion.div
+                 initial={{ width: 0 }}
+                 animate={{ width: "100px" }}
+                 transition={{ duration: 1, delay: 1.2 }}
+                 className="h-1 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full mx-auto mt-6"
+               ></motion.div>
+             </motion.div>
+
+            {/* Enhanced CTA button */}
+                         <motion.div
+               initial={{ opacity: 0, y: 10 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.6, delay: 0.8 }}
+               className="text-center"
+             >
+               <motion.button 
+                 onClick={async () => {
+                   setLoadingResults(true);
+                   try {
+                     // Use the pre-filled answers to calculate personality
+                     const apiPayload = {
+                       ...transformStateToApiFormat(answers),
+                       personalityTraits
+                     };
+                     const apiResults = await calculatePersonality(apiPayload);
+                     setResults(apiResults);
+                     setShowResults(true);
+                     setShowExistingUserScreen(false);
+                   } catch (error) {
+                     setApiError('Failed to fetch results. Please try again.');
+                   } finally {
+                     setLoadingResults(false);
+                   }
+                 }}
+                 disabled={loadingResults}
+                 whileHover={{ scale: 1.05, y: -2 }}
+                 whileTap={{ scale: 0.98 }}
+                 className="group relative inline-flex items-center gap-4 px-12 py-6 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-2xl font-serif rounded-3xl shadow-2xl hover:shadow-3xl hover:from-green-500 hover:to-emerald-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700 }}
+               >
+                {/* Button background glow */}
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                
+                                 {/* Loading spinner */}
+                 {loadingResults && (
+                   <motion.div
+                     animate={{ rotate: 360 }}
+                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                     className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full"
+                   />
+                 )}
+                 
+                 {/* Button text */}
+                 <span className="relative z-10">
+                   {loadingResults ? 'Calculating...' : 'See Results'}
+                 </span>
+                 
+                 {/* Arrow icon */}
+                 {!loadingResults && (
+                   <motion.svg 
+                     className="w-6 h-6 relative z-10 group-hover:translate-x-1 transition-transform duration-200" 
+                     fill="none" 
+                     stroke="currentColor" 
+                     viewBox="0 0 24 24"
+                   >
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                   </motion.svg>
+                                  )}
+               </motion.button>
+             </motion.div>
+
+            {/* Subtle decorative elements */}
+            <div className="absolute bottom-4 left-4 w-2 h-2 bg-green-300 rounded-full opacity-60"></div>
+            <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-amber-300 rounded-full opacity-60"></div>
+          </motion.div>
         </div>
       </div>
     );
