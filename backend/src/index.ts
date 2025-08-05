@@ -34,6 +34,9 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Handle preflight OPTIONS requests
+app.options('*', cors());
+
 // Routes
 app.use('/api/personality', personalityRoutes);
 app.use('/api/recommendations', recommendationRoutes);
