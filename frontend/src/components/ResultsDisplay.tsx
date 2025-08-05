@@ -327,6 +327,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [dynamicPersonality, setDynamicPersonality] = useState<PersonalityResponse | null>(null);
     const [showJourney, setShowJourney] = useState(false);
   const [showStoryModal, setShowStoryModal] = useState(false);
+  const [activeSection, setActiveSection] = useState<'climate-self' | 'climate-signature'>('climate-self');
+  const [showActionDrawer, setShowActionDrawer] = useState(false);
  
   const journeyRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -863,71 +865,414 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   return (
     <ErrorBoundary>
       <div className={cn(
-        "min-h-screen bg-gradient-to-br from-sage-50 via-cream-50 to-warm-100 transition-opacity duration-500 relative overflow-hidden",
+        "min-h-screen bg-gradient-to-br from-slate-50 via-sage-50 to-emerald-50 transition-opacity duration-700 relative overflow-hidden",
         isVisible ? "opacity-100" : "opacity-0"
       )}>
-        {/* Floating Elements Background */}
+        {/* Enhanced Floating Elements Background */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 left-10 w-4 h-4 bg-sage-200/30 rounded-full animate-float"></div>
-          <div className="absolute top-40 right-20 w-6 h-6 bg-cream-300/40 rounded-full animate-float-delayed"></div>
-          <div className="absolute bottom-40 left-20 w-3 h-3 bg-warm-200/50 rounded-full animate-float"></div>
-          <div className="absolute bottom-20 right-10 w-5 h-5 bg-sage-300/30 rounded-full animate-float-delayed"></div>
+          {/* Animated Geometric Shapes */}
+          <div className="absolute top-20 left-10 w-6 h-6 bg-gradient-to-br from-sage-400/20 to-emerald-400/20 rounded-full animate-float blur-sm"></div>
+          <div className="absolute top-40 right-20 w-8 h-8 bg-gradient-to-br from-amber-300/30 to-orange-300/30 rounded-full animate-float-delayed blur-sm"></div>
+          <div className="absolute bottom-40 left-20 w-4 h-4 bg-gradient-to-br from-blue-400/25 to-cyan-400/25 rounded-full animate-float blur-sm"></div>
+          <div className="absolute bottom-20 right-10 w-7 h-7 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full animate-float-delayed blur-sm"></div>
+          
+          {/* Subtle Grid Pattern */}
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: `
+              linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px'
+          }}></div>
+          
+          {/* Organic Flow Lines */}
+          <div className="absolute top-1/4 left-0 w-64 h-px bg-gradient-to-r from-transparent via-sage-300/20 to-transparent"></div>
+          <div className="absolute bottom-1/4 right-0 w-64 h-px bg-gradient-to-l from-transparent via-emerald-300/20 to-transparent"></div>
+          
+          {/* Radial Gradients */}
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-radial-gradient from-sage-200/10 via-transparent to-transparent"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-radial-gradient from-emerald-200/10 via-transparent to-transparent"></div>
             </div>
 
         <div className="max-w-4xl mx-auto px-6 py-12 space-y-16 relative z-10">
+          {/* Enhanced Header with Back Button and Action Drawer Toggle */}
+          <div className="flex justify-between items-center mb-12">
           {/* Back Button */}
           {onBack && (
-            <div className="flex justify-start mb-8">
               <Button
                 onClick={onBack}
                 variant="outline"
-                className="flex items-center gap-2 text-sage-700 border-sage-200 hover:bg-sage-50 hover:border-sage-300 transition-colors"
+                className="relative group bg-white/80 backdrop-blur-sm border-sage-200/60 text-sage-700 hover:bg-sage-50 hover:border-sage-300 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-3 px-6 py-3 rounded-2xl"
               >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Quiz
+                <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-300" />
+                <span className="font-medium">Back to Quiz</span>
               </Button>
+            )}
+            
+            {/* Enhanced Action Drawer Toggle Button */}
+            <button
+              onClick={() => setShowActionDrawer(true)}
+              className="relative group overflow-hidden bg-gradient-to-r from-sage-500 via-emerald-500 to-sage-600 text-white px-8 py-4 rounded-3xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 flex items-center gap-4"
+            >
+              {/* Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-sage-400/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              
+              {/* Button Content */}
+              <div className="relative flex items-center gap-4">
+                <div className="w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                <span className="font-semibold text-lg">Take Action</span>
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
           </div>
-          )}
+            </button>
+          </div>
+
+          {/* Ultra-Classy Toggle Section */}
+          <div className="flex justify-center mb-16">
+            <div className="relative group">
+              {/* Enhanced Glow Effect */}
+              <div className="absolute -inset-2 bg-gradient-to-r from-sage-400/30 via-emerald-400/30 to-sage-600/30 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+              
+              {/* Main Toggle Container */}
+              <div className="relative bg-white/95 backdrop-blur-2xl rounded-3xl p-3 shadow-3xl border border-sage-200/40 overflow-hidden">
+                {/* Sophisticated Background Pattern */}
+                <div className="absolute inset-0 opacity-[0.02]" style={{
+                  backgroundImage: `
+                    linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
+                  `,
+                  backgroundSize: '30px 30px'
+                }}></div>
+                
+                {/* Enhanced Animated Slider */}
+                <div className={`absolute top-3 bottom-3 w-[calc(50%-6px)] bg-gradient-to-r from-sage-500 via-emerald-500 to-sage-600 rounded-2xl shadow-xl transition-all duration-1000 ease-out ${
+                  activeSection === 'climate-self' ? 'left-3' : 'left-[calc(50%+3px)]'
+                }`}>
+                  {/* Slider Glow */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-sage-400/40 to-emerald-400/40 rounded-2xl blur-md"></div>
+                  {/* Inner Glow */}
+                  <div className="absolute inset-1 bg-gradient-to-r from-white/20 to-white/10 rounded-xl"></div>
+                </div>
+                
+                <div className="relative flex">
+                  <button
+                    onClick={() => setActiveSection('climate-self')}
+                    className={`relative px-10 py-5 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out flex items-center gap-4 ${
+                      activeSection === 'climate-self'
+                        ? 'text-white'
+                        : 'text-sage-600 hover:text-sage-700'
+                    }`}
+                  >
+                    {/* Enhanced Active Indicator */}
+                    <div className={`w-4 h-4 rounded-full transition-all duration-700 ${
+                      activeSection === 'climate-self' 
+                        ? 'bg-white shadow-xl scale-125' 
+                        : 'bg-sage-300 group-hover:bg-sage-400'
+                    }`}>
+                      {activeSection === 'climate-self' && (
+                        <div className="absolute inset-0 bg-white/30 rounded-full animate-ping"></div>
+                      )}
+                    </div>
+                    
+                    <span className="relative z-10 text-base">Your Climate Self</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveSection('climate-signature')}
+                    className={`relative px-10 py-5 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out flex items-center gap-4 ${
+                      activeSection === 'climate-signature'
+                        ? 'text-white'
+                        : 'text-sage-600 hover:text-sage-700'
+                    }`}
+                  >
+                    {/* Enhanced Active Indicator */}
+                    <div className={`w-4 h-4 rounded-full transition-all duration-700 ${
+                      activeSection === 'climate-signature' 
+                        ? 'bg-white shadow-xl scale-125' 
+                        : 'bg-sage-300 group-hover:bg-sage-400'
+                    }`}>
+                      {activeSection === 'climate-signature' && (
+                        <div className="absolute inset-0 bg-white/30 rounded-full animate-ping"></div>
+                      )}
+                    </div>
+                    
+                    <span className="relative z-10 text-base">Your Climate Signature</span>
+                  </button>
+                </div>
+                
+                {/* Enhanced Border Glow */}
+                <div className="absolute inset-0 rounded-3xl border border-sage-300/30 pointer-events-none"></div>
+              </div>
+            </div>
+          </div>
           
            {/* Profile Section */}
-           <div className="flex flex-col items-center justify-center">
+           {activeSection === 'climate-self' && (
+           <div className="space-y-8">
+             {/* Section Header */}
+             <div className="text-center space-y-4">
+               <h2 className="text-3xl md:text-4xl font-bold text-sage-800">
+                 Your Climate Self
+               </h2>
+               <p className="text-lg text-sage-600 max-w-2xl mx-auto">
+                 Meet the part of you already making a difference.
+               </p>
+             </div>
              
-             {/* Main Avatar */}
-             <div className="relative mb-6">
-               <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-sage-200 shadow-lg">
+             {/* Profile Content */}
+             <div className="flex flex-col items-center justify-center bg-gradient-to-br from-sage-50 to-cream-50 rounded-3xl p-8 shadow-xl border border-sage-100">
+             
+             {/* Main Avatar with Enhanced Styling */}
+             <div className="relative mb-8">
+               <div className="w-48 h-48 rounded-full overflow-hidden border-8 border-sage-200 shadow-2xl relative">
                  <img
                    src={profileImage}
                    alt="Profile Avatar"
                    className="w-full h-full object-cover"
                  />
+                 {/* Decorative Elements */}
+                 <div className="absolute -top-2 -right-2 w-8 h-8 bg-sage-300 rounded-full flex items-center justify-center">
+                   <Leaf className="h-5 w-5 text-white" />
+                 </div>
+                 <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-cream-300 rounded-full flex items-center justify-center">
+                   <Sparkles className="h-4 w-4 text-sage-700" />
+                 </div>
                </div>
              </div>
              
-             {/* Personality Name */}
-             <h1 className="text-3xl md:text-4xl font-bold text-sage-800 mb-4 text-center">
+             {/* Personality Name with Enhanced Typography */}
+             <div className="text-center mb-6">
+               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent mb-2">
                {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Eco in Progress'}
              </h1>
-             
-
-             
-             {/* Hook Line */}
-             <div className="text-center max-w-2xl mx-auto mb-4">
-               <p className="text-lg font-medium text-sage-700 italic">
-                 {dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}
-               </p>
+               <div className="w-24 h-1 bg-gradient-to-r from-sage-300 to-cream-300 mx-auto rounded-full"></div>
              </div>
              
-             {/* Detailed Personality Description */}
-             <div className="text-center max-w-2xl mx-auto mb-6">
-               <p className="text-base text-sage-600 leading-relaxed">
-                 {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
-               </p>
+             {/* Hook Line with Enhanced Styling */}
+             <div className="text-center max-w-3xl mx-auto mb-6">
+               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-sage-100">
+                 <p className="text-xl font-medium text-sage-700 italic leading-relaxed">
+                   "{dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}"
+                 </p>
+               </div>
              </div>
              
-
+             {/* Detailed Personality Description with Enhanced Layout */}
+             <div className="text-center max-w-3xl mx-auto mb-8">
+               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-md border border-sage-100">
+                 <p className="text-lg text-sage-600 leading-relaxed">
+                   {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
+                 </p>
+               </div>
+             </div>
              
+             {/* View Personalized Dashboard Button */}
+             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+               <Button
+                 onClick={() => navigate('/dashboard')}
+                 className="flex-1 bg-gradient-to-r from-sage-600 to-sage-700 hover:from-sage-700 hover:to-sage-800 text-white px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold text-lg"
+               >
+                 <div className="flex items-center gap-3">
+                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                     <Sparkles className="h-5 w-5" />
+                   </div>
+                   <span>View Personalized Dashboard</span>
+                 </div>
+               </Button>
+                      </div>
 
+         {/* Ultra-Classy Join the Sanctuary Section */}
+         <div className="flex justify-center mt-20 mb-12">
+           <div className="relative group">
+             {/* Enhanced Glow Effect */}
+             <div className="absolute -inset-6 bg-gradient-to-r from-sage-400/40 via-emerald-400/40 to-sage-600/40 rounded-3xl blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+             
+             {/* Main Button Container */}
+             <button 
+               className="relative overflow-hidden rounded-3xl shadow-3xl hover:shadow-4xl transition-all duration-700 hover:scale-105 transform border border-white/20"
+               onClick={() => console.log('Join the Sanctuary clicked')}
+             >
+               {/* Background Image */}
+               <div 
+                 className="w-[500px] h-96 bg-cover bg-center bg-no-repeat"
+                 style={{
+                   backgroundImage: `url('/images/join.png')`
+                 }}
+               >
+                 {/* Sophisticated Overlay */}
+                 <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/25 to-black/15 group-hover:from-black/30 group-hover:via-black/20 group-hover:to-black/10 transition-all duration-700"></div>
+                 
+                 {/* Subtle Pattern Overlay */}
+                 <div className="absolute inset-0 opacity-[0.02]" style={{
+                   backgroundImage: `
+                     linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
+                   `,
+                   backgroundSize: '50px 50px'
+                 }}></div>
+                 
+                 {/* Button Content */}
+                 <div className="relative h-full flex items-center justify-center">
+                   <div className="text-center space-y-6">
+                     {/* Decorative Elements */}
+                     <div className="absolute top-8 left-8 w-2 h-2 bg-white/30 rounded-full animate-pulse"></div>
+                     <div className="absolute top-12 right-12 w-1 h-1 bg-white/20 rounded-full animate-pulse delay-300"></div>
+                     <div className="absolute bottom-16 left-16 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse delay-500"></div>
+                     <div className="absolute bottom-8 right-8 w-1 h-1 bg-white/15 rounded-full animate-pulse delay-700"></div>
+                     
+                     {/* Enhanced Title */}
+                     <h3 className="text-4xl font-bold mb-4 tracking-wide">
+                       <span className="bg-gradient-to-r from-white via-sage-100 to-white bg-clip-text text-transparent">
+                         Join the Sanctuary
+                       </span>
+                     </h3>
+                     
+                     {/* Decorative Line */}
+                     <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-white/60 to-transparent mx-auto"></div>
+                     
+                                          {/* Enhanced Subtitle */}
+                     <p className="text-xl font-medium mb-24 mt-8 opacity-95 leading-relaxed max-w-sm">
+                       Connect with like-minded climate champions
+                     </p>
+                     
+                     {/* Centered White Arrow */}
+                     <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                       <ArrowRight className="h-12 w-12 text-white drop-shadow-lg group-hover:scale-110 group-hover:translate-x-1 transition-all duration-500" />
+                     </div>
+                   </div>
+                 </div>
+                 
+                 {/* Border Glow */}
+                 <div className="absolute inset-0 rounded-3xl border border-white/15 pointer-events-none"></div>
+               </div>
+             </button>
            </div>
+         </div>
+
+         {/* Ultra-Classy Action Navigation Drawer */}
+         {showActionDrawer && (
+           <div className="fixed inset-0 bg-black/60 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+             <motion.div
+               initial={{ scale: 0.8, opacity: 0, y: 20 }}
+               animate={{ scale: 1, opacity: 1, y: 0 }}
+               exit={{ scale: 0.8, opacity: 0, y: 20 }}
+               transition={{ duration: 0.5, ease: "easeOut" }}
+               className="relative bg-white/98 backdrop-blur-3xl rounded-3xl p-10 shadow-3xl border border-sage-200/40 max-w-3xl w-full overflow-hidden"
+             >
+               {/* Sophisticated Background Pattern */}
+               <div className="absolute inset-0 opacity-[0.01]" style={{
+                 backgroundImage: `
+                   linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
+                 `,
+                 backgroundSize: '40px 40px'
+               }}></div>
+               
+               {/* Radial Gradient Overlay */}
+               <div className="absolute inset-0 bg-radial-gradient from-sage-50/30 via-transparent to-transparent"></div>
+               {/* Enhanced Close Button */}
+               <button
+                 onClick={() => setShowActionDrawer(false)}
+                 className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-2xl hover:bg-gray-50 hover:scale-110 transition-all duration-300 border border-gray-200/50 z-20"
+               >
+                 <X className="h-7 w-7 text-gray-700" />
+               </button>
+               
+               {/* Enhanced Drawer Header */}
+               <div className="text-center mb-10 relative z-10">
+                 <div className="flex items-center justify-center gap-6 mb-6">
+                   <div className="w-16 h-16 bg-gradient-to-br from-sage-500 via-emerald-500 to-sage-600 rounded-3xl flex items-center justify-center shadow-2xl">
+                     <Zap className="w-8 h-8 text-white" />
+                   </div>
+                   <h2 className="text-4xl font-bold bg-gradient-to-r from-sage-700 via-emerald-700 to-sage-800 bg-clip-text text-transparent">
+                     Choose Your Action
+                   </h2>
+                 </div>
+                 <p className="text-xl text-sage-600 font-medium">
+                   Select your next step on your sustainability journey
+                 </p>
+                 <div className="w-32 h-1 bg-gradient-to-r from-sage-300 to-emerald-300 mx-auto mt-6 rounded-full"></div>
+             </div>
+             
+               {/* Enhanced Action Cards Grid */}
+               <div className="grid grid-cols-1 gap-8 relative z-10">
+                 {/* Generate Your Story */}
+                 <button
+                   onClick={async () => {
+                     setShowActionDrawer(false);
+                     await generateStory();
+                     setShowStoryModal(true);
+                   }}
+                   disabled={isGeneratingStory}
+                   className="group relative overflow-hidden bg-gradient-to-r from-red-50 via-orange-50 to-red-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 border border-red-200/30"
+                 >
+                   {/* Card Glow Effect */}
+                   <div className="absolute inset-0 bg-gradient-to-r from-red-400/5 to-orange-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                   
+                   <div className="flex items-center gap-6">
+                     <div className="w-16 h-16 bg-gradient-to-br from-red-500 via-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-500">
+                       <BookOpen className="h-8 w-8 text-white" />
+               </div>
+                     <div className="flex-1 text-left">
+                       <h3 className="text-2xl font-bold text-gray-900 mb-2">Generate Your Story</h3>
+                       <p className="text-base text-gray-600 leading-relaxed">Transform your climate journey into an inspiring story that motivates others</p>
+                     </div>
+                     <ArrowRight className="h-6 w-6 text-red-500 group-hover:translate-x-2 transition-transform duration-500" />
+                   </div>
+                 </button>
+                 
+                 {/* Personalized Recommendations */}
+                 <button
+                   onClick={() => {
+                     setShowActionDrawer(false);
+                     navigate('/recommendations');
+                   }}
+                   className="group relative overflow-hidden bg-gradient-to-r from-yellow-50 via-amber-50 to-yellow-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 border border-yellow-200/30"
+                 >
+                   {/* Card Glow Effect */}
+                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 to-amber-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                   
+                   <div className="flex items-center gap-6">
+                     <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 via-amber-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-500">
+                       <Lightbulb className="h-8 w-8 text-white" />
+           </div>
+                     <div className="flex-1 text-left">
+                       <h3 className="text-2xl font-bold text-gray-900 mb-2">Personalized Recommendations</h3>
+                       <p className="text-base text-gray-600 leading-relaxed">Get actionable steps tailored to your unique lifestyle that will maximize your impact</p>
+                     </div>
+                     <ArrowRight className="h-6 w-6 text-yellow-500 group-hover:translate-x-2 transition-transform duration-500" />
+                   </div>
+                 </button>
+                 
+                 {/* Journalize Your Journey */}
+                 <button
+                   onClick={() => {
+                     setShowActionDrawer(false);
+                     console.log('Journalize clicked');
+                   }}
+                   className="group relative overflow-hidden bg-gradient-to-r from-sage-50 via-blue-50 to-sage-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 border border-sage-200/30"
+                 >
+                   {/* Card Glow Effect */}
+                   <div className="absolute inset-0 bg-gradient-to-r from-sage-400/5 to-blue-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                   
+                   <div className="flex items-center gap-6">
+                     <div className="w-16 h-16 bg-gradient-to-br from-sage-500 via-blue-500 to-sage-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-500">
+                       <PenTool className="h-8 w-8 text-white" />
+                     </div>
+                     <div className="flex-1 text-left">
+                       <h3 className="text-2xl font-bold text-gray-900 mb-2">Journalize Your Journey</h3>
+                       <p className="text-base text-gray-600 leading-relaxed">Track your progress, celebrate wins, and build lasting sustainable habits</p>
+                     </div>
+                     <ArrowRight className="h-6 w-6 text-sage-500 group-hover:translate-x-2 transition-transform duration-500" />
+                   </div>
+                 </button>
+               </div>
+             </motion.div>
+           </div>
+         )}
+
+         </div>
+           </div>
+           )}
 
            {/* Impact Metrics Section - Speedometer Gauge (Hidden) */}
            {/* <div className="space-y-8">
@@ -949,10 +1294,38 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
            </div> */}
 
            {/* Three Action Buttons */}
-           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+           {activeSection === 'climate-self' && (
+           <div className="space-y-8">
+             {/* Enhanced Section Header */}
+             <div className="text-center space-y-6">
+               <div className="relative">
+                 {/* Background Glow */}
+                 <div className="absolute -inset-4 bg-gradient-to-r from-sage-400/10 via-sage-500/10 to-sage-600/10 rounded-3xl blur-xl"></div>
+                 
+                 <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-sage-200/50">
+                   <div className="flex items-center justify-center gap-4 mb-4">
+                     <div className="w-12 h-12 bg-gradient-to-br from-sage-500 to-sage-600 rounded-2xl flex items-center justify-center shadow-lg">
+                       <Zap className="w-6 h-6 text-white" />
+                     </div>
+                     <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent">
+                       Ready to Make a Difference?
+                     </h2>
+                   </div>
+                   <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-medium">
+                     Your climate journey doesn't end here. Choose your next powerful step and start creating real impact today.
+                   </p>
+                   <div className="w-32 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mx-auto mt-6 rounded-full"></div>
+                 </div>
+               </div>
+             </div>
+             
+             {/* Cards Grid */}
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
              {/* Generate Your Story Button */}
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-orange-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
              <button 
-               className="group bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 hover:shadow-2xl hover:scale-105 hover:border-gray-300 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95"
+                    className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-red-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-red-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
                onClick={async () => {
                  await generateStory();
                  setShowStoryModal(true);
@@ -960,252 +1333,494 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                disabled={isGeneratingStory}
                aria-label="Generate your sustainability story"
              >
-               <div className="text-center space-y-4">
-                 <div className="w-12 h-12 mx-auto bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                   <BookOpen className="h-8 w-8 text-black" />
+                    <div className="text-center space-y-6">
+                      {/* Top Icon with Enhanced Styling */}
+                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-red-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg">
+                        <BookOpen className="h-10 w-10 text-red-600" />
                  </div>
-                 <h3 className="text-lg font-bold text-gray-900">Generate Your Story</h3>
-                 <p className="text-sm text-gray-600">Discover your unique sustainability journey and share it with others</p>
-                 <div className="mt-4">
-                   <div className="w-20 h-20 mx-auto">
+                      
+                      {/* Title with Gradient */}
+                      <h3 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">Generate Your Story</h3>
+                      
+                      {/* Enhanced Description */}
+                      <p className="text-sm text-gray-600 leading-relaxed">Transform your climate journey into an inspiring story that motivates others to join the movement</p>
+                      
+                      {/* Impact Badge */}
+                      <div className="flex items-center justify-center gap-2 mt-2">
+                        <div className="px-3 py-1 bg-red-100 rounded-full">
+                          <span className="text-xs font-semibold text-red-600">High Impact</span>
+                        </div>
+                      </div>
+                      
+                      {/* Central Icon with Animation */}
+                      <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
+                        <div className="w-24 h-24 mx-auto">
                      <svg viewBox="0 0 64 64" className="w-full h-full">
-                       <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300"/>
-                       <circle cx="24" cy="28" r="2" fill="currentColor" className="text-black"/>
-                       <circle cx="40" cy="28" r="2" fill="currentColor" className="text-black"/>
-                       <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-black"/>
+                            <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-200"/>
+                            <circle cx="24" cy="28" r="2" fill="currentColor" className="text-red-600"/>
+                            <circle cx="40" cy="28" r="2" fill="currentColor" className="text-red-600"/>
+                            <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"/>
                      </svg>
                    </div>
                  </div>
-                 {/* Get Started Button */}
-                 <div className="flex items-center justify-center mt-4">
-                   <div className="relative overflow-hidden bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-gray-200 transition-all duration-300 cursor-pointer flex items-center gap-2">
-                     <span className="relative z-10">Get Started</span>
-                     <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                     <div className="absolute inset-0 bg-gray-200 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                   </div>
+                      
+                      {/* Enhanced Get Started Button */}
+                      <div className="flex items-center justify-center mt-6">
+                        <div className="relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-red-600 group-hover:to-orange-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
+                          <span className="relative z-10">Start Creating Impact</span>
+                          <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                        </div>
                  </div>
                </div>
              </button>
+                </div>
 
              {/* Recommendations Button */}
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
              <button 
-               className="group bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 hover:shadow-2xl hover:scale-105 hover:border-gray-300 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95"
+                    className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-yellow-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
                onClick={() => navigate('/recommendations')}
                aria-label="Get personalized recommendations"
              >
-               <div className="text-center space-y-4">
-                 <div className="w-12 h-12 mx-auto bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                   <Lightbulb className="h-8 w-8 text-black" />
+                    <div className="text-center space-y-6">
+                      {/* Top Icon with Enhanced Styling */}
+                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-yellow-100 to-amber-100 rounded-2xl flex items-center justify-center group-hover:from-yellow-200 group-hover:to-amber-200 transition-all duration-300 shadow-lg">
+                        <Lightbulb className="h-10 w-10 text-yellow-600" />
                  </div>
-                 <h3 className="text-lg font-bold text-gray-900">Personalized Recommendations</h3>
-                 <p className="text-sm text-gray-600">Get tailored suggestions based on your lifestyle and goals</p>
-                 <div className="mt-4">
-                   <div className="w-20 h-20 mx-auto">
+                      
+                      {/* Title with Gradient */}
+                      <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">Personalized Recommendations</h3>
+                      
+                      {/* Enhanced Description */}
+                      <p className="text-sm text-gray-600 leading-relaxed">Get actionable steps tailored to your unique lifestyle that will maximize your climate impact</p>
+                      
+                      {/* Impact Badge */}
+                      <div className="flex items-center justify-center gap-2 mt-2">
+                        <div className="px-3 py-1 bg-yellow-100 rounded-full">
+                          <span className="text-xs font-semibold text-yellow-600">Smart Action</span>
+                        </div>
+                      </div>
+                      
+                      {/* Central Icon with Animation */}
+                      <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
+                        <div className="w-24 h-24 mx-auto">
                      <svg viewBox="0 0 64 64" className="w-full h-full">
-                       <rect x="16" y="20" width="32" height="24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300"/>
-                       <line x1="16" y1="28" x2="48" y2="28" stroke="currentColor" strokeWidth="2" className="text-black"/>
-                       <line x1="16" y1="36" x2="48" y2="36" stroke="currentColor" strokeWidth="2" className="text-black"/>
-                       <line x1="16" y1="44" x2="40" y2="44" stroke="currentColor" strokeWidth="2" className="text-black"/>
-                       <circle cx="12" cy="16" r="2" fill="currentColor" className="text-black"/>
-                       <circle cx="20" cy="16" r="2" fill="currentColor" className="text-black"/>
+                            <rect x="16" y="20" width="32" height="24" fill="none" stroke="currentColor" strokeWidth="2" className="text-yellow-200"/>
+                            <line x1="16" y1="28" x2="48" y2="28" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
+                            <line x1="16" y1="36" x2="48" y2="36" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
+                            <line x1="16" y1="44" x2="40" y2="44" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
+                            <circle cx="12" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
+                            <circle cx="20" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
                      </svg>
                    </div>
                  </div>
-                 {/* Get Started Button */}
-                 <div className="flex items-center justify-center mt-4">
-                   <div className="relative overflow-hidden bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-gray-200 transition-all duration-300 cursor-pointer flex items-center gap-2">
-                     <span className="relative z-10">Get Started</span>
-                     <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                     <div className="absolute inset-0 bg-gray-200 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                   </div>
+                      
+                      {/* Enhanced Get Started Button */}
+                      <div className="flex items-center justify-center mt-6">
+                        <div className="relative overflow-hidden bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-yellow-600 group-hover:to-amber-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
+                          <span className="relative z-10">Discover Your Path</span>
+                          <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                        </div>
                  </div>
                </div>
              </button>
+                </div>
 
              {/* Journalize Button */}
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-sage-100 to-blue-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
              <button 
-               className="group bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 hover:shadow-2xl hover:scale-105 hover:border-gray-300 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95"
+                    className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-sage-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-sage-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
                onClick={() => console.log('Journalize clicked')}
                aria-label="Journalize your sustainability journey"
              >
-               <div className="text-center space-y-4">
-                 <div className="w-12 h-12 mx-auto bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                   <PenTool className="h-8 w-8 text-black" />
+                    <div className="text-center space-y-6">
+                      {/* Top Icon with Enhanced Styling */}
+                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-sage-100 to-blue-100 rounded-2xl flex items-center justify-center group-hover:from-sage-200 group-hover:to-blue-200 transition-all duration-300 shadow-lg">
+                        <PenTool className="h-10 w-10 text-sage-600" />
                  </div>
-                 <h3 className="text-lg font-bold text-gray-900">Journalize Your Journey</h3>
-                 <p className="text-sm text-gray-600">Reflect on your progress and track your sustainability growth</p>
-                 <div className="mt-4">
-                   <div className="w-20 h-20 mx-auto">
+                      
+                      {/* Title with Gradient */}
+                      <h3 className="text-xl font-bold bg-gradient-to-r from-sage-600 to-blue-600 bg-clip-text text-transparent">Journalize Your Journey</h3>
+                      
+                      {/* Enhanced Description */}
+                      <p className="text-sm text-gray-600 leading-relaxed">Track your progress, celebrate wins, and build lasting sustainable habits through mindful reflection</p>
+                      
+                      {/* Impact Badge */}
+                      <div className="flex items-center justify-center gap-2 mt-2">
+                        <div className="px-3 py-1 bg-sage-100 rounded-full">
+                          <span className="text-xs font-semibold text-sage-600">Mindful Growth</span>
+                        </div>
+                      </div>
+                      
+                      {/* Central Icon with Animation */}
+                      <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
+                        <div className="w-24 h-24 mx-auto">
                      <svg viewBox="0 0 64 64" className="w-full h-full">
-                       <rect x="16" y="12" width="32" height="40" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-300"/>
-                       <line x1="20" y1="20" x2="44" y2="20" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <line x1="20" y1="24" x2="44" y2="24" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <line x1="20" y1="28" x2="44" y2="28" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <line x1="20" y1="32" x2="44" y2="32" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <line x1="20" y1="36" x2="44" y2="36" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <line x1="20" y1="40" x2="44" y2="40" stroke="currentColor" strokeWidth="1" className="text-black"/>
-                       <rect x="20" y="44" width="8" height="4" fill="currentColor" className="text-black"/>
-                       <rect x="36" y="44" width="8" height="4" fill="currentColor" className="text-black"/>
-                       <circle cx="12" cy="16" r="1" fill="currentColor" className="text-black"/>
-                       <circle cx="20" cy="16" r="1" fill="currentColor" className="text-black"/>
+                            <rect x="16" y="12" width="32" height="40" fill="none" stroke="currentColor" strokeWidth="2" className="text-sage-200"/>
+                            <line x1="20" y1="20" x2="44" y2="20" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                            <line x1="20" y1="24" x2="44" y2="24" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                            <line x1="20" y1="28" x2="44" y2="28" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                            <line x1="20" y1="32" x2="44" y2="32" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                            <line x1="20" y1="36" x2="44" y2="36" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                            <line x1="20" y1="40" x2="44" y2="40" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                            <rect x="20" y="44" width="8" height="4" fill="currentColor" className="text-sage-600"/>
+                            <rect x="36" y="44" width="8" height="4" fill="currentColor" className="text-sage-600"/>
+                            <circle cx="12" cy="16" r="1" fill="currentColor" className="text-sage-600"/>
+                            <circle cx="20" cy="16" r="1" fill="currentColor" className="text-sage-600"/>
                      </svg>
                    </div>
                  </div>
-                 {/* Get Started Button */}
-                 <div className="flex items-center justify-center mt-4">
-                   <div className="relative overflow-hidden bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-gray-200 transition-all duration-300 cursor-pointer flex items-center gap-2">
-                     <span className="relative z-10">Get Started</span>
-                     <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                     <div className="absolute inset-0 bg-gray-200 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                   </div>
+                      
+                      {/* Enhanced Get Started Button */}
+                      <div className="flex items-center justify-center mt-6">
+                        <div className="relative overflow-hidden bg-gradient-to-r from-sage-500 to-blue-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-sage-600 group-hover:to-blue-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
+                          <span className="relative z-10">Track Your Growth</span>
+                          <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                        </div>
                  </div>
                </div>
              </button>
            </div>
+             </div>
+           </div>
+           )}
 
                                       {/* Power Moves Grid - Using Highlights from API */}
-           <div className="space-y-8">
-             <div className="text-left space-y-4">
-               <h2 className="text-3xl md:text-4xl font-serif text-sage-800">
-                 Your Climate Signature
+           {activeSection === 'climate-signature' && (
+           <div className="space-y-12 relative">
+             {/* Background Pattern */}
+             <div className="absolute inset-0 pointer-events-none">
+               {/* Subtle Grid Pattern */}
+               <div className="absolute inset-0 opacity-[0.03]" style={{
+                 backgroundImage: `
+                   linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
+                 `,
+                 backgroundSize: '40px 40px'
+               }}></div>
+               
+               {/* Floating Geometric Shapes */}
+               <div className="absolute top-10 left-10 w-20 h-20 border border-sage-200/20 rounded-full"></div>
+               <div className="absolute top-20 right-20 w-12 h-12 border border-sage-300/20 rotate-45"></div>
+               <div className="absolute bottom-20 left-20 w-16 h-16 border border-sage-200/20 rounded-full"></div>
+               <div className="absolute bottom-10 right-10 w-8 h-8 border border-sage-300/20 rotate-45"></div>
+               
+               {/* Organic Flow Lines */}
+               <div className="absolute top-1/4 left-0 w-32 h-px bg-gradient-to-r from-transparent via-sage-200/30 to-transparent"></div>
+               <div className="absolute bottom-1/4 right-0 w-32 h-px bg-gradient-to-l from-transparent via-sage-200/30 to-transparent"></div>
+               
+               {/* Radial Gradient Overlay */}
+               <div className="absolute inset-0 bg-radial-gradient from-sage-50/50 via-transparent to-transparent"></div>
+             </div>
+             
+             {/* Enhanced Header Section */}
+             <div className="text-center space-y-6 relative z-10">
+               <div className="flex flex-col items-center gap-4 mb-6">
+                 <div className="w-12 h-12 bg-gradient-to-br from-sage-400 to-sage-600 rounded-2xl flex items-center justify-center shadow-lg">
+                   <Leaf className="w-6 h-6 text-white" />
+                 </div>
+                 <div className="text-center">
+                   <h2 className="text-4xl md:text-5xl font-serif text-sage-800 leading-tight">
+                     Your Signature
               </h2>
-               <p className="text-lg text-sage-600 max-w-2xl">
+                   <div className="w-24 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mt-3 rounded-full mx-auto"></div>
+                 </div>
+               </div>
+               <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-light">
                  These quiet patterns reveal where you already lead with care—and where small changes can ripple outward
                </p>
             </div>
 
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+             {/* Enhanced Cards Grid */}
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                {/* Card 1: Power Habit */}
-               <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 shadow-lg border border-green-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
-                 <div className="absolute inset-0 opacity-20">
-                   <div className="w-full h-full" style={{
-                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(34, 197, 94, 0.1) 8px, rgba(34, 197, 94, 0.1) 16px)`
+               <div className="group relative h-full">
+                 <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-emerald-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-green-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
+                   {/* Enhanced Decorative Background Pattern */}
+                   <div className="absolute inset-0">
+                     {/* Subtle Grid Pattern */}
+                     <div className="absolute inset-0 opacity-[0.02]" style={{
+                       backgroundImage: `
+                         linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
+                         linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
+                       `,
+                       backgroundSize: '20px 20px'
+                     }}></div>
+                     
+                     {/* Radial Gradient Pattern */}
+                     <div className="absolute inset-0 opacity-[0.03]" style={{
+                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%)`
+                     }}></div>
+                     
+                     {/* Corner Accent */}
+                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
+                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(34, 197, 94, 0.1) 0deg, transparent 90deg)`
                    }}></div>
                  </div>
-                 <div className="relative z-10 space-y-4">
-                   <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Lightbulb className="w-12 h-12 text-green-600" />
+                   
+                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
+                     {/* Enhanced Icon Container */}
+                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center group-hover:from-green-200 group-hover:to-emerald-200 transition-all duration-300 shadow-lg border border-green-200">
+                       <Lightbulb className="w-10 h-10 text-green-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-habit')?.title || 'Your Power Habit'}
-                   </h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-habit')?.subtext || 
+                     
+                     {/* Enhanced Title */}
+                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-habit')?.title || 'Your Power Habit'}
+                     </h3>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-habit')?.subtext || 
                       "You're taking steps toward sustainability — every small action counts and builds momentum."}
                    </p>
+                   </div>
                  </div>
                </div>
 
                {/* Card 2: Power Move */}
-               <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 shadow-lg border border-purple-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
-                 <div className="absolute inset-0 opacity-20">
-                   <div className="w-full h-full" style={{
-                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(147, 51, 234, 0.1) 8px, rgba(147, 51, 234, 0.1) 16px)`
+               <div className="group relative h-full">
+                 <div className="absolute inset-0 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-purple-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
+                   {/* Enhanced Decorative Background Pattern */}
+                   <div className="absolute inset-0">
+                     {/* Subtle Grid Pattern */}
+                     <div className="absolute inset-0 opacity-[0.02]" style={{
+                       backgroundImage: `
+                         linear-gradient(rgba(147, 51, 234, 0.1) 1px, transparent 1px),
+                         linear-gradient(90deg, rgba(147, 51, 234, 0.1) 1px, transparent 1px)
+                       `,
+                       backgroundSize: '20px 20px'
+                     }}></div>
+                     
+                     {/* Radial Gradient Pattern */}
+                     <div className="absolute inset-0 opacity-[0.03]" style={{
+                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(147, 51, 234, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%)`
+                     }}></div>
+                     
+                     {/* Corner Accent */}
+                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
+                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(147, 51, 234, 0.1) 0deg, transparent 90deg)`
                    }}></div>
                  </div>
-                 <div className="relative z-10 space-y-4">
-                   <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Zap className="w-12 h-12 text-purple-600" />
+                   
+                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
+                     {/* Enhanced Icon Container */}
+                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl flex items-center justify-center group-hover:from-purple-200 group-hover:to-indigo-200 transition-all duration-300 shadow-lg border border-purple-200">
+                       <Zap className="w-10 h-10 text-purple-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-move')?.title || 'Your Power Move'}
-                   </h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-move')?.subtext || 
+                     
+                     {/* Enhanced Title */}
+                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-move')?.title || 'Your Power Move'}
+                     </h3>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-move')?.subtext || 
                       "Try creating a 7-day visual tracker to improve one small habit. Builders like you thrive on small systems."}
                    </p>
+                   </div>
                  </div>
                </div>
 
                {/* Card 3: Go Further */}
-               <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 shadow-lg border border-blue-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
-                 <div className="absolute inset-0 opacity-20">
-                   <div className="w-full h-full" style={{
-                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(59, 130, 246, 0.1) 8px, rgba(59, 130, 246, 0.1) 16px)`
+               <div className="group relative h-full">
+                 <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-blue-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
+                   {/* Enhanced Decorative Background Pattern */}
+                   <div className="absolute inset-0">
+                     {/* Subtle Grid Pattern */}
+                     <div className="absolute inset-0 opacity-[0.02]" style={{
+                       backgroundImage: `
+                         linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                         linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+                       `,
+                       backgroundSize: '20px 20px'
+                     }}></div>
+                     
+                     {/* Radial Gradient Pattern */}
+                     <div className="absolute inset-0 opacity-[0.03]" style={{
+                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%)`
+                     }}></div>
+                     
+                     {/* Corner Accent */}
+                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
+                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(59, 130, 246, 0.1) 0deg, transparent 90deg)`
                    }}></div>
                  </div>
-                 <div className="relative z-10 space-y-4">
-                   <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Target className="w-12 h-12 text-blue-600" />
+                   
+                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
+                     {/* Enhanced Icon Container */}
+                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-300 shadow-lg border border-blue-200">
+                       <Target className="w-10 h-10 text-blue-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'go-further')?.title || 'Go Further'}
-                   </h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'go-further')?.subtext || 
+                     
+                     {/* Enhanced Title */}
+                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'go-further')?.title || 'Go Further'}
+                     </h3>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'go-further')?.subtext || 
                       "Want to go further? Choose one area to focus on and build sustainable habits over time."}
                    </p>
+                   </div>
                  </div>
                </div>
 
                {/* Card 4: Your Spark */}
-               <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-6 shadow-lg border border-amber-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
-                 <div className="absolute inset-0 opacity-20">
-                   <div className="w-full h-full" style={{
-                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(245, 158, 11, 0.1) 8px, rgba(245, 158, 11, 0.1) 16px)`
+               <div className="group relative h-full">
+                 <div className="absolute inset-0 bg-gradient-to-br from-amber-100 to-orange-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-amber-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
+                   {/* Enhanced Decorative Background Pattern */}
+                   <div className="absolute inset-0">
+                     {/* Subtle Grid Pattern */}
+                     <div className="absolute inset-0 opacity-[0.02]" style={{
+                       backgroundImage: `
+                         linear-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px),
+                         linear-gradient(90deg, rgba(245, 158, 11, 0.1) 1px, transparent 1px)
+                       `,
+                       backgroundSize: '20px 20px'
+                     }}></div>
+                     
+                     {/* Radial Gradient Pattern */}
+                     <div className="absolute inset-0 opacity-[0.03]" style={{
+                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.1) 0%, transparent 50%)`
+                     }}></div>
+                     
+                     {/* Corner Accent */}
+                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
+                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(245, 158, 11, 0.1) 0deg, transparent 90deg)`
                    }}></div>
                  </div>
-                 <div className="relative z-10 space-y-4">
-                   <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Sparkles className="w-12 h-12 text-amber-600" />
+                   
+                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
+                     {/* Enhanced Icon Container */}
+                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-amber-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg border border-amber-200">
+                       <Sparkles className="w-10 h-10 text-amber-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'spark')?.title || 'Your Spark'}
+                     
+                     {/* Enhanced Title */}
+                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'spark')?.title || 'Your Spark'}
                    </h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'spark')?.summary || 
-                      "You see the big picture and inspire others. Your vision creates lasting change."}
-                   </p>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'spark')?.summary || 
+                        "You see the big picture and inspire others. Your vision creates lasting change."}
+                     </p>
+                   </div>
                  </div>
                </div>
 
                {/* Card 5: Decision Style */}
-               <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 shadow-lg border border-emerald-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
-                 <div className="absolute inset-0 opacity-20">
-                   <div className="w-full h-full" style={{
-                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(16, 185, 129, 0.1) 8px, rgba(16, 185, 129, 0.1) 16px)`
+               <div className="group relative h-full">
+                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-emerald-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
+                   {/* Enhanced Decorative Background Pattern */}
+                   <div className="absolute inset-0">
+                     {/* Subtle Grid Pattern */}
+                     <div className="absolute inset-0 opacity-[0.02]" style={{
+                       backgroundImage: `
+                         linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px),
+                         linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px)
+                       `,
+                       backgroundSize: '20px 20px'
+                     }}></div>
+                     
+                     {/* Radial Gradient Pattern */}
+                     <div className="absolute inset-0 opacity-[0.03]" style={{
+                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.1) 0%, transparent 50%)`
+                     }}></div>
+                     
+                     {/* Corner Accent */}
+                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
+                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(16, 185, 129, 0.1) 0deg, transparent 90deg)`
                    }}></div>
                  </div>
-                 <div className="relative z-10 space-y-4">
-                   <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <Brain className="w-12 h-12 text-emerald-600" />
+                   
+                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
+                     {/* Enhanced Icon Container */}
+                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center group-hover:from-emerald-200 group-hover:to-teal-200 transition-all duration-300 shadow-lg border border-emerald-200">
+                       <Brain className="w-10 h-10 text-emerald-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'decision-style')?.title || 'Decision Style'}
-                   </h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'decision-style')?.summary || 
-                      dynamicPersonality?.highlights?.personalityInsights?.decisionStyle || 'Intuitive'}
-                   </p>
+                     
+                     {/* Enhanced Title */}
+                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'decision-style')?.title || 'Decision Style'}
+                     </h3>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'decision-style')?.summary || 
+                        dynamicPersonality?.highlights?.personalityInsights?.decisionStyle || 'Intuitive'}
+                     </p>
+                   </div>
                  </div>
                </div>
 
                {/* Card 6: Action Style */}
-               <div className="bg-gradient-to-br from-rose-50 to-rose-100 rounded-2xl p-6 shadow-lg border border-rose-200 hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
-                 <div className="absolute inset-0 opacity-20">
-                   <div className="w-full h-full" style={{
-                     backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(244, 63, 94, 0.1) 8px, rgba(244, 63, 94, 0.1) 16px)`
+               <div className="group relative h-full">
+                 <div className="absolute inset-0 bg-gradient-to-br from-rose-100 to-pink-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-rose-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
+                   {/* Enhanced Decorative Background Pattern */}
+                   <div className="absolute inset-0">
+                     {/* Subtle Grid Pattern */}
+                     <div className="absolute inset-0 opacity-[0.02]" style={{
+                       backgroundImage: `
+                         linear-gradient(rgba(244, 63, 94, 0.1) 1px, transparent 1px),
+                         linear-gradient(90deg, rgba(244, 63, 94, 0.1) 1px, transparent 1px)
+                       `,
+                       backgroundSize: '20px 20px'
+                     }}></div>
+                     
+                     {/* Radial Gradient Pattern */}
+                     <div className="absolute inset-0 opacity-[0.03]" style={{
+                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(244, 63, 94, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%)`
+                     }}></div>
+                     
+                     {/* Corner Accent */}
+                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
+                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(244, 63, 94, 0.1) 0deg, transparent 90deg)`
                    }}></div>
                  </div>
-                 <div className="relative z-10 space-y-4">
-                   <div className="w-16 h-16 mx-auto flex items-center justify-center">
-                     <ArrowRight className="w-12 h-12 text-rose-600" />
+                   
+                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
+                     {/* Enhanced Icon Container */}
+                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-rose-100 to-pink-100 rounded-2xl flex items-center justify-center group-hover:from-rose-200 group-hover:to-pink-200 transition-all duration-300 shadow-lg border border-rose-200">
+                       <ArrowRight className="w-10 h-10 text-rose-600" />
                    </div>
-                   <h3 className="text-lg font-bold text-gray-900 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'action-style')?.title || 'Action Style'}
-                   </h3>
-                   <p className="text-sm text-gray-600 text-center">
-                     {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'action-style')?.summary || 
-                      dynamicPersonality?.highlights?.personalityInsights?.actionStyle || 'Planner'}
+                     
+                     {/* Enhanced Title */}
+                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'action-style')?.title || 'Action Style'}
+                     </h3>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'action-style')?.summary || 
+                        dynamicPersonality?.highlights?.personalityInsights?.actionStyle || 'Planner'}
                    </p>
                  </div>
                </div>
              </div>
            </div>
+           </div>
+           )}
 
 
 
-                    {/* Progress Visual - Flower Ring */}
+                    {/* Progress Visual - Flower Ring - HIDDEN */}
+        {/* 
         <div className="space-y-8">
             <div className="text-center space-y-4">
               <h2 className="text-3xl md:text-4xl font-serif text-sage-800">
@@ -1218,10 +1833,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
             <div className="flex justify-center">
               <div className="relative w-64 h-64">
-                {/* Flower Ring Progress */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative w-full h-full">
-                    {/* Outer Ring - Completed Habits */}
                     <div className="absolute inset-0 rounded-full border-8 border-sage-200"></div>
                     <div 
                       className="absolute inset-0 rounded-full border-8 border-sage-400"
@@ -1230,7 +1843,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                       }}
                     ></div>
                     
-                    {/* Petals */}
                     {Array.from({ length: 8 }, (_, i) => (
                       <div
                         key={i}
@@ -1247,7 +1859,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   </div>
                 </div>
 
-                {/* Center Content */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center space-y-2">
                     <div className="text-4xl font-bold text-sage-700">
@@ -1259,9 +1870,205 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 </div>
               </div>
             </div>
+                     </div> 
+         */}
 
+         {/* Take Action Section for Climate Signature */}
+         {activeSection === 'climate-signature' && (
+           <div className="space-y-8 mt-12">
+             {/* Enhanced Section Header */}
+            <div className="text-center space-y-6">
+               <div className="relative">
+                 {/* Background Glow */}
+                 <div className="absolute -inset-4 bg-gradient-to-r from-sage-400/10 via-sage-500/10 to-sage-600/10 rounded-3xl blur-xl"></div>
+                 
+                 <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-sage-200/50">
+                   <div className="flex items-center justify-center gap-4 mb-4">
+                     <div className="w-12 h-12 bg-gradient-to-br from-sage-500 to-sage-600 rounded-2xl flex items-center justify-center shadow-lg">
+                       <Zap className="w-6 h-6 text-white" />
+                     </div>
+                     <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent">
+                       Ready to Make a Difference?
+                     </h2>
+                   </div>
+                   <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-medium">
+                     Your climate journey doesn't end here. Choose your next powerful step and start creating real impact today.
+                   </p>
+                   <div className="w-32 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mx-auto mt-6 rounded-full"></div>
+                 </div>
+               </div>
+             </div>
+             
+             {/* Cards Grid */}
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+               {/* Generate Your Story Button */}
+               <div className="group relative">
+                 <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-orange-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <button
+                   className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-red-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-red-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
+                   onClick={async () => {
+                     await generateStory();
+                     setShowStoryModal(true);
+                   }}
+                   disabled={isGeneratingStory}
+                   aria-label="Generate your sustainability story"
+                 >
+                   <div className="text-center space-y-6">
+                     {/* Top Icon with Enhanced Styling */}
+                     <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-red-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg">
+                       <BookOpen className="h-10 w-10 text-red-600" />
+              </div>
 
+                     {/* Title with Gradient */}
+                     <h3 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">Generate Your Story</h3>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 leading-relaxed">Transform your climate journey into an inspiring story that motivates others to join the movement</p>
+                     
+                     {/* Impact Badge */}
+                     <div className="flex items-center justify-center gap-2 mt-2">
+                       <div className="px-3 py-1 bg-red-100 rounded-full">
+                         <span className="text-xs font-semibold text-red-600">High Impact</span>
+            </div>
           </div>
+
+                     {/* Central Icon with Animation */}
+                     <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
+                       <div className="w-24 h-24 mx-auto">
+                         <svg viewBox="0 0 64 64" className="w-full h-full">
+                           <path d="M32 8c-13.3 0-24 10.7-24 24s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-200"/>
+                           <circle cx="24" cy="28" r="2" fill="currentColor" className="text-red-600"/>
+                           <circle cx="40" cy="28" r="2" fill="currentColor" className="text-red-600"/>
+                           <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"/>
+                         </svg>
+                       </div>
+        </div>
+
+                     {/* Enhanced Get Started Button */}
+                                            <div className="flex items-center justify-center mt-6">
+                         <div className="relative overflow-hidden bg-gradient-to-r from-red-500 to-orange-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-red-600 group-hover:to-orange-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
+                           <span className="relative z-10">Start Creating Impact</span>
+                           <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                         <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+            </div>
+                </div>
+            </div>
+                 </button>
+          </div>
+          
+               {/* Recommendations Button */}
+               <div className="group relative">
+                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                    <button 
+                     className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-yellow-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
+                   onClick={() => navigate('/recommendations')}
+                   aria-label="Get personalized recommendations"
+                 >
+                   <div className="text-center space-y-6">
+                     {/* Top Icon with Enhanced Styling */}
+                     <div className="w-16 h-16 mx-auto bg-gradient-to-br from-yellow-100 to-amber-100 rounded-2xl flex items-center justify-center group-hover:from-yellow-200 group-hover:to-amber-200 transition-all duration-300 shadow-lg">
+                       <Lightbulb className="h-10 w-10 text-yellow-600" />
+                  </div>
+                     
+                     {/* Title with Gradient */}
+                     <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">Personalized Recommendations</h3>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 leading-relaxed">Get actionable steps tailored to your unique lifestyle that will maximize your climate impact</p>
+                     
+                     {/* Impact Badge */}
+                     <div className="flex items-center justify-center gap-2 mt-2">
+                       <div className="px-3 py-1 bg-yellow-100 rounded-full">
+                         <span className="text-xs font-semibold text-yellow-600">Smart Action</span>
+                  </div>
+                </div>
+
+                     {/* Central Icon with Animation */}
+                     <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
+                       <div className="w-24 h-24 mx-auto">
+                         <svg viewBox="0 0 64 64" className="w-full h-full">
+                           <rect x="16" y="20" width="32" height="24" fill="none" stroke="currentColor" strokeWidth="2" className="text-yellow-200"/>
+                           <line x1="16" y1="28" x2="48" y2="28" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
+                           <line x1="16" y1="36" x2="48" y2="36" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
+                           <line x1="16" y1="44" x2="40" y2="44" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
+                           <circle cx="12" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
+                           <circle cx="20" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
+                         </svg>
+                    </div>
+                  </div>
+                     
+                     {/* Enhanced Get Started Button */}
+                                            <div className="flex items-center justify-center mt-6">
+                         <div className="relative overflow-hidden bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-yellow-600 group-hover:to-amber-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
+                           <span className="relative z-10">Discover Your Path</span>
+                           <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                         <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                    </div>
+                  </div>
+                    </div>
+                 </button>
+                </div>
+
+               {/* Journalize Button */}
+               <div className="group relative">
+                 <div className="absolute inset-0 bg-gradient-to-br from-sage-100 to-blue-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                    <button 
+                     className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-sage-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-sage-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
+                   onClick={() => console.log('Journalize clicked')}
+                   aria-label="Journalize your sustainability journey"
+                 >
+                   <div className="text-center space-y-6">
+                     {/* Top Icon with Enhanced Styling */}
+                     <div className="w-16 h-16 mx-auto bg-gradient-to-br from-sage-100 to-blue-100 rounded-2xl flex items-center justify-center group-hover:from-sage-200 group-hover:to-blue-200 transition-all duration-300 shadow-lg">
+                       <PenTool className="h-10 w-10 text-sage-600" />
+              </div>
+                     
+                     {/* Title with Gradient */}
+                     <h3 className="text-xl font-bold bg-gradient-to-r from-sage-600 to-blue-600 bg-clip-text text-transparent">Journalize Your Journey</h3>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 leading-relaxed">Track your progress, celebrate wins, and build lasting sustainable habits through mindful reflection</p>
+                     
+                     {/* Impact Badge */}
+                     <div className="flex items-center justify-center gap-2 mt-2">
+                       <div className="px-3 py-1 bg-sage-100 rounded-full">
+                         <span className="text-xs font-semibold text-sage-600">Mindful Growth</span>
+                  </div>
+                </div>
+                     
+                     {/* Central Icon with Animation */}
+                     <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
+                       <div className="w-24 h-24 mx-auto">
+                         <svg viewBox="0 0 64 64" className="w-full h-full">
+                           <rect x="16" y="12" width="32" height="40" fill="none" stroke="currentColor" strokeWidth="2" className="text-sage-200"/>
+                           <line x1="20" y1="20" x2="44" y2="20" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                           <line x1="20" y1="24" x2="44" y2="24" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                           <line x1="20" y1="28" x2="44" y2="28" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                           <line x1="20" y1="32" x2="44" y2="32" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                           <line x1="20" y1="36" x2="44" y2="36" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                           <line x1="20" y1="40" x2="44" y2="40" stroke="currentColor" strokeWidth="1" className="text-sage-600"/>
+                           <rect x="20" y="44" width="8" height="4" fill="currentColor" className="text-sage-600"/>
+                           <rect x="36" y="44" width="8" height="4" fill="currentColor" className="text-sage-600"/>
+                           <circle cx="12" cy="16" r="1" fill="currentColor" className="text-sage-600"/>
+                           <circle cx="20" cy="16" r="1" fill="currentColor" className="text-sage-600"/>
+                         </svg>
+                </div>
+                  </div>
+                     
+                     {/* Enhanced Get Started Button */}
+                                            <div className="flex items-center justify-center mt-6">
+                         <div className="relative overflow-hidden bg-gradient-to-r from-sage-500 to-blue-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-sage-600 group-hover:to-blue-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
+                           <span className="relative z-10">Track Your Growth</span>
+                           <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                         <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                  </div>
+                </div>
+                   </div>
+                 </button>
+               </div>
+             </div>
+            </div>
+          )}
 
         </div>
 
