@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/Layout';
 import Calculator from '@/components/Calculator';
 import { useCalculator } from '@/hooks/useCalculator';
@@ -93,28 +94,206 @@ function CircularImageReveal() {
 
 function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onStartB: () => void; onBack?: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9F7E8] px-4 py-12">
-      {/* Brand logo */}
-      <img src="/images/new_logo.png" alt="Zerrah logo" className="h-32 mb-6 opacity-90" />
-      {/* Decorative background shape and illustration */}
-      <div className="relative mb-8">
-        <div className="absolute inset-0 w-80 h-80 bg-amber-100 rounded-full blur-2xl opacity-60 -z-10"></div>
-        <img src="/images/intro_girl.png" alt="Quiz intro" className="w-64 h-64 rounded-full shadow-xl border-4 border-amber-200 object-cover" />
-      </div>
-      {/* Headline */}
-      <h1 className="text-5xl font-extrabold text-emerald-900 mb-3 font-serif tracking-tight text-center">What's your sustainability story?</h1>
-      {/* Subtitle */}
-      <p className="italic text-lg text-amber-700 mb-4 max-w-2xl text-center">*Spoiler: it's not about being perfect, eating lettuce forever, or turning your life upside down overnight.*</p>
-      {/* Description */}
-      <p className="text-xl text-amber-900 mb-6 max-w-2xl text-center leading-relaxed">
-        Take the Zerrah Quiz to discover your personal sustainability story, uncover your strengths, and get purposeful ideas to move forward.
-      </p>
-      {/* Final line */}
-      <p className="text-base text-emerald-700 italic mb-8 text-center">Because the small stuff? It adds up.</p>
-      {/* CTA Buttons */}
-      <div className="flex gap-6">
-        <button className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-bold py-3 px-8 rounded-full shadow transition" onClick={onStartA}>Begin My Story</button>
-        <button className="bg-amber-500 hover:bg-amber-600 text-white text-lg font-bold py-3 px-8 rounded-full shadow transition" onClick={onStartB}>Surprise Me</button>
+    <div className="min-h-screen bg-white relative overflow-hidden">
+
+      {/* Main Content */}
+      <div className="relative z-10 flex min-h-screen px-6 lg:px-12 pt-8">
+        <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-start mx-auto">
+          
+          {/* Left Side - Text and Image Stack */}
+          <motion.div 
+            initial={{ opacity: 0, x: -60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="relative flex flex-col items-center justify-center"
+          >
+            {/* Prominent Animated Text */}
+            <motion.div
+              initial={{ opacity: 0, y: -30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
+              className="text-center mb-8"
+            >
+              {/* Main Greeting */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+                className="text-slate-800 font-serif text-3xl lg:text-4xl font-bold tracking-wide mb-2"
+                style={{ fontFamily: 'Cormorant Garamond, serif' }}
+              >
+                <motion.span
+                  animate={{ 
+                    color: ["#1e293b", "#3b82f6", "#1e293b"],
+                    textShadow: [
+                      "0 0 0px rgba(59, 130, 246, 0)",
+                      "0 0 20px rgba(59, 130, 246, 0.3)",
+                      "0 0 0px rgba(59, 130, 246, 0)"
+                    ]
+                  }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  Greetings, I am Bobo
+                </motion.span>
+              </motion.div>
+              
+              {/* Subtitle */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 1.0 }}
+                className="text-slate-600 font-light text-lg lg:text-xl tracking-wider uppercase font-medium"
+              >
+                <motion.span
+                  animate={{ 
+                    opacity: [0.7, 1, 0.7],
+                    letterSpacing: ["0.1em", "0.2em", "0.1em"]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  Your Climate Companion
+                </motion.span>
+              </motion.div>
+              
+              {/* Decorative underline */}
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "100px" }}
+                transition={{ duration: 1, delay: 1.2 }}
+                className="h-0.5 bg-gradient-to-r from-blue-400 to-emerald-400 rounded-full mx-auto mt-3"
+              />
+            </motion.div>
+            
+            {/* Image Container with Elegant Shadow */}
+            <div className="relative w-full max-w-lg">
+              {/* Subtle Glow Effect */}
+              <motion.div 
+                animate={{ 
+                  scale: [1, 1.05, 1],
+                  opacity: [0.2, 0.4, 0.2]
+                }}
+                transition={{ 
+                  duration: 4, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+                className="absolute inset-0 bg-gradient-to-r from-blue-100 via-emerald-100 to-blue-100 rounded-3xl blur-3xl"
+              />
+              
+              {/* Image with Elegant Styling */}
+              <motion.div
+                className="relative z-10 rounded-3xl overflow-hidden shadow-2xl"
+                whileHover={{ scale: 1.02, y: -4 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              >
+                <img 
+                  src="/images/quiz_intro.png" 
+                  alt="Quiz Introduction" 
+                  className="w-full h-auto object-cover"
+                />
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Right Side - Content */}
+          <motion.div 
+            initial={{ opacity: 0, x: 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+            className="space-y-8"
+          >
+
+
+            {/* Main Headline */}
+            <motion.h1 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.7 }}
+              className="text-4xl lg:text-6xl xl:text-7xl font-bold text-slate-900 leading-tight tracking-tight -mt-4"
+              style={{ fontFamily: 'Cormorant Garamond, serif' }}
+            >
+              Let's begin your
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-600">
+                sustainability story.
+              </span>
+            </motion.h1>
+
+            {/* Subheading */}
+            <motion.p 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+              className="text-xl lg:text-2xl text-slate-600 leading-relaxed font-light"
+            >
+              This isn't about being perfect — it's about being present. One small step, together with Bobo.
+            </motion.p>
+
+            {/* Body Text */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.1 }}
+              className="space-y-6 text-slate-600 leading-relaxed text-lg"
+            >
+              <p className="font-light">
+                Zerrah is a safe space to reflect. There are no scores, no guilt, no pressure. Just gentle questions, thoughtful pauses, and moments to notice the beauty in your everyday choices.
+              </p>
+              <p className="font-light">
+                Bobo will guide you through each step — with kindness, curiosity, and zero judgment.
+              </p>
+            </motion.div>
+
+
+
+            {/* CTA Button */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.5 }}
+              className="pt-8"
+            >
+              <motion.button 
+                onClick={onStartB}
+                whileHover={{ scale: 1.05, y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative w-full max-w-md mx-auto bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white text-xl font-bold py-6 px-12 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden"
+              >
+                {/* Animated background overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                
+                {/* Subtle animated sparkles */}
+                <motion.div 
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  className="absolute top-2 right-4 w-3 h-3 bg-white/30 rounded-full"
+                />
+                <motion.div 
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute bottom-2 left-4 w-2 h-2 bg-white/40 rounded-full"
+                />
+                
+                {/* Button content */}
+                <div className="relative flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="font-bold text-2xl">Start Your Journey</div>
+                    <div className="text-sm font-normal opacity-90 mt-1">Discover your sustainability story with Bobo</div>
+                  </div>
+                </div>
+                
+                {/* Arrow icon */}
+                <motion.svg 
+                  className="absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 text-white/90 group-hover:translate-x-1 transition-transform duration-200" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </motion.svg>
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
@@ -164,10 +343,12 @@ const Quiz = () => {
 
   if (started === null) {
     return (
-      <QuizIntro
-        onStartA={() => setStarted('A')}
-        onStartB={() => setStarted('B')}
-      />
+      <Layout>
+        <QuizIntro
+          onStartA={() => setStarted('A')}
+          onStartB={() => setStarted('B')}
+        />
+      </Layout>
     );
   }
 
@@ -226,7 +407,9 @@ const Quiz = () => {
 
   if (started === 'B') {
     return (
-      <PoeticJourneyQuiz />
+      <Layout>
+        <PoeticJourneyQuiz />
+      </Layout>
     );
   }
 };
@@ -643,18 +826,6 @@ function PoeticJourneyQuiz() {
       ]
     },
     {
-      key: 'waste.management',
-      header: 'Chapter 5: Waste & Wisdom',
-      icon: '♻️',
-      question: 'Think about how you manage your everyday waste—what best reflects your habits?',
-      type: 'select',
-      options: [
-        { value: 'A', label: 'Advanced Management' },
-        { value: 'B', label: 'Basic Management' },
-        { value: 'C', label: 'Limited Management' }
-      ]
-    },
-    {
       key: 'waste.repairOrReplace',
       header: 'Chapter 5: Waste & Wisdom',
       icon: '🔧',
@@ -856,15 +1027,6 @@ function PoeticJourneyQuiz() {
       question: 'How many people, including you, share your home?',
       type: 'number',
       placeholder: 'Enter number of people'
-    },
-    // Username verification question (at the end)
-    {
-      key: 'username',
-      header: 'Chapter VII: Your Story & Context',
-      icon: '👤',
-      question: 'What name should we use when we chat about your eco-journey?',
-      type: 'text',
-      placeholder: 'Enter your name or email'
     }
   ];
 
@@ -942,7 +1104,7 @@ function PoeticJourneyQuiz() {
     }
     
     // Special handling for username verification on Next button click
-    if (q.key === 'name' || q.key === 'username') {
+    if (q.key === 'name') {
       console.log('🎯 Next button clicked for username question:', currentAnswer);
       if (currentAnswer && currentAnswer.trim()) {
         try {
@@ -1071,7 +1233,8 @@ function PoeticJourneyQuiz() {
   // Show existing user screen if user was found
   if (showExistingUserScreen && existingUser) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+      <Layout>
+        <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
         {/* Enhanced animated background with floating elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-green-50 to-emerald-50">
           {/* Animated gradient overlay */}
@@ -1327,29 +1490,34 @@ function PoeticJourneyQuiz() {
           </motion.div>
         </div>
       </div>
+      </Layout>
     );
   }
 
   if (showResults) {
     if (loadingResults) {
       return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F7E8] px-4 py-12">
-          <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] text-center">
-            <h1 className="text-3xl font-serif mb-4">Calculating your results...</h1>
-            <div className="text-lg text-[#A08C7D] italic">Please wait while we fetch your personalized results.</div>
+        <Layout>
+          <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F7E8] px-4 py-12">
+            <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] text-center">
+              <h1 className="text-3xl font-serif mb-4">Calculating your results...</h1>
+              <div className="text-lg text-[#A08C7D] italic">Please wait while we fetch your personalized results.</div>
+            </div>
           </div>
-        </div>
+        </Layout>
       );
     }
     if (apiError) {
       return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F7E8] px-4 py-12">
-          <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] text-center">
-            <h1 className="text-3xl font-serif mb-4">Error</h1>
-            <div className="text-lg text-red-600 italic mb-4">{apiError}</div>
-            <button className="bg-green-600 text-white px-6 py-2 rounded-xl" onClick={handleFinishQuiz}>Try Again</button>
+        <Layout>
+          <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9F7E8] px-4 py-12">
+            <div className="max-w-2xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-8 border border-[#A7D58E22] text-center">
+              <h1 className="text-3xl font-serif mb-4">Error</h1>
+              <div className="text-lg text-red-600 italic mb-4">{apiError}</div>
+              <button className="bg-green-600 text-white px-6 py-2 rounded-xl" onClick={handleFinishQuiz}>Try Again</button>
+            </div>
           </div>
-        </div>
+        </Layout>
       );
     }
     // Compose categoryEmissions to match ResultsDisplay's expected type
@@ -1371,32 +1539,34 @@ function PoeticJourneyQuiz() {
     
     // For recommendations, pass an empty array (or map if you have Recommendation[])
     return (
-      <ResultsDisplay
-        score={results?.finalScore || 0}
-        emissions={Number(results?.impactMetrics?.carbonReduced) || 0}
-        categoryEmissions={categoryEmissions}
-        recommendations={[]}
-        isVisible={true}
-        onReset={() => {
-          setShowResults(false);
-          setResults(null);
-          setStep(0);
-          setAnswers({});
-          setPersonalityTraits({});
-          setShowExistingUserScreen(false);
-          setExistingUser(null);
-        }}
-        onBack={() => {
-          setShowResults(false);
-          setResults(null);
-          // Go back to the welcome back screen
-          setShowExistingUserScreen(true);
-        }}
-        state={answers}
-        gender={answers.gender === 'female' ? 'girl' : 'boy'}
-        // Pass the comprehensivePowerMoves data directly
-        comprehensivePowerMoves={results?.comprehensivePowerMoves}
-      />
+      <Layout>
+        <ResultsDisplay
+          score={results?.finalScore || 0}
+          emissions={Number(results?.impactMetrics?.carbonReduced) || 0}
+          categoryEmissions={categoryEmissions}
+          recommendations={[]}
+          isVisible={true}
+          onReset={() => {
+            setShowResults(false);
+            setResults(null);
+            setStep(0);
+            setAnswers({});
+            setPersonalityTraits({});
+            setShowExistingUserScreen(false);
+            setExistingUser(null);
+          }}
+          onBack={() => {
+            setShowResults(false);
+            setResults(null);
+            // Go back to the welcome back screen
+            setShowExistingUserScreen(true);
+          }}
+          state={answers}
+          gender={answers.gender === 'female' ? 'girl' : 'boy'}
+          // Pass the comprehensivePowerMoves data directly
+          comprehensivePowerMoves={results?.comprehensivePowerMoves}
+        />
+      </Layout>
     );
   }
 
@@ -1409,7 +1579,7 @@ function PoeticJourneyQuiz() {
   console.log(`All answers so far:`, answers);
   
   // Special debug for username question
-  if (q.key === 'username' || q.key === 'name') {
+  if (q.key === 'name') {
     console.log('🎯 Username question detected!');
     console.log('Question type:', q.type);
     console.log('Question placeholder:', q.placeholder);
@@ -1503,7 +1673,7 @@ function PoeticJourneyQuiz() {
       
 
       
-      <div className="max-w-3xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-6 mb-6 border border-[#A7D58E22] relative z-10 max-h-[90vh] overflow-y-auto">
+      <div className="max-w-5xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-6 border border-[#A7D58E22] relative z-10 max-h-[90vh] overflow-y-auto">
         {/* Chapter Title */}
         <div className="mb-6">
           <h2 className="text-2xl md:text-3xl font-serif text-sage-800 text-center mb-2 tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700 }}>{section.title}</h2>
@@ -1518,12 +1688,12 @@ function PoeticJourneyQuiz() {
           )}
           <div className="text-xl md:text-2xl font-serif text-sage-800 text-center mt-4 mb-6 leading-tight" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>{q.question}</div>
         </div>
-        <div className="flex flex-wrap justify-center gap-3 mb-6">
+        <div className="flex flex-wrap justify-center gap-4 mb-8 max-w-4xl mx-auto">
           {q.key === 'country' ? (
             <select
               value={getNestedValue(answers, q.key) || ''}
               onChange={e => handleSelect(q.key, e.target.value)}
-              className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-md bg-white appearance-none transition-colors duration-200 hover:border-sage-300 text-sage-800"
+              className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-lg bg-white appearance-none transition-colors duration-200 hover:border-sage-300 text-sage-800"
               style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.25rem 1.25rem', paddingRight: '3rem', fontFamily: 'Inter, sans-serif' }}
             >
               <option value="" disabled>Enter your country</option>
@@ -1561,7 +1731,7 @@ function PoeticJourneyQuiz() {
                 return (
                   <select
                     disabled
-                    className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 bg-gray-100 text-gray-400 shadow-lg w-full max-w-md appearance-none"
+                    className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 bg-gray-100 text-gray-400 shadow-lg w-full max-w-lg appearance-none"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     <option value="">Select a country first</option>
@@ -1572,7 +1742,7 @@ function PoeticJourneyQuiz() {
                   <select
                     value={getNestedValue(answers, q.key) || ''}
                     onChange={e => handleSelect(q.key, e.target.value)}
-                    className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-md bg-white appearance-none transition-colors duration-200 hover:border-sage-300 text-sage-800"
+                    className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-lg bg-white appearance-none transition-colors duration-200 hover:border-sage-300 text-sage-800"
                     style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.25rem 1.25rem', paddingRight: '3rem', fontFamily: 'Inter, sans-serif' }}
                   >
                     <option value="" disabled>Select your city</option>
@@ -1588,7 +1758,7 @@ function PoeticJourneyQuiz() {
                     value={getNestedValue(answers, q.key) || ''}
                     onChange={e => handleSelect(q.key, e.target.value)}
                     placeholder="Enter your city"
-                    className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-md text-sage-800 placeholder-sage-400"
+                    className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-lg text-sage-800 placeholder-sage-400"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   />
                 );
@@ -1601,7 +1771,7 @@ function PoeticJourneyQuiz() {
                   key={opt.value}
                   onClick={() => handleSelect(q.key, opt.value)}
                   className={`rounded-xl px-8 py-4 text-base font-medium shadow-lg transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-sage-600 text-white border-sage-600 shadow-sage-200' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-300 hover:shadow-md'}`}
-                  style={{ minWidth: 140, fontFamily: 'Inter, sans-serif' }}
+                  style={{ minWidth: 180, fontFamily: 'Inter, sans-serif' }}
                 >
                   {opt.label}
                 </button>
@@ -1613,7 +1783,7 @@ function PoeticJourneyQuiz() {
                 key={opt.value}
                 onClick={() => handleSelect(q.key, opt.value)}
                 className={`rounded-xl px-8 py-4 text-base font-medium shadow-lg transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-sage-600 text-white border-sage-600 shadow-sage-200' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-300 hover:shadow-md'}`}
-                style={{ minWidth: 140, fontFamily: 'Inter, sans-serif' }}
+                style={{ minWidth: 180, fontFamily: 'Inter, sans-serif' }}
               >
                 {opt.label}
               </button>
@@ -1627,7 +1797,7 @@ function PoeticJourneyQuiz() {
                 handleSelect(q.key, e.target.value);
               }}
               placeholder={q.placeholder}
-              className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-md text-sage-800 placeholder-sage-400"
+              className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-lg text-sage-800 placeholder-sage-400"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
           ) : q.type === 'number' ? (
@@ -1636,7 +1806,7 @@ function PoeticJourneyQuiz() {
               value={getNestedValue(answers, q.key) || ''}
               onChange={e => handleSelect(q.key, e.target.value)}
               placeholder={q.placeholder}
-              className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-md text-sage-800 placeholder-sage-400"
+              className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-lg text-sage-800 placeholder-sage-400"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
           ) : q.type === 'yesno' ? (
@@ -1658,7 +1828,7 @@ function PoeticJourneyQuiz() {
             </div>
           ) : null}
         </div>
-        <div className="flex justify-between items-center mt-8 max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mt-8 max-w-5xl mx-auto">
           {/* Back Button */}
           <button
             onClick={handleBack}
@@ -1733,7 +1903,6 @@ function PoeticJourneyQuiz() {
 export default Quiz; 
 
 // PandaGifWithDelay: Shows a looping GIF with a 2s pause after each loop
-import React, { useRef, useEffect, useState } from 'react';
 const PANDA_GIF_URL = '/gif/panda.gif';
 const GIF_DURATION_MS = 2000; // Set this to the actual duration of your GIF in ms
 const PAUSE_MS = 2000; // 2s pause
