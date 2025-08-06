@@ -192,6 +192,9 @@ const Signup = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [waitlistPosition, setWaitlistPosition] = useState(0);
   const [returningUser, setReturningUser] = useState(false);
+  const [showExistingUserModal, setShowExistingUserModal] = useState(false);
+  
+
 
   // Check for returning user on component mount
   useEffect(() => {
@@ -267,6 +270,10 @@ const Signup = () => {
           <p className="text-sm">Welcome back! We'll prefill your information.</p>
         </div>
       )}
+
+      
+
+      
       <ChatSignup
         onComplete={async (data) => {
           setIsLoading(true);
@@ -285,14 +292,130 @@ const Signup = () => {
             setWaitlistPosition(response.waitlistPosition);
             localStorage.setItem('zerrah_user_id', response.user.id);
             setIsSuccess(true);
-          } catch (error) {
-            console.error('Signup error:', error);
-            // Optionally show error toast
+          } catch (error: any) {
+            console.error('=== SIGNUP ERROR DEBUG ===');
+            console.error('Full error object:', error);
+            console.error('Error type:', typeof error);
+            console.error('Error keys:', Object.keys(error || {}));
+            
+            // Log all possible error properties
+            if (error?.response) {
+              console.error('Error response:', error.response);
+              console.error('Response data:', error.response.data);
+              console.error('Response status:', error.response.status);
+            }
+            
+            if (error?.message) console.error('Error message:', error.message);
+            if (error?.error) console.error('Error error:', error.error);
+            if (error?.data) console.error('Error data:', error.data);
+            
+            // Check if it's an existing user error - check multiple possible error formats
+            const errorMessage = error?.message || error?.error || error?.response?.data?.error || error?.data?.error || JSON.stringify(error);
+            console.log('Final error message:', errorMessage);
+            console.log('Error message type:', typeof errorMessage);
+            
+            // Check the exact error format from the API response (axios error structure)
+            const apiError = error?.response?.data?.error || error?.error;
+            console.log('API error field:', apiError);
+            console.log('Response data:', error?.response?.data);
+            console.log('Response status:', error?.response?.status);
+            
+            // More comprehensive error checking
+            const isExistingUserError = 
+              errorMessage?.toLowerCase().includes('already exists') || 
+              errorMessage?.toLowerCase().includes('user with this email') ||
+              errorMessage?.toLowerCase().includes('email already exists') ||
+              errorMessage?.toLowerCase().includes('user exists') ||
+              errorMessage?.toLowerCase().includes('email exists') ||
+              errorMessage?.toLowerCase().includes('duplicate') ||
+              errorMessage?.toLowerCase().includes('already registered') ||
+              apiError?.toLowerCase().includes('already exists');
+            
+            console.log('Is existing user error:', isExistingUserError);
+            
+            if (isExistingUserError) {
+              console.log('✅ Setting modal to true');
+              setShowExistingUserModal(true);
+            } else {
+              console.log('❌ Not an existing user error');
+              console.log('Available error text:', errorMessage);
+              console.log('API error text:', apiError);
+              
+              // Force modal for testing if we see the exact error
+              if (apiError === "User with this email already exists") {
+                console.log('🎯 Exact match found - forcing modal');
+                setShowExistingUserModal(true);
+              }
+              
+              // Also check response data directly
+              if (error?.response?.data?.error === "User with this email already exists") {
+                console.log('🎯 Direct response match found - forcing modal');
+                setShowExistingUserModal(true);
+              }
+            }
           } finally {
             setIsLoading(false);
           }
         }}
       />
+      
+
+      
+
+      
+      {/* Existing User Modal */}
+      {showExistingUserModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[9999] p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center relative">
+            {/* Close button */}
+            <button
+              onClick={() => setShowExistingUserModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            {/* Panda Icon */}
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-emerald-50 flex items-center justify-center">
+              <img src="/gif/joyful_panda.gif" alt="Bobo" className="w-16 h-16" />
+            </div>
+            
+            {/* Title */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Welcome Back! 🎉
+            </h2>
+            
+            {/* Message */}
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              It looks like you've already joined our community! We're so happy to see you again. 
+              You can continue with your climate journey or check your personalized dashboard.
+            </p>
+            
+            {/* Buttons */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  setShowExistingUserModal(false);
+                  // Navigate to quiz using React Router
+                  window.location.href = '/quiz';
+                }}
+                className="w-full bg-emerald-500 text-white py-3 px-6 rounded-xl font-semibold hover:bg-emerald-600 transition-colors"
+              >
+                Continue Your Journey
+              </button>
+              
+              <button
+                onClick={() => setShowExistingUserModal(false)}
+                className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };

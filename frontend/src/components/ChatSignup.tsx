@@ -216,31 +216,63 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
   };
 
   return (
-    <div className="flex flex-col h-[70vh] max-h-[600px] w-full max-w-lg mx-auto bg-gray-50 rounded-2xl shadow-lg overflow-hidden">
+    <div className="flex flex-col h-[80vh] max-h-[800px] w-full max-w-2xl mx-auto bg-gray-50 rounded-3xl shadow-xl overflow-hidden">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'bot' ? 'items-start' : 'items-end justify-end'}`}>
-            {msg.role === 'bot' && <img src={pandaSrc} alt="panda" className="w-8 h-8 mr-2" />}
+            {msg.role === 'bot' && (
+              <div className="relative mr-3">
+                {/* Glowing background effect */}
+                <div className="absolute inset-0 bg-emerald-200/30 rounded-full blur-sm scale-110"></div>
+                {/* Icon container with enhanced styling */}
+                <div className="relative bg-white rounded-full p-1.5 shadow-lg border border-emerald-100">
+                  <img 
+                    src={pandaSrc} 
+                    alt="Bobo the Panda" 
+                    className="w-10 h-10 object-contain transition-transform duration-300 hover:scale-110" 
+                  />
+                </div>
+                {/* Subtle animation */}
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full opacity-60 animate-pulse"></div>
+              </div>
+            )}
             <div
-              className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line shadow ${msg.role === 'bot' ? 'bg-emerald-50 text-gray-900 border border-emerald-100' : 'bg-emerald-500 text-white'}`}
-              style={{ maxWidth: '80%' }}
+              className={`rounded-2xl px-6 py-4 text-base md:text-lg leading-relaxed whitespace-pre-line shadow-lg ${msg.role === 'bot' ? 'bg-emerald-50 text-gray-900 border border-emerald-100' : 'bg-emerald-500 text-white'}`}
+              style={{ maxWidth: '85%' }}
             >
-              {msg.text}
+              <div className="font-medium">
+                {msg.text}
+              </div>
             </div>
-            {msg.role === 'user' && <img src={penguinSrc} alt="penguin" className="w-8 h-8 ml-2" />}
+            {msg.role === 'user' && (
+              <div className="relative ml-3">
+                {/* Glowing background effect */}
+                <div className="absolute inset-0 bg-blue-200/30 rounded-full blur-sm scale-110"></div>
+                {/* Icon container with enhanced styling */}
+                <div className="relative bg-white rounded-full p-1.5 shadow-lg border border-blue-100">
+                  <img 
+                    src={penguinSrc} 
+                    alt="You" 
+                    className="w-10 h-10 object-contain transition-transform duration-300 hover:scale-110" 
+                  />
+                </div>
+                {/* Subtle animation */}
+                <div className="absolute -top-1 -left-1 w-3 h-3 bg-blue-400 rounded-full opacity-60 animate-pulse"></div>
+              </div>
+            )}
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
       {/* Input */}
       {!finished ? (
-        <div className="border-t p-3 flex gap-2 bg-white">
+        <div className="border-t p-4 flex gap-3 bg-white">
           {current.inputType === 'select' ? (
             <select
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              className="flex-1 border rounded px-3 py-2 text-sm"
+              className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-base font-medium focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all duration-200"
             >
               <option value="" disabled>{current.placeholder || 'Select...'}</option>
               {current.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
@@ -252,7 +284,7 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
               placeholder={current.placeholder}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKey}
-              className="flex-1 border rounded px-3 py-2 text-sm"
+              className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-base font-medium focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all duration-200"
             />
           )}
           <Button

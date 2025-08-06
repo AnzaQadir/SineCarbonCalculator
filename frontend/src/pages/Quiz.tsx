@@ -1545,9 +1545,9 @@ function PoeticJourneyQuiz() {
               <div className="absolute inset-0 bg-gradient-to-r from-sage-200/50 via-emerald-200/50 to-sage-200/50 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 scale-150"></div>
               
               {/* Icon container with elegant styling */}
-              <div className="relative bg-white/90 backdrop-blur-sm rounded-full p-6 shadow-2xl border border-sage-200/30 group-hover:border-sage-300/50 transition-all duration-300">
+              <div className="relative bg-white/90 backdrop-blur-sm rounded-full p-8 shadow-2xl border border-sage-200/30 group-hover:border-sage-300/50 transition-all duration-300">
                 <motion.span 
-                  style={{ fontSize: 48 }}
+                  style={{ fontSize: 64 }}
                   className="block"
                   animate={{ 
                     y: [0, -2, 0],
@@ -1583,7 +1583,7 @@ function PoeticJourneyQuiz() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-xl md:text-2xl font-serif text-sage-800 text-center mt-6 mb-6 leading-tight" 
+            className="text-2xl md:text-3xl lg:text-4xl font-serif text-sage-800 text-center mt-8 mb-8 leading-tight" 
             style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}
           >
             {q.question}
