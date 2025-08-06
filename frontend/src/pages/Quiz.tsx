@@ -514,14 +514,7 @@ function getSectionInfo(key: string, type?: string) {
       sub: 'How do you part with what no longer serves you?'
     };
   }
-  if ([
-    'airQuality.outdoorAirQuality', 'airQuality.aqiMonitoring', 'airQuality.indoorAirQuality', 'airQuality.airQualityCommuting', 'airQuality.airQualityImpact',
-  ].includes(key)) {
-    return {
-      title: 'Chapter VI: The Air Around You',
-      sub: 'How does the air you breathe feel—inside and out?'
-    };
-  }
+
   // Demographics
   return {
     title: 'Chapter VII: Your Story & Context',
@@ -791,38 +784,38 @@ function PoeticJourneyQuiz() {
       key: 'waste.prevention',
       header: 'Chapter 5: Waste & Wisdom',
       icon: '♻️',
-      question: 'Imagine a typical day—how do you stop waste from ever reaching your bin?',
+      question: 'How do you typically handle items before they become waste?',
       type: 'select',
       options: [
-        { value: 'A', label: 'Zero Waste Champion' },
-        { value: 'B', label: 'Consistent Reuser' },
-        { value: 'C', label: 'Occasional Reuser' },
-        { value: 'D', label: 'Basic Disposer' }
+        { value: 'A', label: 'I actively avoid creating waste (reuse containers, buy in bulk, compost)' },
+        { value: 'B', label: 'I often reuse items and try to reduce waste when possible' },
+        { value: 'C', label: 'I sometimes reuse items but mostly use disposable options' },
+        { value: 'D', label: 'I usually throw things away when I\'m done with them' }
       ]
     },
     {
       key: 'waste.smartShopping',
       header: 'Chapter 5: Waste & Wisdom',
       icon: '🛍️',
-      question: 'Every purchase and disposal shapes the waste we create. Which option best describes your everyday approach?',
+      question: 'When shopping, how do you think about packaging and waste?',
       type: 'select',
       options: [
-        { value: 'A', label: 'Conscious Consumer' },
-        { value: 'B', label: 'Balanced Shopper' },
-        { value: 'C', label: 'Convenience Shopper' }
+        { value: 'A', label: 'I choose products with minimal packaging and bring my own bags' },
+        { value: 'B', label: 'I try to avoid excess packaging when convenient' },
+        { value: 'C', label: 'I usually go with whatever is easiest and most convenient' }
       ]
     },
     {
       key: 'waste.dailyWaste',
       header: 'Chapter 5: Waste & Wisdom',
       icon: '🗑️',
-      question: 'How much waste do you typically generate in a day?',
+      question: 'How full is your trash bin at the end of a typical day?',
       type: 'select',
       options: [
-        { value: 'A', label: 'Minimal Waste' },
-        { value: 'B', label: 'Moderate Waste' },
-        { value: 'C', label: 'Regular Waste' },
-        { value: 'D', label: 'High Waste' }
+        { value: 'A', label: 'Almost empty (less than 1/4 full)' },
+        { value: 'B', label: 'Half full' },
+        { value: 'C', label: 'Mostly full (3/4 full)' },
+        { value: 'D', label: 'Full or overflowing' }
       ]
     },
     {
@@ -838,71 +831,7 @@ function PoeticJourneyQuiz() {
       ]
     },
 
-    // --- Air Quality ---
-    {
-      key: 'airQuality.outdoorAirQuality',
-      header: 'Chapter 6: Breath of Life',
-      icon: '🌬️',
-      question: 'Imagine stepping outside into your neighborhood. How would you describe the quality of the air you breathe?',
-      type: 'select',
-      options: [
-        { value: 'A', label: 'Fresh and Clean' },
-        { value: 'B', label: 'Generally Clear' },
-        { value: 'C', label: 'Sometimes Polluted' },
-        { value: 'D', label: 'Not Sure' },
-        { value: 'E', label: 'Mostly Polluted' }
-      ]
-    },
-    {
-      key: 'airQuality.aqiMonitoring',
-      header: 'Chapter 6: Breath of Life',
-      icon: '☀️',
-      question: 'Do you check the Air Quality Index (AQI) in your area to plan your day or outdoor activities?',
-      type: 'select',
-      options: [
-        { value: 'A', label: 'Active Monitoring' },
-        { value: 'B', label: 'Basic Awareness' },
-        { value: 'C', label: 'No Monitoring' }
-      ]
-    },
-    {
-      key: 'airQuality.indoorAirQuality',
-      header: 'Chapter 6: Breath of Life',
-      icon: '🏠',
-      question: 'How do you manage the air inside your home to keep it as fresh as possible?',
-      type: 'select',
-      options: [
-        { value: 'A', label: 'Air Purifiers & Plants' },
-        { value: 'B', label: 'Natural Ventilation' },
-        { value: 'C', label: 'Basic Management' },
-        { value: 'D', label: 'Not Considered' }
-      ]
-    },
-    {
-      key: 'airQuality.airQualityCommuting',
-      header: 'Chapter 6: Breath of Life',
-      icon: '🚶',
-      question: 'While commuting or running errands, do you make an effort to avoid times or areas with particularly poor air quality?',
-      type: 'select',
-      options: [
-        { value: 'A', label: 'Air Quality Conscious' },
-        { value: 'B', label: 'Sometimes Considerate' },
-        { value: 'C', label: 'Not Considered' },
-        { value: 'D', label: 'Never Thought About It' }
-      ]
-    },
-    {
-      key: 'airQuality.airQualityImpact',
-      header: 'Chapter 6: Breath of Life',
-      icon: '🌿',
-      question: 'Have you ever felt that changes in air quality affect your mood or energy levels?',
-      type: 'select',
-      options: [
-        { value: 'A', label: 'Low Impact' },
-        { value: 'B', label: 'Moderate Impact' },
-        { value: 'C', label: 'High Impact' }
-      ]
-    },
+
 
     // --- Demographics ---
     {
@@ -1235,258 +1164,176 @@ function PoeticJourneyQuiz() {
     return (
       <Layout>
         <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-        {/* Enhanced animated background with floating elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-green-50 to-emerald-50">
-          {/* Animated gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-green-100/20 via-transparent to-amber-100/20 animate-pulse"></div>
-          
-          {/* Floating leaves with better positioning and timing */}
-          <motion.div 
-            animate={{ y: [-10, 10, -10] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-20 left-10 w-8 h-8 bg-green-200 rounded-full opacity-40"
-          ></motion.div>
-          <motion.div 
-            animate={{ y: [10, -10, 10] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="absolute top-40 right-20 w-6 h-6 bg-amber-200 rounded-full opacity-50"
-          ></motion.div>
-          <motion.div 
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-            className="absolute bottom-32 left-1/4 w-4 h-4 bg-emerald-200 rounded-full opacity-60"
-          ></motion.div>
-          <motion.div 
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-20 right-1/3 w-10 h-10 bg-green-100 rounded-full opacity-30"
-          ></motion.div>
-          
-          {/* Additional floating elements */}
-          <motion.div 
-            animate={{ x: [-5, 5, -5] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/3 left-1/4 w-3 h-3 bg-yellow-200 rounded-full opacity-40"
-          ></motion.div>
-          <motion.div 
-            animate={{ opacity: [0.3, 0.8, 0.3] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute top-2/3 right-1/4 w-5 h-5 bg-emerald-100 rounded-full"
-          ></motion.div>
-          
-          {/* Subtle pattern overlay with better opacity */}
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}></div>
+        {/* Clean, minimal background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50">
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-100/10 via-transparent to-emerald-100/10"></div>
         </div>
 
-        {/* Main content container */}
-        <div className="relative z-10 max-w-4xl w-full mx-auto px-8 py-16">
-          {/* Card with enhanced styling */}
+                 {/* Main content container */}
+         <div className="relative z-10 max-w-4xl w-full mx-auto px-8 py-16">
+           {/* Back Button */}
+           <motion.div
+             initial={{ opacity: 0, x: -20 }}
+             animate={{ opacity: 1, x: 0 }}
+             transition={{ duration: 0.6, delay: 0.2 }}
+             className="mb-8"
+           >
+             <button
+               onClick={() => {
+                 setShowExistingUserScreen(false);
+                 setExistingUser(null);
+                 // Go back to the name question specifically
+                 const nameQuestionIndex = questions.findIndex(q => q.key === 'name');
+                 setStep(nameQuestionIndex >= 0 ? nameQuestionIndex : 0);
+               }}
+               className="group relative flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm border-2 border-slate-200/60 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 shadow-lg hover:shadow-xl rounded-2xl"
+             >
+               {/* Background glow effect */}
+               <div className="absolute inset-0 bg-gradient-to-r from-slate-100/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+               
+               {/* Icon with enhanced animation */}
+               <div className="relative z-10 flex items-center justify-center w-6 h-6 bg-slate-100 rounded-full group-hover:bg-slate-200 transition-colors duration-300">
+                 <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                 </svg>
+               </div>
+               
+               {/* Text */}
+               <span className="relative z-10 font-semibold">Back</span>
+             </button>
+           </motion.div>
+
+           {/* Card with sleek styling */}
           <motion.div 
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-12 border border-green-100/50 relative overflow-hidden"
+            className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-16 border border-slate-200/50 relative overflow-hidden"
           >
-            {/* Enhanced decorative corner elements */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 0.4, scale: 1 }}
-              transition={{ duration: 1, delay: 0.3 }}
-              className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-green-300 to-transparent rounded-br-3xl"
-            ></motion.div>
-            <motion.div 
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 0.4, scale: 1 }}
-              transition={{ duration: 1, delay: 0.5 }}
-              className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-amber-300 to-transparent rounded-tl-3xl"
-            ></motion.div>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.2 }}
-              transition={{ duration: 1.5, delay: 0.7 }}
-              className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-emerald-200 to-transparent rounded-bl-3xl"
-            ></motion.div>
             
-            {/* Panda container with enhanced styling */}
+            {/* Panda container with sleek styling */}
             <motion.div 
               initial={{ scale: 0.8, rotate: -5 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative mb-8"
+              className="relative mb-12"
             >
-                             {/* Enhanced glowing background circle */}
-               <motion.div 
-                 animate={{ 
-                   scale: [1, 1.1, 1],
-                   opacity: [0.3, 0.6, 0.3]
-                 }}
-                 transition={{ 
-                   duration: 3, 
-                   repeat: Infinity, 
-                   ease: "easeInOut" 
-                 }}
-                 className="absolute inset-0 bg-gradient-to-r from-green-200 via-amber-200 to-emerald-200 rounded-full blur-2xl"
-               ></motion.div>
-               
-               {/* Panda image with enhanced border and glow */}
+               {/* Panda image with elegant styling */}
                <div className="relative">
                  <motion.img 
                    src="/gif/joyful_panda.gif" 
                    alt="Joyful Panda" 
                    className="w-48 h-48 mx-auto rounded-full shadow-2xl border-4 border-white/90 relative z-10"
-                   whileHover={{ scale: 1.05 }}
+                   whileHover={{ scale: 1.02 }}
                    transition={{ duration: 0.3 }}
                  />
-                 
-                 {/* Enhanced floating sparkles around panda */}
-                 <motion.div 
-                   animate={{ 
-                     scale: [1, 1.3, 1],
-                     opacity: [0.6, 1, 0.6]
-                   }}
-                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                   className="absolute -top-2 -left-2 w-4 h-4 bg-yellow-300 rounded-full shadow-lg"
-                 ></motion.div>
-                 <motion.div 
-                   animate={{ 
-                     scale: [1, 1.2, 1],
-                     opacity: [0.7, 1, 0.7]
-                   }}
-                   transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                   className="absolute -top-1 -right-1 w-3 h-3 bg-green-300 rounded-full shadow-lg"
-                 ></motion.div>
-                 <motion.div 
-                   animate={{ 
-                     scale: [1, 1.4, 1],
-                     opacity: [0.5, 1, 0.5]
-                   }}
-                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                   className="absolute -bottom-1 -left-3 w-3 h-3 bg-amber-300 rounded-full shadow-lg"
-                 ></motion.div>
-                 
-                 {/* Additional sparkles */}
-                 <motion.div 
-                   animate={{ 
-                     rotate: [0, 360],
-                     opacity: [0.3, 0.8, 0.3]
-                   }}
-                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                   className="absolute -top-3 right-2 w-2 h-2 bg-blue-300 rounded-full"
-                 ></motion.div>
                </div>
             </motion.div>
 
-            {/* Welcome text with enhanced typography */}
-                         <motion.div
-               initial={{ opacity: 0, y: 10 }}
-               animate={{ opacity: 1, y: 0 }}
-               transition={{ duration: 0.6, delay: 0.4 }}
-               className="text-center mb-12"
-             >
-               <motion.h1 
-                 initial={{ opacity: 0, scale: 0.9 }}
-                 animate={{ opacity: 1, scale: 1 }}
-                 transition={{ duration: 0.8, delay: 0.6 }}
-                 className="text-5xl md:text-7xl font-serif mb-6 text-sage-900 leading-tight" 
-                 style={{ 
-                   fontFamily: 'Cormorant Garamond, serif',
-                   fontWeight: 800,
-                   background: 'linear-gradient(135deg, #2D5016 0%, #4A7C59 50%, #7A8B7A 100%)',
-                   WebkitBackgroundClip: 'text',
-                   WebkitTextFillColor: 'transparent',
-                   backgroundClip: 'text'
-                 }}
-               >
-                 Welcome back, {existingUser.firstName || existingUser.email}!
-               </motion.h1>
-               
-               <motion.p 
-                 initial={{ opacity: 0, y: 5 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ duration: 1, delay: 0.8 }}
-                 className="text-2xl md:text-3xl text-sage-700 italic leading-relaxed max-w-2xl mx-auto font-medium"
-                 style={{ fontFamily: 'Inter, sans-serif', fontStyle: 'italic' }}
-               >
-                 We already know a glimpse of your story. Let's see your personalized results.
-               </motion.p>
-               
-               {/* Decorative line */}
-               <motion.div
-                 initial={{ width: 0 }}
-                 animate={{ width: "100px" }}
-                 transition={{ duration: 1, delay: 1.2 }}
-                 className="h-1 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full mx-auto mt-6"
-               ></motion.div>
-             </motion.div>
+            {/* Welcome text with sleek typography */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="text-center mb-12"
+            >
+              <motion.h1 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="text-5xl md:text-6xl font-serif mb-8 text-slate-900 leading-tight" 
+                style={{ 
+                  fontFamily: 'Cormorant Garamond, serif',
+                  fontWeight: 700
+                }}
+              >
+                Welcome back, {existingUser.firstName || existingUser.email}!
+              </motion.h1>
+              
+              <motion.p 
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.8 }}
+                className="text-xl md:text-2xl text-slate-600 leading-relaxed max-w-2xl mx-auto font-light"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                We already know a glimpse of your story. Let's see your personalized results.
+              </motion.p>
+              
+              {/* Elegant separator */}
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "80px" }}
+                transition={{ duration: 1, delay: 1.2 }}
+                className="h-px bg-gradient-to-r from-slate-300 to-slate-400 rounded-full mx-auto mt-8"
+              ></motion.div>
+            </motion.div>
 
-            {/* Enhanced CTA button */}
-                         <motion.div
-               initial={{ opacity: 0, y: 10 }}
-               animate={{ opacity: 1, y: 0 }}
-               transition={{ duration: 0.6, delay: 0.8 }}
-               className="text-center"
-             >
-               <motion.button 
-                 onClick={async () => {
-                   setLoadingResults(true);
-                   try {
-                     // Use the pre-filled answers to calculate personality
-                     const apiPayload = {
-                       ...transformStateToApiFormat(answers),
-                       personalityTraits
-                     };
-                     const apiResults = await calculatePersonality(apiPayload);
-                     setResults(apiResults);
-                     setShowResults(true);
-                     setShowExistingUserScreen(false);
-                   } catch (error) {
-                     setApiError('Failed to fetch results. Please try again.');
-                   } finally {
-                     setLoadingResults(false);
-                   }
-                 }}
-                 disabled={loadingResults}
-                 whileHover={{ scale: 1.05, y: -2 }}
-                 whileTap={{ scale: 0.98 }}
-                 className="group relative inline-flex items-center gap-4 px-12 py-6 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-2xl font-serif rounded-3xl shadow-2xl hover:shadow-3xl hover:from-green-500 hover:to-emerald-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
-                 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700 }}
-               >
+            {/* Sleek CTA button */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="text-center"
+            >
+              <motion.button 
+                onClick={async () => {
+                  setLoadingResults(true);
+                  try {
+                    // Use the pre-filled answers to calculate personality
+                    const apiPayload = {
+                      ...transformStateToApiFormat(answers),
+                      personalityTraits
+                    };
+                    const apiResults = await calculatePersonality(apiPayload);
+                    setResults(apiResults);
+                    setShowResults(true);
+                    setShowExistingUserScreen(false);
+                  } catch (error) {
+                    setApiError('Failed to fetch results. Please try again.');
+                  } finally {
+                    setLoadingResults(false);
+                  }
+                }}
+                disabled={loadingResults}
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative inline-flex items-center gap-4 px-12 py-5 bg-gradient-to-r from-[#FA8072] to-[#FFB6C1] text-white text-xl font-medium rounded-2xl shadow-xl hover:shadow-2xl hover:from-[#FFB6C1] hover:to-[#FA8072] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
                 {/* Button background glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
-                                 {/* Loading spinner */}
-                 {loadingResults && (
-                   <motion.div
-                     animate={{ rotate: 360 }}
-                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                     className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full"
-                   />
-                 )}
-                 
-                 {/* Button text */}
-                 <span className="relative z-10">
-                   {loadingResults ? 'Calculating...' : 'See Results'}
-                 </span>
-                 
-                 {/* Arrow icon */}
-                 {!loadingResults && (
-                   <motion.svg 
-                     className="w-6 h-6 relative z-10 group-hover:translate-x-1 transition-transform duration-200" 
-                     fill="none" 
-                     stroke="currentColor" 
-                     viewBox="0 0 24 24"
-                   >
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                   </motion.svg>
-                                  )}
-               </motion.button>
-             </motion.div>
+                {/* Loading spinner */}
+                {loadingResults && (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                  />
+                )}
+                
+                {/* Button text */}
+                <span className="relative z-10">
+                  {loadingResults ? 'Calculating...' : 'See Results'}
+                </span>
+                
+                {/* Arrow icon */}
+                {!loadingResults && (
+                  <motion.svg 
+                    className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform duration-200" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </motion.svg>
+                )}
+              </motion.button>
+            </motion.div>
 
-            {/* Subtle decorative elements */}
-            <div className="absolute bottom-4 left-4 w-2 h-2 bg-green-300 rounded-full opacity-60"></div>
-            <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-amber-300 rounded-full opacity-60"></div>
+
           </motion.div>
         </div>
       </div>
@@ -1539,34 +1386,33 @@ function PoeticJourneyQuiz() {
     
     // For recommendations, pass an empty array (or map if you have Recommendation[])
     return (
-      <Layout>
-        <ResultsDisplay
-          score={results?.finalScore || 0}
-          emissions={Number(results?.impactMetrics?.carbonReduced) || 0}
-          categoryEmissions={categoryEmissions}
-          recommendations={[]}
-          isVisible={true}
-          onReset={() => {
-            setShowResults(false);
-            setResults(null);
-            setStep(0);
-            setAnswers({});
-            setPersonalityTraits({});
-            setShowExistingUserScreen(false);
-            setExistingUser(null);
-          }}
-          onBack={() => {
-            setShowResults(false);
-            setResults(null);
-            // Go back to the welcome back screen
-            setShowExistingUserScreen(true);
-          }}
-          state={answers}
-          gender={answers.gender === 'female' ? 'girl' : 'boy'}
-          // Pass the comprehensivePowerMoves data directly
-          comprehensivePowerMoves={results?.comprehensivePowerMoves}
-        />
-      </Layout>
+      <ResultsDisplay
+        score={results?.finalScore || 0}
+        emissions={Number(results?.impactMetrics?.carbonReduced) || 0}
+        categoryEmissions={categoryEmissions}
+        recommendations={[]}
+        isVisible={true}
+        onReset={() => {
+          setShowResults(false);
+          setResults(null);
+          setStep(0);
+          setAnswers({});
+          setPersonalityTraits({});
+          setShowExistingUserScreen(false);
+          setExistingUser(null);
+        }}
+        onBack={() => {
+          setShowResults(false);
+          setResults(null);
+          // Go back to the welcome back screen while preserving all quiz data
+          setShowExistingUserScreen(true);
+          // All quiz data (answers, personalityTraits, existingUser) remains intact
+        }}
+        state={answers}
+        gender={answers.gender === 'female' ? 'girl' : 'boy'}
+        // Pass the comprehensivePowerMoves data directly
+        comprehensivePowerMoves={results?.comprehensivePowerMoves}
+      />
     );
   }
 
@@ -1684,9 +1530,64 @@ function PoeticJourneyQuiz() {
           {q.type === 'personality' ? (
             <PandaGifWithDelay gifUrl={step % 2 === 0 ? '/gif/joyful_panda.gif' : '/gif/panda.gif'} />
           ) : (
-            <span style={{ fontSize: 36 }}>{q.icon}</span>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              whileHover={{ 
+                scale: 1.1, 
+                rotate: [0, -5, 5, 0],
+                transition: { duration: 0.6 }
+              }}
+              className="relative group"
+            >
+              {/* Glowing background circle */}
+              <div className="absolute inset-0 bg-gradient-to-r from-sage-200/50 via-emerald-200/50 to-sage-200/50 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 scale-150"></div>
+              
+              {/* Icon container with elegant styling */}
+              <div className="relative bg-white/90 backdrop-blur-sm rounded-full p-6 shadow-2xl border border-sage-200/30 group-hover:border-sage-300/50 transition-all duration-300">
+                <motion.span 
+                  style={{ fontSize: 48 }}
+                  className="block"
+                  animate={{ 
+                    y: [0, -2, 0],
+                    transition: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                  }}
+                >
+                  {q.icon}
+                </motion.span>
+              </div>
+              
+              {/* Floating sparkles */}
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.8, 0.3],
+                  rotate: [0, 180, 360]
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-2 -right-2 w-3 h-3 bg-yellow-300 rounded-full opacity-0 group-hover:opacity-100"
+              />
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.3, 1],
+                  opacity: [0.4, 0.9, 0.4],
+                  rotate: [360, 180, 0]
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-300 rounded-full opacity-0 group-hover:opacity-100"
+              />
+            </motion.div>
           )}
-          <div className="text-xl md:text-2xl font-serif text-sage-800 text-center mt-4 mb-6 leading-tight" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>{q.question}</div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-xl md:text-2xl font-serif text-sage-800 text-center mt-6 mb-6 leading-tight" 
+            style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}
+          >
+            {q.question}
+          </motion.div>
         </div>
         <div className="flex flex-wrap justify-center gap-4 mb-8 max-w-4xl mx-auto">
           {q.key === 'country' ? (

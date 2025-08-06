@@ -328,7 +328,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     const [showJourney, setShowJourney] = useState(false);
   const [showStoryModal, setShowStoryModal] = useState(false);
   const [activeSection, setActiveSection] = useState<'climate-self' | 'climate-signature' | 'take-action'>('climate-self');
-  const [showActionDrawer, setShowActionDrawer] = useState(false);
+
  
   const journeyRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -895,36 +895,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             </div>
 
         <div className="max-w-4xl mx-auto px-6 py-12 space-y-16 relative z-10">
-          {/* Enhanced Header with Back Button and Action Drawer Toggle */}
-          <div className="flex justify-between items-center mb-12">
-          {/* Back Button */}
-          {onBack && (
-              <Button
-                onClick={onBack}
-                variant="outline"
-                className="relative group bg-white/80 backdrop-blur-sm border-sage-200/60 text-sage-700 hover:bg-sage-50 hover:border-sage-300 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-3 px-6 py-3 rounded-2xl"
-              >
-                <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-300" />
-                <span className="font-medium">Back to Quiz</span>
-              </Button>
-            )}
-            
-            {/* Enhanced Action Drawer Toggle Button */}
-            <button
-              onClick={() => setShowActionDrawer(true)}
-              className="relative group overflow-hidden bg-gradient-to-r from-sage-500 via-emerald-500 to-sage-600 text-white px-8 py-4 rounded-3xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 flex items-center gap-4"
-            >
-              {/* Glow Effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-sage-400/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
-              {/* Button Content */}
-              <div className="relative flex items-center gap-4">
-                <div className="w-4 h-4 bg-white rounded-full shadow-sm"></div>
-                <span className="font-semibold text-lg">Take Action</span>
-                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-          </div>
-            </button>
-          </div>
+
 
           {/* Ultra-Classy Toggle Section */}
           <div className="flex justify-center mb-16">
@@ -1177,127 +1148,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
            </div>
          </div>
 
-         {/* Ultra-Classy Action Navigation Drawer */}
-         {showActionDrawer && (
-           <div className="fixed inset-0 bg-black/60 backdrop-blur-xl z-50 flex items-center justify-center p-4">
-             <motion.div
-               initial={{ scale: 0.8, opacity: 0, y: 20 }}
-               animate={{ scale: 1, opacity: 1, y: 0 }}
-               exit={{ scale: 0.8, opacity: 0, y: 20 }}
-               transition={{ duration: 0.5, ease: "easeOut" }}
-               className="relative bg-white/98 backdrop-blur-3xl rounded-3xl p-10 shadow-3xl border border-sage-200/40 max-w-3xl w-full overflow-hidden"
-             >
-               {/* Sophisticated Background Pattern */}
-               <div className="absolute inset-0 opacity-[0.01]" style={{
-                 backgroundImage: `
-                   linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
-                   linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
-                 `,
-                 backgroundSize: '40px 40px'
-               }}></div>
-               
-               {/* Radial Gradient Overlay */}
-               <div className="absolute inset-0 bg-radial-gradient from-sage-50/30 via-transparent to-transparent"></div>
-               {/* Enhanced Close Button */}
-               <button
-                 onClick={() => setShowActionDrawer(false)}
-                 className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-2xl hover:bg-gray-50 hover:scale-110 transition-all duration-300 border border-gray-200/50 z-20"
-               >
-                 <X className="h-7 w-7 text-gray-700" />
-               </button>
-               
-               {/* Enhanced Drawer Header */}
-               <div className="text-center mb-10 relative z-10">
-                 <div className="flex items-center justify-center gap-6 mb-6">
-                   <div className="w-16 h-16 bg-gradient-to-br from-sage-500 via-emerald-500 to-sage-600 rounded-3xl flex items-center justify-center shadow-2xl">
-                     <Zap className="w-8 h-8 text-white" />
-                   </div>
-                   <h2 className="text-4xl font-bold bg-gradient-to-r from-sage-700 via-emerald-700 to-sage-800 bg-clip-text text-transparent">
-                     Choose Your Action
-                   </h2>
-                 </div>
-                 <p className="text-xl text-sage-600 font-medium">
-                   Select your next step on your sustainability journey
-                 </p>
-                 <div className="w-32 h-1 bg-gradient-to-r from-sage-300 to-emerald-300 mx-auto mt-6 rounded-full"></div>
-             </div>
-             
-               {/* Enhanced Action Cards Grid */}
-               <div className="grid grid-cols-1 gap-8 relative z-10">
-                 {/* Generate Your Story */}
-                 <button
-                   onClick={async () => {
-                     setShowActionDrawer(false);
-                     await generateStory();
-                     setShowStoryModal(true);
-                   }}
-                   disabled={isGeneratingStory}
-                   className="group relative overflow-hidden bg-gradient-to-r from-red-50 via-orange-50 to-red-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 border border-red-200/30"
-                 >
-                   {/* Card Glow Effect */}
-                   <div className="absolute inset-0 bg-gradient-to-r from-red-400/5 to-orange-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                   
-                   <div className="flex items-center gap-6">
-                     <div className="w-16 h-16 bg-gradient-to-br from-red-500 via-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-500">
-                       <BookOpen className="h-8 w-8 text-white" />
-               </div>
-                     <div className="flex-1 text-left">
-                       <h3 className="text-2xl font-bold text-gray-900 mb-2">Generate Your Story</h3>
-                       <p className="text-base text-gray-600 leading-relaxed">Transform your climate journey into an inspiring story that motivates others</p>
-                     </div>
-                     <ArrowRight className="h-6 w-6 text-red-500 group-hover:translate-x-2 transition-transform duration-500" />
-                   </div>
-                 </button>
-                 
-                 {/* Personalized Recommendations */}
-                 <button
-                   onClick={() => {
-                     setShowActionDrawer(false);
-                     navigate('/recommendations');
-                   }}
-                   className="group relative overflow-hidden bg-gradient-to-r from-yellow-50 via-amber-50 to-yellow-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 border border-yellow-200/30"
-                 >
-                   {/* Card Glow Effect */}
-                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 to-amber-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                   
-                   <div className="flex items-center gap-6">
-                     <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 via-amber-500 to-yellow-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-500">
-                       <Lightbulb className="h-8 w-8 text-white" />
-           </div>
-                     <div className="flex-1 text-left">
-                       <h3 className="text-2xl font-bold text-gray-900 mb-2">Personalized Recommendations</h3>
-                       <p className="text-base text-gray-600 leading-relaxed">Get actionable steps tailored to your unique lifestyle that will maximize your impact</p>
-                     </div>
-                     <ArrowRight className="h-6 w-6 text-yellow-500 group-hover:translate-x-2 transition-transform duration-500" />
-                   </div>
-                 </button>
-                 
-                 {/* Journalize Your Journey */}
-                 <button
-                   onClick={() => {
-                     setShowActionDrawer(false);
-                     console.log('Journalize clicked');
-                   }}
-                   className="group relative overflow-hidden bg-gradient-to-r from-sage-50 via-blue-50 to-sage-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-500 border border-sage-200/30"
-                 >
-                   {/* Card Glow Effect */}
-                   <div className="absolute inset-0 bg-gradient-to-r from-sage-400/5 to-blue-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                   
-                   <div className="flex items-center gap-6">
-                     <div className="w-16 h-16 bg-gradient-to-br from-sage-500 via-blue-500 to-sage-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-500">
-                       <PenTool className="h-8 w-8 text-white" />
-                     </div>
-                     <div className="flex-1 text-left">
-                       <h3 className="text-2xl font-bold text-gray-900 mb-2">Journalize Your Journey</h3>
-                       <p className="text-base text-gray-600 leading-relaxed">Track your progress, celebrate wins, and build lasting sustainable habits</p>
-                     </div>
-                     <ArrowRight className="h-6 w-6 text-sage-500 group-hover:translate-x-2 transition-transform duration-500" />
-                   </div>
-                 </button>
-               </div>
-             </motion.div>
-           </div>
-         )}
+
 
          </div>
            </div>
