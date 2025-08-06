@@ -53,7 +53,7 @@ function parseDatabaseUrl(url: string) {
 
 const dbConfig = parseDatabaseUrl(process.env.DATABASE_URL);
 
-console.log('Parsed database config:', {
+console.log('Parsed database config:', process.env.DATABASE_URL, {
   username: dbConfig.username,
   host: dbConfig.host,
   port: dbConfig.port,
@@ -70,13 +70,10 @@ const sequelize = new Sequelize({
   password: dbConfig.password,
   logging: false,
   dialectOptions: {
-    ssl: process.env.NODE_ENV === 'production' ? {
+    ssl: {
       require: true,
-      rejectUnauthorized: false,
-      ca: undefined,
-      key: undefined,
-      cert: undefined
-    } : false
+      rejectUnauthorized: false
+    }
   },
   pool: {
     max: 5,
