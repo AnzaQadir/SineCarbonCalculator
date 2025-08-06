@@ -60,7 +60,8 @@ app.use((req, res, next) => {
         'http://localhost:3000',
         'http://localhost:5173',
         'http://localhost:4173',
-        'http://localhost:8080'
+        'http://localhost:8080',
+        'http://localhost:8081'
     ];
     const origin = req.headers.origin;
     if (origin && allowedOrigins.includes(origin)) {
