@@ -265,11 +265,7 @@ const Signup = () => {
   // Conversational signup flow
   return (
     <Layout>
-      {returningUser && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-emerald-100 border border-emerald-300 text-emerald-800 px-4 py-2 rounded-lg shadow-lg">
-          <p className="text-sm">Welcome back! We'll prefill your information.</p>
-        </div>
-      )}
+
 
       
 

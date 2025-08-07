@@ -746,7 +746,7 @@ function PoeticJourneyQuiz() {
       key: 'clothing.durability',
       header: 'Chapter 4: Style & Substance',
       icon: '⏰',
-      question: 'How long do your clothes typically last?',
+      question: 'How would you describe your wardrobe shopping style?',
       type: 'select',
       options: [
         { value: 'A', label: 'Long-lasting Items' },
@@ -773,9 +773,10 @@ function PoeticJourneyQuiz() {
       question: 'How do you choose your clothing brands?',
       type: 'select',
       options: [
-        { value: 'A', label: 'Brand Conscious' },
-        { value: 'B', label: 'Flexible Shopper' },
-        { value: 'C', label: 'Variety Seeker' }
+        { value: 'A', label: 'Price and convenience: If it\'s affordable and easy to find, I\'m in' },
+        { value: 'B', label: 'Style and fit: I go for what looks good and feels right, brand comes second' },
+        { value: 'C', label: 'Reputation and values: I try to support brands that align with my ethics' },
+        { value: 'D', label: 'I don\'t really think about it: I just grab what I need when I need it' }
       ]
     },
 
@@ -827,7 +828,8 @@ function PoeticJourneyQuiz() {
       options: [
         { value: 'A', label: 'Always Repair' },
         { value: 'B', label: 'Sometimes Repair' },
-        { value: 'C', label: 'Usually Replace' }
+        { value: 'C', label: 'Usually Replace' },
+        { value: 'D', label: 'Always Replace' }
       ]
     },
 

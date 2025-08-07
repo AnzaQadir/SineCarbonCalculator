@@ -1153,18 +1153,18 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                
                {/* Radial Gradient Overlay */}
                <div className="absolute inset-0 bg-radial-gradient from-sage-50/50 via-transparent to-transparent"></div>
-                 </div>
-             
+           </div>
+
                           {/* Enhanced Header Section */}
              <div className="text-center space-y-8 relative z-10">
-               <div className="text-center space-y-4">
+             <div className="text-center space-y-4">
                  <h2 className="text-5xl md:text-6xl font-bold text-black leading-tight tracking-tight">
                    Your Signature
-                 </h2>
+              </h2>
                  <div className="w-32 h-0.5 bg-gradient-to-r from-sage-400 via-sage-500 to-sage-600 mt-4 rounded-full mx-auto"></div>
                </div>
                <p className="text-2xl text-black max-w-4xl mx-auto leading-relaxed font-light tracking-wide">
-                 These quiet patterns reveal where you already lead with care—and where small changes can ripple outward
+                 Your current habits are the foundation—let's build on what's working and transform what isn't
                </p>
             </div>
 
@@ -1529,8 +1529,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      {/* Top Icon with Enhanced Styling */}
                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-red-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg">
                        <BookOpen className="h-10 w-10 text-red-600" />
-          </div>
-          
+              </div>
+
                      {/* Title with Gradient */}
                      <h3 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">Generate Your Story</h3>
                      
@@ -1541,7 +1541,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      <div className="flex items-center justify-center gap-2 mt-2">
                        <div className="px-3 py-1 bg-red-100 rounded-full">
                          <span className="text-xs font-semibold text-red-600">High Impact</span>
-                  </div>
+            </div>
           </div>
 
                      {/* Central Icon with Animation */}
@@ -1554,7 +1554,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                            <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"/>
                          </svg>
                   </div>
-                </div>
+        </div>
 
                      {/* Enhanced Get Started Button */}
                                             <div className="flex items-center justify-center mt-6">
@@ -1562,11 +1562,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                            <span className="relative z-10">Start Creating Impact</span>
                            <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                    </div>
-                  </div>
-                    </div>
+            </div>
+                </div>
+            </div>
                  </button>
-                  </div>
+          </div>
           
 
 
@@ -1582,7 +1582,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      {/* Top Icon with Enhanced Styling */}
                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-sage-100 to-blue-100 rounded-2xl flex items-center justify-center group-hover:from-sage-200 group-hover:to-blue-200 transition-all duration-300 shadow-lg">
                        <PenTool className="h-10 w-10 text-sage-600" />
-                    </div>
+                  </div>
                      
                      {/* Title with Gradient */}
                      <h3 className="text-xl font-bold bg-gradient-to-r from-sage-600 to-blue-600 bg-clip-text text-transparent">Journalize Your Journey</h3>
@@ -1613,7 +1613,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                            <circle cx="12" cy="16" r="1" fill="currentColor" className="text-sage-600"/>
                            <circle cx="20" cy="16" r="1" fill="currentColor" className="text-sage-600"/>
                          </svg>
-              </div>
+                    </div>
                   </div>
                      
                      {/* Enhanced Get Started Button */}
@@ -1622,11 +1622,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                            <span className="relative z-10">Track Your Growth</span>
                            <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                </div>
-                </div>
+                    </div>
                   </div>
+                    </div>
                  </button>
-                  </div>
+                </div>
 
                {/* View Personalized Recommendations Button */}
                <div className="group relative">
@@ -1640,7 +1640,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      {/* Top Icon with Enhanced Styling */}
                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-yellow-100 to-amber-100 rounded-2xl flex items-center justify-center group-hover:from-yellow-200 group-hover:to-amber-200 transition-all duration-300 shadow-lg">
                        <Lightbulb className="h-10 w-10 text-yellow-600" />
-                   </div>
+              </div>
 
                      {/* Title with Gradient */}
                      <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">Personalized Recommendations</h3>
@@ -1652,8 +1652,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      <div className="flex items-center justify-center gap-2 mt-2">
                        <div className="px-3 py-1 bg-yellow-100 rounded-full">
                          <span className="text-xs font-semibold text-yellow-600">Smart Action</span>
-                   </div>
-                 </div>
+                  </div>
+                </div>
 
                      {/* Central Icon with Animation */}
                      <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
@@ -1666,8 +1666,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                            <circle cx="12" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
                            <circle cx="20" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
                          </svg>
-                   </div>
-                 </div>
+                </div>
+                  </div>
 
                      {/* Enhanced Get Started Button */}
                      <div className="flex items-center justify-center mt-6">
@@ -1675,8 +1675,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                          <span className="relative z-10">Discover Your Path</span>
                          <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                   </div>
-                 </div>
+                  </div>
+                </div>
                    </div>
                  </button>
                </div>
