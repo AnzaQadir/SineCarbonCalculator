@@ -906,7 +906,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 <ArrowLeft className="h-5 w-5 text-sage-600 group-hover:text-sage-700 transition-colors" />
                 <span className="font-semibold text-sage-700 group-hover:text-sage-800 transition-colors">Back</span>
               </button>
-            </div>
+          </div>
           )}
 
 
@@ -1073,8 +1073,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
              <div className="text-center max-w-3xl mx-auto mb-8">
                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-md border border-sage-100">
                  <p className="text-lg text-sage-600 leading-relaxed">
-                   {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
-                 </p>
+                 {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
+               </p>
                </div>
              </div>
              
@@ -1087,7 +1087,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                  <div className="flex items-center gap-3">
                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                      <Sparkles className="h-5 w-5" />
-                   </div>
+               </div>
                    <span>View Personalized Dashboard</span>
                  </div>
                </Button>
@@ -1152,7 +1152,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                        <ArrowRight className="h-12 w-12 text-white drop-shadow-lg group-hover:scale-110 group-hover:translate-x-1 transition-all duration-500" />
                      </div>
                    </div>
-                 </div>
+           </div>
                  
                  {/* Border Glow */}
                  <div className="absolute inset-0 rounded-3xl border border-white/15 pointer-events-none"></div>
@@ -1214,7 +1214,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                
                {/* Radial Gradient Overlay */}
                <div className="absolute inset-0 bg-radial-gradient from-sage-50/50 via-transparent to-transparent"></div>
-             </div>
+                 </div>
              
              {/* Enhanced Header Section */}
              <div className="text-center space-y-6 relative z-10">
@@ -1227,8 +1227,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      Your Signature
               </h2>
                    <div className="w-24 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mt-3 rounded-full mx-auto"></div>
+                   </div>
                  </div>
-               </div>
                <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-light">
                  These quiet patterns reveal where you already lead with care—and where small changes can ripple outward
                </p>
