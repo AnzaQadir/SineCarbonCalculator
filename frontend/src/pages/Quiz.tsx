@@ -213,7 +213,7 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
               style={{ fontFamily: 'Cormorant Garamond, serif' }}
             >
               Let's begin your
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-600">
+              <span className="block text-slate-900">
                 sustainability story.
               </span>
             </motion.h1>
