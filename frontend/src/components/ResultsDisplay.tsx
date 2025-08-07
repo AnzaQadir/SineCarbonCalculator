@@ -895,6 +895,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             </div>
 
         <div className="max-w-4xl mx-auto px-6 py-12 space-y-16 relative z-10">
+          
+          {/* Back Button */}
+          {onBack && (
+            <div className="flex justify-start mb-8">
+              <button
+                onClick={onBack}
+                className="flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-sage-200/50 hover:bg-white/90 hover:shadow-xl transition-all duration-300 group"
+              >
+                <ArrowLeft className="h-5 w-5 text-sage-600 group-hover:text-sage-700 transition-colors" />
+                <span className="font-semibold text-sage-700 group-hover:text-sage-800 transition-colors">Back</span>
+              </button>
+            </div>
+          )}
 
 
           {/* Ultra-Classy Toggle Section */}
