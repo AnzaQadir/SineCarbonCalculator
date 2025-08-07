@@ -27,16 +27,16 @@ type Q = {
 const questions: Q[] = [
   {
     key: 'name',
-    question: 'Bobo: “Hi there 🌿”',
-    subtext: 'I’m Bobo, your friendly panda guide. What name should I call you as we explore your climate story together?',
+    question: 'Bobo: Hi there, new friend!',
+    subtext: 'I\'m Bobo your gentle panda guide through this climate journey. What name should I call you as we wander together?',
     inputType: 'text',
     placeholder: 'Your first name',
     required: true,
   },
   {
     key: 'email',
-    question: (a) => `Bobo: “Lovely to meet you${a.name ? `, ${a.name}` : ''}!”`,
-    subtext: 'Where can I send your personalized reflections and gentle updates? I pinky promise — no spam, just little nudges of joy.',
+    question: (a) => `Bobo: Lovely to meet you${a.name ? `, ${a.name}` : ''}!`,
+    subtext: 'Where should I send your little bundles of joy reflections, nudges, and tiny climate wins? (No spam just warm, helpful moments. Pinky promise)',
     inputType: 'email',
     placeholder: 'you@example.com',
     required: true,
@@ -45,8 +45,8 @@ const questions: Q[] = [
   },
   {
     key: 'age',
-    question: 'Bobo: “Out of soft curiosity…”',
-    subtext: 'How many seasons young are you? Everyone’s welcome here, no matter how many birthdays they’ve gathered 🌱',
+    question: 'Bobo: Out of soft curiosity…',
+    subtext: 'How many beautiful seasons young are you? All ages are welcome there\'s wisdom in every chapter.',
     inputType: 'number',
     placeholder: 'Your age',
     required: true,
@@ -55,16 +55,16 @@ const questions: Q[] = [
   },
   {
     key: 'gender',
-    question: 'Bobo: “And if you feel like sharing…”',
-    subtext: 'How do you identify? Our community blooms brightest when every voice and identity feels seen.',
+    question: 'Bobo: And if you feel like sharing…',
+    subtext: 'How do you identify? Every voice, every identity adds a new thread to our shared story.',
     inputType: 'select',
     options: ['Female', 'Male', 'Non-binary', 'Prefer to self-describe', 'Prefer not to say'],
     required: true,
   },
   {
     key: 'profession',
-    question: (a) => `Bobo: “What fills your days${a.name ? `, ${a.name}` : ''}?”`,
-    subtext: 'Whether you’re learning, creating, working, or caring — your rhythm matters. I’ll use this to tailor your experience.',
+    question: (a) => `Bobo: What fills your days${a.name ? `, ${a.name}` : ''}?`,
+    subtext: 'Whether you\'re teaching, coding, planting, parenting I\'m here to walk with you. This helps me make your journey more you-shaped.',
     inputType: 'select',
     options: [
       'Student (School / College / University)',
@@ -92,16 +92,16 @@ const questions: Q[] = [
   },
   {
     key: 'location',
-    question: 'Bobo: “Where’s home for you?”',
-    subtext: 'City, country — wherever you feel rooted. This helps me notice local patterns and stories across our eco-community 🌏',
+    question: 'Bobo: Where in the world do you call home?',
+    subtext: 'Just your city and country is perfect so I can notice patterns and stories blooming nearby.',
     inputType: 'text',
     placeholder: 'City, Country',
     required: true,
   },
   {
     key: 'household',
-    question: 'Bobo: “And who shares your cozy nest?”',
-    subtext: 'How many hearts live with you at home? Every household, big or small, is a climate team in disguise 💛',
+    question: 'Bobo: And who shares your cozy nest?',
+    subtext: 'How many hearts live with you under one roof? Every household is a little team cheering for the planet in their own way.',
     inputType: 'number',
     placeholder: 'Number of people',
     required: true,
@@ -139,21 +139,10 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
       if (existingUserData.household) prefilledAnswers.household = existingUserData.household;
       
       setAnswers(prefilledAnswers);
-      
-      // Skip to the end if we have all the data
-      if (Object.keys(prefilledAnswers).length >= questions.length - 1) {
-        setStep(questions.length - 1);
-        setMessages([
-          { role: 'bot', text: `🐼 Bobo: "Welcome back! I see you've been here before. Let me just confirm your details..."` },
-        ]);
-      } else {
-        // Set initial message only if not skipping to end
-        setMessages([{ role: 'bot', text: makeBotText(current, answers) }]);
-      }
-    } else {
-      // Set initial message for new users
-      setMessages([{ role: 'bot', text: makeBotText(current, answers) }]);
     }
+    
+    // Always start from the first question
+    setMessages([{ role: 'bot', text: makeBotText(current, answers) }]);
   }, []); // Only run once on mount
 
   const current = questions[step];
@@ -204,7 +193,7 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
       // final
       setMessages((m) => [
         ...m,
-        { role: 'bot', text: `🐼 Bobo: “Thank you for sharing, ${updatedAns.name || 'friend'}! I can’t wait to walk beside you — one gentle step at a time.”` },
+        { role: 'bot', text: `Bobo: Thank you for sharing your story, ${updatedAns.name || 'friend'}! I'm so glad we found each other. Let's keep going one gentle, joyful step at a time.` },
       ]);
       setFinished(true);
       onComplete(updatedAns);
