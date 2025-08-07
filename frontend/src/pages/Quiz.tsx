@@ -1162,8 +1162,7 @@ function PoeticJourneyQuiz() {
   // Show existing user screen if user was found
   if (showExistingUserScreen && existingUser) {
     return (
-      <Layout>
-        <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+      <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
         {/* Clean, minimal background */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50">
           {/* Subtle gradient overlay */}
@@ -1337,7 +1336,6 @@ function PoeticJourneyQuiz() {
           </motion.div>
         </div>
       </div>
-      </Layout>
     );
   }
 
