@@ -692,12 +692,12 @@ export class PersonalityService {
       }
     });
 
-    // Helper to pick dominant or random
+    // Helper to pick dominant or deterministic fallback
     const pickDominant = (counts: Record<string, number>, cats: readonly string[]): string => {
       const max = Math.max(...cats.map(c => counts[c]));
       if (max === 0) {
-        // All neutral – pick random category
-        return cats[Math.floor(Math.random() * cats.length)];
+        // All neutral – pick first category deterministically
+        return cats[0];
       }
       const winners = cats.filter(c => counts[c] === max);
       winners.sort();
@@ -1025,12 +1025,12 @@ export class PersonalityService {
         }
       });
 
-      // Helper to pick dominant or random
+      // Helper to pick dominant or deterministic fallback
       const pickDominant = (counts: Record<string, number>, cats: readonly string[]): string => {
         const max = Math.max(...cats.map(c => counts[c]));
         if (max === 0) {
-          // All neutral – pick random category
-          return cats[Math.floor(Math.random() * cats.length)];
+          // All neutral – pick first category deterministically
+          return cats[0];
         }
         const winners = cats.filter(c => counts[c] === max);
         winners.sort();

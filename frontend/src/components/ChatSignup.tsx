@@ -146,9 +146,15 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
         setMessages([
           { role: 'bot', text: `🐼 Bobo: "Welcome back! I see you've been here before. Let me just confirm your details..."` },
         ]);
+      } else {
+        // Set initial message only if not skipping to end
+        setMessages([{ role: 'bot', text: makeBotText(current, answers) }]);
       }
+    } else {
+      // Set initial message for new users
+      setMessages([{ role: 'bot', text: makeBotText(current, answers) }]);
     }
-  }, []);
+  }, []); // Only run once on mount
 
   const current = questions[step];
   const isLast = step === questions.length - 1;
@@ -162,10 +168,7 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
     return sub ? `${main}\n${sub}` : main;
   };
 
-  // push first bot message on mount
-  useEffect(() => {
-    setMessages([{ role: 'bot', text: makeBotText(current, answers) }]);
-  }, []);
+
 
   // auto-scroll
   useEffect(() => {
