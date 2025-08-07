@@ -21,6 +21,19 @@ const ResultsScreen: React.FC = () => {
     <Layout>
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <div className="flex justify-start mb-8">
+          <Button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-sage-200/50 hover:bg-white/90 hover:shadow-xl transition-all duration-300 group"
+          >
+            <svg className="h-5 w-5 text-sage-600 group-hover:text-sage-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="font-semibold text-sage-700 group-hover:text-sage-800 transition-colors">Back</span>
+          </Button>
+        </div>
+        
         <ResultsDisplay
           score={quizResults.finalScore || 0}
           emissions={quizResults.impactMetrics?.carbonReduced ? parseFloat(quizResults.impactMetrics.carbonReduced) : 0}
@@ -36,15 +49,7 @@ const ResultsScreen: React.FC = () => {
           state={quizResults}
           gender={user?.gender || 'boy'}
         />
-        <div className="flex justify-center mt-8">
-          <Button
-            className="text-white px-8 py-3 rounded-lg shadow-lg text-lg font-semibold"
-            style={{ backgroundColor: '#5E1614' }}
-            onClick={() => navigate('/recommendations')}
-          >
-            View Personalized Recommendations
-          </Button>
-        </div>
+
       </div>
     </div>
     </Layout>

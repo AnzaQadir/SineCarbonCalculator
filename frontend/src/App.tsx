@@ -12,6 +12,7 @@ import InviteScreen from '@/pages/InviteScreen';
 import ReflectionScreen from './pages/ReflectionScreen';
 import Signup from './pages/Signup';
 import Quiz from './pages/Quiz';
+import PersonalizedDashboard from './pages/PersonalizedDashboard';
 import { Analytics } from '@vercel/analytics/react';
 
 // Create a client
@@ -34,6 +35,7 @@ function App() {
               <Route path="/reflections" element={<ReflectionScreen />} />
               <Route path="/quiz" element={<Quiz />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<PersonalizedDashboard />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
