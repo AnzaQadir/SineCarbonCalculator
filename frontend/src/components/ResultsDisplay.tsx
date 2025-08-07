@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
   Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2, Check, BookOpen,
   Book, Star, Sparkles, Trophy, Heart, 
-  Lightbulb, Users, Target, ArrowRight, ShoppingBag, Droplet, Shirt, X, Quote, PenTool, Brain
+  Lightbulb, Users, Target, ArrowRight, ShoppingBag, Droplet, Shirt, X, Quote, PenTool, Brain, BarChart3
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
@@ -851,16 +851,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     );
   }
 
-  // Add this button in the appropriate section of your JSX
-  const renderRecommendationsButton = () => (
-    <Button
-      onClick={() => navigate('/recommendations')}
-      className="w-full text-white rounded-lg shadow transition text-lg py-3 font-semibold mt-4"
-      style={{ backgroundColor: '#5E1614' }}
-    >
-      View Personalized Recommendations
-    </Button>
-  );
+
 
   return (
     <ErrorBoundary>
@@ -947,67 +938,34 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 <div className="relative flex">
                   <button
                     onClick={() => setActiveSection('climate-self')}
-                    className={`relative px-6 py-5 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out flex items-center gap-4 ${
+                    className={`relative px-8 py-4 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out ${
                       activeSection === 'climate-self'
                         ? 'text-white'
                         : 'text-sage-600 hover:text-sage-700'
                     }`}
                   >
-                    {/* Enhanced Active Indicator */}
-                    <div className={`w-4 h-4 rounded-full transition-all duration-700 ${
-                      activeSection === 'climate-self' 
-                        ? 'bg-white shadow-xl scale-125' 
-                        : 'bg-sage-300 group-hover:bg-sage-400'
-                    }`}>
-                      {activeSection === 'climate-self' && (
-                        <div className="absolute inset-0 bg-white/30 rounded-full animate-ping"></div>
-                      )}
-                    </div>
-                    
                     <span className="relative z-10 text-base">Your Self</span>
                   </button>
                   
                   <button
                     onClick={() => setActiveSection('climate-signature')}
-                    className={`relative px-6 py-5 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out flex items-center gap-4 ${
+                    className={`relative px-8 py-4 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out ${
                       activeSection === 'climate-signature'
                         ? 'text-white'
                         : 'text-sage-600 hover:text-sage-700'
                     }`}
                   >
-                    {/* Enhanced Active Indicator */}
-                    <div className={`w-4 h-4 rounded-full transition-all duration-700 ${
-                      activeSection === 'climate-signature' 
-                        ? 'bg-white shadow-xl scale-125' 
-                        : 'bg-sage-300 group-hover:bg-sage-400'
-                    }`}>
-                      {activeSection === 'climate-signature' && (
-                        <div className="absolute inset-0 bg-white/30 rounded-full animate-ping"></div>
-                      )}
-                    </div>
-                    
                     <span className="relative z-10 text-base">Your Signature</span>
                   </button>
                   
                   <button
                     onClick={() => setActiveSection('take-action')}
-                    className={`relative px-6 py-5 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out flex items-center gap-4 ${
+                    className={`relative px-8 py-4 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out ${
                       activeSection === 'take-action'
                         ? 'text-white'
                         : 'text-sage-600 hover:text-sage-700'
                     }`}
                   >
-                    {/* Enhanced Active Indicator */}
-                    <div className={`w-4 h-4 rounded-full transition-all duration-700 ${
-                      activeSection === 'take-action' 
-                        ? 'bg-white shadow-xl scale-125' 
-                        : 'bg-sage-300 group-hover:bg-sage-400'
-                    }`}>
-                      {activeSection === 'take-action' && (
-                        <div className="absolute inset-0 bg-white/30 rounded-full animate-ping"></div>
-                      )}
-                    </div>
-                    
                     <span className="relative z-10 text-base">Take Action</span>
                   </button>
                 </div>
@@ -1063,99 +1021,80 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
              {/* Hook Line with Enhanced Styling */}
              <div className="text-center max-w-3xl mx-auto mb-6">
                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-sage-100">
-                 <p className="text-xl font-medium text-sage-700 italic leading-relaxed">
-                   "{dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}"
-                 </p>
+                 <p className="text-xl font-medium text-black italic leading-relaxed">
+                 {dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}
+               </p>
                </div>
              </div>
              
              {/* Detailed Personality Description with Enhanced Layout */}
              <div className="text-center max-w-3xl mx-auto mb-8">
                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-md border border-sage-100">
-                 <p className="text-lg text-sage-600 leading-relaxed">
+                 <p className="text-lg text-black leading-relaxed">
                  {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
                </p>
                </div>
              </div>
              
-             {/* View Personalized Dashboard Button */}
-             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-               <Button
+             {/* Integrated Dashboard Button */}
+             <div className="mt-8 text-center">
+               <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-sage-200/50 hover:bg-white hover:shadow-xl transition-all duration-300 group cursor-pointer"
                  onClick={() => navigate('/dashboard')}
-                 className="flex-1 bg-gradient-to-r from-sage-600 to-sage-700 hover:from-sage-700 hover:to-sage-800 text-white px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold text-lg"
                >
-                 <div className="flex items-center gap-3">
-                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                     <Sparkles className="h-5 w-5" />
+                 <div className="w-6 h-6 bg-gradient-to-br from-sage-500 to-sage-600 rounded-full flex items-center justify-center">
+                   <BarChart3 className="h-4 w-4 text-white" />
                </div>
-                   <span>View Personalized Dashboard</span>
-                 </div>
-               </Button>
-                      </div>
+                 <span className="font-semibold text-sage-700 group-hover:text-sage-800 transition-colors">View Personalized Dashboard</span>
+                 <ArrowRight className="h-4 w-4 text-sage-600 group-hover:translate-x-1 transition-transform duration-300" />
+               </div>
+             </div>
 
-         {/* Ultra-Classy Join the Sanctuary Section */}
-         <div className="flex justify-center mt-20 mb-12">
+         {/* Professional Join the Sanctuary Section */}
+         <div className="flex justify-center mt-16 mb-12">
            <div className="relative group">
-             {/* Enhanced Glow Effect */}
-             <div className="absolute -inset-6 bg-gradient-to-r from-sage-400/40 via-emerald-400/40 to-sage-600/40 rounded-3xl blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+             {/* Subtle Glow Effect */}
+             <div className="absolute -inset-4 bg-gradient-to-r from-sage-400/20 via-emerald-400/20 to-sage-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
              
-             {/* Main Button Container */}
+             {/* Main Container */}
              <button 
-               className="relative overflow-hidden rounded-3xl shadow-3xl hover:shadow-4xl transition-all duration-700 hover:scale-105 transform border border-white/20"
+               className="relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] transform"
                onClick={() => console.log('Join the Sanctuary clicked')}
              >
                {/* Background Image */}
                <div 
-                 className="w-[500px] h-96 bg-cover bg-center bg-no-repeat"
+                 className="w-[700px] h-80 bg-cover bg-center bg-no-repeat"
                  style={{
                    backgroundImage: `url('/images/join.png')`
                  }}
                >
-                 {/* Sophisticated Overlay */}
-                 <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/25 to-black/15 group-hover:from-black/30 group-hover:via-black/20 group-hover:to-black/10 transition-all duration-700"></div>
+                 {/* Professional Overlay */}
+                 <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/30 to-black/20 group-hover:from-black/40 group-hover:via-black/25 group-hover:to-black/15 transition-all duration-500"></div>
                  
-                 {/* Subtle Pattern Overlay */}
-                 <div className="absolute inset-0 opacity-[0.02]" style={{
-                   backgroundImage: `
-                     linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-                     linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
-                   `,
-                   backgroundSize: '50px 50px'
-                 }}></div>
-                 
-                 {/* Button Content */}
+                 {/* Content Overlay */}
                  <div className="relative h-full flex items-center justify-center">
-                   <div className="text-center space-y-6">
-                     {/* Decorative Elements */}
-                     <div className="absolute top-8 left-8 w-2 h-2 bg-white/30 rounded-full animate-pulse"></div>
-                     <div className="absolute top-12 right-12 w-1 h-1 bg-white/20 rounded-full animate-pulse delay-300"></div>
-                     <div className="absolute bottom-16 left-16 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse delay-500"></div>
-                     <div className="absolute bottom-8 right-8 w-1 h-1 bg-white/15 rounded-full animate-pulse delay-700"></div>
-                     
-                     {/* Enhanced Title */}
-                     <h3 className="text-4xl font-bold mb-4 tracking-wide">
-                       <span className="bg-gradient-to-r from-white via-sage-100 to-white bg-clip-text text-transparent">
-                         Join the Sanctuary
-                       </span>
+                   <div className="text-center space-y-4">
+                     {/* Professional Title */}
+                     <h3 className="text-4xl font-bold text-white tracking-wide mb-2">
+                       Join the Sanctuary
                      </h3>
                      
-                     {/* Decorative Line */}
-                     <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-white/60 to-transparent mx-auto"></div>
+                     {/* Elegant Divider */}
+                     <div className="w-16 h-px bg-white/60 mx-auto mb-3"></div>
                      
-                                          {/* Enhanced Subtitle */}
-                     <p className="text-xl font-medium mb-24 mt-8 opacity-95 leading-relaxed max-w-sm">
+                     {/* Professional Subtitle */}
+                     <p className="text-lg font-medium text-white/90 leading-relaxed max-w-xs">
                        Connect with like-minded climate champions
                      </p>
                      
-                     {/* Centered White Arrow */}
-                     <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                       <ArrowRight className="h-12 w-12 text-white drop-shadow-lg group-hover:scale-110 group-hover:translate-x-1 transition-all duration-500" />
+                     {/* Professional Arrow */}
+                     <div className="mt-4">
+                       <ArrowRight className="h-10 w-10 text-white/80 mx-auto group-hover:translate-x-1 group-hover:text-white transition-all duration-300" />
                      </div>
                    </div>
            </div>
                  
-                 {/* Border Glow */}
-                 <div className="absolute inset-0 rounded-3xl border border-white/15 pointer-events-none"></div>
+                 {/* Subtle Border */}
+                 <div className="absolute inset-0 rounded-2xl border border-white/10 pointer-events-none"></div>
                </div>
              </button>
            </div>
@@ -1216,20 +1155,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                <div className="absolute inset-0 bg-radial-gradient from-sage-50/50 via-transparent to-transparent"></div>
                  </div>
              
-             {/* Enhanced Header Section */}
-             <div className="text-center space-y-6 relative z-10">
-               <div className="flex flex-col items-center gap-4 mb-6">
-                 <div className="w-12 h-12 bg-gradient-to-br from-sage-400 to-sage-600 rounded-2xl flex items-center justify-center shadow-lg">
-                   <Leaf className="w-6 h-6 text-white" />
-                 </div>
-                 <div className="text-center">
-                   <h2 className="text-4xl md:text-5xl font-serif text-sage-800 leading-tight">
-                     Your Signature
-              </h2>
-                   <div className="w-24 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mt-3 rounded-full mx-auto"></div>
-                   </div>
-                 </div>
-               <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-light">
+                          {/* Enhanced Header Section */}
+             <div className="text-center space-y-8 relative z-10">
+               <div className="text-center space-y-4">
+                 <h2 className="text-5xl md:text-6xl font-bold text-black leading-tight tracking-tight">
+                   Your Signature
+                 </h2>
+                 <div className="w-32 h-0.5 bg-gradient-to-r from-sage-400 via-sage-500 to-sage-600 mt-4 rounded-full mx-auto"></div>
+               </div>
+               <p className="text-2xl text-black max-w-4xl mx-auto leading-relaxed font-light tracking-wide">
                  These quiet patterns reveal where you already lead with care—and where small changes can ripple outward
                </p>
             </div>
@@ -1573,39 +1507,17 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
 
 
-          {/* Take Action Section - Reuse existing section */}
+          {/* Take Action Section - Sleek and Classy */}
           {activeSection === 'take-action' && (
-           <div className="space-y-8 mt-12">
-             {/* Enhanced Section Header */}
-            <div className="text-center space-y-6">
-               <div className="relative">
-                 {/* Background Glow */}
-                 <div className="absolute -inset-4 bg-gradient-to-r from-sage-400/10 via-sage-500/10 to-sage-600/10 rounded-3xl blur-xl"></div>
-                 
-                 <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-sage-200/50">
-                   <div className="flex items-center justify-center gap-4 mb-4">
-                     <div className="w-12 h-12 bg-gradient-to-br from-sage-500 to-sage-600 rounded-2xl flex items-center justify-center shadow-lg">
-                       <Zap className="w-6 h-6 text-white" />
-                     </div>
-                     <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent">
-                       Ready to Make a Difference?
-                     </h2>
-                   </div>
-                   <p className="text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-medium">
-                     Your climate journey doesn't end here. Choose your next powerful step and start creating real impact today.
-                   </p>
-                   <div className="w-32 h-1 bg-gradient-to-r from-sage-300 to-sage-500 mx-auto mt-6 rounded-full"></div>
-                 </div>
-               </div>
-             </div>
-             
+           <div className="space-y-12 mt-16">
+
              {/* Cards Grid */}
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
                {/* Generate Your Story Button */}
                <div className="group relative">
                  <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-orange-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <button
-                   className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-red-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-red-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
+                   className="relative bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-100/50 hover:shadow-2xl hover:scale-[1.02] hover:border-red-200/50 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-red-200/30 focus:ring-opacity-50 cursor-pointer transform active:scale-98 w-full h-full"
                    onClick={async () => {
                      await generateStory();
                      setShowStoryModal(true);
@@ -1617,8 +1529,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      {/* Top Icon with Enhanced Styling */}
                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-red-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-red-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg">
                        <BookOpen className="h-10 w-10 text-red-600" />
-              </div>
-
+          </div>
+          
                      {/* Title with Gradient */}
                      <h3 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">Generate Your Story</h3>
                      
@@ -1629,7 +1541,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      <div className="flex items-center justify-center gap-2 mt-2">
                        <div className="px-3 py-1 bg-red-100 rounded-full">
                          <span className="text-xs font-semibold text-red-600">High Impact</span>
-            </div>
+                  </div>
           </div>
 
                      {/* Central Icon with Animation */}
@@ -1641,8 +1553,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                            <circle cx="40" cy="28" r="2" fill="currentColor" className="text-red-600"/>
                            <path d="M20 36c0 0 4 4 12 4s12-4 12-4" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600"/>
                          </svg>
-                       </div>
-        </div>
+                  </div>
+                </div>
 
                      {/* Enhanced Get Started Button */}
                                             <div className="flex items-center justify-center mt-6">
@@ -1650,70 +1562,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                            <span className="relative z-10">Start Creating Impact</span>
                            <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-            </div>
-                </div>
-            </div>
+                    </div>
+                  </div>
+                    </div>
                  </button>
-          </div>
+                  </div>
           
-               {/* Recommendations Button */}
-               <div className="group relative">
-                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                    <button 
-                     className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-yellow-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
-                   onClick={() => navigate('/recommendations')}
-                   aria-label="Get personalized recommendations"
-                 >
-                   <div className="text-center space-y-6">
-                     {/* Top Icon with Enhanced Styling */}
-                     <div className="w-16 h-16 mx-auto bg-gradient-to-br from-yellow-100 to-amber-100 rounded-2xl flex items-center justify-center group-hover:from-yellow-200 group-hover:to-amber-200 transition-all duration-300 shadow-lg">
-                       <Lightbulb className="h-10 w-10 text-yellow-600" />
-                  </div>
-                     
-                     {/* Title with Gradient */}
-                     <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">Personalized Recommendations</h3>
-                     
-                     {/* Enhanced Description */}
-                     <p className="text-sm text-gray-600 leading-relaxed">Get actionable steps tailored to your unique lifestyle that will maximize your climate impact</p>
-                     
-                     {/* Impact Badge */}
-                     <div className="flex items-center justify-center gap-2 mt-2">
-                       <div className="px-3 py-1 bg-yellow-100 rounded-full">
-                         <span className="text-xs font-semibold text-yellow-600">Smart Action</span>
-                  </div>
-                </div>
 
-                     {/* Central Icon with Animation */}
-                     <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
-                       <div className="w-24 h-24 mx-auto">
-                         <svg viewBox="0 0 64 64" className="w-full h-full">
-                           <rect x="16" y="20" width="32" height="24" fill="none" stroke="currentColor" strokeWidth="2" className="text-yellow-200"/>
-                           <line x1="16" y1="28" x2="48" y2="28" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
-                           <line x1="16" y1="36" x2="48" y2="36" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
-                           <line x1="16" y1="44" x2="40" y2="44" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
-                           <circle cx="12" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
-                           <circle cx="20" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
-                         </svg>
-                    </div>
-                  </div>
-                     
-                     {/* Enhanced Get Started Button */}
-                                            <div className="flex items-center justify-center mt-6">
-                         <div className="relative overflow-hidden bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-yellow-600 group-hover:to-amber-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
-                           <span className="relative z-10">Discover Your Path</span>
-                           <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-                         <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                    </div>
-                  </div>
-                    </div>
-                 </button>
-                </div>
 
                {/* Journalize Button */}
                <div className="group relative">
                  <div className="absolute inset-0 bg-gradient-to-br from-sage-100 to-blue-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                    <button 
-                     className="relative bg-white rounded-3xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-sage-200 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-sage-200 focus:ring-opacity-50 cursor-pointer transform active:scale-95 w-full h-full"
+                                                     <button 
+                   className="relative bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-100/50 hover:shadow-2xl hover:scale-[1.02] hover:border-sage-200/50 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-sage-200/30 focus:ring-opacity-50 cursor-pointer transform active:scale-98 w-full h-full"
                    onClick={() => console.log('Journalize clicked')}
                    aria-label="Journalize your sustainability journey"
                  >
@@ -1721,7 +1582,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      {/* Top Icon with Enhanced Styling */}
                      <div className="w-16 h-16 mx-auto bg-gradient-to-br from-sage-100 to-blue-100 rounded-2xl flex items-center justify-center group-hover:from-sage-200 group-hover:to-blue-200 transition-all duration-300 shadow-lg">
                        <PenTool className="h-10 w-10 text-sage-600" />
-              </div>
+                    </div>
                      
                      {/* Title with Gradient */}
                      <h3 className="text-xl font-bold bg-gradient-to-r from-sage-600 to-blue-600 bg-clip-text text-transparent">Journalize Your Journey</h3>
@@ -1735,7 +1596,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                          <span className="text-xs font-semibold text-sage-600">Mindful Growth</span>
                   </div>
                 </div>
-                     
+
                      {/* Central Icon with Animation */}
                      <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
                        <div className="w-24 h-24 mx-auto">
@@ -1752,7 +1613,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                            <circle cx="12" cy="16" r="1" fill="currentColor" className="text-sage-600"/>
                            <circle cx="20" cy="16" r="1" fill="currentColor" className="text-sage-600"/>
                          </svg>
-                </div>
+              </div>
                   </div>
                      
                      {/* Enhanced Get Started Button */}
@@ -1761,12 +1622,65 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                            <span className="relative z-10">Track Your Growth</span>
                            <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                          <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
-                  </div>
                 </div>
+                </div>
+                  </div>
+                 </button>
+                  </div>
+
+               {/* View Personalized Recommendations Button */}
+               <div className="group relative">
+                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                 <button
+                   className="relative bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-100/50 hover:shadow-2xl hover:scale-[1.02] hover:border-yellow-200/50 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-yellow-200/30 focus:ring-opacity-50 cursor-pointer transform active:scale-98 w-full h-full"
+                   onClick={() => navigate('/recommendations')}
+                   aria-label="Get personalized recommendations"
+                 >
+                   <div className="text-center space-y-6">
+                     {/* Top Icon with Enhanced Styling */}
+                     <div className="w-16 h-16 mx-auto bg-gradient-to-br from-yellow-100 to-amber-100 rounded-2xl flex items-center justify-center group-hover:from-yellow-200 group-hover:to-amber-200 transition-all duration-300 shadow-lg">
+                       <Lightbulb className="h-10 w-10 text-yellow-600" />
+                   </div>
+
+                     {/* Title with Gradient */}
+                     <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">Personalized Recommendations</h3>
+                     
+                     {/* Enhanced Description */}
+                     <p className="text-sm text-gray-600 leading-relaxed">Get actionable steps tailored to your unique lifestyle that will maximize your climate impact</p>
+                     
+                     {/* Impact Badge */}
+                     <div className="flex items-center justify-center gap-2 mt-2">
+                       <div className="px-3 py-1 bg-yellow-100 rounded-full">
+                         <span className="text-xs font-semibold text-yellow-600">Smart Action</span>
+                   </div>
+                 </div>
+
+                     {/* Central Icon with Animation */}
+                     <div className="mt-6 group-hover:scale-110 transition-transform duration-300">
+                       <div className="w-24 h-24 mx-auto">
+                         <svg viewBox="0 0 64 64" className="w-full h-full">
+                           <rect x="16" y="20" width="32" height="24" fill="none" stroke="currentColor" strokeWidth="2" className="text-yellow-200"/>
+                           <line x1="16" y1="28" x2="48" y2="28" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
+                           <line x1="16" y1="36" x2="48" y2="36" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
+                           <line x1="16" y1="44" x2="40" y2="44" stroke="currentColor" strokeWidth="2" className="text-yellow-600"/>
+                           <circle cx="12" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
+                           <circle cx="20" cy="16" r="2" fill="currentColor" className="text-yellow-600"/>
+                         </svg>
+                   </div>
+                 </div>
+
+                     {/* Enhanced Get Started Button */}
+                     <div className="flex items-center justify-center mt-6">
+                       <div className="relative overflow-hidden bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-8 py-4 rounded-full text-sm font-semibold group-hover:from-yellow-600 group-hover:to-amber-600 transition-all duration-300 cursor-pointer flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105">
+                         <span className="relative z-10">Discover Your Path</span>
+                         <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                         <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                   </div>
+                 </div>
                    </div>
                  </button>
                </div>
-             </div>
+                </div>
             </div>
           )}
 
