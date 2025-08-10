@@ -1485,7 +1485,8 @@ function PoeticJourneyQuiz() {
         state={answers}
         gender={answers.gender === 'female' ? 'girl' : 'boy'}
         // Pass the comprehensivePowerMoves data directly
-        comprehensivePowerMoves={results?.comprehensivePowerMoves}
+          comprehensivePowerMoves={results?.comprehensivePowerMoves}
+          highlights={results?.highlights}
       />
     );
   }

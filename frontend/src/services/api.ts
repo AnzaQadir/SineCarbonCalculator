@@ -134,6 +134,23 @@ export interface PersonalityResponse {
     };
     tone: string;
   };
+  // Highlights from backend (optional)
+  highlights?: {
+    highlights: Array<{
+      id: string;
+      title: string;
+      icon: string;
+      category: string;
+      summary: string;
+      subtext: string;
+      cta?: string;
+    }>;
+    personalityInsights: {
+      decisionStyle: string;
+      actionStyle: string;
+      spark: string;
+    };
+  };
   newPersonality?: string;
   newPersonalityDescription?: string;
   personalityTraits?: {
