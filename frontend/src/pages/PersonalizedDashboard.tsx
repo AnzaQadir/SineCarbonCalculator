@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { X, Share2, TrendingUp, Leaf, Car, Utensils, Trash2, Shirt, Wind, BarChart3 } from 'lucide-react';
+import { X, Share2, TrendingUp, Leaf, Car, Utensils, Trash2, Shirt, Wind, BarChart3, Coffee, Beef, Trees } from 'lucide-react';
 import { useQuizStore } from '@/stores/quizStore';
 import Layout from '@/components/Layout';
 import ClimateRing from '@/components/ClimateRing';
@@ -45,6 +45,7 @@ const PersonalizedDashboard: React.FC = () => {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'homeEnergy':
+      case 'home':
         return <Leaf className="h-6 w-6" />;
       case 'transport':
         return <Car className="h-6 w-6" />;
@@ -64,6 +65,7 @@ const PersonalizedDashboard: React.FC = () => {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'homeEnergy':
+      case 'home':
         return 'from-gray-600 to-gray-700';
       case 'transport':
         return 'from-blue-500 to-blue-600';
@@ -83,6 +85,7 @@ const PersonalizedDashboard: React.FC = () => {
   const getCategoryName = (category: string) => {
     switch (category) {
       case 'homeEnergy':
+      case 'home':
         return 'Home Energy';
       case 'transport':
         return 'Transportation';
@@ -112,6 +115,14 @@ const PersonalizedDashboard: React.FC = () => {
     return Math.round(percentages.reduce((sum, p) => sum + p, 0) / percentages.length);
   };
 
+  // Average based on raw scores (used for percent-difference visualization)
+  const calculateAverageScore = () => {
+    if (!categoryScores) return 0;
+    const scores = Object.values(categoryScores).map(cat => Number(cat.score) || 0);
+    if (scores.length === 0) return 0;
+    return scores.reduce((sum, s) => sum + s, 0) / scores.length;
+  };
+
   // Get impact metrics from quiz results
   const getImpactMetrics = () => {
     if (!quizResults?.impactMetrics) {
@@ -128,7 +139,9 @@ const PersonalizedDashboard: React.FC = () => {
     };
   };
 
-  // Get the first 4 categories for display (excluding airQuality if it's 0)
+  const formatInt = (n: number) => Math.max(0, Math.round(n)).toLocaleString();
+
+  // Get the first 4 categories for display
   const getDisplayCategories = () => {
     if (!categoryScores) return [];
     
@@ -136,8 +149,8 @@ const PersonalizedDashboard: React.FC = () => {
     console.log('Category Scores:', categoryScores);
     
     const categories = Object.entries(categoryScores)
-      .filter(([_, data]) => data.percentage > 0) // Filter out categories with 0%
-      .slice(0, 4); // Take first 4 categories
+      // Keep all categories (including negatives and zeros); we may still slice to 4 for layout
+      .slice(0, 4);
     
     console.log('Display Categories:', categories);
     return categories;
@@ -332,43 +345,108 @@ const PersonalizedDashboard: React.FC = () => {
             <div className="flex justify-center">
               <div className="grid grid-cols-4 gap-8">
               {getDisplayCategories().length > 0 ? (
-                getDisplayCategories().map(([category, data], index) => (
+                getDisplayCategories().map(([category, data], index) => {
+                  const avgScore = calculateAverageScore();
+                  // Percent difference from average score. Food is treated as negative.
+                  let impact = avgScore === 0 ? 0 : ((Number(data.score) - avgScore) / avgScore) * 100;
+                  if (category === 'food') impact = -impact;
+                  const isNegative = impact < 0;
+                  const magnitude = Math.min(Math.abs(impact), 100);
+                  const signedLabel = `${impact >= 0 ? '+' : ''}${impact.toFixed(1)}%`;
+                  return (
                 <motion.div
-                  key={category}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 + index * 0.1 }}
-                  className="flex flex-col items-center"
-                >
-                  {/* Progress Bar */}
-                  <div className="relative w-16 h-48 bg-slate-100 rounded-2xl overflow-hidden mb-4 border border-slate-200">
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 opacity-10">
-                      <div className="w-full h-full" style={{
-                        backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 6px)`
-                      }}></div>
+                    key={category}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3 + index * 0.1 }}
+                    className="flex flex-col items-center"
+                  >
+                    {/* Top-of-container percentage label */}
+                    <div className="mb-1 select-none">
+                      <span className={`text-[12px] font-bold ${isNegative ? 'text-rose-600' : 'text-slate-700'}`}>
+                        {signedLabel}
+                      </span>
                     </div>
-                    
-                    {/* Progress Fill */}
-                    <motion.div
-                      className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t ${getCategoryColor(category)} rounded-b-2xl`}
-                      initial={{ height: 0 }}
-                      animate={{ height: `${data.percentage}%` }}
-                      transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                    >
-                      {/* Percentage Text */}
-                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-white font-bold text-sm">
-                        {data.percentage.toFixed(1)}%
-                      </div>
-                    </motion.div>
-                  </div>
 
-                  {/* Category Name */}
-                  <h3 className="text-center font-semibold text-slate-800 text-sm">
-                    {getCategoryName(category)}
-                  </h3>
-                </motion.div>
-              ))
+                    {/* Progress Bar with midline baseline */}
+                    <div className="relative w-16 h-48 bg-slate-100 rounded-2xl overflow-hidden mb-4 border border-slate-200">
+                      {/* Y-axis scale labels (percent) */}
+                      {(() => {
+                        const ticks = [
+                          { label: '+100%', pos: 0 },
+                          { label: '+50%', pos: 25 },
+                          { label: '0%', pos: 50 },
+                          { label: '-50%', pos: 75 },
+                          { label: '-100%', pos: 100 },
+                        ];
+                        return (
+                          <div className="absolute inset-y-0 pointer-events-none select-none" style={{ left: '-2.6rem' }}>
+                            {ticks.map(t => (
+                              <div
+                                key={t.label}
+                                className="absolute -translate-y-1/2 text-[10px] font-medium text-slate-500"
+                                style={{ top: `${t.pos}%` }}
+                              >
+                                {t.label}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
+                      {/* Background Pattern */}
+                      <div className="absolute inset-0 opacity-10">
+                        <div className="w-full h-full" style={{
+                          backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 6px)`
+                        }}></div>
+                      </div>
+
+                      {/* Midline baseline (average) */}
+                      <div className="absolute left-0 right-0" style={{ bottom: '50%', height: '50%' }}>
+                        <div className="w-full h-full bg-white/30"></div>
+                      </div>
+                      <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-px bg-slate-300/60"></div>
+                      {/* Midline label */}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 select-none pointer-events-none">
+                        <span className="text-[10px] font-semibold text-slate-600 bg-white/85 border border-slate-200 rounded-full px-2 py-0.5">
+                          Avg
+                        </span>
+                      </div>
+
+                      {/* Positive fill from middle to top OR negative fill from middle to bottom */}
+                      <motion.div
+                        className={`absolute left-0 right-0 ${isNegative ? 'top-1/2 bg-gradient-to-b rounded-b-2xl' : 'bottom-1/2 bg-gradient-to-t rounded-t-2xl'} ${getCategoryColor(category)} flex items-center justify-center`}
+                        style={{ transform: 'translateY(0)' }}
+                        initial={{ height: 0 }}
+                        animate={{ height: `${magnitude / 2}%` }}
+                        transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
+                      >
+                        {/* no internal label; external label rendered at container right */}
+                      </motion.div>
+
+                      {/* External percentage label on the right aligned with bar end (in addition to top label) */}
+                      {(() => {
+                        const heightPercent = magnitude / 2; // fill height relative to half-container
+                        const posStyle = isNegative
+                          ? { top: `calc(${50 - heightPercent}% )` }
+                          : { bottom: `calc(${50 + heightPercent}% )` };
+                        return (
+                          <div
+                            className="absolute right-0 translate-x-full text-[11px] font-bold text-slate-700 select-none pointer-events-none"
+                            style={{ right: '-0.4rem', ...posStyle }}
+                          >
+                            {signedLabel}
+                          </div>
+                        );
+                      })()}
+                    </div>
+
+                    {/* Category Name */}
+                    <h3 className="text-center font-semibold text-slate-800 text-sm">
+                      {getCategoryName(category)}
+                    </h3>
+                  </motion.div>
+                  );
+                })
               ) : (
                 // Fallback: Show default progress bars
                 ['homeEnergy', 'transport', 'food', 'waste'].map((category, index) => (
@@ -428,26 +506,32 @@ const PersonalizedDashboard: React.FC = () => {
             <div className="flex items-center mb-4">
               <h3 className="text-xl font-bold text-slate-800">Quantified Impact</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-slate-800 mb-1">
-                  {Math.round(getImpactMetrics().carbonReduced)} lb
+            {(() => {
+              const { carbonReduced, treesPlanted } = getImpactMetrics();
+              const kg = carbonReduced * 0.453592;
+              const carKm = kg / 0.25; // ~0.25 kg CO₂ per km driven
+              const cups = kg / 0.21; // ~0.21 kg CO₂ per cup of coffee
+              const burgers = kg / 3; // ~3 kg CO₂ per beef burger
+              const tshirts = kg / 2.5; // ~2.5 kg CO₂ per cotton T-shirt
+              const items = [
+                { label: 'Car KmDriven', value: `${formatInt(carKm)} km`, icon: <Car className="h-7 w-7 text-slate-700" /> },
+                { label: 'Tree Saved', value: formatInt(treesPlanted), icon: <Trees className="h-7 w-7 text-green-600" /> },
+                { label: 'CupOfCoffee', value: formatInt(cups), icon: <Coffee className="h-7 w-7 text-amber-600" /> },
+                { label: 'Burger', value: formatInt(burgers), icon: <Beef className="h-7 w-7 text-rose-600" /> },
+                { label: 'T shirt', value: formatInt(tshirts), icon: <Shirt className="h-7 w-7 text-blue-600" /> }
+              ];
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                  {items.map((it, idx) => (
+                    <div key={it.label} className={`text-center ${idx !== 0 ? 'md:border-l md:border-slate-200' : ''}`}>
+                      <div className="flex justify-center mb-1">{it.icon}</div>
+                      <div className="text-2xl font-bold text-slate-800 mb-1">{it.value}</div>
+                      <div className="text-sm text-slate-600">{it.label}</div>
+                    </div>
+                  ))}
                 </div>
-                <div className="text-sm text-slate-600">CO₂ Saved</div>
-              </div>
-              <div className="text-center border-l border-r border-slate-200">
-                <div className="text-2xl font-bold text-slate-800 mb-1">
-                  {getImpactMetrics().treesPlanted} ft²
-                </div>
-                <div className="text-sm text-slate-600">Forest Area</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-slate-800 mb-1">
-                  {Math.floor(getImpactMetrics().communityImpact / 60)}h {getImpactMetrics().communityImpact % 60}m
-                </div>
-                <div className="text-sm text-slate-600">Time Invested</div>
-              </div>
-            </div>
+              );
+            })()}
           </motion.div>
 
           {/* Section Divider */}
