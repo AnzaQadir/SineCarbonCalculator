@@ -686,7 +686,7 @@ const Index = () => {
       <div className={fontClass} style={defaultStyles}>
         <main className="flex flex-col items-center text-center relative bg-white">
           {/* Hero Section */}
-          <div className="w-full aspect-[1536/1024] relative" style={{ backgroundImage: 'url(/images/green_bg_short.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+          <div className="w-full aspect-[1536/1024] relative" style={{ backgroundImage: 'url(/images/bg_green.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
             <motion.div
               className="flex flex-col items-center justify-center min-h-[60vh] py-12 md:py-16 px-4 max-w-3xl mx-auto mt-8"
               initial={{ opacity: 0, y: 32 }}
@@ -911,8 +911,8 @@ const Index = () => {
                   transition={{ duration: 0.2 }}
                   className="flex flex-col items-center"
                 >
-                  <img src="/images/Kind-of-Conscious-Boy.png" alt="Anza Qadir"
-                    className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white shadow-lg object-cover mb-4 transition-all duration-200" />
+                  <img src="/Personality Avatars/Builder Male.png" alt="Anza Qadir"
+                    className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white shadow-lg object-contain bg-white px-1 py-1.5 mb-4 transition-all duration-200" />
                   <div className="text-2xl md:text-3xl font-bold text-gray-900">Anza Qadir</div>
                   <div className="text-base md:text-lg text-gray-400 mb-2">Co-Founder</div>
                   <a href="https://www.linkedin.com/in/anza-qadir/" target="_blank" rel="noopener noreferrer"
@@ -927,8 +927,8 @@ const Index = () => {
                   transition={{ duration: 0.2 }}
                   className="flex flex-col items-center"
                 >
-                  <img src="/images/Sustainability-Slayer-Girl.png" alt="Salma Zahra"
-                    className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white shadow-lg object-cover mb-4 transition-all duration-200" />
+                  <img src="/Personality Avatars/Networker Female.png" alt="Salma Zahra"
+                    className="h-36 w-36 md:h-44 md:w-44 rounded-full border-4 border-white shadow-lg object-contain bg-white px-1 py-1.5 mb-4 transition-all duration-200" />
                   <div className="text-2xl md:text-3xl font-bold text-gray-900">Salma Zahra</div>
                   <div className="text-base md:text-lg text-gray-400 mb-2">Co-Founder</div>
                   <a href="https://www.linkedin.com/in/salma-zahra-05285112b/" target="_blank" rel="noopener noreferrer"
@@ -1147,18 +1147,18 @@ function SocialRippleDiagram({ large = false }: { large?: boolean }): React.Reac
     { icon: <FaSlack className="text-[#611f69] w-14 h-14" />, style: "top-4 right-8" },
   ];
   const avatars = [
-    { src: "/images/Kind-of-Conscious-Boy.png", style: "top-8 left-1/2 -translate-x-1/2" },
-    { src: "/images/Planets-Main-Character-Boy.png", style: "left-8 top-1/2 -translate-y-1/2" },
-    { src: "/images/Eco-in-Progres-Boy.png", style: "bottom-8 left-1/2 -translate-x-1/2" },
-    { src: "/images/Sustainability-Slayer-Girl.png", style: "right-8 top-1/2 -translate-y-1/2" },
+    { src: "/Personality Avatars/Builder Female.png", style: "top-8 left-1/2 -translate-x-1/2" },
+    { src: "/Personality Avatars/Catalyst Male.png", style: "left-8 top-1/2 -translate-y-1/2" },
+    { src: "/Personality Avatars/Networker Female.png", style: "bottom-8 left-1/2 -translate-x-1/2" },
+    { src: "/Personality Avatars/Seed Male.png", style: "right-8 top-1/2 -translate-y-1/2" },
   ];
   return (
     <div className={`relative ${large ? 'w-[650px] h-[650px]' : 'w-[400px] h-[400px]'} mx-auto bg-gradient-to-br from-emerald-50 to-white rounded-3xl shadow-lg mb-12 font-['Proxima Nova']`}>
       {/* Central personality image */}
       <motion.img
-        src="/images/Planets-Main-Character-Girl.png"
+        src="/profile.jpg"
         alt="Personality"
-        className="absolute left-1/2 top-1/2 w-24 h-24 rounded-full object-cover border-4 border-white shadow-xl z-10 -translate-x-1/2 -translate-y-1/2"
+        className="absolute left-1/2 top-1/2 w-24 h-24 rounded-full object-contain border-4 border-white shadow-xl z-10 -translate-x-1/2 -translate-y-1/2 px-1 py-1.5 bg-white"
         whileHover={{ scale: 1.08 }}
       />
       {/* Social icons */}
@@ -1179,7 +1179,7 @@ function SocialRippleDiagram({ large = false }: { large?: boolean }): React.Reac
           key={i}
           src={item.src}
           alt=""
-          className={`absolute w-12 h-12 rounded-full object-cover border-2 border-white shadow ${item.style}`}
+          className={`absolute w-16 h-16 rounded-full object-contain border-2 border-white shadow px-1 py-1.5 bg-white ${item.style}`}
           initial={{ scale: 0.9, opacity: 0.8 }}
           animate={{ scale: 1, opacity: 1, y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
