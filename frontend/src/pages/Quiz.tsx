@@ -214,7 +214,7 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
             >
               Let's begin your
               <span className="block text-slate-900">
-                sustainability story.
+                sustainability story
               </span>
             </motion.h1>
 
@@ -225,7 +225,7 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
               transition={{ duration: 0.8, delay: 0.9 }}
               className="text-xl lg:text-2xl text-slate-600 leading-relaxed font-light"
             >
-              This isn't about being perfect — it's about being present. One small step, together with Bobo.
+              This isn't about being perfect  it's about being 
             </motion.p>
 
             {/* Body Text */}
@@ -239,7 +239,7 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
                 Zerrah is a safe space to reflect. There are no scores, no guilt, no pressure. Just gentle questions, thoughtful pauses, and moments to notice the beauty in your everyday choices.
               </p>
               <p className="font-light">
-                Bobo will guide you through each step — with kindness, curiosity, and zero judgment.
+              Bobo will guide you through each step with kindness, curiosity, and zero judgment
               </p>
             </motion.div>
 
