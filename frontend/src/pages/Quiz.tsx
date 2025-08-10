@@ -295,17 +295,7 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
           </motion.div>
         </div>
       </div>
-      {showValidationModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <div className="text-lg font-semibold text-slate-800 mb-2">Check your input</div>
-            <div className="text-slate-600 mb-6">{validationMessage}</div>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setShowValidationModal(false)} className="px-5 py-2 rounded-lg bg-emerald-600 text-white font-semibold shadow hover:bg-emerald-700">OK</button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+      
     </div>
   );
 }
