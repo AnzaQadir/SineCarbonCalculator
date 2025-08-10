@@ -21,10 +21,10 @@ const ResultsScreen: React.FC = () => {
     <Layout>
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
+        {/* Back Button (always return to Quiz at last stored step) */}
         <div className="flex justify-start mb-8">
           <Button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/quiz')}
             className="flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-sage-200/50 hover:bg-white/90 hover:shadow-xl transition-all duration-300 group"
           >
             <svg className="h-5 w-5 text-sage-600 group-hover:text-sage-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,8 +46,9 @@ const ResultsScreen: React.FC = () => {
           recommendations={[]}
           isVisible={true}
           onReset={() => navigate('/')}
+          onBack={() => navigate('/quiz')}
           state={quizResults}
-          gender={user?.gender || 'boy'}
+          gender={'boy'}
         />
 
       </div>

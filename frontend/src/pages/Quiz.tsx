@@ -302,7 +302,9 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
 
 const Quiz = () => {
   const { state, updateCalculator } = useCalculator();
-  const [currentStep, setCurrentStep] = useState(0);
+  const lastStep = useQuizStore(s => s.lastStep);
+  const setLastStep = useQuizStore(s => s.setLastStep);
+  const [currentStep, setCurrentStep] = useState(lastStep ?? 0);
   const [started, setStarted] = useState<null | 'A' | 'B'>(null);
   const [notReady, setNotReady] = useState(false);
 
@@ -332,14 +334,20 @@ const Quiz = () => {
 
   const handleBack = () => {
     setCurrentStep(prev => Math.max(0, prev - 1));
+    setLastStep(Math.max(0, (lastStep ?? 0) - 1));
   };
 
   const handleNext = () => {
-    setCurrentStep(prev => Math.min(5, prev + 1));
+    setCurrentStep(prev => {
+      const next = Math.min(5, prev + 1);
+      setLastStep(next);
+      return next;
+    });
   };
 
   const handleStepChange = (step: number) => {
     setCurrentStep(step);
+    setLastStep(step);
   };
 
   if (started === null) {
@@ -1467,11 +1475,12 @@ function PoeticJourneyQuiz() {
           setExistingUser(null);
         }}
         onBack={() => {
+          // Return into quiz at the last recorded step
           setShowResults(false);
           setResults(null);
-          // Go back to the welcome back screen while preserving all quiz data
-          setShowExistingUserScreen(true);
-          // All quiz data (answers, personalityTraits, existingUser) remains intact
+          setShowExistingUserScreen(false);
+          const last = useQuizStore.getState().lastStep;
+          setStep(typeof last === 'number' ? last : questions.length - 1);
         }}
         state={answers}
         gender={answers.gender === 'female' ? 'girl' : 'boy'}

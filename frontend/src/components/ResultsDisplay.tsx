@@ -333,6 +333,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const journeyRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { setQuizResults, setQuizAnswers } = useQuizStore();
+  const cachedQuizResults = useQuizStore(s => s.quizResults);
   // Always use the persisted quizAnswers from the store
   const quizAnswers = useQuizStore(s => s.quizAnswers);
   const state = quizAnswers || _state;
@@ -343,6 +344,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   // Add a ref to track if calculation has been attempted
   const hasAttemptedCalculation = useRef(false);
+  // Seed from cached store results to avoid re-calling the API on remounts
+  useEffect(() => {
+    if (!hasAttemptedCalculation.current && cachedQuizResults) {
+      setDynamicPersonality(cachedQuizResults);
+      hasAttemptedCalculation.current = true;
+    }
+  }, [cachedQuizResults]);
+
 
   // Update error handling with proper typing
   const handleError = (error: unknown) => {
@@ -719,6 +728,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const calculateInitialPersonality = async () => {
     // Prevent duplicate calls
     if (isLoading || dynamicPersonality || hasAttemptedCalculation.current) return;
+    // Short-circuit if we already seeded from cached results
+    if (cachedQuizResults) return;
     
     try {
       hasAttemptedCalculation.current = true;

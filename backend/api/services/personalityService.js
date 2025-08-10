@@ -277,28 +277,118 @@ class PersonalityService {
                 finalScore += score.score;
             }
         });
-        // Determine personality type based on final score
-        const personalityType = this.determinePersonalityType(finalScore);
+        // Keep numeric aggregates for compatibility, but personalityType is decided elsewhere now
         return {
-            personalityType,
+            personalityType: 'Eco in Progress', // placeholder; not used by caller anymore
             categoryScores,
             finalScore
         };
     }
-    determinePersonalityType(score) {
-        if (score >= 80)
-            return 'Sustainability Slayer';
-        if (score >= 65)
-            return "Planet's Main Character";
-        if (score >= 50)
-            return 'Sustainability Soft Launch';
-        if (score >= 35)
-            return 'Kind of Conscious, Kind of Confused';
-        if (score >= 20)
+    /**
+     * Determine eco personality by tallying mapping hits rather than numeric thresholds.
+     * This eliminates the threshold-based mapping and uses explicit mappings per response.
+     */
+    determinePersonalityFromMappings(responses) {
+        // Initialize tally with known personalities only
+        const tally = {};
+        ecoPersonality_1.personalityHierarchy.forEach((p) => {
+            tally[p] = 0;
+        });
+        const addVotes = (personalityKeys) => {
+            if (!personalityKeys || !Array.isArray(personalityKeys))
+                return;
+            for (const key of personalityKeys) {
+                if (key in tally) {
+                    tally[key] = (tally[key] ?? 0) + 1;
+                }
+            }
+        };
+        // Home Energy
+        if (responses.homeEfficiency) {
+            addVotes(ecoPersonality_1.personalityMappings?.homeEnergy?.efficiency?.[responses.homeEfficiency]);
+        }
+        if (responses.energyManagement) {
+            addVotes(ecoPersonality_1.personalityMappings?.homeEnergy?.management?.[responses.energyManagement]);
+        }
+        // Transport
+        if (responses.primaryTransportMode) {
+            addVotes(ecoPersonality_1.personalityMappings?.transport?.primary?.[responses.primaryTransportMode]);
+        }
+        if (responses.carProfile) {
+            addVotes(ecoPersonality_1.personalityMappings?.transport?.carProfile?.[responses.carProfile]);
+        }
+        if (responses.longDistanceTravel) {
+            // Optional mapping, add if defined
+            addVotes(ecoPersonality_1.personalityMappings?.transport?.longDistanceTravel?.[responses.longDistanceTravel]);
+        }
+        // Food & Diet
+        if (responses.dietType) {
+            addVotes(ecoPersonality_1.personalityMappings?.food?.dietType?.[responses.dietType]);
+        }
+        if (responses.plateProfile) {
+            addVotes(ecoPersonality_1.personalityMappings?.food?.plateProfile?.[responses.plateProfile]);
+        }
+        if (responses.monthlyDiningOut) {
+            addVotes(ecoPersonality_1.personalityMappings?.food?.monthlyDiningOut?.[responses.monthlyDiningOut]);
+        }
+        // Waste
+        if (responses.waste) {
+            const w = responses.waste;
+            if (w.prevention)
+                addVotes(ecoPersonality_1.personalityMappings?.waste?.prevention?.[w.prevention]);
+            if (w.management)
+                addVotes(ecoPersonality_1.personalityMappings?.waste?.management?.[w.management]);
+            if (w.repairOrReplace)
+                addVotes(ecoPersonality_1.personalityMappings?.waste?.repairOrReplace?.[w.repairOrReplace]);
+            // Note: smartShopping and dailyWaste are not defined in backend mappings; intentionally omitted
+        }
+        // Air Quality (optional keys)
+        if (responses.airQuality) {
+            const a = responses.airQuality;
+            if (a.aqiMonitoring)
+                addVotes(ecoPersonality_1.personalityMappings?.airQuality?.monitoring?.[a.aqiMonitoring]);
+            if (a.airQualityImpact)
+                addVotes(ecoPersonality_1.personalityMappings?.airQuality?.impact?.[a.airQualityImpact]);
+            if (a.outdoorAirQuality)
+                addVotes(ecoPersonality_1.personalityMappings?.airQuality?.outdoorAirQuality?.[a.outdoorAirQuality]);
+            if (a.indoorAirQuality)
+                addVotes(ecoPersonality_1.personalityMappings?.airQuality?.indoorAirQuality?.[a.indoorAirQuality]);
+            if (a.airQualityCommuting)
+                addVotes(ecoPersonality_1.personalityMappings?.airQuality?.airQualityCommuting?.[a.airQualityCommuting]);
+        }
+        // Clothing
+        if (responses.clothing) {
+            const c = responses.clothing;
+            if (c.wardrobeImpact)
+                addVotes(ecoPersonality_1.personalityMappings?.clothing?.wardrobeImpact?.[c.wardrobeImpact]);
+            if (c.mindfulUpgrades)
+                addVotes(ecoPersonality_1.personalityMappings?.clothing?.mindfulUpgrades?.[c.mindfulUpgrades]);
+            if (c.durability)
+                addVotes(ecoPersonality_1.personalityMappings?.clothing?.durability?.[c.durability]);
+            if (c.consumptionFrequency)
+                addVotes(ecoPersonality_1.personalityMappings?.clothing?.consumptionFrequency?.[c.consumptionFrequency]);
+            if (c.brandLoyalty)
+                addVotes(ecoPersonality_1.personalityMappings?.clothing?.brandLoyalty?.[c.brandLoyalty]);
+        }
+        // Select top personality by max votes; break ties by hierarchy order.
+        let maxCount = 0;
+        const top = [];
+        for (const key of ecoPersonality_1.personalityHierarchy) {
+            const count = tally[key] ?? 0;
+            if (count > maxCount) {
+                maxCount = count;
+                top.length = 0;
+                top.push(key);
+            }
+            else if (count === maxCount) {
+                top.push(key);
+            }
+        }
+        // If all zeros, default to a reasonable middle-ground personality.
+        if (maxCount === 0)
             return 'Eco in Progress';
-        if (score >= 5)
-            return 'Doing Nothing for the Planet';
-        return 'Certified Climate Snoozer';
+        // Tie-break deterministically by hierarchy order (earliest wins)
+        return top[0];
     }
     calculateCarbonEmissions(responses) {
         let totalEmissions = 0;
@@ -472,29 +562,29 @@ class PersonalityService {
         return { goodHabits, stretchAreas, habitTags };
     }
     determinePersonalityArchetype(personalityTraits) {
-        const decisionCategories = ['analyst', 'intuitive', 'connector'];
-        const actionCategories = ['planner', 'experimenter', 'collaborator'];
-        const decisionCounts = { analyst: 0, intuitive: 0, connector: 0 };
-        const actionCounts = { planner: 0, experimenter: 0, collaborator: 0 };
+        // Extend with a 4th option: neutral/indecisive
+        const decisionCategories = ['analyst', 'intuitive', 'connector', 'neutral', 'indecisive'];
+        const actionCategories = ['planner', 'experimenter', 'collaborator', 'neutral', 'indecisive'];
+        const decisionCounts = { analyst: 0, intuitive: 0, connector: 0, neutral: 0, indecisive: 0 };
+        const actionCounts = { planner: 0, experimenter: 0, collaborator: 0, neutral: 0, indecisive: 0 };
         Object.entries(personalityTraits).forEach(([key, value]) => {
             // Map personality traits to decision and action categories
-            if (['relationshipWithChange', 'decisionMaking', 'motivation', 'ecoIdentity', 'opennessToLearning'].includes(key)) {
-                if (decisionCategories.includes(value)) {
-                    decisionCounts[value] += 1;
-                }
+            const val = value;
+            const isDecisionKey = ['relationshipWithChange', 'decisionMaking', 'motivation', 'ecoIdentity', 'opennessToLearning'].includes(key) || key.startsWith('decisionMaking');
+            const isActionKey = ['socialInfluence', 'emotionalConnection', 'barriers', 'goalSetting', 'selfEfficacy'].includes(key) || key.startsWith('actionTaking');
+            if (isDecisionKey && decisionCategories.includes(val)) {
+                decisionCounts[val] += 1;
             }
-            if (['socialInfluence', 'emotionalConnection', 'barriers', 'goalSetting', 'selfEfficacy'].includes(key)) {
-                if (actionCategories.includes(value)) {
-                    actionCounts[value] += 1;
-                }
+            if (isActionKey && actionCategories.includes(val)) {
+                actionCounts[val] += 1;
             }
         });
-        // Helper to pick dominant or random
+        // Helper to pick dominant or deterministic fallback
         const pickDominant = (counts, cats) => {
             const max = Math.max(...cats.map(c => counts[c]));
             if (max === 0) {
-                // All neutral – pick random category
-                return cats[Math.floor(Math.random() * cats.length)];
+                // All neutral – pick first category deterministically
+                return cats[0];
             }
             const winners = cats.filter(c => counts[c] === max);
             winners.sort();
@@ -502,6 +592,19 @@ class PersonalityService {
         };
         const decisionStyle = pickDominant(decisionCounts, decisionCategories);
         const actionStyle = pickDominant(actionCounts, actionCategories);
+        // Seed condition: if dominant decision OR action is neutral/indecisive
+        if (['neutral', 'indecisive'].includes(decisionStyle) || ['neutral', 'indecisive'].includes(actionStyle)) {
+            const pretty = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+            return {
+                archetype: 'The Seed',
+                decision: pretty(decisionStyle),
+                action: pretty(actionStyle),
+                description: "You’re not quite sure where you stand yet, but you're curious, you're here, and you're starting to pay attention. That alone matters.\n" +
+                    "Maybe you haven’t figured out your routine, your values, or how it all fits together. Maybe you’re still deciding what’s realistic or meaningful for you. That’s not a flaw; it’s the beginning of growth.\n" +
+                    "Like a seed in the soil, you don’t have to do everything right away. Start small. Notice one thing this week: how much plastic shows up in your day, or how often you toss leftovers. No pressure to act. Just pay attention and you’ll be on your way.",
+                hookLine: "**10. The Seed**\n*You’re not quite sure where you stand yet and that’s okay.*"
+            };
+        }
         // Matrix mapping
         const matrix = {
             analyst: {
@@ -740,10 +843,11 @@ class PersonalityService {
         // Analyze behavioral patterns
         const behavioralPatterns = this.analyzeBehavioralPatterns(responses);
         // Determine personality archetype if personality traits are available
+        // Coherent default (decision/action match archetype): Connector + Planner => Builder
         let personality = {
             archetype: 'Builder',
             decision: 'Connector',
-            action: 'Experimenter',
+            action: 'Planner',
             description: 'You break big goals into steps. You co-create small experiments with others and build lasting systems that grow over time.',
             hookLine: 'You break goals into steps and create systems that stick.'
         };
@@ -755,16 +859,21 @@ class PersonalityService {
         return {
             personality,
             powerMoves,
-            tone: 'supportive, intelligent, honest, warm'
+            tone: 'supportive, intelligent, honest, warm',
+            gender: (responses.gender === 'boy' || responses.gender === 'girl')
+                ? responses.gender
+                : (responses.gender && responses.gender.toLowerCase().startsWith('m') ? 'boy' : 'girl')
         };
     }
     async calculatePersonality(responses) {
         console.log('Calculating personality for responses:', responses);
+        // Legacy: category-based numeric scoring retained for backward-compatible fields
         const scores = this.calculatePersonalityScores(responses);
         console.log('Calculated scores:', scores);
         const impactMetrics = this.calculateImpactMetrics(responses);
         console.log('Calculated impact metrics:', impactMetrics);
-        const personalityType = scores.personalityType;
+        // New: eliminate threshold mapping, pick personality by mapping tally
+        const personalityType = this.determinePersonalityFromMappings(responses);
         console.log('Determined personality type:', personalityType);
         const personalityInfo = ecoPersonality_1.EcoPersonalityTypes[personalityType];
         console.log('Retrieved personality info:', personalityInfo);
@@ -775,53 +884,9 @@ class PersonalityService {
         let newPersonality;
         let newPersonalityDescription;
         if (responses.personalityTraits) {
-            const { personalityTraits } = responses;
-            const decisionCategories = ['analyst', 'intuitive', 'connector'];
-            const actionCategories = ['planner', 'experimenter', 'collaborator'];
-            const decisionCounts = { analyst: 0, intuitive: 0, connector: 0 };
-            const actionCounts = { planner: 0, experimenter: 0, collaborator: 0 };
-            Object.entries(personalityTraits).forEach(([key, value]) => {
-                if (key.startsWith('decisionMaking') && decisionCategories.includes(value)) {
-                    decisionCounts[value] += 1;
-                }
-                if (key.startsWith('actionTaking') && actionCategories.includes(value)) {
-                    actionCounts[value] += 1;
-                }
-            });
-            // Helper to pick dominant or random
-            const pickDominant = (counts, cats) => {
-                const max = Math.max(...cats.map(c => counts[c]));
-                if (max === 0) {
-                    // All neutral – pick random category
-                    return cats[Math.floor(Math.random() * cats.length)];
-                }
-                const winners = cats.filter(c => counts[c] === max);
-                winners.sort();
-                return winners[0];
-            };
-            const decisionStyle = pickDominant(decisionCounts, decisionCategories);
-            const actionStyle = pickDominant(actionCounts, actionCategories);
-            // Matrix mapping
-            const matrix = {
-                analyst: {
-                    planner: { type: 'Strategist', desc: 'You like to know the plan before you start. Try mapping out your week’s meals to cut food waste, or setting reminders to switch off lights and unplug chargers when you leave a room. Small routines add up.' },
-                    experimenter: { type: 'Trailblazer', desc: 'You jump in and see what sticks. Test out one new swap each month—like swapping bottled water for a refillable bottle—and keep the ones that feel easiest.' },
-                    collaborator: { type: 'Coordinator', desc: 'You bring people together for a common goal. Host a mini clothing swap among friends or family—it’s social, fun, and cuts down on impulse buys.' }
-                },
-                intuitive: {
-                    planner: { type: 'Visionary', desc: 'You see the big picture and sketch out a brighter future. Turn that into action by dedicating one corner of your home to indoor plants or setting up a small herb garden—green space you can build on over time.' },
-                    experimenter: { type: 'Explorer', desc: 'You learn by doing, then share what works. Try biking or walking one errand this week instead of driving, see how it feels, then tell a friend about your experience.' },
-                    collaborator: { type: 'Catalyst', desc: 'You spark enthusiasm in others. Start a group chat challenge—like “no-plastic week”—and cheer people on with photos and quick tips each day.' }
-                },
-                connector: {
-                    planner: { type: 'Builder', desc: 'You break big goals into steps. Pick one space—your kitchen counter, desk, or balcony—and transform it: add a compost bin, arrange reusable containers, or line up your recycling bins so it’s second nature.' },
-                    experimenter: { type: 'Networker', desc: 'You connect dots and share resources. Keep a list of local second-hand shops or repair cafés and pass it along to neighbors or colleagues when they ask where to find sustainable options.' },
-                    collaborator: { type: 'Steward', desc: 'You stick with habits that protect what matters. Set a weekly “switch-off hour” where you turn off all non-essential electronics and spend that time reading, cooking, or chatting—no screens, no stress.' }
-                }
-            };
-            const resultEntry = matrix[decisionStyle][actionStyle];
-            newPersonality = resultEntry.type;
-            newPersonalityDescription = resultEntry.desc;
+            const result = this.determinePersonalityArchetype(responses.personalityTraits);
+            newPersonality = result.archetype;
+            newPersonalityDescription = result.description;
         }
         // Generate comprehensive power moves using new system
         const comprehensivePowerMoves = this.generateComprehensivePowerMoves(responses);
@@ -842,6 +907,7 @@ class PersonalityService {
             description: personalityInfo.description,
             strengths: personalityInfo.strengths,
             nextSteps: personalityInfo.nextSteps,
+            // Preserve existing response shape for compatibility
             categoryScores: scores.categoryScores,
             impactMetrics,
             finalScore: scores.finalScore,

@@ -32,42 +32,46 @@ const personalityImageMap: Record<PersonalityType, Record<Gender, string>> = {
     boy: '/images/Certified-Climate-Snoozer-Boy.png',
     girl: '/images/Certified-Climate-Snoozer-Girl.png'
   },
-  // New archetypes from comprehensivePowerMoves
+  // New archetypes from comprehensivePowerMoves -> map to new public folder avatar assets
   'Strategist': {
-    boy: '/images/Sustainability-Slayer-Boy.png', // Using existing image as fallback
-    girl: '/images/Sustainability-Slayer-Girl.png'
+    boy: '/Personality Avatars/Strategist Male.png',
+    girl: '/Personality Avatars/Strategist Female.png'
   },
   'Trailblazer': {
-    boy: '/images/Planets-Main-Character-Boy.png',
-    girl: '/images/Planets-Main-Character-Girl.png'
+    boy: '/Personality Avatars/Trailblazer Male.png',
+    girl: '/Personality Avatars/Trailblazer Female.png'
   },
   'Coordinator': {
-    boy: '/images/Sustainability-Soft-Launch-Boy.png',
-    girl: '/images/Sustainability-Soft-Launch-Girl.png'
+    boy: '/Personality Avatars/Coordinator Male.png',
+    girl: '/Personality Avatars/Coordinator Female.png'
   },
   'Visionary': {
-    boy: '/images/Eco-in-Progres-Boy.png',
-    girl: '/images/Eco-In-Progress-Girl.png'
+    boy: '/Personality Avatars/Visionary Male.png',
+    girl: '/Personality Avatars/Visionary Female.png'
   },
   'Explorer': {
-    boy: '/images/Kind-of-Conscious-Boy.png',
-    girl: '/images/Kind-of-Conscious-Girl.png'
+    boy: '/Personality Avatars/Explorer Male.png',
+    girl: '/Personality Avatars/Explorer Female.png'
   },
   'Catalyst': {
-    boy: '/images/Doing-Nothing-Boy.png',
-    girl: '/images/Doing-Nothing-Girl.png'
+    boy: '/Personality Avatars/Catalyst Male.png',
+    girl: '/Personality Avatars/Catalyst Female.png'
   },
   'Builder': {
-    boy: '/images/Certified-Climate-Snoozer-Boy.png',
-    girl: '/images/Certified-Climate-Snoozer-Girl.png'
+    boy: '/Personality Avatars/Builder Male.png',
+    girl: '/Personality Avatars/Builder Female.png'
   },
   'Networker': {
-    boy: '/images/Sustainability-Slayer-Boy.png',
-    girl: '/images/Sustainability-Slayer-Girl.png'
+    boy: '/Personality Avatars/Networker Male.png',
+    girl: '/Personality Avatars/Networker Female.png'
   },
   'Steward': {
-    boy: '/images/Planets-Main-Character-Boy.png',
-    girl: '/images/Planets-Main-Character-Girl.png'
+    boy: '/Personality Avatars/Steward Male.png',
+    girl: '/Personality Avatars/Steward Female.png'
+  },
+  'The Seed': {
+    boy: '/Personality Avatars/Seed Male.png',
+    girl: '/Personality Avatars/Seed Female.png'
   }
 };
 

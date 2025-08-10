@@ -27,54 +27,14 @@ catch (error) {
     console.error('❌ pg module not found. Please install it manually.');
     throw new Error('Please install pg package manually');
 }
-// Parse DATABASE_URL manually to handle URL encoding issues
-function parseDatabaseUrl(url) {
-    try {
-        // Handle URL encoding issues by manually parsing
-        const match = url.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
-        if (!match) {
-            throw new Error('Invalid DATABASE_URL format');
-        }
-        const [, username, password, host, port, database] = match;
-        // Decode the password (handle %23 -> #)
-        const decodedPassword = decodeURIComponent(password);
-        return {
-            username,
-            password: decodedPassword,
-            host,
-            port: parseInt(port),
-            database
-        };
-    }
-    catch (error) {
-        console.error('❌ Error parsing DATABASE_URL:', error);
-        throw error;
-    }
-}
-const dbConfig = parseDatabaseUrl(process.env.DATABASE_URL);
-console.log('Parsed database config:', {
-    username: dbConfig.username,
-    host: dbConfig.host,
-    port: dbConfig.port,
-    database: dbConfig.database,
-    passwordLength: dbConfig.password.length
-});
-const sequelize = new sequelize_1.Sequelize({
+const sequelize = new sequelize_1.Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
-    host: dbConfig.host,
-    port: dbConfig.port,
-    database: dbConfig.database,
-    username: dbConfig.username,
-    password: dbConfig.password,
     logging: false,
     dialectOptions: {
-        ssl: process.env.NODE_ENV === 'production' ? {
+        ssl: {
             require: true,
-            rejectUnauthorized: false,
-            ca: undefined,
-            key: undefined,
-            cert: undefined
-        } : false
+            rejectUnauthorized: false
+        }
     },
     pool: {
         max: 5,
