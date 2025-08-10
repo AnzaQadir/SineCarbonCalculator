@@ -1025,21 +1025,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
              {/* Profile Content */}
              <div className="flex flex-col items-center justify-center bg-gradient-to-br from-sage-50 to-cream-50 rounded-3xl p-8 shadow-xl border border-sage-100">
              
-             {/* Main Avatar with Enhanced Styling */}
-             <div className="relative mb-8">
-               <div className="w-48 h-48 rounded-full overflow-hidden border-8 border-sage-200 shadow-2xl relative">
-                 <img
-                   src={profileImage}
-                   alt="Profile Avatar"
-                   className="w-full h-full object-cover"
-                 />
-                 {/* Decorative Elements */}
-                 <div className="absolute -top-2 -right-2 w-8 h-8 bg-sage-300 rounded-full flex items-center justify-center">
-                   <Leaf className="h-5 w-5 text-white" />
-                 </div>
-                 <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-cream-300 rounded-full flex items-center justify-center">
-                   <Sparkles className="h-4 w-4 text-sage-700" />
-                 </div>
+              {/* Main Avatar with Enhanced Styling */}
+              <div className="relative mb-8">
+                <div className="w-64 aspect-[3/4] rounded-3xl overflow-hidden border-8 border-sage-200 shadow-2xl relative bg-white">
+                  <img
+                    src={profileImage}
+                    alt="Profile Avatar"
+                    className="w-full h-full object-cover"
+                    style={{ objectPosition: 'center top' }}
+                  />
                </div>
              </div>
              
