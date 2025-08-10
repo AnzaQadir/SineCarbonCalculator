@@ -91,11 +91,22 @@ const questions: Q[] = [
     required: true,
   },
   {
-    key: 'location',
+    key: 'country',
     question: 'Bobo: Where in the world do you call home?',
-    subtext: 'Just your city and country is perfect so I can notice patterns and stories blooming nearby.',
-    inputType: 'text',
-    placeholder: 'City, Country',
+    subtext: 'Choose your country so I can notice patterns and stories blooming nearby.',
+    inputType: 'select',
+    options: [
+      'United States','Canada','United Kingdom','Australia','India','Pakistan','United Arab Emirates','Saudi Arabia','Germany','France','Brazil','Japan','China','South Africa','Turkey','Indonesia','Bangladesh','Nigeria','Mexico','Russia','Egypt','Argentina','Italy','Spain','Other'
+    ],
+    placeholder: 'Select your country',
+    required: true,
+  },
+  {
+    key: 'city',
+    question: (a) => `Bobo: And which city in ${a.country || 'your country'}?`,
+    subtext: 'Pick the city that feels most like home.',
+    inputType: 'select',
+    placeholder: 'Your city',
     required: true,
   },
   {
@@ -120,6 +131,7 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
   const [finished, setFinished] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [cityList, setCityList] = useState<string[]>([]);
 
   // Check for existing user data on mount
   useEffect(() => {
@@ -165,22 +177,45 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
   }, [messages]);
 
   const sendUserAnswer = () => {
-    if (!inputValue.trim()) return;
-    // user message
-    setMessages((m) => [...m, { role: 'user', text: inputValue.trim() }]);
+    const value = inputValue.trim();
+    if (!value) return;
 
-    // validate
-    if (current.validate && !current.validate(inputValue.trim())) {
+    // validate BEFORE sending the user message
+    if (current.validate && !current.validate(value)) {
       setError(current.error || 'Invalid input');
+      // Send a gentle bot prompt instead of echoing the invalid answer
+      setMessages((m) => [
+        ...m,
+        { role: 'bot', text: current.error || 'Please provide a valid input.' },
+      ]);
       return;
     }
 
-    const updatedAns = { ...answers, [current.key]: inputValue.trim() };
+    // clear any previous error once valid
+    if (error) setError(null);
+
+    // user message (only for valid input)
+    setMessages((m) => [...m, { role: 'user', text: value }]);
+
+    const updatedAns = { ...answers, [current.key]: value };
     setAnswers(updatedAns);
     setInputValue('');
 
     if (!isLast) {
       const next = questions[step + 1];
+      // If moving to city, prep city list if we know the country
+      if (next?.key === 'city') {
+        const c = updatedAns.country;
+        const map: Record<string, string[]> = {
+          'United States': ['New York','Los Angeles','Chicago','San Francisco','Other'],
+          Pakistan: ['Karachi','Lahore','Islamabad','Rawalpindi','Other'],
+          India: ['Mumbai','Delhi','Bangalore','Chennai','Other'],
+          Canada: ['Toronto','Vancouver','Montreal','Calgary','Other'],
+          'United Kingdom': ['London','Manchester','Birmingham','Liverpool','Other'],
+          Australia: ['Sydney','Melbourne','Brisbane','Perth','Other'],
+        };
+        setCityList(map[c] || ['Other']);
+      }
       // push bot message after small delay
       setTimeout(() => {
         setMessages((m) => [
@@ -267,7 +302,9 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
               className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-base font-medium focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all duration-200"
             >
               <option value="" disabled>{current.placeholder || 'Select...'}</option>
-              {current.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+              {current.key === 'city' && cityList.length > 0
+                ? cityList.map((opt) => <option key={opt} value={opt}>{opt}</option>)
+                : current.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           ) : (
             <input

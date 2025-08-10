@@ -295,6 +295,17 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
           </motion.div>
         </div>
       </div>
+      {showValidationModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="text-lg font-semibold text-slate-800 mb-2">Check your input</div>
+            <div className="text-slate-600 mb-6">{validationMessage}</div>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowValidationModal(false)} className="px-5 py-2 rounded-lg bg-emerald-600 text-white font-semibold shadow hover:bg-emerald-700">OK</button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
@@ -541,6 +552,14 @@ function PoeticJourneyQuiz() {
   const [dividerSubtitle, setDividerSubtitle] = useState('');
   const shownGroupsRef = useRef<Set<string>>(new Set());
   const dividerTimerRef = useRef<number | null>(null);
+  // Simple email validation state
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  const isValidEmail = (v: string) => /[^@\s]+@[^@\s]+\.[^@\s]+/.test(v);
+
+  // Validation modal
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const [validationMessage, setValidationMessage] = useState('');
 
   // Show scroll hint after 3 seconds
   useEffect(() => {
@@ -854,7 +873,7 @@ function PoeticJourneyQuiz() {
       header: 'Chapter 7: Your Story',
       icon: '📧',
       question: 'Where can we send your personalized tips and progress updates?',
-      type: 'text',
+      type: 'email',
       placeholder: 'Enter your email'
     },
     {
@@ -1076,12 +1095,20 @@ function PoeticJourneyQuiz() {
       return;
     }
     
-    // Special handling for username verification on Next button click
-    if (q.key === 'name') {
-      console.log('🎯 Next button clicked for username question:', currentAnswer);
+    // Special handling for existing user check using email on Next button click
+    if (q.key === 'email') {
+      console.log('🎯 Next button clicked for email question:', currentAnswer);
+      if (!isValidEmail(currentAnswer)) {
+        setEmailError('Please enter a valid email address.');
+        setValidationMessage('Please enter a valid email address to continue.');
+        setShowValidationModal(true);
+        return;
+      } else {
+        setEmailError(null);
+      }
       if (currentAnswer && currentAnswer.trim()) {
         try {
-          console.log('🔍 Checking user existence for:', currentAnswer);
+          console.log('🔍 Checking user existence (by email) for:', currentAnswer);
           const response = await checkUserExists(currentAnswer);
           console.log('📡 User check response:', response);
           if (response.success && response.exists) {
@@ -1107,8 +1134,14 @@ function PoeticJourneyQuiz() {
           } else {
             console.log('User not found, proceeding with quiz');
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error checking user existence:', error);
+          // Surface a friendly, actionable prompt to the user
+          const message = typeof error?.response?.data?.error === 'string'
+            ? error.response.data.error
+            : (error?.message || 'We could not verify your email right now.');
+          setValidationMessage(`${message} Please try again or continue without lookup.`);
+          setShowValidationModal(true);
           // Continue with quiz even if check fails
         }
       }
@@ -1508,6 +1541,17 @@ function PoeticJourneyQuiz() {
             </div>
           </div>
         </motion.div>
+        {showValidationModal && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+              <div className="text-lg font-semibold text-slate-800 mb-2">Check your input</div>
+              <div className="text-slate-600 mb-6">{validationMessage}</div>
+              <div className="flex justify-end">
+                <button onClick={() => setShowValidationModal(false)} className="px-5 py-2 rounded-lg bg-emerald-600 text-white font-semibold shadow hover:bg-emerald-700">OK</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     );
   }
@@ -1793,6 +1837,24 @@ function PoeticJourneyQuiz() {
               className="rounded-xl px-6 py-4 text-base font-medium border-2 border-sage-200 focus:border-sage-500 focus:outline-none shadow-lg w-full max-w-lg text-sage-800 placeholder-sage-400"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
+          ) : q.type === 'email' ? (
+            <div className="w-full max-w-lg">
+              <input
+                type="email"
+                value={getNestedValue(answers, q.key) || ''}
+                onChange={e => {
+                  const val = e.target.value;
+                  handleSelect(q.key, val);
+                  setEmailError(val && !isValidEmail(val) ? 'Please enter a valid email address.' : null);
+                }}
+                placeholder={q.placeholder}
+                className={`rounded-xl px-6 py-4 text-base font-medium border-2 shadow-lg w-full text-sage-800 placeholder-sage-400 ${emailError ? 'border-red-400 focus:border-red-500' : 'border-sage-200 focus:border-sage-500'}`}
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              />
+              {emailError && (
+                <div className="mt-2 text-sm text-red-600">{emailError}</div>
+              )}
+            </div>
           ) : q.type === 'number' ? (
             <input
               type="number"
