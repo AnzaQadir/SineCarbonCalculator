@@ -344,13 +344,35 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   // Add a ref to track if calculation has been attempted
   const hasAttemptedCalculation = useRef(false);
-  // Seed from cached store results to avoid re-calling the API on remounts
+  // Seed from props first (authoritative), then from cached store to avoid re-calls
   useEffect(() => {
-    if (!hasAttemptedCalculation.current && cachedQuizResults) {
+    if (hasAttemptedCalculation.current || dynamicPersonality) return;
+    if (comprehensivePowerMoves) {
+      // Build a minimal personality object from props
+      setDynamicPersonality({
+        personalityType: (comprehensivePowerMoves.personality?.archetype || 'Eco in Progress') as PersonalityType,
+        description: comprehensivePowerMoves.personality?.description || '',
+        strengths: [],
+        nextSteps: [],
+        categoryScores: {
+          home: { score: categoryEmissions.home, percentage: 0, maxPossible: 10, maxPossibleScore: 10 },
+          transport: { score: categoryEmissions.transport, percentage: 0, maxPossible: 10, maxPossibleScore: 10 },
+          food: { score: categoryEmissions.food, percentage: 0, maxPossible: 10, maxPossibleScore: 10 },
+          waste: { score: categoryEmissions.waste, percentage: 0, maxPossible: 10, maxPossibleScore: 10 }
+        },
+        impactMetrics: { carbonReduced: emissions.toString(), treesPlanted: Math.round(emissions / 0.02), communityImpact: Math.round(emissions * 10) },
+        finalScore: score,
+        powerMoves: [],
+        comprehensivePowerMoves,
+      } as any);
+      hasAttemptedCalculation.current = true;
+      return;
+    }
+    if (cachedQuizResults) {
       setDynamicPersonality(cachedQuizResults);
       hasAttemptedCalculation.current = true;
     }
-  }, [cachedQuizResults]);
+  }, [comprehensivePowerMoves, cachedQuizResults, dynamicPersonality, categoryEmissions, emissions, score]);
 
 
   // Update error handling with proper typing
