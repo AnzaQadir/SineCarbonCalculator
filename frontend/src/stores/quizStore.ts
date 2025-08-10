@@ -9,6 +9,8 @@ interface QuizStore {
   quizAnswers: UserResponses | null;
   setQuizAnswers: (answers: UserResponses | null) => void;
   clearQuizAnswers: () => void;
+  lastStep: number | null;
+  setLastStep: (step: number) => void;
 }
 
 export const useQuizStore = create<QuizStore>((set) => ({
@@ -18,4 +20,6 @@ export const useQuizStore = create<QuizStore>((set) => ({
   quizAnswers: null,
   setQuizAnswers: (answers) => set({ quizAnswers: answers }),
   clearQuizAnswers: () => set({ quizAnswers: null }),
+  lastStep: null,
+  setLastStep: (step) => set({ lastStep: step }),
 })); 
