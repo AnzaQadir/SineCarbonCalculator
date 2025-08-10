@@ -137,6 +137,23 @@ interface ResultsDisplayProps {
   onBack?: () => void; // Add back function prop
   state: any;
   gender: 'boy' | 'girl';
+  // Optional highlights payload returned by backend
+  highlights?: {
+    highlights: Array<{
+      id: string;
+      title: string;
+      summary: string;
+      subtext: string;
+      cta?: string;
+      icon: string;
+      category: string;
+    }>;
+    personalityInsights: {
+      decisionStyle: string;
+      actionStyle: string;
+      spark: string;
+    };
+  };
   comprehensivePowerMoves?: {
     personality: {
       archetype: string;
@@ -304,7 +321,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   onBack,
   state: _state,
   gender,
-  comprehensivePowerMoves
+  comprehensivePowerMoves,
+  highlights: initialHighlights
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isPersonalityLoading, setIsPersonalityLoading] = useState(true);
@@ -364,6 +382,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         finalScore: score,
         powerMoves: [],
         comprehensivePowerMoves,
+        highlights: initialHighlights,
       } as any);
       hasAttemptedCalculation.current = true;
       return;
@@ -391,6 +410,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const badge = dynamicPersonality?.badge;
   const champion = undefined; // Not in canonical type
   const powerMoves = dynamicPersonality?.powerMoves;
+
+  // Helper to safely access highlights from either state or direct prop
+  const findHighlight = (id: string) =>
+    (dynamicPersonality?.highlights?.highlights || initialHighlights?.highlights)?.find(h => h.id === id);
+  const highlightInsights = dynamicPersonality?.highlights?.personalityInsights || initialHighlights?.personalityInsights;
 
   // Debug logging for state changes
   useEffect(() => {
@@ -780,6 +804,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           finalScore: score,
           powerMoves: [],
           comprehensivePowerMoves: comprehensivePowerMoves,
+          highlights: initialHighlights,
           dominantCategory: Object.entries(categoryEmissions)
             .reduce((a, b) => (a[1] > b[1] ? a : b))[0],
           emoji: '🌱',
@@ -1230,15 +1255,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    </div>
                      
                      {/* Enhanced Title */}
-                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-habit')?.title || 'Your Power Habit'}
-                     </h3>
+                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                        {findHighlight('power-habit')?.title || 'Your Power Habit'}
+                      </h3>
                      
                      {/* Enhanced Description */}
-                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-habit')?.subtext || 
-                      "You're taking steps toward sustainability — every small action counts and builds momentum."}
-                   </p>
+                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                        {findHighlight('power-habit')?.subtext || 
+                       "You're taking steps toward sustainability — every small action counts and builds momentum."}
+                    </p>
                    </div>
                  </div>
                </div>
@@ -1276,15 +1301,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    </div>
                      
                      {/* Enhanced Title */}
-                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-move')?.title || 'Your Power Move'}
-                     </h3>
+                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                        {findHighlight('power-move')?.title || 'Your Power Move'}
+                      </h3>
                      
                      {/* Enhanced Description */}
-                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'power-move')?.subtext || 
-                      "Try creating a 7-day visual tracker to improve one small habit. Builders like you thrive on small systems."}
-                   </p>
+                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                        {findHighlight('power-move')?.subtext || 
+                       "Try creating a 7-day visual tracker to improve one small habit. Builders like you thrive on small systems."}
+                    </p>
                    </div>
                  </div>
                </div>
@@ -1322,15 +1347,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    </div>
                      
                      {/* Enhanced Title */}
-                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'go-further')?.title || 'Go Further'}
-                     </h3>
+                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                        {findHighlight('go-further')?.title || 'Go Further'}
+                      </h3>
                      
                      {/* Enhanced Description */}
-                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'go-further')?.subtext || 
-                      "Want to go further? Choose one area to focus on and build sustainable habits over time."}
-                   </p>
+                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                        {findHighlight('go-further')?.subtext || 
+                       "Want to go further? Choose one area to focus on and build sustainable habits over time."}
+                    </p>
                    </div>
                  </div>
                </div>
@@ -1368,15 +1393,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    </div>
                      
                      {/* Enhanced Title */}
-                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'spark')?.title || 'Your Spark'}
-                   </h3>
+                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                        {findHighlight('spark')?.title || 'Your Spark'}
+                    </h3>
                      
                      {/* Enhanced Description */}
-                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'spark')?.summary || 
-                        "You see the big picture and inspire others. Your vision creates lasting change."}
-                     </p>
+                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                        {findHighlight('spark')?.summary || 
+                         "You see the big picture and inspire others. Your vision creates lasting change."}
+                      </p>
                    </div>
                  </div>
                </div>
@@ -1414,15 +1439,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    </div>
                      
                      {/* Enhanced Title */}
-                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'decision-style')?.title || 'Decision Style'}
-                     </h3>
+                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                        {findHighlight('decision-style')?.title || 'Decision Style'}
+                      </h3>
                      
                      {/* Enhanced Description */}
-                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'decision-style')?.summary || 
-                        dynamicPersonality?.highlights?.personalityInsights?.decisionStyle || 'Intuitive'}
-                     </p>
+                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                        {findHighlight('decision-style')?.summary || 
+                         highlightInsights?.decisionStyle || 'Intuitive'}
+                      </p>
                    </div>
                  </div>
                </div>
@@ -1460,15 +1485,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    </div>
                      
                      {/* Enhanced Title */}
-                     <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'action-style')?.title || 'Action Style'}
-                     </h3>
+                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+                        {findHighlight('action-style')?.title || 'Action Style'}
+                      </h3>
                      
                      {/* Enhanced Description */}
-                     <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
-                       {dynamicPersonality?.highlights?.highlights?.find(h => h.id === 'action-style')?.summary || 
-                        dynamicPersonality?.highlights?.personalityInsights?.actionStyle || 'Planner'}
-                   </p>
+                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                        {findHighlight('action-style')?.summary || 
+                         highlightInsights?.actionStyle || 'Planner'}
+                    </p>
                  </div>
                </div>
              </div>
