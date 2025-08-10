@@ -536,6 +536,11 @@ function PoeticJourneyQuiz() {
   const [showExistingUserScreen, setShowExistingUserScreen] = useState(false);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const setQuizAnswers = useQuizStore(state => state.setQuizAnswers);
+  // Divider slide state
+  const [showDivider, setShowDivider] = useState(false);
+  const [dividerSubtitle, setDividerSubtitle] = useState('');
+  const shownGroupsRef = useRef<Set<string>>(new Set());
+  const dividerTimerRef = useRef<number | null>(null);
 
   // Show scroll hint after 3 seconds
   useEffect(() => {
@@ -960,6 +965,43 @@ function PoeticJourneyQuiz() {
       placeholder: 'Enter number of people'
     }
   ];
+
+  // Group resolver for divider
+  const getGroupForKey = (key: string, type?: string): string => {
+    if (type === 'personality') return 'personality';
+    if (['homeSize','homeEfficiency','energyManagement'].includes(key)) return 'home';
+    if (['primaryTransportMode','carProfile','weeklyKm','longDistanceTravel'].includes(key)) return 'transport';
+    if (['dietType','plateProfile','monthlyDiningOut','plantBasedMealsPerWeek'].includes(key)) return 'food';
+    if (['clothing.wardrobeImpact','clothing.mindfulUpgrades','clothing.durability','clothing.consumptionFrequency','clothing.brandLoyalty'].includes(key)) return 'clothing';
+    if (['waste.prevention','waste.smartShopping','waste.dailyWaste','waste.management','waste.repairOrReplace'].includes(key)) return 'waste';
+    return 'demographics';
+  };
+
+  const dividerCopy: Record<string,string> = {
+    personality: 'As a first step, bobo the panda wants to get to know you',
+    home: 'Now that I know you better, tell me about the way you do things at home.',
+    transport: 'How do you travel through the world?',
+    food: 'What nourishes you day to day?',
+    clothing: 'How would you describe your wardrobe and shopping choices?',
+    waste: 'How do you reduce, reuse, and let go?',
+    demographics: 'Just a few details to personalize your experience.',
+  };
+
+  useEffect(() => {
+    const q = questions[step];
+    if (!q) return;
+    const group = getGroupForKey(q.key, q.type);
+    if (!shownGroupsRef.current.has(group)) {
+      shownGroupsRef.current.add(group);
+      setDividerSubtitle(dividerCopy[group]);
+      setShowDivider(true);
+      if (dividerTimerRef.current) window.clearTimeout(dividerTimerRef.current);
+      dividerTimerRef.current = window.setTimeout(() => setShowDivider(false), 5000);
+      return () => {
+        if (dividerTimerRef.current) window.clearTimeout(dividerTimerRef.current);
+      };
+    }
+  }, [step]);
 
   // Store answers in the same structure as CalculatorState
   const answersRef = useRef<any>({});
@@ -1419,6 +1461,57 @@ function PoeticJourneyQuiz() {
   const q = questions[step];
   const section = getSectionInfo(q.key, q.type);
 
+  // Divider screen rendering
+  if (showDivider) {
+    return (
+      <div className="min-h-screen flex items-start justify-center bg-white pt-10 md:pt-16">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35 }} className="text-center px-6 w-full">
+          <div className="max-w-lg md:max-w-xl mx-auto bg-white/92 border border-slate-200/70 rounded-[32px] shadow-2xl px-10 md:px-14 py-12 md:py-14">
+            <motion.div
+              initial={{ y: 6, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.35 }}
+              className="mx-auto mb-6 w-28 h-28 md:w-32 md:h-32 rounded-full bg-white ring-1 ring-slate-200/70 shadow-inner flex items-center justify-center"
+            >
+              <motion.div
+                className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden"
+                animate={{ y: [0, -2, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ transform: 'scale(3)', transformOrigin: 'center' }}
+              >
+                <video
+                  src="/gif/dancing.mp4"
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
+              </motion.div>
+            </motion.div>
+
+            <div className="text-5xl md:text-6xl leading-tight font-extrabold tracking-tight text-emerald-600 text-center mb-3" style={{letterSpacing:'-0.01em'}}>Bobo</div>
+
+            <div className="h-px bg-slate-200/70 mx-auto my-5 md:my-6 w-24 md:w-28 rounded-full" />
+
+            <div className="text-center text-lg md:text-xl leading-relaxed md:leading-relaxed max-w-3xl mx-auto mb-8 text-slate-700 font-medium">
+              {dividerSubtitle}
+            </div>
+
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowDivider(false)}
+                className="h-14 px-8 rounded-full bg-emerald-600 text-white font-semibold shadow hover:bg-emerald-700 transition-colors w-full sm:w-auto text-lg"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   // Debug: Log current question
   console.log(`Step ${step + 1}/${questions.length}: ${q.key} - ${q.question}`);
   console.log(`Current answer for ${q.key}:`, getNestedValue(answers, q.key));
@@ -1520,10 +1613,9 @@ function PoeticJourneyQuiz() {
 
       
       <div className="max-w-5xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-6 border border-[#A7D58E22] relative z-10 max-h-[90vh] overflow-y-auto">
-        {/* Chapter Title */}
+        {/* Chapter Title (subheading removed by request) */}
         <div className="mb-6">
           <h2 className="text-2xl md:text-3xl font-serif text-sage-800 text-center mb-2 tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700 }}>{section.title}</h2>
-          <div className="text-base md:text-lg text-sage-600 text-center italic mb-4 leading-relaxed" style={{ fontFamily: 'Inter, sans-serif', fontStyle: 'italic', fontWeight: 400 }}>{section.sub}</div>
         </div>
         {/* Question */}
         <div className="flex flex-col items-center mb-4">
