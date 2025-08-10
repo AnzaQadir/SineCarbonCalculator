@@ -3,12 +3,12 @@ export const personalityQuestions = [
   {
     key: 'decisionMaking1',
     icon: '/images/panda_stretching.png',
-    question: 'When you’re making a life decision—big or small—you usually:',
+    question: 'When you’re making a life decision big or small you usually:',
     options: [
       { value: 'analyst', label: 'Gather facts, compare options, and try to make the smartest choice.' },
-      { value: 'intuitive', label: 'Go with what feels aligned in the moment—even if it’s not "logical."' },
+      { value: 'intuitive', label: 'Go with what feels aligned in the moment even if it’s not logical.' },
       { value: 'connector', label: 'Talk to a few people first to get their take.' },
-      { value: 'neutral', label: 'I’m not sure—I kind of figure it out as I go.' },
+      { value: 'neutral', label: 'I’m not sure I kind of figure it out as I go.' },
     ],
   },
   {
@@ -19,7 +19,7 @@ export const personalityQuestions = [
       { value: 'analyst', label: 'You read reviews, maybe even look up a comparison video.' },
       { value: 'intuitive', label: 'If it speaks to you or sparks excitement, you\'re in.' },
       { value: 'connector', label: 'If a friend raves about it, you’ll give it a go.' },
-      { value: 'neutral', label: 'I don’t really have a method—I just see what happens.' },
+      { value: 'neutral', label: 'I don’t really have a method I just see what happens.' },
     ],
   },
   {
@@ -41,7 +41,7 @@ export const personalityQuestions = [
       { value: 'analyst', label: 'Do more research or analysis until it makes sense.' },
       { value: 'intuitive', label: 'Reflect or journal until your gut gives you clarity.' },
       { value: 'connector', label: 'Share your thoughts out loud with someone.' },
-      { value: 'neutral', label: 'It depends on the situation—I don’t have a go-to approach.' },
+      { value: 'neutral', label: 'It depends on the situation I don’t have a go to approach.' },
     ],
   },
   {
@@ -74,7 +74,7 @@ export const personalityQuestions = [
     question: 'You want to cut down your electricity bill. First step?',
     options: [
       { value: 'planner', label: 'Make a checklist and tackle it room by room.' },
-      { value: 'experimenter', label: 'Try something small—maybe turn off fans earlier and see what happens.' },
+      { value: 'experimenter', label: 'Try something small maybe turn off fans earlier and see what happens.' },
       { value: 'collaborator', label: 'Ask a friend or sibling to try with you so you stay on track.' },
       { value: 'neutral', label: 'I haven’t really thought about doing anything yet.' },
     ],
@@ -106,7 +106,7 @@ export const personalityQuestions = [
     icon: '/images/panda_stretching.png',
     question: 'You want to waste less water. You’re most likely to:',
     options: [
-      { value: 'planner', label: 'Set goals—like a shorter shower timer or fewer loads of laundry per week.' },
+      { value: 'planner', label: 'Set goals like a shorter shower timer or fewer loads of laundry per week.' },
       { value: 'experimenter', label: 'Test one habit at a time and keep what works.' },
       { value: 'collaborator', label: 'Share ideas with others or join a challenge for fun.' },
       { value: 'neutral', label: 'I know it matters, but I haven’t done much about it.' },
@@ -117,9 +117,9 @@ export const personalityQuestions = [
     icon: '/images/panda_stretching.png',
     question: 'How do you usually take on small lifestyle shifts?',
     options: [
-      { value: 'planner', label: 'With structure—you like a plan.' },
+      { value: 'planner', label: 'With structure you like a plan.' },
       { value: 'experimenter', label: 'You just wing it and adjust along the way.' },
-      { value: 'collaborator', label: 'You bring someone else in—it’s better together.' },
+      { value: 'collaborator', label: 'You bring someone else in it’s better together.' },
       { value: 'neutral', label: 'I want to start, but feel stuck.' },
     ],
   },
