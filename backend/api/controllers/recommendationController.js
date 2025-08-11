@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateStaticRecommendationsHandler = exports.generateRecommendationsHandler = void 0;
+exports.getCatalogByDomainHandler = exports.getCatalogHandler = exports.generateStaticRecommendationsHandler = exports.generateRecommendationsHandler = void 0;
 const personalityRecommendationService_1 = require("../services/personalityRecommendationService");
+const recommendationCatalogService_1 = require("../services/recommendationCatalogService");
 const generateRecommendationsHandler = async (req, res) => {
     try {
         const { personalityType, preferences } = req.body;
@@ -64,3 +65,41 @@ const generateStaticRecommendationsHandler = async (req, res) => {
     }
 };
 exports.generateStaticRecommendationsHandler = generateStaticRecommendationsHandler;
+const getCatalogHandler = async (req, res) => {
+    try {
+        const persona = req.query.persona || undefined;
+        const domain = req.query.domain || undefined;
+        const maxItems = req.query.maxItems ? parseInt(req.query.maxItems, 10) : undefined;
+        const cards = (0, recommendationCatalogService_1.queryCatalog)({ domain, persona, maxItems });
+        return res.json({
+            catalogVersion: 'v1.0',
+            domains: ['transport', 'food', 'home', 'clothing', 'waste'],
+            cards,
+            meta: (0, recommendationCatalogService_1.getCatalogMeta)(),
+        });
+    }
+    catch (error) {
+        console.error('Error fetching catalog recommendations:', error);
+        res.status(500).json({ error: 'Failed to fetch catalog recommendations' });
+    }
+};
+exports.getCatalogHandler = getCatalogHandler;
+const getCatalogByDomainHandler = async (req, res) => {
+    try {
+        const persona = req.query.persona || undefined;
+        const domain = req.params.domain;
+        const maxItems = req.query.maxItems ? parseInt(req.query.maxItems, 10) : undefined;
+        const cards = (0, recommendationCatalogService_1.queryCatalog)({ domain, persona, maxItems });
+        return res.json({
+            catalogVersion: 'v1.0',
+            domains: ['transport', 'food', 'home', 'clothing', 'waste'],
+            cards,
+            meta: (0, recommendationCatalogService_1.getCatalogMeta)(),
+        });
+    }
+    catch (error) {
+        console.error('Error fetching catalog recommendations by domain:', error);
+        res.status(500).json({ error: 'Failed to fetch catalog recommendations by domain' });
+    }
+};
+exports.getCatalogByDomainHandler = getCatalogByDomainHandler;

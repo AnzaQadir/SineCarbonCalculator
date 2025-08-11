@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecommendationEngine from '@/components/RecommendationEngine';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Home } from 'lucide-react';
+// Removed unused UI imports
 import { useUserStore } from '@/stores/userStore'; // Assuming you have a user store
 import { useQuizStore } from '@/stores/quizStore'; // Assuming you have a quiz store
 import Layout from '@/components/Layout';
@@ -33,9 +32,17 @@ const RecommendationScreen: React.FC = () => {
   console.log('RecommendationScreen - quizResults:', JSON.stringify(quizResults, null, 2));
   console.log('RecommendationScreen - user:', user);
 
-  // Get the personality type from quizResults
-  const personalityType = quizResults?.personalityType || 'Eco in Progress';
-  console.log('RecommendationScreen - personalityType:', personalityType);
+  // Prefer new archetype sources with fallback to legacy
+  const personaForEngine = (
+    (quizResults as any)?.comprehensivePowerMoves?.personality?.archetype ||
+    (quizResults as any)?.newPersonality ||
+    quizResults?.personalityType ||
+    'Eco in Progress'
+  );
+
+  // Canonical display type (for legacy mapping only if needed)
+  const personalityType = personalityTypeMap[personaForEngine] || personaForEngine;
+  console.log('RecommendationScreen - personalityType (resolved):', personalityType);
 
   // Extract only the relevant personality keys
   const personalityData = quizResults

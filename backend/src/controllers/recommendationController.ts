@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { PersonalityRecommendationService } from '../services/personalityRecommendationService';
 import { PersonalityType } from '../types/personality';
+import { queryCatalog, getCatalogMeta } from '../services/recommendationCatalogService';
+import { Domain } from '../types/recommendationCatalog';
 
 interface RecommendationRequest {
   personalityType: PersonalityType;
@@ -81,3 +83,41 @@ export const generateStaticRecommendationsHandler = async (req: Request, res: Re
     res.status(500).json({ error: 'Failed to generate static recommendations' });
   }
 }; 
+
+export const getCatalogHandler = async (req: Request, res: Response) => {
+  try {
+    const persona = (req.query.persona as string) || undefined;
+    const domain = (req.query.domain as Domain) || undefined;
+    const maxItems = req.query.maxItems ? parseInt(req.query.maxItems as string, 10) : undefined;
+
+    const cards = queryCatalog({ domain, persona, maxItems });
+    return res.json({
+      catalogVersion: 'v1.0',
+      domains: ['transport', 'food', 'home', 'clothing', 'waste'],
+      cards,
+      meta: getCatalogMeta(),
+    });
+  } catch (error) {
+    console.error('Error fetching catalog recommendations:', error);
+    res.status(500).json({ error: 'Failed to fetch catalog recommendations' });
+  }
+};
+
+export const getCatalogByDomainHandler = async (req: Request, res: Response) => {
+  try {
+    const persona = (req.query.persona as string) || undefined;
+    const domain = req.params.domain as Domain;
+    const maxItems = req.query.maxItems ? parseInt(req.query.maxItems as string, 10) : undefined;
+
+    const cards = queryCatalog({ domain, persona, maxItems });
+    return res.json({
+      catalogVersion: 'v1.0',
+      domains: ['transport', 'food', 'home', 'clothing', 'waste'],
+      cards,
+      meta: getCatalogMeta(),
+    });
+  } catch (error) {
+    console.error('Error fetching catalog recommendations by domain:', error);
+    res.status(500).json({ error: 'Failed to fetch catalog recommendations by domain' });
+  }
+};
