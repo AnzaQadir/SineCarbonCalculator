@@ -88,7 +88,7 @@ const RecommendationScreen: React.FC = () => {
           profileImage={user?.profileImage || '/default-avatar.png'}
           personality={personalityType}
           userName={user?.name || 'Eco Hero'}
-          autoSimulate={true}
+          autoSimulate={false}
           onBack={() => navigate('/results')}
         />
       </main>
