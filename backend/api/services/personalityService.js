@@ -4,8 +4,10 @@ exports.PersonalityService = void 0;
 const ecoPersonality_1 = require("../types/ecoPersonality");
 const powerMovesService_1 = require("./powerMovesService");
 const highlightsService_1 = require("./highlightsService");
+const impactMetricAndEquivalenceService_1 = require("./impactMetricAndEquivalenceService");
 class PersonalityService {
     constructor() {
+        this.impactMetricAndEquivalenceService = new impactMetricAndEquivalenceService_1.ImpactMetricAndEquivalenceService();
         this.CATEGORY_WEIGHTS = {
             homeEnergy: 0.167, // 16.67%
             transport: 0.167, // 16.67%
@@ -872,6 +874,14 @@ class PersonalityService {
         console.log('Calculated scores:', scores);
         const impactMetrics = this.calculateImpactMetrics(responses);
         console.log('Calculated impact metrics:', impactMetrics);
+        // Calculate impact metrics and equivalences using the new service
+        const impactMetricAndEquivalence = this.impactMetricAndEquivalenceService.calculateImpactMetricAndEquivalence(responses, undefined, // categoryEmissionsKg - let the service calculate
+        'conventional', // referencePolicy
+        undefined, // cohortAveragesKg
+        'clean', // rounding
+        'en' // copyLocale
+        );
+        console.log('Calculated impact metric and equivalence:', impactMetricAndEquivalence);
         // New: eliminate threshold mapping, pick personality by mapping tally
         const personalityType = this.determinePersonalityFromMappings(responses);
         console.log('Determined personality type:', personalityType);
@@ -910,6 +920,7 @@ class PersonalityService {
             // Preserve existing response shape for compatibility
             categoryScores: scores.categoryScores,
             impactMetrics,
+            impactMetricAndEquivalence, // New impact metric and equivalence field
             finalScore: scores.finalScore,
             powerMoves,
             comprehensivePowerMoves, // New comprehensive power moves structure
