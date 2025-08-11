@@ -2,6 +2,8 @@ import { EcoPersonalityTypes, EcoPersonalityType, personalityMappings, personali
 import { PowerMovesService, PersonalizedPowerMovesResponse } from './powerMovesService';
 import { HighlightsService, HighlightsResponse } from './highlightsService';
 import { UserResponses } from '../types/userResponses';
+import { ImpactMetricAndEquivalenceService } from './impactMetricAndEquivalenceService';
+import { ImpactMetricAndEquivalenceResponse } from '../types/impactMetricAndEquivalence';
 
 interface CategoryScore {
   score: number;
@@ -46,6 +48,7 @@ interface PersonalityResponse {
   nextSteps: string[];
   categoryScores: Record<string, CategoryScore>;
   impactMetrics: ImpactMetrics;
+  impactMetricAndEquivalence?: ImpactMetricAndEquivalenceResponse;
   finalScore: number;
   powerMoves: string[];
   comprehensivePowerMoves?: PowerMovesResponse;
@@ -86,6 +89,8 @@ interface PowerMovesResponse {
 }
 
 export class PersonalityService {
+  private readonly impactMetricAndEquivalenceService = new ImpactMetricAndEquivalenceService();
+  
   private readonly CATEGORY_WEIGHTS: CategoryWeights = {
     homeEnergy: 0.167, // 16.67%
     transport: 0.167,  // 16.67%
@@ -1026,6 +1031,17 @@ export class PersonalityService {
     const impactMetrics = this.calculateImpactMetrics(responses);
     console.log('Calculated impact metrics:', impactMetrics);
     
+    // Calculate impact metrics and equivalences using the new service
+    const impactMetricAndEquivalence = this.impactMetricAndEquivalenceService.calculateImpactMetricAndEquivalence(
+      responses,
+      undefined, // categoryEmissionsKg - let the service calculate
+      'conventional', // referencePolicy
+      undefined, // cohortAveragesKg
+      'clean', // rounding
+      'en' // copyLocale
+    );
+    console.log('Calculated impact metric and equivalence:', impactMetricAndEquivalence);
+    
     // New: eliminate threshold mapping, pick personality by mapping tally
     const personalityType = this.determinePersonalityFromMappings(responses);
     console.log('Determined personality type:', personalityType);
@@ -1073,6 +1089,7 @@ export class PersonalityService {
       // Preserve existing response shape for compatibility
       categoryScores: scores.categoryScores,
       impactMetrics,
+      impactMetricAndEquivalence, // New impact metric and equivalence field
       finalScore: scores.finalScore,
       powerMoves,
       comprehensivePowerMoves, // New comprehensive power moves structure
