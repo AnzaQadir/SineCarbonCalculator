@@ -7,6 +7,7 @@ import { personalityRoutes } from './routes/personalityRoutes';
 import { recommendationRoutes } from './routes/recommendationRoutes';
 import { userRoutes } from './routes/userRoutes';
 import sessionRoutes from './routes/sessionRoutes';
+import userPersonalityRoutes from './routes/userPersonalityRoutes';
 import { initializeDatabase } from './models';
 
 // Load environment variables (only in development)
@@ -59,6 +60,7 @@ app.use('/api/personality', personalityRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/sessions', sessionRoutes);
+app.use('/api/user-personality', userPersonalityRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
