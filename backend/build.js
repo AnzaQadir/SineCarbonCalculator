@@ -19,7 +19,8 @@ try {
   // Clean previous build
   console.log('🧹 Cleaning previous build...');
   if (fs.existsSync('api')) {
-    execSync('rm -rf api', { stdio: 'inherit' });
+    // Remove only the compiled JavaScript files, not the entire directory
+    execSync('find api -name "*.js" -type f -delete', { stdio: 'inherit' });
   }
 
   // Compile TypeScript
