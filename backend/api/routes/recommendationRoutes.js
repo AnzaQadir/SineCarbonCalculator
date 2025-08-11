@@ -10,3 +10,5 @@ const router = express_1.default.Router();
 exports.recommendationRoutes = router;
 router.post('/', recommendationController_1.generateRecommendationsHandler);
 router.post('/static', recommendationController_1.generateStaticRecommendationsHandler);
+router.get('/catalog', recommendationController_1.getCatalogHandler);
+router.get('/catalog/:domain', recommendationController_1.getCatalogByDomainHandler);

@@ -10,7 +10,7 @@ import { getPersonalityImage } from '@/utils/personalityImages';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '@/services/api';
 
-// Type guard for PersonalityType
+// Type guard for PersonalityType (includes legacy 7 + new archetypes)
 const isPersonalityType = (value: string): value is PersonalityType => {
   return [
     'Sustainability Slayer',
@@ -20,7 +20,17 @@ const isPersonalityType = (value: string): value is PersonalityType => {
     'Eco in Progress',
     'Doing Nothing for the Planet',
     'Certified Climate Snoozer',
-  ].includes(value);
+    'Strategist',
+    'Trailblazer',
+    'Coordinator',
+    'Visionary',
+    'Explorer',
+    'Catalyst',
+    'Builder',
+    'Networker',
+    'Steward',
+    'The Seed'
+  ].includes(value as any);
 };
 
 interface RecommendationROI {
@@ -90,20 +100,71 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({ personality
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/recommendations/static`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(personalityData),
-        });
-        console.log('API Response status:', res.status);
-        if (!res.ok) throw new Error('Failed to fetch recommendations');
-        const data = await res.json();
-        console.log('API Response data:', JSON.stringify(data, null, 2));
-        setWeeks(data);
-        setWeekKeys(Object.keys(data));
-        if (Object.keys(data).length > 0) {
-          setSelectedWeek(Object.keys(data)[0]);
-          setRecommendations(data[Object.keys(data)[0]].actions);
+        // If the provided personality is a new archetype, use the catalog endpoint
+        const isNewArchetype = isPersonalityType(personality) && ![
+          'Sustainability Slayer',
+          "Planet's Main Character",
+          'Sustainability Soft Launch',
+          'Kind of Conscious, Kind of Confused',
+          'Eco in Progress',
+          'Doing Nothing for the Planet',
+          'Certified Climate Snoozer',
+        ].includes(personality as any);
+
+        if (isNewArchetype) {
+          const res = await fetch(`${API_BASE_URL}/recommendations/catalog?persona=${encodeURIComponent(personality as string)}&domain=transport`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          });
+          console.log('Catalog API Response status:', res.status);
+          if (!res.ok) throw new Error('Failed to fetch catalog recommendations');
+          const data = await res.json();
+          console.log('Catalog API Response data:', JSON.stringify(data, null, 2));
+
+          // Convert catalog cards to the existing weekly UI shape (single week list)
+          const actions = (data.cards || []).slice(0, 9).map((c: any) => ({
+            action: c.action,
+            linkedBehavior: c.id,
+            impact: c.why,
+            analogy: (c.equivalents && c.equivalents[0]) || '',
+            effortLevel: 'medium',
+            roi: { emotional: c.personaOverlays?.[personality as string]?.nudge || '', environmental: c.why },
+            category: c.domain,
+            simulation: { monthly: `${c.estImpactKgPerYear} kg/year (est.)` },
+            personas: [personality as PersonalityType],
+            region: 'Global',
+            lifestyle: ''
+          }));
+
+          const weekly = {
+            week1: { theme: 'Transport Starters', actions: actions.slice(0, 3) },
+            week2: { theme: 'Transport Momentum', actions: actions.slice(3, 6) },
+            week3: { theme: 'Transport Stretch', actions: actions.slice(6, 9) },
+          } as Record<string, WeekData>;
+
+          setWeeks(weekly);
+          setWeekKeys(Object.keys(weekly));
+          if (Object.keys(weekly).length > 0) {
+            setSelectedWeek(Object.keys(weekly)[0]);
+            setRecommendations(weekly[Object.keys(weekly)[0]].actions);
+          }
+        } else {
+          // Legacy: use static weekly endpoint
+          const res = await fetch(`${API_BASE_URL}/recommendations/static`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(personalityData),
+          });
+          console.log('Static API Response status:', res.status);
+          if (!res.ok) throw new Error('Failed to fetch recommendations');
+          const data = await res.json();
+          console.log('Static API Response data:', JSON.stringify(data, null, 2));
+          setWeeks(data);
+          setWeekKeys(Object.keys(data));
+          if (Object.keys(data).length > 0) {
+            setSelectedWeek(Object.keys(data)[0]);
+            setRecommendations(data[Object.keys(data)[0]].actions);
+          }
         }
       } catch (err: any) {
         console.error('Error fetching recommendations:', err);
@@ -113,7 +174,7 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({ personality
       }
     };
     fetchRecommendations();
-  }, [personalityData]);
+  }, [personalityData, personality]);
 
   // Update recommendations when week changes
   useEffect(() => {

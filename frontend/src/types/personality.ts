@@ -15,7 +15,8 @@ export type PersonalityType =
   | 'Catalyst'
   | 'Builder'
   | 'Networker'
-  | 'Steward';
+  | 'Steward'
+  | 'The Seed';
 
 export interface ComprehensivePowerMoves {
   personality: {
