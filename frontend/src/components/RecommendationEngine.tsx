@@ -275,21 +275,21 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-blue-50">
       {/* Header */}
       <div className="bg-white border-b-2 border-gray-200 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-8xl mx-auto px-10 py-12">
+        <div className="max-w-5xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-4">
               {onBack && (
             <Button
                   variant="ghost"
                   onClick={onBack}
-                  className="flex items-center gap-4 text-gray-700 hover:text-black hover:bg-gray-50 px-6 py-3 rounded-xl transition-all duration-200 border border-transparent hover:border-gray-200"
+                  className="flex items-center gap-2 text-gray-700 hover:text-black hover:bg-gray-50 px-3 py-2 rounded-md transition-all duration-200 border border-transparent hover:border-gray-200"
                 >
-                  <ArrowLeft className="h-6 w-6" />
-                  <span className="font-medium text-lg">Back</span>
+                  <ArrowLeft className="h-4 w-4" />
+                  <span className="font-medium text-sm">Back</span>
                 </Button>
               )}
-              <div className="flex items-center gap-8">
-                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-gray-100 shadow-2xl bg-white ring-4 ring-gray-50">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-100 shadow-lg bg-white ring-2 ring-gray-50">
                   <img 
                     src={displayProfileImage} 
                     alt="Profile" 
@@ -298,8 +298,8 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({
                   />
                 </div>
                 <div>
-                  <h1 className="text-6xl font-extrabold text-black mb-6 tracking-tighter leading-tight">Personalized Recommendations</h1>
-                  <p className="text-2xl text-black font-normal tracking-wide">Tailored for <span className="font-medium">{personalityType}</span></p>
+                  <h1 className="text-3xl font-extrabold text-black mb-3 tracking-tighter leading-tight">Personalized Recommendations</h1>
+                  <p className="text-base text-black font-normal tracking-wide">Tailored for <span className="font-medium">{personalityType}</span></p>
                 </div>
         </div>
         </div>
@@ -308,34 +308,34 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({
               </div>
 
       {/* Main Content */}
-      <div className="max-w-8xl mx-auto px-10 py-20">
+      <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Category Tabs */}
-        <div className="mb-24">
+        <div className="mb-12">
           <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 bg-gradient-to-r from-gray-50 to-white border-2 border-gray-200 p-8 rounded-3xl shadow-2xl min-h-[120px] backdrop-blur-sm">
+            <TabsList className="grid w-full grid-cols-5 bg-gradient-to-r from-gray-50 to-white border-2 border-gray-200 p-4 rounded-xl shadow-lg min-h-[60px] backdrop-blur-sm">
               {categories.map((category) => (
                 <TabsTrigger
                   key={category.domain}
                   value={category.domain}
                   className={cn(
-                    "flex flex-col items-center justify-center gap-3 px-8 py-10 rounded-2xl transition-all duration-500 data-[state=active]:shadow-2xl font-semibold relative overflow-hidden min-h-[100px] group",
+                    "flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-lg transition-all duration-500 data-[state=active]:shadow-lg font-semibold relative overflow-hidden min-h-[50px] group",
                     selectedCategory === category.domain
-                      ? "bg-white text-black border-2 border-gray-200 shadow-2xl transform scale-105 ring-4 ring-gray-100"
-                      : "text-gray-600 hover:text-black hover:bg-white/80 hover:scale-105 hover:shadow-xl border-2 border-transparent hover:border-gray-200"
+                      ? "bg-white text-black border-2 border-gray-200 shadow-lg transform scale-105 ring-1 ring-gray-100"
+                      : "text-gray-600 hover:text-black hover:bg-white/80 hover:scale-105 hover:shadow-md border-2 border-transparent hover:border-gray-200"
                   )}
                 >
                   {selectedCategory === category.domain && (
                     <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50 opacity-80"></div>
                   )}
                   <div className={cn(
-                    "w-20 h-20 flex items-center justify-center rounded-3xl transition-all duration-500 group-hover:scale-110",
+                    "w-12 h-12 flex items-center justify-center rounded-lg transition-all duration-500 group-hover:scale-110",
                     selectedCategory === category.domain 
-                      ? "bg-gradient-to-br from-gray-100 to-gray-200 shadow-inner ring-2 ring-gray-300" 
+                      ? "bg-gradient-to-br from-gray-100 to-gray-200 shadow-inner ring-1 ring-gray-300" 
                       : "bg-gray-100/50 group-hover:bg-gray-100"
                   )}>
                     {category.icon}
                   </div>
-                  <span className="capitalize text-xl relative z-10 font-semibold tracking-wide group-hover:scale-105 transition-transform duration-300">{category.domain}</span>
+                  <span className="capitalize text-base relative z-10 font-semibold tracking-wide group-hover:scale-105 transition-transform duration-300">{category.domain}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -353,30 +353,10 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({
             className="space-y-8"
           >
             {/* Category Header */}
-            <div className="text-center space-y-16">
-              <p className="text-2xl text-black max-w-5xl mx-auto leading-relaxed font-normal tracking-wide">
+            <div className="text-center space-y-8">
+              <p className="text-lg text-black max-w-3xl mx-auto leading-relaxed font-normal tracking-wide">
                 Discover personalized actions to reduce your <span className="font-medium">{selectedCategory}</span> impact
               </p>
-              <div className="flex items-center justify-center gap-20">
-                <div className="flex items-center gap-6 bg-white/90 backdrop-blur-sm px-8 py-6 rounded-3xl border-2 border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-300 group hover:scale-105">
-                  <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center shadow-inner ring-2 ring-gray-300 group-hover:ring-gray-400 transition-all duration-300">
-                    <Target className="h-8 w-8 text-gray-700" />
-                  </div>
-                  <div className="text-left">
-                    <div className="text-2xl font-bold text-black">{getCurrentCards().length}</div>
-                    <div className="text-base text-gray-600 font-medium">actions available</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6 bg-white/90 backdrop-blur-sm px-8 py-6 rounded-3xl border-2 border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-300 group hover:scale-105">
-                  <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center shadow-inner ring-2 ring-gray-300 group-hover:ring-gray-400 transition-all duration-300">
-                    <Leaf className="h-8 w-8 text-gray-700" />
-                  </div>
-                  <div className="text-left">
-                    <div className="text-2xl font-bold text-black">~{Math.round(getCurrentCategory()?.totalImpact || 0)}</div>
-                    <div className="text-base text-gray-600 font-medium">kg CO₂e/year potential</div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Cards Carousel */}
@@ -387,71 +367,71 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({
                   onClick={prevCard}
                   disabled={currentCardIndex === 0}
                   className={cn(
-                    "absolute left-8 top-1/2 -translate-y-1/2 z-10 w-24 h-24 rounded-full bg-white/95 backdrop-blur-sm border-2 border-gray-200 shadow-2xl flex items-center justify-center transition-all duration-500 group",
+                    "absolute left-6 top-1/2 -translate-y-1/2 z-10 w-16 h-16 rounded-full bg-white/95 backdrop-blur-sm border-2 border-gray-200 shadow-lg flex items-center justify-center transition-all duration-500 group",
                     currentCardIndex === 0
                       ? "opacity-40 cursor-not-allowed"
-                      : "hover:border-gray-300 hover:shadow-3xl hover:scale-110 hover:bg-white hover:ring-4 hover:ring-gray-100"
+                      : "hover:border-gray-300 hover:shadow-xl hover:scale-110 hover:bg-white hover:ring-2 hover:ring-gray-100"
                   )}
                 >
-                  <ChevronLeft className="h-12 w-12 text-gray-700 group-hover:text-black transition-colors duration-300" />
+                  <ChevronLeft className="h-8 w-8 text-gray-700 group-hover:text-black transition-colors duration-300" />
                 </button>
 
                 <button
                   onClick={nextCard}
                   disabled={currentCardIndex === getCurrentCards().length - 1}
                   className={cn(
-                    "absolute right-8 top-1/2 -translate-y-1/2 z-10 w-24 h-24 rounded-full bg-white/95 backdrop-blur-sm border-2 border-gray-200 shadow-2xl flex items-center justify-center transition-all duration-500 group",
+                    "absolute right-6 top-1/2 -translate-y-1/2 z-10 w-16 h-16 rounded-full bg-white/95 backdrop-blur-sm border-2 border-gray-200 shadow-lg flex items-center justify-center transition-all duration-500 group",
                     currentCardIndex === getCurrentCards().length - 1
                       ? "opacity-40 cursor-not-allowed"
-                      : "hover:border-gray-300 hover:shadow-3xl hover:scale-110 hover:bg-white hover:ring-4 hover:ring-gray-100"
+                      : "hover:border-gray-300 hover:shadow-xl hover:scale-110 hover:bg-white hover:ring-2 hover:ring-gray-100"
                   )}
                 >
-                  <ChevronRight className="h-12 w-12 text-gray-700 group-hover:text-black transition-colors duration-300" />
+                  <ChevronRight className="h-8 w-8 text-gray-700 group-hover:text-black transition-colors duration-300" />
                 </button>
 
                 {/* Current Card */}
-                <div className="max-w-6xl mx-auto px-24">
+                <div className="max-w-4xl mx-auto px-12">
                   <motion.div
                     key={`${selectedCategory}-${currentCardIndex}`}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Card className="bg-white border-2 border-gray-100 shadow-2xl hover:shadow-3xl transition-all duration-500 cursor-pointer transform hover:scale-[1.01] overflow-hidden"
+                    <Card className="bg-white border-2 border-gray-100 shadow-lg hover:shadow-xl transition-all duration-500 cursor-pointer transform hover:scale-[1.01] overflow-hidden"
                           onClick={() => handleCardClick(getCurrentCards()[currentCardIndex])}>
                       <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 to-transparent pointer-events-none"></div>
-                      <CardContent className="p-12 relative z-10">
-                        <div className="space-y-8">
+                      <CardContent className="p-6 relative z-10">
+                        <div className="space-y-5">
                           {/* Card Header */}
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                                                    <h3 className="text-4xl font-extrabold text-black leading-tight mb-6 tracking-tight">
+                                                    <h3 className="text-2xl font-extrabold text-black leading-tight mb-3 tracking-tight">
                         {getCurrentCards()[currentCardIndex]?.action || 'Loading...'}
                       </h3>
                             </div>
                             <div className="text-right">
-                              <div className="text-4xl font-bold text-black">
+                              <div className="text-2xl font-bold text-black">
                                 {getCurrentCards()[currentCardIndex]?.estImpactKgPerYear || 0}
                               </div>
-                              <div className="text-base text-gray-500 font-medium">kg CO₂e/year</div>
+                              <div className="text-xs text-gray-500 font-medium">kg CO₂e/year</div>
                             </div>
                           </div>
 
                                                      {/* Impact & Why */}
-                           <div className="bg-gray-50 rounded-2xl p-8 border-2 border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-                             <div className="flex items-start gap-6">
-                               <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-inner">
-                                 <Leaf className="h-8 w-8 text-gray-700" />
+                           <div className="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+                             <div className="flex items-start gap-4">
+                               <div className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
+                                 <Leaf className="h-6 w-6 text-gray-700" />
                                </div>
                                <div className="flex-1">
-                                                         <h4 className="text-2xl font-bold text-black mb-4 tracking-tight">Why This Matters</h4>
-                        <p className="text-lg text-black leading-relaxed font-normal">
+                                                         <h4 className="text-xl font-bold text-black mb-3 tracking-tight">Why This Matters</h4>
+                        <p className="text-base text-black leading-relaxed font-normal">
                           {getCurrentCards()[currentCardIndex]?.why || 'Loading...'}
                         </p>
                                  {getCurrentCards()[currentCardIndex]?.equivalents && (
-                                   <div className="mt-4 flex flex-wrap gap-3">
+                                   <div className="mt-3 flex flex-wrap gap-2">
                                      {getCurrentCards()[currentCardIndex]?.equivalents.map((equiv, idx) => (
-                                       <Badge key={idx} variant="secondary" className="bg-white text-gray-700 border-2 border-gray-200 px-3 py-1 text-sm font-medium shadow-sm hover:shadow-md transition-all duration-200">
+                                       <Badge key={idx} variant="secondary" className="bg-white text-gray-700 border-2 border-gray-200 px-2 py-1 text-xs font-medium shadow-sm hover:shadow-md transition-all duration-200">
                                          {equiv}
                                        </Badge>
                                      ))}
@@ -462,21 +442,21 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({
                            </div>
 
                            {/* Personality Overlay */}
-                           <div className="bg-gray-50 rounded-2xl p-8 border-2 border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-                             <div className="flex items-start gap-6">
-                               <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-inner">
-                                 <Brain className="h-8 w-8 text-gray-700" />
+                           <div className="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+                             <div className="flex items-start gap-4">
+                               <div className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
+                                 <Brain className="h-6 w-6 text-gray-700" />
                                </div>
                                <div className="flex-1">
-                                                         <h4 className="text-2xl font-bold text-black mb-4 tracking-tight">Personalized for You</h4>
-                        <div className="space-y-4">
+                                                         <h4 className="text-xl font-bold text-black mb-3 tracking-tight">Personalized for You</h4>
+                        <div className="space-y-3">
                           <div>
-                            <span className="text-base font-semibold text-black">Tone:</span>
-                            <span className="ml-3 text-lg text-black font-normal">{getPersonalityOverlay(getCurrentCards()[currentCardIndex] || {} as RecommendationCard).tone}</span>
+                            <span className="text-sm font-semibold text-black">Tone:</span>
+                            <span className="ml-2 text-base text-black font-normal">{getPersonalityOverlay(getCurrentCards()[currentCardIndex] || {} as RecommendationCard).tone}</span>
                           </div>
                           <div>
-                            <span className="text-base font-semibold text-black">Your Nudge:</span>
-                            <span className="ml-3 text-lg text-black font-normal">{getPersonalityOverlay(getCurrentCards()[currentCardIndex] || {} as RecommendationCard).nudge}</span>
+                            <span className="text-sm font-semibold text-black">Your Nudge:</span>
+                            <span className="ml-2 text-base text-black font-normal">{getPersonalityOverlay(getCurrentCards()[currentCardIndex] || {} as RecommendationCard).nudge}</span>
                           </div>
                         </div>
                                </div>
@@ -484,12 +464,12 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({
                            </div>
 
                           {/* Action Button */}
-                          <div className="text-center pt-6">
+                          <div className="text-center pt-4">
                             <Button 
-                              className="bg-black hover:bg-gray-800 text-white px-10 py-4 rounded-xl text-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-black"
+                              className="bg-black hover:bg-gray-800 text-white px-8 py-3 rounded-lg text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-black"
                               onClick={() => handleCardClick(getCurrentCards()[currentCardIndex])}
                             >
-                              <Rocket className="h-6 w-6 mr-3" />
+                              <Rocket className="h-5 w-5 mr-2" />
                               Explore Action Levels
                 </Button>
                           </div>
