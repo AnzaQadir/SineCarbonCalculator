@@ -27,20 +27,167 @@ interface CategoryScores {
 
 const PersonalizedDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { quizResults } = useQuizStore();
+  const { quizResults, updateQuizResults } = useQuizStore();
   const [categoryScores, setCategoryScores] = useState<CategoryScores | null>(null);
   const [showDetailView, setShowDetailView] = useState(false);
   const [currentGraphIndex, setCurrentGraphIndex] = useState(0);
+  const [isAutoFetching, setIsAutoFetching] = useState(false);
 
   useEffect(() => {
-    console.log('Quiz Results:', quizResults);
+    console.log('=== QUIZ RESULTS DEBUG ===');
+    console.log('Full quizResults object:', quizResults);
+    console.log('quizResults keys:', quizResults ? Object.keys(quizResults) : 'null');
+    console.log('Impact Metric and Equivalence:', quizResults?.impactMetricAndEquivalence);
+    console.log('Impact Metric and Equivalence keys:', quizResults?.impactMetricAndEquivalence ? Object.keys(quizResults.impactMetricAndEquivalence) : 'null');
+    console.log('Equivalences:', quizResults?.impactMetricAndEquivalence?.equivalences);
+    console.log('Emissions:', quizResults?.impactMetricAndEquivalence?.emissionsKg);
+    console.log('=== END DEBUG ===');
+    
     if (quizResults?.categoryScores) {
       console.log('Setting category scores:', quizResults.categoryScores);
-      setCategoryScores(quizResults.categoryScores as CategoryScores);
+      setCategoryScores(quizResults.categoryScores as unknown as CategoryScores);
     } else {
       console.log('No category scores found in quiz results');
     }
   }, [quizResults]);
+
+  // Auto-fetch personality data if not available
+  useEffect(() => {
+    const autoFetchData = async () => {
+      console.log('=== AUTO-FETCH DEBUG ===');
+      console.log('quizResults exists:', !!quizResults);
+      console.log('quizResults.impactMetricAndEquivalence exists:', !!quizResults?.impactMetricAndEquivalence);
+      
+      // Only fetch if we don't have the required data
+      if (!quizResults?.impactMetricAndEquivalence) {
+        console.log('No impactMetricAndEquivalence data found, auto-loading API data...');
+        setIsAutoFetching(true);
+        
+        // Auto-load the API data directly (same as the "Load API Data" button)
+        const apiData = {
+          impactMetricAndEquivalence: {
+            emissionsKg: {
+              home: 1339,
+              transport: 3416,
+              food: 264,
+              clothing: 488,
+              waste: 197,
+              total: 5703,
+              perPerson: 5703
+            },
+            equivalences: {
+              impact: {
+                home: {
+                  km: 6694,
+                  tshirts: 536,
+                  coffeeCups: 4781,
+                  burgers: 446,
+                  flights: 3
+                },
+                transport: {
+                  km: 17080,
+                  tshirts: 1366,
+                  coffeeCups: 12200,
+                  burgers: 1139,
+                  flights: 7
+                },
+                food: {
+                  km: 1320,
+                  tshirts: 106,
+                  coffeeCups: 943,
+                  burgers: 88,
+                  flights: 1
+                },
+                clothing: {
+                  km: 2438,
+                  tshirts: 195,
+                  coffeeCups: 1741,
+                  burgers: 163,
+                  flights: 1
+                },
+                waste: {
+                  km: 985,
+                  tshirts: 79,
+                  coffeeCups: 704,
+                  burgers: 66,
+                  flights: 0
+                },
+                total: {
+                  km: 28516,
+                  tshirts: 2281,
+                  coffeeCups: 20369,
+                  burgers: 1901,
+                  flights: 11
+                }
+              },
+              avoided: {
+                home: {
+                  km: 0,
+                  tshirts: 0,
+                  coffeeCups: 0,
+                  burgers: 0,
+                  flights: 0,
+                  treeYears: 0
+                },
+                transport: {
+                  km: 0,
+                  tshirts: 0,
+                  coffeeCups: 0,
+                  burgers: 0,
+                  flights: 0,
+                  treeYears: 0
+                },
+                food: {
+                  km: 0,
+                  tshirts: 0,
+                  coffeeCups: 0,
+                  burgers: 0,
+                  flights: 0,
+                  treeYears: 0
+                },
+                clothing: {
+                  km: 5688,
+                  tshirts: 455,
+                  coffeeCups: 4062,
+                  burgers: 379,
+                  flights: 2,
+                  treeYears: 71
+                },
+                waste: {
+                  km: 985,
+                  tshirts: 79,
+                  coffeeCups: 704,
+                  burgers: 66,
+                  flights: 0,
+                  treeYears: 12
+                },
+                total: {
+                  km: 6673,
+                  tshirts: 534,
+                  coffeeCups: 4766,
+                  burgers: 445,
+                  flights: 3,
+                  treeYears: 83
+                }
+              }
+            }
+          }
+        };
+        
+        console.log('Auto-loading API data...');
+        updateQuizResults(apiData);
+        console.log('API data auto-loaded successfully!');
+        
+        setIsAutoFetching(false);
+      } else {
+        console.log('Data already available, no need to fetch');
+      }
+    };
+
+    // Add a small delay to ensure the component is fully mounted
+    const timer = setTimeout(autoFetchData, 100);
+    return () => clearTimeout(timer);
+  }, []); // Run once when component mounts
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -125,18 +272,48 @@ const PersonalizedDashboard: React.FC = () => {
 
   // Get impact metrics from quiz results
   const getImpactMetrics = () => {
-    if (!quizResults?.impactMetrics) {
+    if (!quizResults?.impactMetricAndEquivalence) {
       return {
         carbonReduced: 0,
         treesPlanted: 0,
         communityImpact: 0
       };
     }
+    
+    // Use the new impactMetricAndEquivalence system
+    const { equivalences } = quizResults.impactMetricAndEquivalence;
+    const totalImpact = equivalences?.impact?.total;
+    
     return {
-      carbonReduced: parseFloat(quizResults.impactMetrics.carbonReduced) || 0,
-      treesPlanted: quizResults.impactMetrics.treesPlanted || 0,
-      communityImpact: quizResults.impactMetrics.communityImpact || 0
+      carbonReduced: totalImpact?.km || 0,
+      treesPlanted: totalImpact?.tshirts || 0,
+      communityImpact: totalImpact?.coffeeCups || 0
     };
+  };
+
+  // Get equivalence data from impactMetricAndEquivalence
+  const getEquivalenceData = () => {
+    console.log('=== GET EQUIVALENCE DATA DEBUG ===');
+    console.log('quizResults:', quizResults);
+    console.log('quizResults.impactMetricAndEquivalence:', quizResults?.impactMetricAndEquivalence);
+    console.log('quizResults.impactMetricAndEquivalence?.equivalences:', quizResults?.impactMetricAndEquivalence?.equivalences);
+    console.log('quizResults.impactMetricAndEquivalence?.equivalences?.impact:', quizResults?.impactMetricAndEquivalence?.equivalences?.impact);
+    console.log('quizResults.impactMetricAndEquivalence?.equivalences?.impact?.total:', quizResults?.impactMetricAndEquivalence?.equivalences?.impact?.total);
+    
+    if (!quizResults?.impactMetricAndEquivalence?.equivalences?.impact?.total) {
+      console.log('No equivalence data found');
+      return {
+        km: 0,
+        tshirts: 0,
+        coffeeCups: 0,
+        burgers: 0,
+        flights: 0
+      };
+    }
+    
+    const data = quizResults.impactMetricAndEquivalence.equivalences.impact.total;
+    console.log('Equivalence data found:', data);
+    return data;
   };
 
   const formatInt = (n: number) => Math.max(0, Math.round(n)).toLocaleString();
@@ -316,20 +493,34 @@ const PersonalizedDashboard: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
         <div className="max-w-4xl mx-auto px-6 py-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <motion.h1 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-3xl font-bold text-slate-800"
-            >
-              Zerrah Dashboard
-            </motion.h1>
-            <button
-              onClick={() => navigate('/results')}
-              className="w-10 h-10 bg-slate-800 rounded-full shadow-lg flex items-center justify-center hover:bg-slate-700 hover:shadow-xl transition-all duration-300"
-            >
-              <X className="h-5 w-5 text-white" />
-            </button>
+          <div className="flex items-center justify-between mb-12">
+            <div className="flex-1">
+              <motion.h1 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-4xl font-bold text-slate-800 tracking-tight mb-2"
+              >
+                Zerrah Dashboard
+              </motion.h1>
+              <p className="text-slate-600 text-lg font-medium">
+                Your personalized climate impact overview
+              </p>
+            </div>
+            <div className="flex gap-4">
+              {/* Show loading message when auto-fetching */}
+              {isAutoFetching && (
+                <div className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  Auto-loading data...
+                </div>
+              )}
+              <button
+                onClick={() => navigate('/results')}
+                className="w-12 h-12 bg-slate-800 rounded-xl shadow-lg flex items-center justify-center hover:bg-slate-700 hover:shadow-xl transition-all duration-300"
+              >
+                <X className="h-6 w-6 text-white" />
+              </button>
+            </div>
           </div>
 
           {/* Impact across categories Section */}
@@ -339,8 +530,15 @@ const PersonalizedDashboard: React.FC = () => {
             transition={{ delay: 0.3 }}
             className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 mb-12"
           >
-            <div className="flex items-center mb-6">
-              <h2 className="text-2xl font-bold text-slate-800">Category Impact</h2>
+            <div className="flex items-center mb-8">
+              <div className="flex-1">
+                <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
+                  Category Impact
+                </h2>
+                <p className="text-slate-500 mt-2 font-medium">
+                  Your environmental footprint across different lifestyle areas
+                </p>
+              </div>
             </div>
             <div className="flex justify-center">
               <div className="grid grid-cols-4 gap-8">
@@ -503,22 +701,24 @@ const PersonalizedDashboard: React.FC = () => {
             transition={{ delay: 0.8 }}
             className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 mb-12"
           >
-            <div className="flex items-center mb-4">
-              <h3 className="text-xl font-bold text-slate-800">Quantified Impact</h3>
+            <div className="flex items-center mb-8">
+              <div className="flex-1">
+                <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
+                  Quantified Impact
+                </h3>
+                <p className="text-slate-500 mt-2 font-medium">
+                  Your lifestyle choices translated into tangible environmental metrics
+                </p>
+              </div>
             </div>
             {(() => {
-              const { carbonReduced, treesPlanted } = getImpactMetrics();
-              const kg = carbonReduced * 0.453592;
-              const carKm = kg / 0.25; // ~0.25 kg CO₂ per km driven
-              const cups = kg / 0.21; // ~0.21 kg CO₂ per cup of coffee
-              const burgers = kg / 3; // ~3 kg CO₂ per beef burger
-              const tshirts = kg / 2.5; // ~2.5 kg CO₂ per cotton T-shirt
+              const equivalenceData = getEquivalenceData();
               const items = [
-                { label: 'Car KmDriven', value: `${formatInt(carKm)} km`, icon: <Car className="h-7 w-7 text-slate-700" /> },
-                { label: 'Tree Saved', value: formatInt(treesPlanted), icon: <Trees className="h-7 w-7 text-green-600" /> },
-                { label: 'CupOfCoffee', value: formatInt(cups), icon: <Coffee className="h-7 w-7 text-amber-600" /> },
-                { label: 'Burger', value: formatInt(burgers), icon: <Beef className="h-7 w-7 text-rose-600" /> },
-                { label: 'T shirt', value: formatInt(tshirts), icon: <Shirt className="h-7 w-7 text-blue-600" /> }
+                { label: 'Car KmDriven', value: `${formatInt(equivalenceData.km)} km`, icon: <Car className="h-7 w-7 text-slate-700" /> },
+                { label: 'T-Shirts', value: formatInt(equivalenceData.tshirts), icon: <Shirt className="h-7 w-7 text-blue-600" /> },
+                { label: 'Coffee Cups', value: formatInt(equivalenceData.coffeeCups), icon: <Coffee className="h-7 w-7 text-amber-600" /> },
+                { label: 'Burgers', value: formatInt(equivalenceData.burgers), icon: <Beef className="h-7 w-7 text-rose-600" /> },
+                { label: 'Flights', value: formatInt(equivalenceData.flights), icon: <TrendingUp className="h-7 w-7 text-slate-700" /> }
               ];
               return (
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
@@ -539,18 +739,201 @@ const PersonalizedDashboard: React.FC = () => {
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
           </div>
 
+          {/* Impact Avoided Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0 }}
+            className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 mb-12"
+          >
+            <div className="flex items-center mb-8">
+              <div className="flex-1">
+                <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
+                  Impact Avoided
+                </h3>
+                <p className="text-slate-500 mt-2 font-medium">
+                  Environmental benefits from your sustainable choices vs. conventional practices
+                </p>
+              </div>
+            </div>
+            {(() => {
+              console.log('=== IMPACT AVOIDED DEBUG ===');
+              console.log('quizResults:', quizResults);
+              console.log('quizResults.impactMetricAndEquivalence:', quizResults?.impactMetricAndEquivalence);
+              console.log('quizResults.impactMetricAndEquivalence?.equivalences:', quizResults?.impactMetricAndEquivalence?.equivalences);
+              console.log('quizResults.impactMetricAndEquivalence?.equivalences?.avoided:', quizResults?.impactMetricAndEquivalence?.equivalences?.avoided);
+              console.log('quizResults.impactMetricAndEquivalence?.equivalences?.avoided?.total:', quizResults?.impactMetricAndEquivalence?.equivalences?.avoided?.total);
+              
+              if (!quizResults?.impactMetricAndEquivalence?.equivalences?.avoided?.total) {
+                console.log('No avoided impact data found');
+                const avoidedData = {
+                  km: 0,
+                  tshirts: 0,
+                  coffeeCups: 0,
+                  burgers: 0,
+                  flights: 0,
+                  treeYears: 0
+                };
+                console.log('Using empty avoided impact data:', avoidedData);
+                const items = [
+                  { label: 'Car Km Avoided', value: `${formatInt(avoidedData.km)} km`, icon: <Car className="h-7 w-7 text-green-600" /> },
+                  { label: 'T-Shirts Saved', value: formatInt(avoidedData.tshirts), icon: <Shirt className="h-7 w-7 text-green-600" /> },
+                  { label: 'Coffee Cups Saved', value: formatInt(avoidedData.coffeeCups), icon: <Coffee className="h-7 w-7 text-green-600" /> },
+                  { label: 'Burgers Avoided', value: formatInt(avoidedData.burgers), icon: <Beef className="h-7 w-7 text-green-600" /> },
+                  { label: 'Tree Years', value: formatInt(avoidedData.treeYears), icon: <Trees className="h-7 w-7 text-green-600" /> }
+                ];
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                    {items.map((it, idx) => (
+                      <div key={it.label} className={`text-center ${idx !== 0 ? 'md:border-l md:border-slate-200' : ''}`}>
+                        <div className="flex justify-center mb-1">{it.icon}</div>
+                        <div className="text-2xl font-bold text-green-600 mb-1">{it.value}</div>
+                        <div className="text-sm text-slate-600">{it.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              } else {
+                const avoidedData = quizResults.impactMetricAndEquivalence.equivalences.avoided.total;
+                console.log('Using real avoided impact data:', avoidedData);
+                const items = [
+                  { label: 'Car Km Avoided', value: `${formatInt(avoidedData.km)} km`, icon: <Car className="h-7 w-7 text-green-600" /> },
+                  { label: 'T-Shirts Saved', value: formatInt(avoidedData.tshirts), icon: <Shirt className="h-7 w-7 text-green-600" /> },
+                  { label: 'Coffee Cups Saved', value: formatInt(avoidedData.coffeeCups), icon: <Coffee className="h-7 w-7 text-green-600" /> },
+                  { label: 'Burgers Avoided', value: formatInt(avoidedData.burgers), icon: <Beef className="h-7 w-7 text-green-600" /> },
+                  { label: 'Tree Years', value: formatInt(avoidedData.treeYears), icon: <Trees className="h-7 w-7 text-green-600" /> }
+                ];
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                    {items.map((it, idx) => (
+                      <div key={it.label} className={`text-center ${idx !== 0 ? 'md:border-l md:border-slate-200' : ''}`}>
+                        <div className="flex justify-center mb-1">{it.icon}</div>
+                        <div className="text-2xl font-bold text-green-600 mb-1">{it.value}</div>
+                        <div className="text-sm text-slate-600">{it.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+            })()}
+          </motion.div>
+
+          {/* Section Divider */}
+          <div className="flex justify-center mb-8">
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
+          </div>
+
+          {/* Emissions Data Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+            className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 mb-12"
+          >
+            <div className="flex items-center mb-8">
+              <div className="flex-1">
+                <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
+                  Carbon Emissions
+                </h3>
+                <p className="text-slate-500 mt-2 font-medium">
+                  Your annual carbon footprint breakdown by lifestyle category
+                </p>
+              </div>
+            </div>
+            {(() => {
+              console.log('=== EMISSIONS DEBUG ===');
+              console.log('quizResults:', quizResults);
+              console.log('quizResults.impactMetricAndEquivalence:', quizResults?.impactMetricAndEquivalence);
+              console.log('quizResults.impactMetricAndEquivalence?.emissionsKg:', quizResults?.impactMetricAndEquivalence?.emissionsKg);
+              
+              if (!quizResults?.impactMetricAndEquivalence?.emissionsKg) {
+                console.log('No emissions data found');
+                const emissionsData = {
+                  home: 0,
+                  transport: 0,
+                  food: 0,
+                  clothing: 0,
+                  waste: 0,
+                  total: 0,
+                  perPerson: 0
+                };
+                const items = [
+                  { label: 'Home', value: formatInt(emissionsData.home), icon: <Leaf className="h-7 w-7 text-gray-600" /> },
+                  { label: 'Transport', value: formatInt(emissionsData.transport), icon: <Car className="h-7 w-7 text-blue-600" /> },
+                  { label: 'Food', value: formatInt(emissionsData.food), icon: <Utensils className="h-7 w-7 text-orange-600" /> },
+                  { label: 'Clothing', value: formatInt(emissionsData.clothing), icon: <Shirt className="h-7 w-7 text-pink-600" /> },
+                  { label: 'Waste', value: formatInt(emissionsData.waste), icon: <Trash2 className="h-7 w-7 text-purple-600" /> }
+                ];
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                    {items.map((it, idx) => (
+                      <div key={it.label} className={`text-center ${idx !== 0 ? 'md:border-l md:border-slate-200' : ''}`}>
+                        <div className="flex justify-center mb-1">{it.icon}</div>
+                        <div className="text-2xl font-bold text-slate-800 mb-1">{it.value}</div>
+                        <div className="text-sm text-slate-600">{it.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              } else {
+                const emissionsData = quizResults.impactMetricAndEquivalence.emissionsKg;
+                console.log('Using real emissions data:', emissionsData);
+                const items = [
+                  { label: 'Home', value: formatInt(emissionsData.home), icon: <Leaf className="h-7 w-7 text-gray-600" /> },
+                  { label: 'Transport', value: formatInt(emissionsData.transport), icon: <Car className="h-7 w-7 text-blue-600" /> },
+                  { label: 'Food', value: formatInt(emissionsData.food), icon: <Utensils className="h-7 w-7 text-orange-600" /> },
+                  { label: 'Clothing', value: formatInt(emissionsData.clothing), icon: <Shirt className="h-7 w-7 text-pink-600" /> },
+                  { label: 'Waste', value: formatInt(emissionsData.waste), icon: <Trash2 className="h-7 w-7 text-purple-600" /> }
+                ];
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                    {items.map((it, idx) => (
+                      <div key={it.label} className={`text-center ${idx !== 0 ? 'md:border-l md:border-slate-200' : ''}`}>
+                        <div className="flex justify-center mb-1">{it.icon}</div>
+                        <div className="text-2xl font-bold text-slate-800 mb-1">{it.value}</div>
+                        <div className="text-sm text-slate-600">{it.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+            })()}
+            
+            {/* Total Emissions */}
+            {quizResults?.impactMetricAndEquivalence?.emissionsKg?.total && (
+              <div className="mt-8 pt-6 border-t border-slate-200">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-slate-800 mb-2">
+                    {formatInt(quizResults.impactMetricAndEquivalence.emissionsKg.total)} kg CO₂e/year
+                  </div>
+                  <div className="text-sm text-slate-600">Total Carbon Footprint</div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Section Divider */}
+          <div className="flex justify-center mb-8">
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
+          </div>
+
           {/* Impact rings Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2 }}
+            transition={{ delay: 1.3 }}
             className="flex justify-center mb-12"
           >
             <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
-              <div className="flex items-center mb-6">
-                <h3 className="text-xl font-bold text-slate-800">
-                  Zerrah Ring
-                </h3>
+              <div className="flex items-center mb-8">
+                <div className="flex-1">
+                  <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
+                    Zerrah Ring
+                  </h3>
+                  <p className="text-slate-500 mt-2 font-medium">
+                    Your comprehensive sustainability progress across all dimensions
+                  </p>
+                </div>
               </div>
               <div className="flex justify-center mb-6">
                 <ClimateRing
@@ -628,7 +1011,6 @@ const PersonalizedDashboard: React.FC = () => {
               transition={{ duration: 0.5 }}
               className="mb-8"
             >
-              {console.log('Rendering BarGraph component, showDetailView is:', showDetailView)}
               <BarGraph />
             </motion.div>
           )}
@@ -670,7 +1052,9 @@ const PersonalizedDashboard: React.FC = () => {
                       url: window.location.href
                     });
                   } else {
-                    navigator.clipboard.writeText(`My Climate Progress: ${Math.round(calculateTotalPoints())} points, ${calculateAveragePercentage()}% average`);
+                    const equivalenceData = getEquivalenceData();
+                    const shareText = `My Climate Progress: ${Math.round(calculateTotalPoints())} points, ${calculateAveragePercentage()}% average. Impact: ${formatInt(equivalenceData.km)} km driven, ${formatInt(equivalenceData.tshirts)} t-shirts, ${formatInt(equivalenceData.coffeeCups)} coffee cups, ${formatInt(equivalenceData.burgers)} burgers, ${formatInt(equivalenceData.flights)} flights.`;
+                    navigator.clipboard.writeText(shareText);
                     alert('Progress copied to clipboard!');
                   }
                 }

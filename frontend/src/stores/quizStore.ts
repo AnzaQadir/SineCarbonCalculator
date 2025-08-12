@@ -5,6 +5,7 @@ import type { UserResponses } from '@/services/api';
 interface QuizStore {
   quizResults: PersonalityResponse | null;
   setQuizResults: (results: PersonalityResponse | null) => void;
+  updateQuizResults: (updates: Partial<PersonalityResponse>) => void;
   clearQuizResults: () => void;
   quizAnswers: UserResponses | null;
   setQuizAnswers: (answers: UserResponses | null) => void;
@@ -16,6 +17,9 @@ interface QuizStore {
 export const useQuizStore = create<QuizStore>((set) => ({
   quizResults: null,
   setQuizResults: (results) => set({ quizResults: results }),
+  updateQuizResults: (updates) => set((state) => ({
+    quizResults: state.quizResults ? { ...state.quizResults, ...updates } : null
+  })),
   clearQuizResults: () => set({ quizResults: null }),
   quizAnswers: null,
   setQuizAnswers: (answers) => set({ quizAnswers: answers }),
