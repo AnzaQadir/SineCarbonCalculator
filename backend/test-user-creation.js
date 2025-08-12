@@ -53,3 +53,4 @@ async function createTestUser() {
 
 // Run the test
 createTestUser();
+

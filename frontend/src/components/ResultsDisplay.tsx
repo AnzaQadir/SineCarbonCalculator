@@ -819,6 +819,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           ? { ...apiResponses, personalityTraits: quizAnswers.personalityTraits }
           : apiResponses;
         const result = await calculatePersonality(payload) as PersonalityResponse;
+        console.log('Full API response:', result);
+        console.log('Impact Metric and Equivalence from API:', result.impactMetricAndEquivalence);
 
         setDynamicPersonality({
           personalityType: (result.personalityType && isPersonalityType(result.personalityType) ? result.personalityType : 'Eco in Progress') as PersonalityType,
@@ -827,6 +829,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           nextSteps: result.nextSteps,
           categoryScores: result.categoryScores,
           impactMetrics: result.impactMetrics,
+          // Include the new impactMetricAndEquivalence field
+          impactMetricAndEquivalence: result.impactMetricAndEquivalence,
           finalScore: result.finalScore,
           powerMoves: result.powerMoves,
           comprehensivePowerMoves: result.comprehensivePowerMoves || {
@@ -880,6 +884,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // Update useEffect to store results
   useEffect(() => {
     if (dynamicPersonality) {
+      console.log('Storing in quiz store:', dynamicPersonality);
+      console.log('Impact Metric and Equivalence being stored:', dynamicPersonality.impactMetricAndEquivalence);
       setQuizResults(dynamicPersonality);
       // Also store quiz answers separately for recommendations
       setQuizAnswers(state);

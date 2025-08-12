@@ -71,6 +71,117 @@ export interface PersonalityResponse {
     treesPlanted?: number;
     communityImpact?: number;
   };
+  // User identification
+  userId?: string;
+  userEmail?: string;
+  // New Impact Metric and Equivalence system
+  impactMetricAndEquivalence?: {
+    emissionsKg: {
+      home: number;
+      transport: number;
+      food: number;
+      clothing: number;
+      waste: number;
+      total: number;
+      perPerson: number;
+    };
+    equivalences: {
+      impact: {
+        home: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+        };
+        transport: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+        };
+        food: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+        };
+        clothing: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+        };
+        waste: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+        };
+        total: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+        };
+      };
+      avoided: {
+        home: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+          treeYears: number;
+        };
+        transport: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+          treeYears: number;
+        };
+        food: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+          treeYears: number;
+        };
+        clothing: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+          treeYears: number;
+        };
+        waste: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+          treeYears: number;
+        };
+        total: {
+          km: number;
+          tshirts: number;
+          coffeeCups: number;
+          burgers: number;
+          flights: number;
+          treeYears: number;
+        };
+      };
+    };
+  };
   finalScore: number;
   powerMoves: string[];
   comprehensivePowerMoves?: ComprehensivePowerMoves;
