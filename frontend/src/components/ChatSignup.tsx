@@ -10,6 +10,30 @@ const penguinSrc = '/images/penguin.png';
 // Helper types
 interface Message { role: 'bot' | 'user'; text: string; }
 
+// Typing indicator component
+const TypingIndicator: React.FC = () => (
+  <div className="flex items-center space-x-1">
+    <div className="flex space-x-1">
+      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+    </div>
+    <span className="text-sm text-gray-500 ml-2">Bobo is typing...</span>
+  </div>
+);
+
+// User typing indicator component
+const UserTypingIndicator: React.FC = () => (
+  <div className="flex items-center space-x-1">
+    <span className="text-sm text-white/80 mr-2">You are typing...</span>
+    <div className="flex space-x-1">
+      <div className="w-2 h-2 bg-white/80 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+      <div className="w-2 h-2 bg-white/80 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+      <div className="w-2 h-2 bg-white/80 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+    </div>
+  </div>
+);
+
 // Question definition (reuse the updated Q type)
 type Q = {
   key: string;
@@ -130,8 +154,73 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [finished, setFinished] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [isUserTyping, setIsUserTyping] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [showTopIndicator, setShowTopIndicator] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [cityList, setCityList] = useState<string[]>([]);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastScrollTop = useRef<number>(0);
+
+  // Sound effects using Web Audio API
+  const playMessageSent = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+    oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.2);
+  };
+
+  const playMessageReceived = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1);
+    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.2);
+    
+    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.3);
+  };
+
+  const playTyping = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+    oscillator.type = 'sawtooth';
+    
+    gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.1);
+  };
 
   // Check for existing user data on mount
   useEffect(() => {
@@ -160,8 +249,6 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
   const current = questions[step];
   const isLast = step === questions.length - 1;
 
-  // helper to render text or function
-  const render = (v: string | ((a: Record<string,string>)=>string)) => typeof v==='function'?v(answers):v;
 
   const makeBotText = (q: Q, currentAns: Record<string,string>) => {
     const main = typeof q.question === 'function'? q.question(currentAns): q.question;
@@ -171,14 +258,131 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
 
 
 
-  // auto-scroll
+  // Enhanced scroll functions
+  const scrollToBottom = (smooth = true, delay = 0) => {
+    if (delay > 0) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ 
+          behavior: smooth ? 'smooth' : 'instant',
+          block: 'end',
+          inline: 'nearest'
+        });
+      }, delay);
+    } else {
+      messagesEndRef.current?.scrollIntoView({ 
+        behavior: smooth ? 'smooth' : 'instant',
+        block: 'end',
+        inline: 'nearest'
+      });
+    }
+  };
+
+  const scrollToBottomButton = () => {
+    setIsScrolling(true);
+    scrollToBottom(true, 0);
+    setTimeout(() => setIsScrolling(false), 500);
+  };
+
+  // Check if user is near bottom of scroll
+  const isNearBottom = () => {
+    if (!messagesContainerRef.current) return true;
+    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+    return scrollHeight - scrollTop - clientHeight < 100;
+  };
+
+  // Handle scroll events
+  const handleScroll = () => {
+    if (!messagesContainerRef.current) return;
+    
+    const { scrollTop } = messagesContainerRef.current;
+    const isScrollingUp = scrollTop < lastScrollTop.current;
+    lastScrollTop.current = scrollTop;
+    
+    // Show scroll button if user scrolls up and not near bottom
+    setShowScrollButton(isScrollingUp && !isNearBottom());
+    
+    // Show top indicator if there's content above
+    setShowTopIndicator(scrollTop > 50);
+    
+    // Clear any existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    // Hide scroll button after 2 seconds of no scrolling
+    scrollTimeoutRef.current = setTimeout(() => {
+      setShowScrollButton(false);
+    }, 2000);
+  };
+
+  // Auto-scroll with intelligent behavior
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Only auto-scroll if user is near bottom or if it's a new message
+    if (isNearBottom() || messages.length <= 1) {
+      scrollToBottom(true, 100);
+    }
   }, [messages]);
+
+  // Initialize scroll position on mount
+  useEffect(() => {
+    // Set initial scroll position to bottom
+    setTimeout(() => {
+      scrollToBottom(false, 0);
+    }, 100);
+  }, []);
+
+  // Auto-scroll when typing indicators appear/disappear
+  useEffect(() => {
+    if (isTyping || isUserTyping) {
+      scrollToBottom(true, 50);
+    }
+  }, [isTyping, isUserTyping]);
+
+  // Handle typing detection
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    
+    // Show user typing indicator
+    setIsUserTyping(value.length > 0);
+    
+    // Clear previous timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Play typing sound if user is actively typing
+    if (value.length > 0) {
+      playTyping();
+    }
+    
+    // Hide typing indicator after 1 second of no typing
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsUserTyping(false);
+    }, 1000);
+  };
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const sendUserAnswer = () => {
     const value = inputValue.trim();
     if (!value) return;
+
+    // Clear user typing indicator
+    setIsUserTyping(false);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
 
     // validate BEFORE sending the user message
     if (current.validate && !current.validate(value)) {
@@ -196,6 +400,7 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
 
     // user message (only for valid input)
     setMessages((m) => [...m, { role: 'user', text: value }]);
+    playMessageSent(); // Play sound for user message
 
     const updatedAns = { ...answers, [current.key]: value };
     setAnswers(updatedAns);
@@ -216,22 +421,34 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
         };
         setCityList(map[c] || ['Other']);
       }
+      
+      // Show typing indicator
+      setIsTyping(true);
+      
       // push bot message after small delay
       setTimeout(() => {
+        setIsTyping(false);
         setMessages((m) => [
           ...m,
           { role: 'bot', text: makeBotText(next, updatedAns) },
         ]);
+        playMessageReceived(); // Play sound for bot message
         setStep(step + 1);
-      }, 400);
+      }, 800); // Slightly longer delay to show typing indicator
     } else {
-      // final
-      setMessages((m) => [
-        ...m,
-        { role: 'bot', text: `Bobo: Thank you for sharing your story, ${updatedAns.name || 'friend'}! I'm so glad we found each other. Let's keep going one gentle, joyful step at a time.` },
-      ]);
-      setFinished(true);
-      onComplete(updatedAns);
+      // Show typing indicator for final message
+      setIsTyping(true);
+      
+      setTimeout(() => {
+        setIsTyping(false);
+        setMessages((m) => [
+          ...m,
+          { role: 'bot', text: `Bobo: Thank you for sharing your story, ${updatedAns.name || 'friend'}! I'm so glad we found each other. Let's keep going one gentle, joyful step at a time.` },
+        ]);
+        playMessageReceived(); // Play sound for final bot message
+        setFinished(true);
+        onComplete(updatedAns);
+      }, 800);
     }
   };
 
@@ -245,7 +462,24 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
   return (
     <div className="flex flex-col h-[80vh] max-h-[800px] w-full max-w-2xl mx-auto bg-gray-50 rounded-3xl shadow-xl overflow-hidden">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth custom-scrollbar relative"
+        onScroll={handleScroll}
+        style={{ 
+          scrollBehavior: 'smooth',
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#10b981 #f3f4f6'
+        }}
+      >
+        {/* Top scroll indicator */}
+        {showTopIndicator && (
+          <div className="sticky top-0 z-10 bg-gradient-to-b from-gray-50 to-transparent h-8 flex items-center justify-center">
+            <div className="bg-emerald-100 text-emerald-700 text-xs px-3 py-1 rounded-full shadow-sm">
+              ↑ More messages above
+            </div>
+          </div>
+        )}
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'bot' ? 'items-start' : 'items-end justify-end'}`}>
             {msg.role === 'bot' && (
@@ -290,7 +524,65 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
             )}
           </div>
         ))}
+        {/* Typing indicators */}
+        {isTyping && (
+          <div className="flex items-start">
+            <div className="relative mr-3">
+              <div className="absolute inset-0 bg-emerald-200/30 rounded-full blur-sm scale-110"></div>
+              <div className="relative bg-white rounded-full p-1.5 shadow-lg border border-emerald-100">
+                <img 
+                  src={pandaSrc} 
+                  alt="Bobo the Panda" 
+                  className="w-10 h-10 object-contain" 
+                />
+              </div>
+            </div>
+            <div className="bg-emerald-50 text-gray-900 border border-emerald-100 rounded-2xl px-6 py-4 shadow-lg">
+              <TypingIndicator />
+            </div>
+          </div>
+        )}
+        {isUserTyping && (
+          <div className="flex items-end justify-end">
+            <div className="bg-emerald-500 text-white rounded-2xl px-6 py-4 shadow-lg">
+              <UserTypingIndicator />
+            </div>
+            <div className="relative ml-3">
+              <div className="absolute inset-0 bg-blue-200/30 rounded-full blur-sm scale-110"></div>
+              <div className="relative bg-white rounded-full p-1.5 shadow-lg border border-blue-100">
+                <img 
+                  src={penguinSrc} 
+                  alt="You" 
+                  className="w-10 h-10 object-contain" 
+                />
+              </div>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
+        
+        {/* Scroll to bottom button */}
+        {showScrollButton && (
+          <div className="fixed bottom-24 right-8 z-50">
+            <button
+              onClick={scrollToBottomButton}
+              disabled={isScrolling}
+              className={`bg-emerald-500 hover:bg-emerald-600 text-white rounded-full p-3 shadow-lg transition-all duration-300 transform hover:scale-110 ${
+                isScrolling ? 'opacity-50 cursor-not-allowed' : 'opacity-90 hover:opacity-100'
+              }`}
+              aria-label="Scroll to bottom"
+            >
+              <svg 
+                className={`w-5 h-5 transition-transform duration-300 ${isScrolling ? 'animate-bounce' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
       {/* Input */}
       {!finished ? (
@@ -298,8 +590,12 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
           {current.inputType === 'select' ? (
             <select
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-base font-medium focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all duration-200"
+              onChange={handleInputChange}
+              className={`flex-1 border-2 rounded-xl px-4 py-3 text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all duration-200 ${
+                isUserTyping 
+                  ? 'border-emerald-400 bg-emerald-50' 
+                  : 'border-gray-200 focus:border-emerald-400'
+              }`}
             >
               <option value="" disabled>{current.placeholder || 'Select...'}</option>
               {current.key === 'city' && cityList.length > 0
@@ -311,9 +607,13 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
               type={current.inputType}
               value={inputValue}
               placeholder={current.placeholder}
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKey}
-              className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-base font-medium focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all duration-200"
+              className={`flex-1 border-2 rounded-xl px-4 py-3 text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all duration-200 ${
+                isUserTyping 
+                  ? 'border-emerald-400 bg-emerald-50' 
+                  : 'border-gray-200 focus:border-emerald-400'
+              }`}
             />
           )}
           <Button
