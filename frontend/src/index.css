@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global margin/padding reset for full viewport coverage */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 /* Custom scrollbar styles for chat */
 .custom-scrollbar {
   scrollbar-width: thin;

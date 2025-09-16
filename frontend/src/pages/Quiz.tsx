@@ -155,13 +155,6 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
                 </motion.span>
               </motion.div>
               
-              {/* Decorative underline */}
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: "100px" }}
-                transition={{ duration: 1, delay: 1.2 }}
-                className="h-0.5 bg-gradient-to-r from-blue-400 to-emerald-400 rounded-full mx-auto mt-3"
-              />
             </motion.div>
             
             {/* Image Container with Elegant Shadow */}
@@ -256,7 +249,7 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
                 onClick={onStartB}
                 whileHover={{ scale: 1.05, y: -4 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative w-full max-w-md mx-auto bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white text-xl font-bold py-6 px-12 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden"
+                className="group relative w-full max-w-md mx-auto bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-800 hover:to-amber-950 text-white text-xl font-bold py-6 px-12 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden"
               >
                 {/* Animated background overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -1283,7 +1276,7 @@ function PoeticJourneyQuiz() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-16 border border-slate-200/50 relative overflow-hidden"
+            className="bg-white/98 backdrop-blur-sm rounded-3xl shadow-2xl p-16 border border-slate-200/30 relative overflow-hidden"
           >
             
             {/* Panda container with sleek styling */}
@@ -1306,20 +1299,21 @@ function PoeticJourneyQuiz() {
             </motion.div>
 
             {/* Welcome text with sleek typography */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-center mb-12"
-            >
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="text-center mb-16"
+              >
               <motion.h1 
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
-                className="text-5xl md:text-6xl font-serif mb-8 text-slate-900 leading-tight" 
+                className="text-5xl md:text-6xl font-serif mb-8 text-slate-900 leading-tight tracking-tight" 
                 style={{ 
                   fontFamily: 'Cormorant Garamond, serif',
-                  fontWeight: 700
+                  fontWeight: 600,
+                  letterSpacing: '-0.02em'
                 }}
               >
                 Welcome back, {existingUser.firstName || existingUser.email}!
@@ -1329,19 +1323,18 @@ function PoeticJourneyQuiz() {
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.8 }}
-                className="text-xl md:text-2xl text-slate-600 leading-relaxed max-w-2xl mx-auto font-light"
-                style={{ fontFamily: 'Inter, sans-serif' }}
+                className="text-lg md:text-xl text-slate-700 leading-relaxed max-w-2xl mx-auto font-normal text-center"
+                style={{ 
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 400,
+                  letterSpacing: '0.01em',
+                  lineHeight: '1.6'
+                }}
               >
-                We already know a glimpse of your story. Let's see your personalized results.
+                We already know a glimpse of your story.<br />
+                Let's see your personalized results.
               </motion.p>
               
-              {/* Elegant separator */}
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: "80px" }}
-                transition={{ duration: 1, delay: 1.2 }}
-                className="h-px bg-gradient-to-r from-slate-300 to-slate-400 rounded-full mx-auto mt-8"
-              ></motion.div>
             </motion.div>
 
             {/* Sleek CTA button */}
@@ -1373,7 +1366,7 @@ function PoeticJourneyQuiz() {
                 disabled={loadingResults}
                 whileHover={{ scale: 1.02, y: -1 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative inline-flex items-center gap-4 px-12 py-5 bg-gradient-to-r from-[#FA8072] to-[#FFB6C1] text-white text-xl font-medium rounded-2xl shadow-xl hover:shadow-2xl hover:from-[#FFB6C1] hover:to-[#FA8072] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                className="group relative inline-flex items-center gap-4 px-12 py-5 bg-gradient-to-r from-amber-700 to-amber-900 text-white text-xl font-medium rounded-2xl shadow-xl hover:shadow-2xl hover:from-amber-800 hover:to-amber-950 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {/* Button background glow */}
@@ -1389,7 +1382,7 @@ function PoeticJourneyQuiz() {
                 )}
                 
                 {/* Button text */}
-                <span className="relative z-10">
+                <span className="relative z-10 font-semibold tracking-wide">
                   {loadingResults ? 'Calculating...' : 'See Results'}
                 </span>
                 
@@ -1499,7 +1492,15 @@ function PoeticJourneyQuiz() {
     return (
       <div className="min-h-screen flex items-start justify-center bg-white pt-10 md:pt-16">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35 }} className="text-center px-6 w-full">
-          <div className="max-w-lg md:max-w-xl mx-auto bg-white/92 border border-slate-200/70 rounded-[32px] shadow-2xl px-10 md:px-14 py-12 md:py-14">
+          <div className="max-w-lg md:max-w-xl mx-auto bg-white/92 border-2 border-gradient-to-r from-emerald-200 via-slate-200 to-emerald-200 rounded-[32px] shadow-2xl px-10 md:px-14 py-12 md:py-14 relative overflow-hidden">
+            {/* Sleek gradient border effect */}
+            <div className="absolute inset-0 rounded-[32px] bg-gradient-to-r from-emerald-200/50 via-slate-200/30 to-emerald-200/50 p-[2px]">
+              <div className="w-full h-full bg-white/92 rounded-[30px]"></div>
+            </div>
+            {/* Animated border glow */}
+            <div className="absolute inset-0 rounded-[32px] bg-gradient-to-r from-emerald-300/20 via-transparent to-emerald-300/20 opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
+            {/* Content container */}
+            <div className="relative z-10">
             <motion.div
               initial={{ y: 6, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -1538,6 +1539,7 @@ function PoeticJourneyQuiz() {
               >
                 Continue
               </button>
+            </div>
             </div>
           </div>
         </motion.div>
@@ -1624,14 +1626,22 @@ function PoeticJourneyQuiz() {
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="min-h-screen flex flex-col items-center justify-center relative"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundRepeat: 'repeat',
         backgroundSize: 'auto',
         backgroundPosition: 'top left',
         backgroundColor: '#F9F7E8',
+        minHeight: '100vh',
+        height: '100vh',
+        width: '100vw',
+        margin: 0,
+        padding: 0
       }}
     >
       {/* Optional overlay for extra softness */}
@@ -1643,26 +1653,18 @@ function PoeticJourneyQuiz() {
         zIndex: 0
       }} />
       
-      {/* Fading edge gradient at bottom */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-5"
-        style={{
-          background: 'linear-gradient(to top, rgba(249, 247, 232, 0.9) 0%, rgba(249, 247, 232, 0.6) 30%, rgba(249, 247, 232, 0.3) 60%, transparent 100%)',
-          zIndex: 5
-        }}
-      />
       
 
       
 
       
-      <div className="max-w-5xl w-full mx-auto bg-white/80 rounded-3xl shadow-xl p-8 mb-6 border border-[#A7D58E22] relative z-10 max-h-[90vh] overflow-y-auto">
+      <div className="max-w-4xl w-full mx-auto bg-white/90 rounded-3xl shadow-2xl p-6 md:p-8 border border-[#A7D58E22] relative z-10 mx-4 min-h-[70vh] flex flex-col justify-between">
         {/* Chapter Title (subheading removed by request) */}
-        <div className="mb-6">
+        <div className="mb-8">
           <h2 className="text-2xl md:text-3xl font-serif text-sage-800 text-center mb-2 tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700 }}>{section.title}</h2>
         </div>
         {/* Question */}
-        <div className="flex flex-col items-center mb-4">
+        <div className="flex flex-col items-center mb-12 flex-1">
           {q.type === 'personality' ? (
             <PandaGifWithDelay gifUrl={step % 2 === 0 ? '/gif/joyful_panda.gif' : '/gif/panda.gif'} />
           ) : (
@@ -1725,7 +1727,7 @@ function PoeticJourneyQuiz() {
             {q.question}
           </motion.div>
         </div>
-        <div className="flex flex-wrap justify-center gap-4 mb-8 max-w-4xl mx-auto">
+        <div className="flex flex-wrap justify-center gap-6 mb-8 max-w-4xl mx-auto flex-1">
           {q.key === 'country' ? (
             <select
               value={getNestedValue(answers, q.key) || ''}
@@ -1883,7 +1885,7 @@ function PoeticJourneyQuiz() {
             </div>
           ) : null}
         </div>
-        <div className="flex justify-between items-center mt-8 max-w-5xl mx-auto">
+        <div className="flex justify-between items-center mt-8 max-w-4xl mx-auto px-4">
           {/* Back Button */}
           <button
             onClick={handleBack}
@@ -1951,7 +1953,7 @@ function PoeticJourneyQuiz() {
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
