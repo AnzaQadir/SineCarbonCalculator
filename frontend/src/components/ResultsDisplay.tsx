@@ -969,9 +969,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           {/* Main Content Layout with Left Sidebar */}
           <div className="flex gap-8">
             {/* Left Sidebar Navigation - Desktop Only */}
-            <aside className={`hidden lg:block ${sidebarCollapsed ? 'w-16' : 'w-80'} transition-all duration-300 flex-shrink-0`}>
-              <div className="sticky top-8">
-                <div className={`bg-white/95 backdrop-blur-2xl rounded-3xl ${sidebarCollapsed ? 'p-3' : 'p-6'} shadow-xl border border-sage-200/40 transition-all duration-300`}>
+            <aside className={`hidden lg:block ${sidebarCollapsed ? 'w-16' : 'w-96'} transition-all duration-300 flex-shrink-0`}>
+              <div className="sticky top-24 lg:top-32">
+                <div className={`bg-white/95 backdrop-blur-2xl rounded-3xl ${sidebarCollapsed ? 'p-3' : 'p-7'} shadow-xl border border-sage-200/40 transition-all duration-300`}>
                   {/* Sidebar Header */}
                   <div className="mb-6 flex items-center justify-between">
                     {!sidebarCollapsed && (
@@ -983,12 +983,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     <button
                       onClick={() => setSidebarCollapsed(v => !v)}
                       aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                      className="ml-auto inline-flex items-center justify-center w-10 h-10 rounded-full border border-sage-200 text-sage-700 hover:bg-sage-50 transition shadow-sm"
+                      className="ml-auto inline-flex items-center justify-center w-12 h-12 rounded-full border border-sage-200 text-sage-700 hover:bg-sage-50 transition shadow-sm"
                     >
                       {sidebarCollapsed ? (
-                        <ChevronRight className="w-5 h-5" />
+                        <ChevronRight className="w-6 h-6" />
                       ) : (
-                        <ChevronLeft className="w-5 h-5" />
+                        <ChevronLeft className="w-6 h-6" />
                       )}
                     </button>
                   </div>
@@ -997,7 +997,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   <nav className="space-y-3">
                     <button
                       onClick={() => setActiveSection('climate-self')}
-                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-4 py-4'} rounded-2xl border transition-all duration-300 group ${
+                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group ${
                         activeSection === 'climate-self'
                           ? 'border-sage-300 bg-gradient-to-r from-sage-50 to-emerald-50 text-sage-800 font-semibold shadow-md'
                           : 'border-sage-200/60 bg-white/70 text-sage-600 hover:text-sage-700 hover:border-sage-300 hover:bg-sage-50/50'
@@ -1020,7 +1020,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
                     <button
                       onClick={() => setActiveSection('climate-signature')}
-                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-4 py-4'} rounded-2xl border transition-all duration-300 group ${
+                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group ${
                         activeSection === 'climate-signature'
                           ? 'border-sage-300 bg-gradient-to-r from-sage-50 to-emerald-50 text-sage-800 font-semibold shadow-md'
                           : 'border-sage-200/60 bg-white/70 text-sage-600 hover:text-sage-700 hover:border-sage-300 hover:bg-sage-50/50'
@@ -1043,7 +1043,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
                     <button
                       onClick={() => setActiveSection('take-action')}
-                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-4 py-4'} rounded-2xl border transition-all duration-300 group ${
+                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group ${
                         activeSection === 'take-action'
                           ? 'border-sage-300 bg-gradient-to-r from-sage-50 to-emerald-50 text-sage-800 font-semibold shadow-md'
                           : 'border-sage-200/60 bg-white/70 text-sage-600 hover:text-sage-700 hover:border-sage-300 hover:bg-sage-50/50'
@@ -1091,6 +1091,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
             {/* Main Content Area */}
             <div className="flex-1 min-w-0">
+              {/* Scroll container so content scrolls while sidebar stays sticky */}
+              <div className="lg:max-h-[calc(100vh-8rem)] overflow-y-auto overscroll-contain pr-2 scroll-smooth">
 
 
           {/* Ultra-Classy Toggle Section */}
@@ -1877,6 +1879,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
 
 
+              </div>
             </div> {/* End Main Content Area */}
           </div> {/* End Flex Container */}
         </div>
