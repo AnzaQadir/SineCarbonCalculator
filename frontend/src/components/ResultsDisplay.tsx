@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
   Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2, Check, BookOpen,
   Book, Star, Sparkles, Trophy, Heart, 
-  Lightbulb, Users, Target, ArrowRight, ShoppingBag, Droplet, Shirt, X, Quote, PenTool, Brain, BarChart3
+  Lightbulb, Users, Target, ArrowRight, ShoppingBag, Droplet, Shirt, X, Quote, PenTool, Brain, BarChart3,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
@@ -346,6 +347,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     const [showJourney, setShowJourney] = useState(false);
   const [showStoryModal, setShowStoryModal] = useState(false);
   const [activeSection, setActiveSection] = useState<'climate-self' | 'climate-signature' | 'take-action'>('climate-self');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
  
   const journeyRef = useRef<HTMLDivElement>(null);
@@ -949,7 +951,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-radial-gradient from-emerald-200/10 via-transparent to-transparent"></div>
             </div>
 
-        <div className="max-w-4xl mx-auto px-6 py-12 space-y-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 py-12 space-y-16 relative z-10">
           
           {/* Back Button */}
           {onBack && (
@@ -963,6 +965,132 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </button>
           </div>
           )}
+
+          {/* Main Content Layout with Left Sidebar */}
+          <div className="flex gap-8">
+            {/* Left Sidebar Navigation - Desktop Only */}
+            <aside className={`hidden lg:block ${sidebarCollapsed ? 'w-16' : 'w-80'} transition-all duration-300 flex-shrink-0`}>
+              <div className="sticky top-8">
+                <div className={`bg-white/95 backdrop-blur-2xl rounded-3xl ${sidebarCollapsed ? 'p-3' : 'p-6'} shadow-xl border border-sage-200/40 transition-all duration-300`}>
+                  {/* Sidebar Header */}
+                  <div className="mb-6 flex items-center justify-between">
+                    {!sidebarCollapsed && (
+                      <div>
+                        <h3 className="text-xl font-bold text-sage-800 mb-2">Your Journey</h3>
+                        <p className="text-sm text-sage-600">Navigate through your climate story</p>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => setSidebarCollapsed(v => !v)}
+                      aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                      className="ml-auto inline-flex items-center justify-center w-10 h-10 rounded-full border border-sage-200 text-sage-700 hover:bg-sage-50 transition shadow-sm"
+                    >
+                      {sidebarCollapsed ? (
+                        <ChevronRight className="w-5 h-5" />
+                      ) : (
+                        <ChevronLeft className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Navigation Items */}
+                  <nav className="space-y-3">
+                    <button
+                      onClick={() => setActiveSection('climate-self')}
+                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-4 py-4'} rounded-2xl border transition-all duration-300 group ${
+                        activeSection === 'climate-self'
+                          ? 'border-sage-300 bg-gradient-to-r from-sage-50 to-emerald-50 text-sage-800 font-semibold shadow-md'
+                          : 'border-sage-200/60 bg-white/70 text-sage-600 hover:text-sage-700 hover:border-sage-300 hover:bg-sage-50/50'
+                      }`}
+                    >
+                      <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-4'}`}>
+                        <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          activeSection === 'climate-self' 
+                            ? 'bg-gradient-to-r from-sage-500 to-emerald-500 shadow-lg' 
+                            : 'bg-sage-300 group-hover:bg-sage-400'
+                        }`} />
+                        {!sidebarCollapsed && (
+                          <div>
+                            <div className="font-medium">Your Self</div>
+                            <div className="text-xs text-sage-500 mt-1">Discover your climate personality</div>
+                          </div>
+                        )}
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => setActiveSection('climate-signature')}
+                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-4 py-4'} rounded-2xl border transition-all duration-300 group ${
+                        activeSection === 'climate-signature'
+                          ? 'border-sage-300 bg-gradient-to-r from-sage-50 to-emerald-50 text-sage-800 font-semibold shadow-md'
+                          : 'border-sage-200/60 bg-white/70 text-sage-600 hover:text-sage-700 hover:border-sage-300 hover:bg-sage-50/50'
+                      }`}
+                    >
+                      <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-4'}`}>
+                        <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          activeSection === 'climate-signature' 
+                            ? 'bg-gradient-to-r from-sage-500 to-emerald-500 shadow-lg' 
+                            : 'bg-sage-300 group-hover:bg-sage-400'
+                        }`} />
+                        {!sidebarCollapsed && (
+                          <div>
+                            <div className="font-medium">Your Signature</div>
+                            <div className="text-xs text-sage-500 mt-1">Your unique sustainability approach</div>
+                          </div>
+                        )}
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => setActiveSection('take-action')}
+                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-4 py-4'} rounded-2xl border transition-all duration-300 group ${
+                        activeSection === 'take-action'
+                          ? 'border-sage-300 bg-gradient-to-r from-sage-50 to-emerald-50 text-sage-800 font-semibold shadow-md'
+                          : 'border-sage-200/60 bg-white/70 text-sage-600 hover:text-sage-700 hover:border-sage-300 hover:bg-sage-50/50'
+                      }`}
+                    >
+                      <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-4'}`}>
+                        <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          activeSection === 'take-action' 
+                            ? 'bg-gradient-to-r from-sage-500 to-emerald-500 shadow-lg' 
+                            : 'bg-sage-300 group-hover:bg-sage-400'
+                        }`} />
+                        {!sidebarCollapsed && (
+                          <div>
+                            <div className="font-medium">Take Action</div>
+                            <div className="text-xs text-sage-500 mt-1">Start your climate journey</div>
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  </nav>
+
+                  {/* Progress Indicator */}
+                  {!sidebarCollapsed && (
+                    <div className="mt-6 pt-6 border-t border-sage-200/50">
+                      <div className="flex items-center justify-between text-xs text-sage-500 mb-2">
+                        <span>Progress</span>
+                        <span>
+                          {activeSection === 'climate-self' ? '1' : activeSection === 'climate-signature' ? '2' : '3'} of 3
+                        </span>
+                      </div>
+                      <div className="w-full bg-sage-200/30 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-sage-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
+                          style={{ 
+                            width: activeSection === 'climate-self' ? '33%' : 
+                                   activeSection === 'climate-signature' ? '66%' : '100%' 
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </aside>
+
+            {/* Main Content Area */}
+            <div className="flex-1 min-w-0">
 
 
           {/* Ultra-Classy Toggle Section */}
@@ -1748,6 +1876,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
 
 
+
+            </div> {/* End Main Content Area */}
+          </div> {/* End Flex Container */}
+        </div>
+
         {showWrapped && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -2092,7 +2225,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             </motion.div>
           </motion.div>
         )}
-      </div>
     </ErrorBoundary>
   );
 }
