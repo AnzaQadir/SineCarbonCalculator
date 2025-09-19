@@ -1,39 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, ArrowLeft, Download, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
-  Bike, Bus, Train, Apple, Beef, PackageCheck, Recycle, Battery, Wind, Share, Loader2, Check, BookOpen,
-  Book, Star, Sparkles, Trophy, Heart, 
-  Lightbulb, Users, Target, ArrowRight, ShoppingBag, Droplet, Shirt, X, Quote, PenTool, Brain, BarChart3,
+import { AlertCircle, ArrowLeft, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
+  Bike, Bus, Apple, Recycle, Battery, Wind, Loader2, BookOpen,
+  Sparkles, 
+  Lightbulb, Target, ArrowRight, X, PenTool, Brain, BarChart3,
   ChevronLeft, ChevronRight
 } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { determineEcoPersonality, PersonalityDetails } from '@/utils/ecoPersonality';
-import useSound from 'use-sound';
-import { EcoAvatar } from '@/components/EcoAvatar';
-import { getOutfitForPersonality, getAccessoryForPersonality, getBackgroundForCategory } from '@/utils/ecoPersonality';
-import { Badge } from '@/components/ui/badge';
-import { ClimateChampions } from '@/components/ClimateChampions';
-import { Progress } from "@/components/ui/progress";
-import { SustainabilityJourney } from './SustainabilityJourney';
 import { impactMappings } from '@/utils/impactMappings';
-import { generateEcoStory, formatStoryForDisplay, StoryCard, generateNarrativeStory, NarrativeStory } from '@/utils/ecoStoryEngine';
+import { generateEcoStory, StoryCard, generateNarrativeStory, NarrativeStory } from '@/utils/ecoStoryEngine';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { WrappedStoryCarousel } from './WrappedStoryCarousel';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Separator } from "@/components/ui/separator";
-import WrappedStoryCard from './WrappedStoryCard';
 import html2canvas from 'html2canvas';
 import EcoWrappedCard from './EcoWrappedCard';
 import { calculatePersonality, UserResponses } from '@/services/api';
-import { getPersonalityImage, preloadPersonalityImages } from '@/utils/personalityImages';
+import { getPersonalityImage } from '@/utils/personalityImages';
 import { PersonalityType, PersonalityResponse } from '@/types/personality';
 import { useNavigate } from 'react-router-dom';
 import { useQuizStore } from '@/stores/quizStore';
-import { SpeedometerGauge } from '@/components/SpeedometerGauge';
 
 interface CategoryEmissions {
   home: number;
@@ -1063,6 +1048,25 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                         )}
                       </div>
                     </button>
+
+                    <button
+                      onClick={() => navigate('/dashboard')}
+                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group ${
+                        'border-sage-200/60 bg-white/70 text-sage-600 hover:text-sage-700 hover:border-sage-300 hover:bg-sage-50/50'
+                      }`}
+                    >
+                      <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-4'}`}>
+                        <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          'bg-sage-300 group-hover:bg-sage-400'
+                        }`} />
+                        {!sidebarCollapsed && (
+                          <div>
+                            <div className="font-medium">Personalized Dashboard</div>
+                            <div className="text-xs text-sage-500 mt-1">View your detailed insights</div>
+                          </div>
+                        )}
+                      </div>
+                    </button>
                   </nav>
 
                   {/* Progress Indicator */}
@@ -1071,15 +1075,16 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                       <div className="flex items-center justify-between text-xs text-sage-500 mb-2">
                         <span>Progress</span>
                         <span>
-                          {activeSection === 'climate-self' ? '1' : activeSection === 'climate-signature' ? '2' : '3'} of 3
+                          {activeSection === 'climate-self' ? '1' : activeSection === 'climate-signature' ? '2' : activeSection === 'take-action' ? '3' : '4'} of 4
                         </span>
                       </div>
                       <div className="w-full bg-sage-200/30 rounded-full h-2">
                         <div 
                           className="bg-gradient-to-r from-sage-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
                           style={{ 
-                            width: activeSection === 'climate-self' ? '33%' : 
-                                   activeSection === 'climate-signature' ? '66%' : '100%' 
+                            width: activeSection === 'climate-self' ? '25%' : 
+                                   activeSection === 'climate-signature' ? '50%' : 
+                                   activeSection === 'take-action' ? '75%' : '100%' 
                           }}
                         />
                       </div>
@@ -1172,9 +1177,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           
            {/* Profile Section */}
            {activeSection === 'climate-self' && (
-           <div className="space-y-8">
+           <div className="space-y-1">
              {/* Section Header */}
-             <div className="text-center space-y-4">
+             <div className="text-center space-y-3">
                <h2 className="text-3xl md:text-4xl font-bold text-sage-800">
                  Your Climate Self
                </h2>
@@ -1184,36 +1189,36 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
              </div>
              
              {/* Profile Content */}
-             <div className="flex flex-col items-center justify-center bg-gradient-to-br from-sage-50 to-cream-50 rounded-3xl p-8 shadow-xl border border-sage-100">
+             <div className="flex flex-col items-center justify-start bg-gradient-to-br from-sage-50 to-cream-50 rounded-3xl shadow-xl border border-sage-100">
              
-              {/* Main Avatar with Enhanced Styling */}
-              <div className="relative mb-8">
-                <div className="w-64 aspect-[3/4] rounded-3xl overflow-hidden border-8 border-sage-200 shadow-2xl relative bg-white">
-                  <img
-                    src={profileImage}
-                    alt="Profile Avatar"
-                    className="w-full h-full object-cover"
-                    style={{ objectPosition: 'center top' }}
-                  />
-               </div>
-             </div>
-             
-             {/* Personality Name with Enhanced Typography */}
-             <div className="text-center mb-6">
-               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent mb-2">
-               {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Eco in Progress'}
-             </h1>
-               <div className="w-24 h-1 bg-gradient-to-r from-sage-300 to-cream-300 mx-auto rounded-full"></div>
-             </div>
+            {/* Personality Name with Enhanced Typography */}
+            <div className="text-center mb-0 mt-8">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent mb-2">
+              {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Eco in Progress'}
+            </h1>
+              <div className="w-24 h-1 bg-gradient-to-r from-sage-300 to-cream-300 mx-auto rounded-full"></div>
+            </div>
+
+            {/* Main Avatar with Enhanced Styling */}
+            <div className="mb-6">
+              <div className="inline-block rounded-3xl overflow-hidden border border-sage-200 shadow-2xl bg-white">
+                <img
+                  src={profileImage}
+                  alt="Profile Avatar"
+                  className="block w-48 h-60 object-cover"
+                  style={{ objectPosition: 'center top' }}
+                />
+              </div>
+            </div>
              
              {/* Hook Line with Enhanced Styling */}
              <div className="text-center max-w-3xl mx-auto mb-6">
-               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-sage-100">
-                 <p className="text-xl font-medium text-black italic leading-relaxed">
-                 {dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}
-               </p>
-               </div>
-             </div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-sage-100">
+                <p className="m-0 text-xl font-medium text-black italic leading-relaxed">
+                  {dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}
+                </p>
+              </div>
+            </div>
              
              {/* Detailed Personality Description with Enhanced Layout */}
              <div className="text-center max-w-3xl mx-auto mb-8">
@@ -1237,56 +1242,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                </div>
              </div>
 
-         {/* Professional Join the Sanctuary Section */}
-         <div className="flex justify-center mt-16 mb-12">
-           <div className="relative group">
-             {/* Subtle Glow Effect */}
-             <div className="absolute -inset-4 bg-gradient-to-r from-sage-400/20 via-emerald-400/20 to-sage-600/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-             
-             {/* Main Container */}
-             <button 
-               className="relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] transform"
-               onClick={() => console.log('Join the Sanctuary clicked')}
-             >
-               {/* Background Image */}
-               <div 
-                 className="w-[700px] h-80 bg-cover bg-center bg-no-repeat"
-                 style={{
-                   backgroundImage: `url('/images/join.png')`
-                 }}
-               >
-                 {/* Professional Overlay */}
-                 <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/30 to-black/20 group-hover:from-black/40 group-hover:via-black/25 group-hover:to-black/15 transition-all duration-500"></div>
-                 
-                 {/* Content Overlay */}
-                 <div className="relative h-full flex items-center justify-center">
-                   <div className="text-center space-y-4">
-                     {/* Professional Title */}
-                     <h3 className="text-4xl font-bold text-white tracking-wide mb-2">
-                       Join the Sanctuary
-                     </h3>
-                     
-                     {/* Elegant Divider */}
-                     <div className="w-16 h-px bg-white/60 mx-auto mb-3"></div>
-                     
-                     {/* Professional Subtitle */}
-                     <p className="text-lg font-medium text-white/90 leading-relaxed max-w-xs">
-                       Connect with like-minded climate champions
-                     </p>
-                     
-                     {/* Professional Arrow */}
-                     <div className="mt-4">
-                       <ArrowRight className="h-10 w-10 text-white/80 mx-auto group-hover:translate-x-1 group-hover:text-white transition-all duration-300" />
-                     </div>
-                   </div>
-           </div>
-                 
-                 {/* Subtle Border */}
-                 <div className="absolute inset-0 rounded-2xl border border-white/10 pointer-events-none"></div>
-               </div>
-             </button>
-           </div>
-         </div>
 
 
 

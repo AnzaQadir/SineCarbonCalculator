@@ -885,7 +885,7 @@ function PoeticJourneyQuiz() {
     {
       key: 'gender',
       header: 'Chapter 7: Your Story',
-      icon: '🌈',
+      icon: '👤',
       question: 'Which gender do you identify with?',
       type: 'select',
       options: [
@@ -1625,12 +1625,78 @@ function PoeticJourneyQuiz() {
     "Spain": ["Madrid", "Barcelona", "Valencia", "Seville", "Other"],
   };
 
+  // Lightweight custom select component for fully styled dropdown
+  function CustomSelect({
+    value,
+    onChange,
+    options,
+    placeholder,
+    disabled,
+  }: {
+    value: string;
+    onChange: (v: string) => void;
+    options: { value: string; label: string }[];
+    placeholder?: string;
+    disabled?: boolean;
+  }) {
+    const [open, setOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+      function handleClickOutside(e: MouseEvent) {
+        if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+          setOpen(false);
+        }
+      }
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const selected = options.find(o => o.value === value);
+
+    return (
+      <div ref={containerRef} className={`relative w-full max-w-2xl ${disabled ? 'opacity-60' : ''}`}>
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => setOpen(o => !o)}
+          className="w-full h-24 rounded-3xl px-8 pr-16 text-2xl font-semibold border-2 border-sage-300 focus:border-emerald-500 focus:outline-none shadow-xl text-sage-800 bg-white/90 backdrop-blur-sm transition-colors duration-200 flex items-center justify-between"
+          style={{ fontFamily: 'Inter, sans-serif' }}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+        >
+          <span className={!selected ? 'text-sage-400' : ''}>{selected ? selected.label : (placeholder || 'Select')}</span>
+          <svg className={`w-6 h-6 text-sage-700 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="none" stroke="currentColor">
+            <path d="M6 8L10 12L14 8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        {open && !disabled && (
+          <div className="absolute z-50 mt-2 w-full max-h-80 overflow-y-auto rounded-2xl border-2 border-sage-200 bg-white shadow-2xl">
+            {options.map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => { onChange(opt.value); setOpen(false); }}
+                className={`w-full text-left px-5 py-4 text-lg hover:bg-sage-50 ${value === opt.value ? 'bg-sage-100 text-sage-800 font-semibold' : 'text-sage-700'}`}
+                style={{ fontFamily: 'Inter, sans-serif' }}
+                role="option"
+                aria-selected={value === opt.value}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="min-h-screen flex flex-col items-center justify-center relative pb-28"
+      className="min-h-screen flex flex-col items-center justify-center relative pb-28 px-4 md:px-8"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundRepeat: 'repeat',
@@ -1658,13 +1724,15 @@ function PoeticJourneyQuiz() {
       
 
       
-      <div className="max-w-4xl w-full mx-auto bg-white/90 rounded-3xl shadow-2xl p-6 md:p-8 pb-12 md:pb-14 border border-[#A7D58E22] relative z-10 mx-4 min-h-[74vh] flex flex-col justify-between mb-16">
-        {/* Chapter Title (subheading removed by request) */}
-        <div className="mb-8">
+      <div className="max-w-5xl w-full mx-auto bg-white/90 rounded-3xl shadow-2xl border border-[#A7D58E22] relative z-10 mx-4 mb-16 overflow-hidden
+                      grid grid-rows-[auto_1fr_auto]
+                      h-[calc(100vh-var(--app-header-h,72px)-2rem)] md:h-[calc(100vh-var(--app-header-h,80px)-3rem)]">
+        {/* Card Header */}
+        <div className="p-4 md:p-6 pb-2">
           <h2 className="text-2xl md:text-3xl font-serif text-sage-800 text-center mb-2 tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700 }}>{section.title}</h2>
         </div>
-        {/* Question */}
-        <div className="flex flex-col items-center mb-12 flex-1">
+        {/* Scrollable Body */}
+        <div className="px-6 md:px-8 flex flex-col items-center justify-start mb-4 overflow-y-auto pb-6 min-h-0">
           {q.type === 'personality' ? (
             <PandaGifWithDelay gifUrl={step % 2 === 0 ? '/gif/joyful_panda.gif' : '/gif/panda.gif'} />
           ) : (
@@ -1677,7 +1745,7 @@ function PoeticJourneyQuiz() {
                 rotate: [0, -5, 5, 0],
                 transition: { duration: 0.6 }
               }}
-              className="relative group"
+              className="relative group mb-2"
             >
               {/* Glowing background circle */}
               <div className="absolute inset-0 bg-gradient-to-r from-sage-200/50 via-emerald-200/50 to-sage-200/50 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 scale-150"></div>
@@ -1721,74 +1789,69 @@ function PoeticJourneyQuiz() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-2xl md:text-3xl lg:text-4xl font-serif text-sage-800 text-center mt-8 mb-8 leading-tight" 
+            className="text-2xl md:text-3xl lg:text-4xl font-serif text-sage-800 text-center mt-2 mb-6 lg:mb-8 leading-tight" 
             style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}
           >
             {q.question}
           </motion.div>
-        </div>
-        <div className="flex flex-wrap justify-center gap-6 mb-8 max-w-4xl mx-auto flex-1">
+          {/* Spacer to push options to vertical center between question and footer */}
+          <div className="flex-1" />
+          <div className="flex flex-wrap justify-center gap-3 lg:gap-2 mb-2 max-w-4xl mx-auto mt-4">
           {q.key === 'country' ? (
-            <select
+            <CustomSelect
               value={getNestedValue(answers, q.key) || ''}
-              onChange={e => handleSelect(q.key, e.target.value)}
-              className="w-full max-w-2xl h-24 rounded-3xl px-8 text-2xl font-semibold border-2 border-sage-300 focus:border-emerald-500 focus:outline-none shadow-xl bg-white/90 appearance-none transition-colors duration-200 hover:border-sage-400 text-sage-800"
-              style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'24\' height=\'24\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.5rem 1.5rem', paddingRight: '3rem', fontFamily: 'Inter, sans-serif' }}
-            >
-              <option value="" disabled>Enter your country</option>
-              <option value="United States">United States</option>
-              <option value="Canada">Canada</option>
-              <option value="United Kingdom">United Kingdom</option>
-              <option value="Australia">Australia</option>
-              <option value="India">India</option>
-              <option value="Pakistan">Pakistan</option>
-              <option value="United Arab Emirates">United Arab Emirates</option>
-              <option value="Saudi Arabia">Saudi Arabia</option>
-              <option value="Germany">Germany</option>
-              <option value="France">France</option>
-              <option value="Brazil">Brazil</option>
-              <option value="Japan">Japan</option>
-              <option value="China">China</option>
-              <option value="South Africa">South Africa</option>
-              <option value="Turkey">Turkey</option>
-              <option value="Indonesia">Indonesia</option>
-              <option value="Bangladesh">Bangladesh</option>
-              <option value="Nigeria">Nigeria</option>
-              <option value="Mexico">Mexico</option>
-              <option value="Russia">Russia</option>
-              <option value="Egypt">Egypt</option>
-              <option value="Argentina">Argentina</option>
-              <option value="Italy">Italy</option>
-              <option value="Spain">Spain</option>
-              <option value="Other">Other</option>
-            </select>
+              onChange={(v) => handleSelect(q.key, v)}
+              placeholder="Enter your country"
+              options={[
+                { value: 'United States', label: 'United States' },
+                { value: 'Canada', label: 'Canada' },
+                { value: 'United Kingdom', label: 'United Kingdom' },
+                { value: 'Australia', label: 'Australia' },
+                { value: 'India', label: 'India' },
+                { value: 'Pakistan', label: 'Pakistan' },
+                { value: 'United Arab Emirates', label: 'United Arab Emirates' },
+                { value: 'Saudi Arabia', label: 'Saudi Arabia' },
+                { value: 'Germany', label: 'Germany' },
+                { value: 'France', label: 'France' },
+                { value: 'Brazil', label: 'Brazil' },
+                { value: 'Japan', label: 'Japan' },
+                { value: 'China', label: 'China' },
+                { value: 'South Africa', label: 'South Africa' },
+                { value: 'Turkey', label: 'Turkey' },
+                { value: 'Indonesia', label: 'Indonesia' },
+                { value: 'Bangladesh', label: 'Bangladesh' },
+                { value: 'Nigeria', label: 'Nigeria' },
+                { value: 'Mexico', label: 'Mexico' },
+                { value: 'Russia', label: 'Russia' },
+                { value: 'Egypt', label: 'Egypt' },
+                { value: 'Argentina', label: 'Argentina' },
+                { value: 'Italy', label: 'Italy' },
+                { value: 'Spain', label: 'Spain' },
+                { value: 'Other', label: 'Other' },
+              ]}
+            />
           ) : q.key === 'location' ? (
             (() => {
               const selectedCountry = getNestedValue(answers, 'country');
               const cities = countryCityMap[selectedCountry];
               if (!selectedCountry) {
                 return (
-              <select
-                disabled
-                className="w-full max-w-2xl h-24 rounded-3xl px-8 text-2xl font-semibold border-2 border-sage-200 bg-gray-100 text-gray-400 shadow-xl appearance-none"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                    <option value="">Select a country first</option>
-                  </select>
+                  <CustomSelect
+                    value={''}
+                    onChange={() => {}}
+                    options={[]}
+                    placeholder="Select a country first"
+                    disabled
+                  />
                 );
               } else if (cities) {
                 return (
-                  <select
+                  <CustomSelect
                     value={getNestedValue(answers, q.key) || ''}
-                    onChange={e => handleSelect(q.key, e.target.value)}
-                    className="w-full max-w-2xl h-24 rounded-3xl px-8 text-2xl font-semibold border-2 border-sage-300 focus:border-emerald-500 focus:outline-none shadow-xl bg-white/90 appearance-none transition-colors duration-200 hover:border-sage-400 text-sage-800"
-                    style={{ background: 'url("data:image/svg+xml,%3Csvg width=\'24\' height=\'24\' viewBox=\'0 0 20 20\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 8L10 12L14 8\' stroke=\'%237A8B7A\' stroke-width=\'2.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") no-repeat right 1.5rem center/1.5rem 1.5rem', paddingRight: '3rem', fontFamily: 'Inter, sans-serif' }}
-                  >
-                    <option value="" disabled>Select your city</option>
-                    {cities.map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
+                    onChange={(v) => handleSelect(q.key, v)}
+                    placeholder="Select your city"
+                    options={cities.map(city => ({ value: city, label: city }))}
+                  />
                 );
               } else {
                 return (
@@ -1809,8 +1872,8 @@ function PoeticJourneyQuiz() {
                 <button
                   key={opt.value}
                   onClick={() => handleSelect(q.key, opt.value)}
-                  className={`rounded-xl px-8 py-4 text-base font-medium shadow-lg transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-sage-600 text-white border-sage-600 shadow-sage-200' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-300 hover:shadow-md'}`}
-                  style={{ minWidth: 180, fontFamily: 'Inter, sans-serif' }}
+                  className={`rounded-2xl px-10 py-6 text-lg md:text-xl font-semibold shadow-lg transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-sage-600 text-white border-sage-600 shadow-sage-200' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-300 hover:shadow-md'}`}
+                  style={{ minWidth: 240, fontFamily: 'Inter, sans-serif' }}
                 >
                   {opt.label}
                 </button>
@@ -1821,8 +1884,8 @@ function PoeticJourneyQuiz() {
               <button
                 key={opt.value}
                 onClick={() => handleSelect(q.key, opt.value)}
-                className={`rounded-xl px-8 py-4 text-base font-medium shadow-lg transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-sage-600 text-white border-sage-600 shadow-sage-200' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-300 hover:shadow-md'}`}
-                style={{ minWidth: 180, fontFamily: 'Inter, sans-serif' }}
+                className={`rounded-2xl px-10 py-6 text-lg md:text-xl font-semibold shadow-lg transition-all border-2 ${getNestedValue(answers, q.key) === opt.value ? 'bg-sage-600 text-white border-sage-600 shadow-sage-200' : 'bg-white text-sage-700 border-sage-200 hover:border-sage-300 hover:shadow-md'}`}
+                style={{ minWidth: 240, fontFamily: 'Inter, sans-serif' }}
               >
                 {opt.label}
               </button>
@@ -1858,14 +1921,49 @@ function PoeticJourneyQuiz() {
               )}
             </div>
           ) : q.type === 'number' ? (
-            <input
-              type="number"
-              value={getNestedValue(answers, q.key) || ''}
-              onChange={e => handleSelect(q.key, e.target.value)}
-              placeholder={q.placeholder}
-              className="w-full max-w-2xl h-24 rounded-3xl px-8 text-2xl font-semibold border-2 border-sage-300 focus:border-emerald-500 focus:outline-none shadow-xl text-sage-800 placeholder-sage-400 bg-white/90 backdrop-blur-sm transition-colors duration-200"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            />
+            <div className="relative w-full max-w-2xl">
+              <input
+                type="number"
+                value={getNestedValue(answers, q.key) || ''}
+                onChange={e => handleSelect(q.key, e.target.value)}
+                placeholder={q.placeholder}
+                className="w-full h-24 rounded-3xl px-8 pr-20 text-2xl font-semibold border-2 border-sage-300 focus:border-emerald-500 focus:outline-none shadow-xl text-sage-800 placeholder-sage-400 bg-white/90 backdrop-blur-sm transition-colors duration-200"
+                style={{ 
+                  fontFamily: 'Inter, sans-serif',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'textfield'
+                }}
+              />
+              {/* Custom increment/decrement buttons */}
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentValue = parseInt(getNestedValue(answers, q.key) || '0') || 0;
+                    handleSelect(q.key, (currentValue + 1).toString());
+                  }}
+                  className="w-8 h-8 bg-sage-200 hover:bg-sage-300 text-sage-700 rounded-lg flex items-center justify-center transition-colors duration-200 shadow-sm hover:shadow-md"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentValue = parseInt(getNestedValue(answers, q.key) || '0') || 0;
+                    if (currentValue > 0) {
+                      handleSelect(q.key, (currentValue - 1).toString());
+                    }
+                  }}
+                  className="w-8 h-8 bg-sage-200 hover:bg-sage-300 text-sage-700 rounded-lg flex items-center justify-center transition-colors duration-200 shadow-sm hover:shadow-md"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           ) : q.type === 'yesno' ? (
             <div className="flex gap-4">
               <button
@@ -1884,8 +1982,12 @@ function PoeticJourneyQuiz() {
               </button>
             </div>
           ) : null}
+          </div>
+          {/* Bottom spacer to keep options centered relative to footer top */}
+          <div className="flex-1" />
         </div>
-        <div className="flex justify-between items-center mt-8 px-2 md:px-0">
+        {/* Sticky Footer inside card */}
+        <div className="py-4 md:py-5 px-6 md:px-8 border-top border-t bg-white/95 supports-[backdrop-filter]:bg-white/75 flex justify-between items-center gap-4">
           {/* Back Button */}
           <button
             onClick={handleBack}
