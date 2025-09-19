@@ -17,21 +17,52 @@ const Footer = () => (
     {/* Main Footer Content - Navigation and Brand */}
     <div className="py-8">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+        <div className="flex flex-col lg:flex-row items-start justify-end gap-12 pt-6">
           {/* Left Section - Logo and Brand */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center mt-0">
             <img src="/images/new_logo.png" alt="Zerrah Logo" className="h-24 w-auto opacity-90 drop-shadow-lg transition-transform duration-300 hover:scale-105" />
             <div className="hidden md:block">
               <p className="text-amber-800 text-sm font-medium max-w-md text-center">Zerrah helps you understand and reduce your climate impact.</p>
             </div>
           </div>
+          {/* Navigation */}
+          <div className="mt-8">
+            <h4 className="font-bold mb-3 text-amber-800 text-sm tracking-wider uppercase">Navigation</h4>
+            <ul className="space-y-2">
+              <li><a href="/" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Home</a></li>
+              <li><a href="/quiz" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Quiz</a></li>
+              <li><a href="/reflections" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Reflections</a></li>
+            </ul>
+          </div>
 
-          {/* Center Section - Join the Sanctuary Card */}
+          {/* Resources */}
+          <div className="mt-8">
+            <h4 className="font-bold mb-3 text-amber-800 text-sm tracking-wider uppercase">Resources</h4>
+            <ul className="space-y-2">
+              <li><a href="#" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Sustainability</a></li>
+              <li><a href="#" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Tips</a></li>
+              <li><a href="#" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">FAQ</a></li>
+            </ul>
+          </div>
+
+          {/* Connect */}
+          <div className="mt-8">
+            <h4 className="font-bold mb-3 text-amber-800 text-sm tracking-wider uppercase">Connect</h4>
+            <div className="flex gap-4">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/90 shadow-lg hover:shadow-xl hover:-translate-y-1 hover:bg-amber-50 transition-all duration-300 flex items-center border border-amber-200/60" aria-label="Instagram">
+                <InstagramIcon className="h-6 w-6 text-pink-500" />
+              </a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/90 shadow-lg hover:shadow-xl hover:-translate-y-1 hover:bg-amber-50 transition-all duration-300 flex items-center border border-amber-200/60" aria-label="LinkedIn">
+                <LinkedInIcon className="h-6 w-6 text-blue-600" />
+              </a>
+            </div>
+          </div>
+
+          {/* Join the Sanctuary - moved to extreme right */}
           <div className="flex justify-center">
             <div className="relative group">
               {/* Enhanced Glow Effect - using amber tones */}
               <div className="absolute -inset-4 bg-gradient-to-r from-amber-400/30 via-orange-400/30 to-amber-600/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-              
               {/* Main Container */}
               <button 
                 className="relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-700 hover:scale-[1.02] transform w-[350px] h-[216px]"
@@ -46,67 +77,23 @@ const Footer = () => (
                 >
                   {/* Professional Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/30 to-black/20 group-hover:from-black/40 group-hover:via-black/25 group-hover:to-black/15 transition-all duration-700"></div>
-                  
-                      {/* Content Overlay */}
-                      <div className="relative h-full flex items-center justify-center">
-                        <div className="text-center space-y-2">
-                          {/* Professional Title */}
-                          <h3 className="text-2xl font-bold text-white tracking-wide">
-                            Join the Sanctuary
-                          </h3>
-                          
-                          {/* Elegant Divider */}
-                          <div className="w-16 h-px bg-white/70 mx-auto"></div>
-                          
-                          {/* Professional Subtitle */}
-                          <p className="text-sm font-medium text-white/95 leading-relaxed max-w-xs">
-                            Connect with like-minded climate champions
-                          </p>
-                          
-                          {/* Professional Arrow */}
-                          <div className="mt-2">
-                            <svg className="h-6 w-6 text-white/90 mx-auto group-hover:translate-x-1 group-hover:text-white transition-all duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                          </div>
-                        </div>
+                  {/* Content Overlay */}
+                  <div className="relative h-full flex items-center justify-center">
+                    <div className="text-center space-y-2">
+                      <h3 className="text-2xl font-bold text-white tracking-wide">Join the Sanctuary</h3>
+                      <div className="w-16 h-px bg-white/70 mx-auto"></div>
+                      <p className="text-sm font-medium text-white/95 leading-relaxed max-w-xs">Connect with like-minded climate champions</p>
+                      <div className="mt-2">
+                        <svg className="h-6 w-6 text-white/90 mx-auto group-hover:translate-x-1 group-hover:text-white transition-all duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
                       </div>
-                  
+                    </div>
+                  </div>
                   {/* Enhanced Border */}
                   <div className="absolute inset-0 rounded-3xl border border-white/20 pointer-events-none"></div>
                 </div>
               </button>
-            </div>
-          </div>
-
-          {/* Right Section - Navigation Links */}
-          <div className="flex items-start gap-12 lg:gap-16">
-            <div>
-              <h4 className="font-bold mb-3 text-amber-800 text-sm tracking-wider uppercase">Navigation</h4>
-              <ul className="space-y-2">
-                <li><a href="/" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Home</a></li>
-                <li><a href="/quiz" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Quiz</a></li>
-                <li><a href="/reflections" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Reflections</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-3 text-amber-800 text-sm tracking-wider uppercase">Resources</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Sustainability</a></li>
-                <li><a href="#" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Tips</a></li>
-                <li><a href="#" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">FAQ</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-3 text-amber-800 text-sm tracking-wider uppercase">Connect</h4>
-              <div className="flex gap-4">
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/90 shadow-lg hover:shadow-xl hover:-translate-y-1 hover:bg-amber-50 transition-all duration-300 flex items-center border border-amber-200/60" aria-label="Instagram">
-                  <InstagramIcon className="h-6 w-6 text-pink-500" />
-                </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/90 shadow-lg hover:shadow-xl hover:-translate-y-1 hover:bg-amber-50 transition-all duration-300 flex items-center border border-amber-200/60" aria-label="LinkedIn">
-                  <LinkedInIcon className="h-6 w-6 text-blue-600" />
-                </a>
-              </div>
             </div>
           </div>
         </div>
