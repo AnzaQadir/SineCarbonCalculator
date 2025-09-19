@@ -8,55 +8,126 @@ const LinkedInIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 const Footer = () => (
-  <footer className="relative w-full bg-white rounded-t-3xl border-t-2 border-amber-100 shadow-[0_-8px_32px_0_rgba(217,119,6,0.08)] py-6 md:py-8 px-4 animate-fade-in-up mt-24 transition-all duration-700 overflow-hidden">
-    {/* Elegant gradient border */}
-    <div className="absolute top-0 left-0 w-full h-[2.5px] z-50 pointer-events-none">
-      <div className="w-full h-full rounded-t-3xl" style={{background: 'linear-gradient(90deg, #B45309 0%, #FDE68A 50%, #92400E 100%)'}} />
+  <footer className="relative w-full bg-gradient-to-br from-amber-50 via-white to-orange-50 border-t border-amber-200/60 shadow-[0_-12px_40px_0_rgba(217,119,6,0.08)] mt-24 transition-all duration-700 overflow-hidden">
+    {/* Elegant gradient border - using Zerrah brand colors */}
+    <div className="absolute top-0 left-0 w-full h-[3px] z-50 pointer-events-none">
+      <div className="w-full h-full" style={{background: 'linear-gradient(90deg, #B45309 0%, #FDE68A 50%, #92400E 100%)'}} />
     </div>
-    {/* Top-centered logo and tagline */}
-    <div className="w-full flex flex-col items-center justify-center mb-6">
-      <img src="/images/new_logo.png" alt="Zerrah Logo" className="h-32 w-auto opacity-90 mb-2 drop-shadow-lg transition-transform duration-300 hover:scale-105" />
-      <span className="text-amber-800 text-base md:text-lg text-center max-w-xl font-serif font-semibold">
-        Zerrah helps you understand and reduce your climate impact.
-      </span>
-    </div>
-    {/* Navigation, Connect, Resources */}
-    <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-start justify-between px-2 md:px-8 gap-4 md:gap-8">
-      <div>
-        <h4 className="font-semibold mb-4 text-lg text-amber-800 tracking-wide">Navigation</h4>
-        <ul className="space-y-2">
-          <li><a href="/" className="text-gray-500 hover:text-amber-700 transition-colors duration-200 font-medium">Home</a></li>
-          <li><a href="/quiz" className="text-gray-500 hover:text-amber-700 transition-colors duration-200 font-medium">Quiz</a></li>
-          <li><a href="/reflections" className="text-gray-500 hover:text-amber-700 transition-colors duration-200 font-medium">Reflections</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 className="font-semibold mb-4 text-lg text-amber-800 tracking-wide">Connect</h4>
-        <div className="flex gap-4 mt-2">
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white shadow hover:shadow-lg hover:-translate-y-1 hover:bg-amber-50 transition-all duration-200 flex items-center" aria-label="Instagram">
-            <InstagramIcon className="h-6 w-6 text-pink-500" />
-          </a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white shadow hover:shadow-lg hover:-translate-y-1 hover:bg-amber-50 transition-all duration-200 flex items-center" aria-label="LinkedIn">
-            <LinkedInIcon className="h-6 w-6 text-blue-600" />
-          </a>
+    
+    {/* Main Footer Content - Navigation and Brand */}
+    <div className="py-8">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+          {/* Left Section - Logo and Brand */}
+          <div className="flex flex-col items-center">
+            <img src="/images/new_logo.png" alt="Zerrah Logo" className="h-24 w-auto opacity-90 drop-shadow-lg transition-transform duration-300 hover:scale-105" />
+            <div className="hidden md:block">
+              <p className="text-amber-800 text-sm font-medium max-w-md text-center">Zerrah helps you understand and reduce your climate impact.</p>
+            </div>
+          </div>
+
+          {/* Center Section - Join the Sanctuary Card */}
+          <div className="flex justify-center">
+            <div className="relative group">
+              {/* Enhanced Glow Effect - using amber tones */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-amber-400/30 via-orange-400/30 to-amber-600/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+              
+              {/* Main Container */}
+              <button 
+                className="relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-700 hover:scale-[1.02] transform w-[350px] h-[216px]"
+                onClick={() => console.log('Join the Sanctuary clicked')}
+              >
+                {/* Background Image */}
+                <div 
+                  className="w-full h-full bg-cover bg-center bg-no-repeat"
+                  style={{
+                    backgroundImage: `url('/images/join.png')`
+                  }}
+                >
+                  {/* Professional Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/30 to-black/20 group-hover:from-black/40 group-hover:via-black/25 group-hover:to-black/15 transition-all duration-700"></div>
+                  
+                      {/* Content Overlay */}
+                      <div className="relative h-full flex items-center justify-center">
+                        <div className="text-center space-y-2">
+                          {/* Professional Title */}
+                          <h3 className="text-2xl font-bold text-white tracking-wide">
+                            Join the Sanctuary
+                          </h3>
+                          
+                          {/* Elegant Divider */}
+                          <div className="w-16 h-px bg-white/70 mx-auto"></div>
+                          
+                          {/* Professional Subtitle */}
+                          <p className="text-sm font-medium text-white/95 leading-relaxed max-w-xs">
+                            Connect with like-minded climate champions
+                          </p>
+                          
+                          {/* Professional Arrow */}
+                          <div className="mt-2">
+                            <svg className="h-6 w-6 text-white/90 mx-auto group-hover:translate-x-1 group-hover:text-white transition-all duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                  
+                  {/* Enhanced Border */}
+                  <div className="absolute inset-0 rounded-3xl border border-white/20 pointer-events-none"></div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Right Section - Navigation Links */}
+          <div className="flex items-start gap-12 lg:gap-16">
+            <div>
+              <h4 className="font-bold mb-3 text-amber-800 text-sm tracking-wider uppercase">Navigation</h4>
+              <ul className="space-y-2">
+                <li><a href="/" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Home</a></li>
+                <li><a href="/quiz" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Quiz</a></li>
+                <li><a href="/reflections" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Reflections</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-3 text-amber-800 text-sm tracking-wider uppercase">Resources</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Sustainability</a></li>
+                <li><a href="#" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">Tips</a></li>
+                <li><a href="#" className="text-amber-600 hover:text-amber-800 transition-colors duration-200 text-sm font-medium block">FAQ</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-3 text-amber-800 text-sm tracking-wider uppercase">Connect</h4>
+              <div className="flex gap-4">
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/90 shadow-lg hover:shadow-xl hover:-translate-y-1 hover:bg-amber-50 transition-all duration-300 flex items-center border border-amber-200/60" aria-label="Instagram">
+                  <InstagramIcon className="h-6 w-6 text-pink-500" />
+                </a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/90 shadow-lg hover:shadow-xl hover:-translate-y-1 hover:bg-amber-50 transition-all duration-300 flex items-center border border-amber-200/60" aria-label="LinkedIn">
+                  <LinkedInIcon className="h-6 w-6 text-blue-600" />
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div>
-        <h4 className="font-semibold mb-4 text-lg text-amber-800 tracking-wide">Resources</h4>
-        <ul className="space-y-2">
-          <li><a href="#" className="text-gray-500 hover:text-amber-700 transition-colors duration-200 font-medium">Sustainability Tips</a></li>
-          <li><a href="#" className="text-gray-500 hover:text-amber-700 transition-colors duration-200 font-medium">FAQ</a></li>
-        </ul>
+    </div>
+
+    {/* Bottom Section - Copyright and Thanks */}
+    <div className="bg-amber-50/50 border-t border-amber-200/50 py-4">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-3">
+        <div className="text-xs text-amber-600 flex items-center gap-4">
+          <span>© {new Date().getFullYear()} Zerrah. All rights reserved.</span>
+          <div className="hidden md:flex gap-4">
+            <a href="#" className="hover:text-amber-800 transition-colors duration-200">Privacy Policy</a>
+            <a href="#" className="hover:text-amber-800 transition-colors duration-200">Terms</a>
+          </div>
+        </div>
+        <div className="text-sm text-amber-700 font-serif font-semibold">
+          Thanks for being part of Zerrah
+        </div>
       </div>
     </div>
-    <div className="mt-6 pt-4 border-t border-gray-100/70 text-center text-xs text-gray-400 flex flex-col md:flex-row justify-between items-center gap-2 mx-4">
-      <span>© {new Date().getFullYear()} Zerrah. All rights reserved.</span>
-      <div className="flex gap-4">
-        <a href="#" className="hover:text-amber-700 transition-colors duration-200">Privacy Policy</a>
-        <a href="#" className="hover:text-amber-700 transition-colors duration-200">Terms</a>
-      </div>
-    </div>
-    <div className="text-center text-sm text-amber-800 mt-4 font-serif font-semibold">Thanks for being part of the ripple 🌱</div>
   </footer>
 );
 
