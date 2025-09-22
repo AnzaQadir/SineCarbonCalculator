@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, ArrowLeft, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
   Bike, Bus, Apple, Recycle, Battery, Wind, Loader2, BookOpen,
   Sparkles, 
-  Lightbulb, Target, ArrowRight, X, PenTool, Brain, BarChart3,
+  Lightbulb, Target, ArrowRight, X, PenTool, Brain,
   ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,12 +20,12 @@ import { PersonalityType, PersonalityResponse } from '@/types/personality';
 import { useNavigate } from 'react-router-dom';
 import { useQuizStore } from '@/stores/quizStore';
 
-interface CategoryEmissions {
+type CategoryEmissions = {
   home: number;
   transport: number;
   food: number;
   waste: number;
-}
+};
 
 interface Recommendation {
   category: string;
@@ -157,7 +157,7 @@ interface ResultsDisplayProps {
   };
 }
 
-const getAchievements = (state: any, categoryEmissions: CategoryEmissions): Achievement[] => {
+const getAchievements = (state: any): Achievement[] => {
   const achievements: Achievement[] = [];
 
   // Transport achievements
@@ -544,7 +544,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   }, [showStory, storyCards, narrativeStory, currentCardIndex]);
 
   // Get achievements based on state
-  const achievements = getAchievements(state, categoryEmissions);
+  const achievements = getAchievements(state);
 
   // Helper functions for qualitative assessments
   const getStrengthLevel = (score: number): 'high' | 'medium' | 'low' => {
@@ -936,7 +936,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-radial-gradient from-emerald-200/10 via-transparent to-transparent"></div>
             </div>
 
-        <div className="max-w-7xl mx-auto px-6 py-12 space-y-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 pt-0 pb-12 space-y-12 relative z-10">
           
           {/* Back Button */}
           {onBack && (
@@ -955,7 +955,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="flex gap-8">
             {/* Left Sidebar Navigation - Desktop Only */}
             <aside className={`hidden lg:block ${sidebarCollapsed ? 'w-16' : 'w-96'} transition-all duration-300 flex-shrink-0`}>
-              <div className="sticky top-24 lg:top-32">
+              <div className="sticky top-6 lg:top-10">
                 <div className={`bg-white/95 backdrop-blur-2xl rounded-3xl ${sidebarCollapsed ? 'p-3' : 'p-7'} shadow-xl border border-sage-200/40 transition-all duration-300`}>
                   {/* Sidebar Header */}
                   <div className="mb-6 flex items-center justify-between">
@@ -1100,80 +1100,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               <div className="lg:max-h-[calc(100vh-8rem)] overflow-y-auto overscroll-contain pr-2 scroll-smooth">
 
 
-          {/* Ultra-Classy Toggle Section */}
-          <div className="flex justify-center mb-16">
-            <div className="relative group">
-              {/* Enhanced Glow Effect */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-sage-400/30 via-emerald-400/30 to-sage-600/30 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-              
-              {/* Main Toggle Container */}
-              <div className="relative bg-white/95 backdrop-blur-2xl rounded-3xl p-3 shadow-3xl border border-sage-200/40 overflow-hidden">
-                {/* Sophisticated Background Pattern */}
-                <div className="absolute inset-0 opacity-[0.02]" style={{
-                  backgroundImage: `
-                    linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
-                  `,
-                  backgroundSize: '30px 30px'
-                }}></div>
-                
-                {/* Enhanced Animated Slider */}
-                <div className={`absolute top-3 bottom-3 bg-gradient-to-r from-sage-500 via-emerald-500 to-sage-600 rounded-2xl shadow-xl transition-all duration-1000 ease-out ${
-                  activeSection === 'climate-self' ? 'left-3' : 
-                  activeSection === 'climate-signature' ? 'left-[calc(33.33%+3px)]' : 
-                  'left-[calc(66.66%+3px)]'
-                }`} style={{
-                  width: 'calc(33.33% - 6px)',
-                  left: activeSection === 'climate-self' ? '3px' : 
-                         activeSection === 'climate-signature' ? 'calc(33.33% + 3px)' : 
-                         'calc(66.66% + 3px)'
-                }}>
-                  {/* Slider Glow */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-sage-400/40 to-emerald-400/40 rounded-2xl blur-md"></div>
-                  {/* Inner Glow */}
-                  <div className="absolute inset-1 bg-gradient-to-r from-white/20 to-white/10 rounded-xl"></div>
-                </div>
-                
-                <div className="relative flex">
-                  <button
-                    onClick={() => setActiveSection('climate-self')}
-                    className={`relative px-8 py-4 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out ${
-                      activeSection === 'climate-self'
-                        ? 'text-white'
-                        : 'text-sage-600 hover:text-sage-700'
-                    }`}
-                  >
-                    <span className="relative z-10 text-base">Your Self</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setActiveSection('climate-signature')}
-                    className={`relative px-8 py-4 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out ${
-                      activeSection === 'climate-signature'
-                        ? 'text-white'
-                        : 'text-sage-600 hover:text-sage-700'
-                    }`}
-                  >
-                    <span className="relative z-10 text-base">Your Signature</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setActiveSection('take-action')}
-                    className={`relative px-8 py-4 rounded-2xl text-sm font-semibold transition-all duration-700 ease-out ${
-                      activeSection === 'take-action'
-                        ? 'text-white'
-                        : 'text-sage-600 hover:text-sage-700'
-                    }`}
-                  >
-                    <span className="relative z-10 text-base">Take Action</span>
-                  </button>
-                </div>
-                
-                {/* Enhanced Border Glow */}
-                <div className="absolute inset-0 rounded-3xl border border-sage-300/30 pointer-events-none"></div>
-              </div>
-            </div>
-          </div>
+          {/* Top navigation bar removed as requested */}
           
            {/* Profile Section */}
            {activeSection === 'climate-self' && (
@@ -1192,7 +1119,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
              <div className="flex flex-col items-center justify-start bg-gradient-to-br from-sage-50 to-cream-50 rounded-3xl shadow-xl border border-sage-100">
              
             {/* Personality Name with Enhanced Typography */}
-            <div className="text-center mb-0 mt-8">
+            <div className="text-center mb-0 mt-4">
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent mb-2">
               {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Eco in Progress'}
             </h1>
@@ -1205,7 +1132,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 <img
                   src={profileImage}
                   alt="Profile Avatar"
-                  className="block w-48 h-60 object-cover"
+                  className="block w-[15rem] h-auto object-contain"
                   style={{ objectPosition: 'center top' }}
                 />
               </div>
@@ -1229,18 +1156,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                </div>
              </div>
              
-             {/* Integrated Dashboard Button */}
-             <div className="mt-8 text-center">
-               <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-sage-200/50 hover:bg-white hover:shadow-xl transition-all duration-300 group cursor-pointer"
-                 onClick={() => navigate('/dashboard')}
-               >
-                 <div className="w-6 h-6 bg-gradient-to-br from-sage-500 to-sage-600 rounded-full flex items-center justify-center">
-                   <BarChart3 className="h-4 w-4 text-white" />
-               </div>
-                 <span className="font-semibold text-sage-700 group-hover:text-sage-800 transition-colors">View Personalized Dashboard</span>
-                 <ArrowRight className="h-4 w-4 text-sage-600 group-hover:translate-x-1 transition-transform duration-300" />
-               </div>
-             </div>
+            {/* Integrated Dashboard Button removed as requested */}
 
 
 
@@ -1299,20 +1215,20 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
            </div>
 
                           {/* Enhanced Header Section */}
-             <div className="text-center space-y-8 relative z-10">
-             <div className="text-center space-y-4">
-                 <h2 className="text-5xl md:text-6xl font-bold text-black leading-tight tracking-tight">
+            <div className="text-center space-y-4 relative z-10 mt-0">
+            <div className="text-center space-y-2">
+                <h2 className="text-4xl md:text-5xl font-bold text-black leading-tight tracking-tight mt-0 mb-0">
                    Your Signature
               </h2>
-                 <div className="w-32 h-0.5 bg-gradient-to-r from-sage-400 via-sage-500 to-sage-600 mt-4 rounded-full mx-auto"></div>
+                {/* underline removed */}
                </div>
-               <p className="text-2xl text-black max-w-4xl mx-auto leading-relaxed font-light tracking-wide">
+              <p className="text-xl text-black max-w-3xl mx-auto leading-relaxed font-light tracking-wide">
                  Your current habits are the foundation—let's build on what's working and transform what isn't
                </p>
             </div>
 
              {/* Enhanced Cards Grid */}
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                {/* Card 1: Power Habit */}
                <div className="group relative h-full">
                  <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-emerald-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -1339,19 +1255,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    }}></div>
                  </div>
                    
-                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
+                  <div className="relative z-10 space-y-4 flex-1 flex flex-col justify-center">
                      {/* Enhanced Icon Container */}
-                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center group-hover:from-green-200 group-hover:to-emerald-200 transition-all duration-300 shadow-lg border border-green-200">
-                       <Lightbulb className="w-10 h-10 text-green-600" />
+                    <div className="w-14 h-14 mx-auto bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center group-hover:from-green-200 group-hover:to-emerald-200 transition-all duration-300 shadow-lg border border-green-200">
+                      <Lightbulb className="w-8 h-8 text-green-600" />
                    </div>
                      
                      {/* Enhanced Title */}
-                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                     <h3 className="text-lg font-bold text-gray-900 text-center bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                         {findHighlight('power-habit')?.title || 'Your Power Habit'}
                       </h3>
                      
                      {/* Enhanced Description */}
-                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                     <p className="text-xs text-gray-600 text-center leading-relaxed flex-1">
                         {findHighlight('power-habit')?.subtext || 
                        "You're taking steps toward sustainability — every small action counts and builds momentum."}
                     </p>
@@ -1385,19 +1301,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    }}></div>
                  </div>
                    
-                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
+                  <div className="relative z-10 space-y-4 flex-1 flex flex-col justify-center">
                      {/* Enhanced Icon Container */}
-                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl flex items-center justify-center group-hover:from-purple-200 group-hover:to-indigo-200 transition-all duration-300 shadow-lg border border-purple-200">
-                       <Zap className="w-10 h-10 text-purple-600" />
+                    <div className="w-14 h-14 mx-auto bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl flex items-center justify-center group-hover:from-purple-200 group-hover:to-indigo-200 transition-all duration-300 shadow-lg border border-purple-200">
+                      <Zap className="w-8 h-8 text-purple-600" />
                    </div>
                      
                      {/* Enhanced Title */}
-                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                     <h3 className="text-lg font-bold text-gray-900 text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                         {findHighlight('power-move')?.title || 'Your Power Move'}
                       </h3>
                      
                      {/* Enhanced Description */}
-                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                     <p className="text-xs text-gray-600 text-center leading-relaxed flex-1">
                         {findHighlight('power-move')?.subtext || 
                        "Try creating a 7-day visual tracker to improve one small habit. Builders like you thrive on small systems."}
                     </p>
@@ -1431,19 +1347,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                    }}></div>
                  </div>
                    
-                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
+                  <div className="relative z-10 space-y-4 flex-1 flex flex-col justify-center">
                      {/* Enhanced Icon Container */}
-                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-300 shadow-lg border border-blue-200">
-                       <Target className="w-10 h-10 text-blue-600" />
+                    <div className="w-14 h-14 mx-auto bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-300 shadow-lg border border-blue-200">
+                      <Target className="w-8 h-8 text-blue-600" />
                    </div>
                      
                      {/* Enhanced Title */}
-                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                     <h3 className="text-lg font-bold text-gray-900 text-center bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                         {findHighlight('go-further')?.title || 'Go Further'}
                       </h3>
                      
                      {/* Enhanced Description */}
-                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
+                     <p className="text-xs text-gray-600 text-center leading-relaxed flex-1">
                         {findHighlight('go-further')?.subtext || 
                        "Want to go further? Choose one area to focus on and build sustainable habits over time."}
                     </p>
