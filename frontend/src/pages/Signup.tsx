@@ -1,198 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import { signupUser, joinCommunity, SignupData, getUserBySession, createSession } from '@/services/api';
+import { signupUser, getUserBySession, checkUserExists } from '@/services/api';
 import ChatSignup from '@/components/ChatSignup';
 import { getSessionId, setUserData } from '@/services/session';
-
-// A/B Test variants
-const CTA_VARIANTS = {
-  A: "Join the Movement",
-  B: "Claim Your Spot"
-};
-
-const professions = [
-  'Student (School / College / University)',
-  'Education (Teacher, Lecturer, Academic)',
-  'Business & Management',
-  'Engineering & Technology',
-  'Health & Medicine',
-  'Science & Research',
-  'Law & Policy',
-  'Environment & Sustainability',
-  'Arts, Design & Creative Fields',
-  'Media & Communications',
-  'Social Sciences & Humanities',
-  'IT & Software Development',
-  'Government & Public Sector',
-  'Hospitality, Travel & Tourism',
-  'Skilled Trades (e.g., Electrician, Plumber, Mechanic)',
-  'Retail, Sales & Customer Service',
-  'Logistics, Transport & Delivery',
-  'Home & Caregiving (e.g., Stay-at-home parent, Care worker)',
-  'Currently Unemployed or Exploring Options',
-  'Prefer Not to Say',
-];
-
-const genders = [
-  'Male',
-  'Female',
-  'Non-binary',
-  'Prefer not to say',
-];
-
-const ageRanges = [
-  '10-20',
-  '20-25',
-  '25-30',
-  '30-40',
-  '40-50',
-  '50+',
-];
-
-const countries = [
-  'United States',
-  'United Kingdom',
-  'Canada',
-  'Australia',
-  'Germany',
-  'France',
-  'Japan',
-  'South Korea',
-  'Singapore',
-  'India',
-  'Pakistan',
-  'Bangladesh',
-  'Sri Lanka',
-  'Nepal',
-  'China',
-  'Thailand',
-  'Vietnam',
-  'Malaysia',
-  'Indonesia',
-  'Philippines',
-  'United Arab Emirates',
-  'Saudi Arabia',
-  'Qatar',
-  'Kuwait',
-  'Bahrain',
-  'Oman',
-  'Turkey',
-  'Egypt',
-  'South Africa',
-  'Nigeria',
-  'Kenya',
-  'Ghana',
-  'Ethiopia',
-  'Morocco',
-  'Tunisia',
-  'Brazil',
-  'Argentina',
-  'Mexico',
-  'Colombia',
-  'Chile',
-  'Peru',
-  'Venezuela',
-  'Netherlands',
-  'Belgium',
-  'Switzerland',
-  'Austria',
-  'Sweden',
-  'Norway',
-  'Denmark',
-  'Finland',
-  'Poland',
-  'Czech Republic',
-  'Hungary',
-  'Romania',
-  'Bulgaria',
-  'Greece',
-  'Portugal',
-  'Spain',
-  'Italy',
-  'Ireland',
-  'New Zealand',
-  'Other',
-];
-
-// Cities organized by country
-const citiesByCountry: { [key: string]: string[] } = {
-  'United States': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'],
-  'United Kingdom': ['London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool', 'Leeds', 'Sheffield', 'Edinburgh', 'Bristol', 'Cardiff'],
-  'Canada': ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Edmonton', 'Ottawa', 'Winnipeg', 'Quebec City', 'Hamilton', 'Kitchener'],
-  'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Newcastle', 'Canberra', 'Sunshine Coast', 'Wollongong'],
-  'Germany': ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Dortmund', 'Essen', 'Leipzig'],
-  'France': ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille'],
-  'Japan': ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kobe', 'Kyoto', 'Kawasaki', 'Saitama'],
-  'South Korea': ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Suwon', 'Ulsan', 'Changwon'],
-  'Singapore': ['Singapore'],
-  'India': ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune', 'Ahmedabad', 'Jaipur', 'Surat'],
-  'Pakistan': ['Karachi', 'Lahore', 'Faisalabad', 'Rawalpindi', 'Multan', 'Hyderabad', 'Gujranwala', 'Peshawar', 'Quetta', 'Islamabad'],
-  'Bangladesh': ['Dhaka', 'Chittagong', 'Khulna', 'Rajshahi', 'Barisal', 'Sylhet', 'Rangpur', 'Mymensingh', 'Comilla', 'Narayanganj'],
-  'Sri Lanka': ['Colombo', 'Kandy', 'Galle', 'Jaffna', 'Trincomalee', 'Anuradhapura', 'Polonnaruwa', 'Kurunegala', 'Ratnapura', 'Badulla'],
-  'Nepal': ['Kathmandu', 'Pokhara', 'Lalitpur', 'Bharatpur', 'Biratnagar', 'Birgunj', 'Dharan', 'Butwal', 'Hetauda', 'Nepalgunj'],
-  'China': ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Chengdu', 'Tianjin', 'Chongqing', 'Nanjing', 'Wuhan', 'Xi\'an'],
-  'Thailand': ['Bangkok', 'Chiang Mai', 'Pattaya', 'Phuket', 'Hat Yai', 'Nakhon Ratchasima', 'Udon Thani', 'Khon Kaen', 'Nakhon Si Thammarat', 'Chiang Rai'],
-  'Vietnam': ['Ho Chi Minh City', 'Hanoi', 'Da Nang', 'Hai Phong', 'Can Tho', 'Bien Hoa', 'Hue', 'Nha Trang', 'Buon Ma Thuot', 'Vung Tau'],
-  'Malaysia': ['Kuala Lumpur', 'George Town', 'Ipoh', 'Shah Alam', 'Petaling Jaya', 'Johor Bahru', 'Malacca City', 'Alor Setar', 'Miri', 'Kuching'],
-  'Indonesia': ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 'Palembang', 'Makassar', 'Tangerang', 'Depok', 'Bekasi'],
-  'Philippines': ['Manila', 'Quezon City', 'Davao City', 'Caloocan', 'Cebu City', 'Zamboanga City', 'Antipolo', 'Pasig', 'Taguig', 'Valenzuela'],
-  'United Arab Emirates': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Al Ain', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain'],
-  'Saudi Arabia': ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam', 'Taif', 'Tabuk', 'Buraidah', 'Khamis Mushait', 'Al Hofuf'],
-  'Qatar': ['Doha', 'Al Wakrah', 'Al Khor', 'Lusail', 'Al Rayyan', 'Umm Salal', 'Al Daayen'],
-  'Kuwait': ['Kuwait City', 'Salmiya', 'Hawalli', 'Jahra', 'Farwaniya', 'Mubarak Al-Kabeer'],
-  'Bahrain': ['Manama', 'Riffa', 'Muharraq', 'Hamad Town', 'A\'ali', 'Isa Town'],
-  'Oman': ['Muscat', 'Salalah', 'Sohar', 'Nizwa', 'Sur', 'Ibri'],
-  'Turkey': ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya', 'Adana', 'Gaziantep', 'Konya', 'Mersin', 'Diyarbakir'],
-  'Egypt': ['Cairo', 'Alexandria', 'Giza', 'Shubra El Kheima', 'Port Said', 'Suez', 'Luxor', 'Mansoura', 'El-Mahalla El-Kubra', 'Aswan'],
-  'South Africa': ['Johannesburg', 'Cape Town', 'Durban', 'Pretoria', 'Port Elizabeth', 'Bloemfontein', 'East London', 'Nelspruit', 'Kimberley', 'Polokwane'],
-  'Nigeria': ['Lagos', 'Kano', 'Ibadan', 'Kaduna', 'Port Harcourt', 'Benin City', 'Maiduguri', 'Zaria', 'Aba', 'Jos'],
-  'Kenya': ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Nyeri', 'Machakos', 'Kakamega', 'Thika', 'Kitale'],
-  'Ghana': ['Accra', 'Kumasi', 'Tamale', 'Sekondi-Takoradi', 'Ashaiman', 'Sunyani', 'Cape Coast', 'Koforidua', 'Obuasi', 'Tema'],
-  'Ethiopia': ['Addis Ababa', 'Dire Dawa', 'Mekelle', 'Gondar', 'Adama', 'Jimma', 'Bahir Dar', 'Jijiga', 'Shashamane', 'Bishoftu'],
-  'Morocco': ['Casablanca', 'Rabat', 'Fez', 'Marrakech', 'Agadir', 'Tangier', 'Meknes', 'Oujda', 'Kenitra', 'Tetouan'],
-  'Tunisia': ['Tunis', 'Sfax', 'Sousse', 'Ettadhamen', 'Kairouan', 'Gabès', 'Ariana', 'Gafsa', 'Monastir', 'La Marsa'],
-  'Brazil': ['São Paulo', 'Rio de Janeiro', 'Brasília', 'Salvador', 'Fortaleza', 'Belo Horizonte', 'Manaus', 'Curitiba', 'Recife', 'Porto Alegre'],
-  'Argentina': ['Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza', 'La Plata', 'Tucumán', 'Salta', 'Santa Fe', 'San Juan', 'Resistencia'],
-  'Mexico': ['Mexico City', 'Guadalajara', 'Monterrey', 'Puebla', 'Tijuana', 'Ciudad Juárez', 'León', 'Zapopan', 'Nezahualcóyotl', 'Chihuahua'],
-  'Colombia': ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Cúcuta', 'Bucaramanga', 'Pereira', 'Santa Marta', 'Ibagué'],
-  'Chile': ['Santiago', 'Valparaíso', 'Concepción', 'La Serena', 'Antofagasta', 'Viña del Mar', 'Temuco', 'Rancagua', 'Talca', 'Arica'],
-  'Peru': ['Lima', 'Arequipa', 'Trujillo', 'Chiclayo', 'Piura', 'Iquitos', 'Cusco', 'Chimbote', 'Huancayo', 'Tacna'],
-  'Venezuela': ['Caracas', 'Maracaibo', 'Valencia', 'Barquisimeto', 'Maracay', 'Ciudad Guayana', 'Petare', 'Maturín', 'Barcelona', 'Turmero'],
-  'Netherlands': ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Tilburg', 'Groningen', 'Almere', 'Breda', 'Nijmegen'],
-  'Belgium': ['Brussels', 'Antwerp', 'Ghent', 'Charleroi', 'Liège', 'Bruges', 'Namur', 'Leuven', 'Mons', 'Aalst'],
-  'Switzerland': ['Zurich', 'Geneva', 'Basel', 'Bern', 'Lausanne', 'Winterthur', 'St. Gallen', 'Lucerne', 'Lugano', 'Biel'],
-  'Austria': ['Vienna', 'Graz', 'Linz', 'Salzburg', 'Innsbruck', 'Klagenfurt', 'Villach', 'Wels', 'Sankt Pölten', 'Dornbirn'],
-  'Sweden': ['Stockholm', 'Gothenburg', 'Malmö', 'Uppsala', 'Västerås', 'Örebro', 'Linköping', 'Helsingborg', 'Jönköping', 'Norrköping'],
-  'Norway': ['Oslo', 'Bergen', 'Trondheim', 'Stavanger', 'Drammen', 'Fredrikstad', 'Kristiansand', 'Sandnes', 'Tromsø', 'Sarpsborg'],
-  'Denmark': ['Copenhagen', 'Aarhus', 'Odense', 'Aalborg', 'Esbjerg', 'Randers', 'Kolding', 'Horsens', 'Vejle', 'Roskilde'],
-  'Finland': ['Helsinki', 'Espoo', 'Tampere', 'Vantaa', 'Oulu', 'Turku', 'Jyväskylä', 'Lahti', 'Kuopio', 'Pori'],
-  'Poland': ['Warsaw', 'Kraków', 'Łódź', 'Wrocław', 'Poznań', 'Gdańsk', 'Szczecin', 'Bydgoszcz', 'Lublin', 'Katowice'],
-  'Czech Republic': ['Prague', 'Brno', 'Ostrava', 'Plzen', 'Liberec', 'Olomouc', 'Ústí nad Labem', 'České Budějovice', 'Hradec Králové', 'Pardubice'],
-  'Hungary': ['Budapest', 'Debrecen', 'Szeged', 'Miskolc', 'Pécs', 'Győr', 'Nyíregyháza', 'Kecskemét', 'Székesfehérvár', 'Szombathely'],
-  'Romania': ['Bucharest', 'Cluj-Napoca', 'Timișoara', 'Iași', 'Constanța', 'Craiova', 'Galați', 'Ploiești', 'Brașov', 'Brăila'],
-  'Bulgaria': ['Sofia', 'Plovdiv', 'Varna', 'Burgas', 'Ruse', 'Stara Zagora', 'Pleven', 'Sliven', 'Dobrich', 'Shumen'],
-  'Greece': ['Athens', 'Thessaloniki', 'Patras', 'Piraeus', 'Larissa', 'Heraklion', 'Peristeri', 'Kallithea', 'Acharnes', 'Kalamaria'],
-  'Portugal': ['Lisbon', 'Porto', 'Vila Nova de Gaia', 'Amadora', 'Braga', 'Funchal', 'Coimbra', 'Setúbal', 'Almada', 'Agualva-Cacém'],
-  'Spain': ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Málaga', 'Murcia', 'Palma', 'Las Palmas', 'Bilbao'],
-  'Italy': ['Rome', 'Milan', 'Naples', 'Turin', 'Palermo', 'Genoa', 'Bologna', 'Florence', 'Bari', 'Catania'],
-  'Ireland': ['Dublin', 'Cork', 'Limerick', 'Galway', 'Waterford', 'Drogheda', 'Dundalk', 'Swords', 'Bray', 'Navan'],
-  'New Zealand': ['Auckland', 'Wellington', 'Christchurch', 'Hamilton', 'Tauranga', 'Napier-Hastings', 'Dunedin', 'Palmerston North', 'Nelson', 'Rotorua'],
-};
-
-const householdSizes = [
-  '1 person',
-  '2 people',
-  '3 people',
-  '4 people',
-  '5+ people',
-];
+import { useUserStore } from '@/stores/userStore';
 
 const Signup = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [waitlistPosition, setWaitlistPosition] = useState(0);
-  const [returningUser, setReturningUser] = useState(false);
   const [showExistingUserModal, setShowExistingUserModal] = useState(false);
+  const { setUser } = useUserStore();
   
 
 
@@ -204,7 +21,6 @@ const Signup = () => {
         const response = await getUserBySession(sessionId);
         
         if (response.success && response.session?.userData) {
-          setReturningUser(true);
           setUserData(response.session.userData);
         }
       } catch (error) {
@@ -272,7 +88,6 @@ const Signup = () => {
       
       <ChatSignup
         onComplete={async (data) => {
-          setIsLoading(true);
           try {
             const response = await signupUser({
               email: data.email,
@@ -287,6 +102,19 @@ const Signup = () => {
             });
             setWaitlistPosition(response.waitlistPosition);
             localStorage.setItem('zerrah_user_id', response.user.id);
+            // Persist minimal session user
+            setUser({ id: response.user.id, name: response.user.firstName || data.name || 'Friend', email: response.user.email });
+            // Cache user details in session manager for prefill
+            setUserData({
+              email: response.user.email,
+              firstName: response.user.firstName || data.name,
+              age: response.user.age,
+              gender: response.user.gender,
+              profession: response.user.profession,
+              country: response.user.country,
+              city: response.user.city,
+              household: response.user.household,
+            });
             setIsSuccess(true);
           } catch (error: any) {
             console.error('=== SIGNUP ERROR DEBUG ===');
@@ -332,6 +160,29 @@ const Signup = () => {
             if (isExistingUserError) {
               console.log('✅ Setting modal to true');
               setShowExistingUserModal(true);
+              // Attempt to fetch existing user details and set session UI immediately
+              try {
+                if (data?.email) {
+                  const lookup = await checkUserExists(data.email);
+                  if (lookup?.success && lookup?.exists && lookup?.user) {
+                    const u = lookup.user;
+                    localStorage.setItem('zerrah_user_id', u.id);
+                    setUser({ id: u.id, name: u.firstName || data.name || 'Friend', email: u.email });
+                    setUserData({
+                      email: u.email,
+                      firstName: u.firstName || data.name,
+                      age: u.age,
+                      gender: u.gender,
+                      profession: u.profession,
+                      country: u.country,
+                      city: u.city,
+                      household: u.household,
+                    });
+                  }
+                }
+              } catch (lookupErr) {
+                console.log('Existing user lookup failed:', lookupErr);
+              }
             } else {
               console.log('❌ Not an existing user error');
               console.log('Available error text:', errorMessage);
@@ -350,7 +201,6 @@ const Signup = () => {
               }
             }
           } finally {
-            setIsLoading(false);
           }
         }}
       />

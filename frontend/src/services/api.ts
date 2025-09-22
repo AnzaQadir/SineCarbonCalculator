@@ -385,4 +385,15 @@ export const checkUserExists = async (identifier: string): Promise<any> => {
     console.error('❌ Error checking user existence:', error);
     throw error;
   }
+};
+
+// Fetch latest user personality by userId
+export const getLatestUserPersonality = async (userId: string): Promise<any> => {
+  try {
+    const response = await apiClient.get(`/user-personality/latest/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching latest user personality:', error);
+    throw error;
+  }
 }; 
