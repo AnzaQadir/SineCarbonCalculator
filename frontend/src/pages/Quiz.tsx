@@ -10,7 +10,8 @@ import type { PersonalityResponse } from '@/services/api';
 import type { UserResponses } from '@/services/api';
 import { personalityQuestions } from '@/data/personalityQuestions';
 import { useQuizStore } from '@/stores/quizStore';
-import { getSessionId } from '@/services/session';
+import { getSessionId, setUserData } from '@/services/session';
+import { useUserStore } from '@/stores/userStore';
 
 // Add a type for questions
 interface Question {
@@ -526,6 +527,7 @@ function getSectionInfo(key: string, type?: string) {
 
 function PoeticJourneyQuiz() {
   const { state, updateCalculator } = useCalculator();
+  const { setUser } = useUserStore();
   const [step, setStep] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<PersonalityResponse | null>(null);
@@ -1217,7 +1219,23 @@ function PoeticJourneyQuiz() {
       }
       
       setQuizAnswers(apiPayload); // Persist the full answers in the store
-      const apiResults = await calculatePersonality(apiPayload);
+                const apiResults = await calculatePersonality(apiPayload);
+                // If backend created/found a user, set header session immediately
+                const newUserId = (apiResults as any)?._metadata?.userId;
+                if (newUserId) {
+                  localStorage.setItem('zerrah_user_id', newUserId);
+                  setUser({ id: newUserId, name: answers.name || existingUser?.firstName || 'Friend', email: answers.email || existingUser?.email });
+                  setUserData({
+                    email: answers.email || existingUser?.email,
+                    firstName: answers.name || existingUser?.firstName,
+                    age: answers.age,
+                    gender: answers.gender,
+                    profession: answers.profession,
+                    country: answers.country,
+                    city: answers.location,
+                    household: answers.householdSize,
+                  });
+                }
       setResults(apiResults);
       setShowResults(true);
     } catch (err) {
