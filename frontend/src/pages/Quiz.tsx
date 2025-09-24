@@ -1123,6 +1123,25 @@ function PoeticJourneyQuiz() {
               household: userData.household || '1 person'
             };
             setAnswers(prefilledAnswers);
+            // Update session/user immediately so header switches to "Hi {name}"
+            try {
+              if (userData?.id) {
+                localStorage.setItem('zerrah_user_id', userData.id);
+                setUser({ id: userData.id, name: userData.firstName || answers.name || 'Friend', email: userData.email });
+                setUserData({
+                  email: userData.email,
+                  firstName: userData.firstName || answers.name,
+                  age: userData.age,
+                  gender: userData.gender,
+                  profession: userData.profession,
+                  country: userData.country,
+                  city: userData.city,
+                  household: userData.household,
+                });
+              }
+            } catch (e) {
+              console.log('Failed to set existing user session data:', e);
+            }
             return; // Don't proceed to next step, show welcome back screen
           } else {
             console.log('User not found, proceeding with quiz');

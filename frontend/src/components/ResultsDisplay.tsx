@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import SocialShareCard from '@/components/SocialShareCard';
 import { AlertCircle, ArrowLeft, Share2, Leaf, Info, Car, Utensils, Plane, Zap, Trash2, Home,
   Bike, Bus, Apple, Recycle, Battery, Wind, Loader2, BookOpen,
   Sparkles, 
@@ -333,6 +334,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [showStoryModal, setShowStoryModal] = useState(false);
   const [activeSection, setActiveSection] = useState<'climate-self' | 'climate-signature' | 'take-action'>('climate-self');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
 
  
   const journeyRef = useRef<HTMLDivElement>(null);
@@ -1110,6 +1112,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                <h2 className="text-3xl md:text-4xl font-bold text-sage-800">
                  Your Climate Self
                </h2>
+              <div className="flex justify-center mt-2">
+                <Button
+                  onClick={() => setShowShareCard(true)}
+                  className="bg-sage-600 hover:bg-sage-700 text-white px-5 py-2 rounded-xl"
+                >
+                  Share
+                </Button>
+              </div>
                <p className="text-lg text-sage-600 max-w-2xl mx-auto">
                  Meet the part of you already making a difference.
                </p>
@@ -1858,6 +1868,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
             </motion.div>
           </motion.div>
+        )}
+        {showShareCard && (
+          <SocialShareCard
+            headline={dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || dynamicPersonality?.personalityType || 'Your Climate Self'}
+            subheadline={dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || 'Your unique climate hook—shine with your strengths.'}
+            illustrationSrc={profileImage}
+            mascotSrc={'/images/panda.svg'}
+            logoSrc={'/images/new_logo.png'}
+            backgroundColors={['#F75B5B', '#F79292']}
+            onCtaClick={() => setShowShareCard(false)}
+            ctaHref={'/quiz'}
+            onClose={() => setShowShareCard(false)}
+          />
         )}
 
         {/* Story Modal */}
