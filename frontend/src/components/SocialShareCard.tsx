@@ -28,7 +28,7 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
   onClose,
   userName,
 }) => {
-  const [theme, setTheme] = useState<'red' | 'warm' | 'yellow' | 'green' | 'blue' | 'custom'>('red');
+  const [theme, setTheme] = useState<'red' | 'warm' | 'yellow' | 'green' | 'blue' | 'teal' | 'custom'>('red');
   const [flip, setFlip] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
 
@@ -44,6 +44,8 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
         return { colors: ['#06D6A0', '#9FFFCB'], dot: '#ffffff20' };
       case 'blue':
         return { colors: ['#118AB2', '#82CFFF'], dot: '#ffffff20' };
+      case 'teal':
+        return { colors: ['#3DD6C4', '#9CF6E9'], dot: '#ffffff20' };
       default:
         return { colors: backgroundColors, dot: '#ffffff20' };
     }
@@ -164,12 +166,13 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
         className="w-[420px] flex items-start justify-center"
       >
         <div
-          style={{ width: 350, transform: 'scale(1.0)', transformOrigin: 'center' }}
+          style={{ width: 420, transform: 'scale(1.0)', transformOrigin: 'center' }}
         >
         <div
           className="rounded-2xl shadow-2xl overflow-hidden relative"
           style={{
             backgroundImage: `linear-gradient(135deg, ${gradient[0]}, ${gradient[1]})`,
+            maxHeight: '85vh',
           }}
           ref={cardRef}
         >
@@ -181,7 +184,7 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
               opacity: 0.3,
             }}
           />
-          <div className="relative flex flex-col items-center text-center px-6 sm:px-10 pt-2 sm:pt-3 pb-0">
+          <div className="relative flex flex-col items-center text-center px-6 sm:px-10 pt-2 sm:pt-3 pb-12 overflow-y-auto">
             {/* Magnetic theme chips + flip toggle */}
             <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-slate-700 shadow-md flex items-center gap-2">
               {([
@@ -189,6 +192,7 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
                 { key: 'warm',  colors: ['#F79256','#FBC4A2'],    dot: '#ffffff20' },
                 { key: 'yellow',colors: ['#FFD166','#FFE599'],    dot: '#00000015' },
                 { key: 'green', colors: ['#06D6A0','#9FFFCB'],    dot: '#ffffff20' },
+                { key: 'teal',  colors: ['#3DD6C4','#9CF6E9'],    dot: '#ffffff20' },
                 { key: 'blue',  colors: ['#118AB2','#82CFFF'],    dot: '#ffffff20' },
               ] as const).map(({ key, colors, dot }) => (
                 <button
@@ -246,12 +250,12 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
 
             {/* Illustration framed to harmonize with all themes */}
             <motion.div
-              className="my-6 sm:my-8 w-full max-w-sm"
+              className="mt-2 sm:mt-3 mb-4 sm:mb-6 w-full max-w-sm mx-auto"
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.2 }}
             >
               <div className="rounded-2xl shadow-none p-0 mx-auto">
-                <div className="relative aspect-[4/5] rounded-xl overflow-hidden">
+                <div className="relative h-[320px] sm:h-[340px] rounded-xl overflow-hidden">
                   <img
                     src={illustrationSrc}
                     alt="Illustration"
@@ -264,39 +268,41 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
             </motion.div>
 
             {/* CTA with Bobo cuddling on the right */}
-            <div className="relative flex items-center justify-center gap-2 mt-2">
+            <div className="relative flex items-start justify-center gap-2 mt-2 mb-6">
               {!showShareOptions ? (
                 <motion.button
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setShowShareOptions(true)}
-                  className="inline-flex items-center justify-center rounded-full bg-black text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 shadow-lg mb-0"
+                  className="inline-flex items-center justify-center rounded-full bg-black text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 shadow-lg mt-10 sm:mt-10 mb-10"
                 >
                   Share it
                 </motion.button>
               ) : (
                 <div className="flex flex-col items-stretch gap-2">
-                  <button
-                    onClick={shareToInstagram}
-                    className="text-xs font-semibold px-3 py-2 rounded-full bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white shadow hover:from-pink-600 hover:to-fuchsia-700 inline-flex items-center gap-2"
-                  >
-                    <FaInstagram className="w-4 h-4" />
-                    <span>Instagram</span>
-                  </button>
-                  <button
-                    onClick={shareToWhatsAppText}
-                    className="text-xs font-semibold px-3 py-2 rounded-full bg-green-500 text-white shadow hover:bg-green-600 inline-flex items-center gap-2"
-                  >
-                    <FaWhatsapp className="w-4 h-4" />
-                    <span>WhatsApp</span>
-                  </button>
-                  <button
-                    onClick={copyLink}
-                    className="text-xs font-semibold px-3 py-2 rounded-full bg-gray-800 text-white shadow hover:bg-black inline-flex items-center gap-2"
-                  >
-                    <FaLink className="w-4 h-4" />
-                    <span>Copy link</span>
-                  </button>
+                  <div className="max-h-44 overflow-y-auto pr-1 -mr-1 py-1">
+                    <button
+                      onClick={shareToInstagram}
+                      className="text-xs font-semibold px-3 py-2 rounded-full bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white shadow hover:from-pink-600 hover:to-fuchsia-700 inline-flex items-center gap-2"
+                    >
+                      <FaInstagram className="w-4 h-4" />
+                      <span>Instagram</span>
+                    </button>
+                    <button
+                      onClick={shareToWhatsAppText}
+                      className="text-xs font-semibold px-3 py-2 rounded-full bg-green-500 text-white shadow hover:bg-green-600 inline-flex items-center gap-2"
+                    >
+                      <FaWhatsapp className="w-4 h-4" />
+                      <span>WhatsApp</span>
+                    </button>
+                    <button
+                      onClick={copyLink}
+                      className="text-xs font-semibold px-3 py-2 rounded-full bg-gray-800 text-white shadow hover:bg-black inline-flex items-center gap-2"
+                    >
+                      <FaLink className="w-4 h-4" />
+                      <span>Copy link</span>
+                    </button>
+                  </div>
                   <button
                     onClick={() => setShowShareOptions(false)}
                     className="text-xs font-semibold px-3 py-2 rounded-full bg-white/70 text-slate-700 shadow hover:bg-white"
@@ -308,7 +314,7 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
               <motion.img
                 src={mascotSrc}
                 alt="Bobo"
-                className="w-20 sm:w-24 md:w-28 ml-4 -mr-2 mb-0 select-none"
+                className="w-20 sm:w-24 md:w-28 ml-4 -mr-2 -mt-2 sm:-mt-3 mb-10 select-none"
                 whileHover={{ scale: 1.06 }}
               />
             </div>

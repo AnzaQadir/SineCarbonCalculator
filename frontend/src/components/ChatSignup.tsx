@@ -338,7 +338,7 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
     }
   }, [isTyping, isUserTyping]);
 
-  // Handle typing detection
+  // Handle typing detection for native inputs
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const value = e.target.value;
     setInputValue(value);
@@ -360,6 +360,14 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
     typingTimeoutRef.current = setTimeout(() => {
       setIsUserTyping(false);
     }, 1000);
+  };
+
+  // Handle value change from custom selects
+  const handleSelectChange = (value: string) => {
+    setInputValue(value);
+    setIsUserTyping(value.length > 0);
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => setIsUserTyping(false), 600);
   };
 
   // Cleanup timeouts on unmount
@@ -459,8 +467,52 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
     }
   };
 
+  // Lightweight sleek custom select (similar vibe to quiz)
+  const CustomSelect: React.FC<{
+    value: string;
+    onChange: (v: string) => void;
+    options: string[];
+    placeholder?: string;
+  }> = ({ value, onChange, options, placeholder }) => {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement | null>(null);
+    useEffect(() => {
+      const handler = (e: MouseEvent) => {
+        if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      };
+      document.addEventListener('mousedown', handler);
+      return () => document.removeEventListener('mousedown', handler);
+    }, []);
+    return (
+      <div ref={ref} className="relative w-full">
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          className="w-full h-14 rounded-3xl px-6 pr-14 text-lg font-semibold border-2 border-emerald-200 focus:border-emerald-500 bg-white/90 shadow-xl text-emerald-900 transition-all duration-200 flex items-center justify-between"
+        >
+          <span className={!value ? 'text-emerald-400' : ''}>{value || placeholder || 'Select...'}</span>
+          <svg className={`w-5 h-5 text-emerald-700 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="none" stroke="currentColor"><path d="M6 8L10 12L14 8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </button>
+        {open && (
+          <div className="absolute z-50 bottom-full mb-2 w-full max-h-72 overflow-y-auto rounded-2xl border-2 border-emerald-100 bg-white shadow-2xl">
+            {options.map(opt => (
+              <button
+                type="button"
+                key={opt}
+                onClick={() => { onChange(opt); setOpen(false); }}
+                className={`w-full text-left px-4 py-3 text-base hover:bg-emerald-50 ${value === opt ? 'bg-emerald-100 text-emerald-900 font-semibold' : 'text-emerald-800'}`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div className="flex flex-col h-[80vh] max-h-[800px] w-full max-w-2xl mx-auto bg-gray-50 rounded-3xl shadow-xl overflow-hidden">
+    <div className="flex flex-col h-[80vh] max-h-[800px] w-full max-w-2xl mx-auto bg-gray-50 rounded-3xl shadow-xl overflow-visible">
       {/* Messages */}
       <div 
         ref={messagesContainerRef}
@@ -586,22 +638,14 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
       </div>
       {/* Input */}
       {!finished ? (
-        <div className="border-t p-4 flex gap-3 bg-white">
+        <div className="border-t p-4 flex gap-3 bg-white/90 backdrop-blur-sm">
           {current.inputType === 'select' ? (
-            <select
+            <CustomSelect
               value={inputValue}
-              onChange={handleInputChange}
-              className={`flex-1 border-2 rounded-xl px-4 py-3 text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all duration-200 ${
-                isUserTyping 
-                  ? 'border-emerald-400 bg-emerald-50' 
-                  : 'border-gray-200 focus:border-emerald-400'
-              }`}
-            >
-              <option value="" disabled>{current.placeholder || 'Select...'}</option>
-              {current.key === 'city' && cityList.length > 0
-                ? cityList.map((opt) => <option key={opt} value={opt}>{opt}</option>)
-                : current.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-            </select>
+              onChange={handleSelectChange}
+              options={(current.key === 'city' && cityList.length > 0) ? cityList : (current.options || [])}
+              placeholder={current.placeholder}
+            />
           ) : (
             <input
               type={current.inputType}
@@ -609,10 +653,8 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
               placeholder={current.placeholder}
               onChange={handleInputChange}
               onKeyDown={handleKey}
-              className={`flex-1 border-2 rounded-xl px-4 py-3 text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-100 transition-all duration-200 ${
-                isUserTyping 
-                  ? 'border-emerald-400 bg-emerald-50' 
-                  : 'border-gray-200 focus:border-emerald-400'
+              className={`flex-1 h-14 border-2 rounded-3xl px-6 text-lg font-semibold focus:outline-none focus:ring-0 transition-all duration-200 bg-white/90 shadow-xl placeholder-emerald-300 ${
+                isUserTyping ? 'border-emerald-400' : 'border-emerald-200 focus:border-emerald-500'
               }`}
             />
           )}
@@ -620,9 +662,9 @@ const ChatSignup: React.FC<Props> = ({ onComplete }) => {
             type="button"
             onClick={sendUserAnswer}
             disabled={!inputValue.trim()}
-            className="h-10 w-10 min-w-0 p-0 bg-emerald-500 hover:bg-emerald-600 rounded-full flex items-center justify-center"
+            className="h-14 w-14 min-w-0 p-0 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 rounded-full flex items-center justify-center shadow-xl disabled:opacity-50"
           >
-            <Send className="h-5 w-5 text-white" />
+            <Send className="h-6 w-6 text-white" />
           </Button>
         </div>
       ) : null}
