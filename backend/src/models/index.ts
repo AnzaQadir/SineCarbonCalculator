@@ -4,9 +4,10 @@ import UserActivity from './UserActivity';
 import UserSession from './UserSession';
 import EventLog from './EventLog';
 import UserPersonality from './UserPersonality';
+import ShareContent from './ShareContent';
 
 // Export models
-export { User, UserActivity, UserSession, EventLog, UserPersonality };
+export { User, UserActivity, UserSession, EventLog, UserPersonality, ShareContent };
 
 // Define associations
 const defineAssociations = () => {
