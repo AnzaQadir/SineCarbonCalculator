@@ -16,8 +16,8 @@ const Footer = () => (
     
     {/* Main Footer Content - Navigation and Brand */}
     <div className="py-8">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col lg:flex-row items-start justify-end gap-12 pt-6">
+      <div className="max-w-screen-2xl mx-auto px-6">
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-12 pt-6">
           {/* Left Section - Logo and Brand */}
           <div className="flex flex-col items-center mt-0">
             <img src="/images/new_logo.png" alt="Zerrah Logo" className="h-24 w-auto opacity-90 drop-shadow-lg transition-transform duration-300 hover:scale-105" />
@@ -65,7 +65,7 @@ const Footer = () => (
               <div className="absolute -inset-4 bg-gradient-to-r from-amber-400/30 via-orange-400/30 to-amber-600/30 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               {/* Main Container */}
               <button 
-                className="relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-700 hover:scale-[1.02] transform w-[350px] h-[216px]"
+                className="relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-700 hover:scale-[1.02] transform w-[400px] h-[216px]"
                 onClick={() => console.log('Join the Sanctuary clicked')}
               >
                 {/* Background Image */}
@@ -80,9 +80,9 @@ const Footer = () => (
                   {/* Content Overlay */}
                   <div className="relative h-full flex items-center justify-center">
                     <div className="text-center space-y-2">
-                      <h3 className="text-2xl font-bold text-white tracking-wide">Join the Sanctuary</h3>
+                      <h3 className="text-2xl md:text-3xl font-bold text-white tracking-wide">Join the Sanctuary</h3>
                       <div className="w-16 h-px bg-white/70 mx-auto"></div>
-                      <p className="text-sm font-medium text-white/95 leading-relaxed max-w-xs">Connect with like-minded climate champions</p>
+                      <p className="text-sm md:text-base font-medium text-white/95 leading-relaxed max-w-sm">Find your climate crew — share tips, support, and wins.</p>
                       <div className="mt-2">
                         <svg className="h-6 w-6 text-white/90 mx-auto group-hover:translate-x-1 group-hover:text-white transition-all duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -102,7 +102,7 @@ const Footer = () => (
 
     {/* Bottom Section - Copyright and Thanks */}
     <div className="bg-amber-50/50 border-t border-amber-200/50 py-4">
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-3">
+      <div className="max-w-screen-2xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-3">
         <div className="text-xs text-amber-600 flex items-center gap-4">
           <span>© {new Date().getFullYear()} Zerrah. All rights reserved.</span>
           <div className="hidden md:flex gap-4">
@@ -110,8 +110,8 @@ const Footer = () => (
             <a href="#" className="hover:text-amber-800 transition-colors duration-200">Terms</a>
           </div>
         </div>
-        <div className="text-sm text-amber-700 font-serif font-semibold">
-          Thanks for being part of Zerrah
+        <div className="text-base md:text-lg text-amber-700 font-serif font-semibold md:ml-auto md:text-right">
+          Grateful you’re here together we make impact.
         </div>
       </div>
     </div>
