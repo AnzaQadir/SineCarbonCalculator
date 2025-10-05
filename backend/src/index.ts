@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import { personalityRoutes } from './routes/personalityRoutes';
 import { recommendationRoutes } from './routes/recommendationRoutes';
 import { userRoutes } from './routes/userRoutes';
@@ -47,6 +48,11 @@ app.use((req, res, next) => {
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(cookieParser());
+
+// Session bootstrap: ensure a session cookie exists and refresh it on each request
+import { ensureSession } from './middleware/session';
+app.use(ensureSession);
 
 // Handle preflight OPTIONS requests explicitly for Vercel
 app.options('*', (req, res) => {
