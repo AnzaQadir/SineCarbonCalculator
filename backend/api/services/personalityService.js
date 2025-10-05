@@ -604,7 +604,7 @@ class PersonalityService {
                 description: "You’re not quite sure where you stand yet, but you're curious, you're here, and you're starting to pay attention. That alone matters.\n" +
                     "Maybe you haven’t figured out your routine, your values, or how it all fits together. Maybe you’re still deciding what’s realistic or meaningful for you. That’s not a flaw; it’s the beginning of growth.\n" +
                     "Like a seed in the soil, you don’t have to do everything right away. Start small. Notice one thing this week: how much plastic shows up in your day, or how often you toss leftovers. No pressure to act. Just pay attention and you’ll be on your way.",
-                hookLine: "You’re not quite sure where you stand yet and that’s okay.*"
+                hookLine: "You’re not quite sure where you stand yet and that’s okay.**10. The Seed**\n"
             };
         }
         // Matrix mapping

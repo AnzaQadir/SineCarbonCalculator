@@ -12,6 +12,7 @@ import InviteScreen from '@/pages/InviteScreen';
 import ReflectionScreen from './pages/ReflectionScreen';
 import Signup from './pages/Signup';
 import Quiz from './pages/Quiz';
+import Login from './pages/Login';
 import PersonalizedDashboard from './pages/PersonalizedDashboard';
 import Journey from './pages/Journey';
 import ShareView from './pages/ShareView';
@@ -36,6 +37,7 @@ function App() {
               <Route path="/invite" element={<InviteScreen />} />
               <Route path="/reflections" element={<ReflectionScreen />} />
               <Route path="/quiz" element={<Quiz />} />
+              <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<PersonalizedDashboard />} />
               <Route path="/journey" element={<Journey />} />

@@ -1,9 +1,23 @@
 import axios from 'axios';
 import { getSessionHeaders } from './session';
 
-console.log('VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
-
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+const envBase = (import.meta as any).env?.VITE_API_BASE_URL || (import.meta as any).env?.VITE_API_BASE || (import.meta as any).env?.VITE_BACKEND_URL;
+export const API_BASE_URL = (() => {
+  let base: string | undefined = envBase;
+  if (typeof window !== 'undefined') {
+    const sameOrigin = `${window.location.protocol}//${window.location.host}`;
+    if (!base) {
+      // Prefer proxy when running Vite on 8080
+      if (window.location.port === '8080') return '/api';
+      return 'http://localhost:3000/api';
+    }
+    // If env points to the frontend origin (e.g., http://localhost:8080), use the proxy path
+    if (base === sameOrigin || base === 'http://localhost:8080' || base === 'https://localhost:8080') {
+      return '/api';
+    }
+  }
+  return base as string;
+})();
 
 // Create axios instance with session headers
 const apiClient = axios.create({
