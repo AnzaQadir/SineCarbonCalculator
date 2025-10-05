@@ -19,9 +19,10 @@ export const API_BASE_URL = (() => {
   return base as string;
 })();
 
-// Create axios instance with session headers
+// Create axios instance with session headers and cookies
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
 });
 
 // Add session headers to all requests
@@ -385,6 +386,20 @@ export const getUserBySession = async (sessionId: string): Promise<any> => {
     console.error('Error getting user by session:', error);
     throw error;
   }
+};
+
+// Auth helpers
+export const logout = async (): Promise<void> => {
+  try {
+    await apiClient.post('/auth/logout');
+  } catch (error) {
+    // Ignore errors; cookie clear may still succeed server-side
+  }
+};
+
+export const me = async (): Promise<{ success: boolean; email?: string }> => {
+  const response = await apiClient.get('/auth/me');
+  return response.data;
 };
 
 // Check if user exists by name/email

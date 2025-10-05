@@ -7,7 +7,9 @@ export class SessionController {
    */
   static async createSession(req: Request, res: Response): Promise<void> {
     try {
-      const sessionId = req.headers['x-session-id'] as string;
+      const sessionIdHeader = req.headers['x-session-id'] as string;
+      const sessionIdCookie = (req as any).sessionId || (req as any).cookies?.[process.env.SESSION_COOKIE_NAME || 'zerrah_session_id'];
+      const sessionId = sessionIdHeader || sessionIdCookie;
       
       if (!sessionId) {
         res.status(400).json({

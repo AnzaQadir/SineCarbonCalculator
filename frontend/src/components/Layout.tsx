@@ -3,7 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, Compass, LogOut } from 'lucide-react';
 import Footer from './Footer';
 import { useUserStore } from '@/stores/userStore';
-import { API_BASE_URL } from '@/services/api';
+import { logout } from '@/services/api';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,10 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${API_BASE_URL.replace(/\/$/, '')}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await logout();
     } catch {}
     try {
       // Reset UI/session like after user check fails
