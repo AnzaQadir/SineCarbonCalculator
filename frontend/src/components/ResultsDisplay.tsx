@@ -335,6 +335,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [activeSection, setActiveSection] = useState<'climate-self' | 'climate-signature' | 'take-action'>('climate-self');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showShareCard, setShowShareCard] = useState(false);
+  const [signatureSelected, setSignatureSelected] = useState<string>('power-habit');
 
  
   const journeyRef = useRef<HTMLDivElement>(null);
@@ -404,6 +405,64 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const findHighlight = (id: string) =>
     (dynamicPersonality?.highlights?.highlights || initialHighlights?.highlights)?.find(h => h.id === id);
   const highlightInsights = dynamicPersonality?.highlights?.personalityInsights || initialHighlights?.personalityInsights;
+
+  // Build signature items for the icon-driven Signature section
+  const signatureItems = [
+    {
+      id: 'power-habit',
+      title: findHighlight('power-habit')?.title || 'Power Habit',
+      description: findHighlight('power-habit')?.subtext || "You're taking steps toward sustainability — every small action counts and builds momentum.",
+      Icon: Lightbulb,
+      colorClass: 'bg-zerrah-red',
+      hoverText: 'hover:text-zerrah-red focus-visible:text-zerrah-red',
+      hoverRing: 'hover:ring-2 hover:ring-zerrah-red/20 focus-visible:ring-2 focus-visible:ring-zerrah-red/25',
+    },
+    {
+      id: 'power-move',
+      title: findHighlight('power-move')?.title || 'Power Move',
+      description: findHighlight('power-move')?.subtext || 'Create a 7‑day visual tracker to improve one small habit.',
+      Icon: Zap,
+      colorClass: 'bg-zerrah-orange',
+      hoverText: 'hover:text-zerrah-orange focus-visible:text-zerrah-orange',
+      hoverRing: 'hover:ring-2 hover:ring-zerrah-orange/20 focus-visible:ring-2 focus-visible:ring-zerrah-orange/25',
+    },
+    {
+      id: 'go-further',
+      title: findHighlight('go-further')?.title || 'Go Further',
+      description: findHighlight('go-further')?.subtext || 'Choose one area to focus on and build sustainable habits over time.',
+      Icon: Target,
+      colorClass: 'bg-zerrah-yellow',
+      hoverText: 'hover:text-zerrah-yellow focus-visible:text-zerrah-yellow',
+      hoverRing: 'hover:ring-2 hover:ring-zerrah-yellow/20 focus-visible:ring-2 focus-visible:ring-zerrah-yellow/25',
+    },
+    {
+      id: 'spark',
+      title: findHighlight('spark')?.title || 'Your Spark',
+      description: findHighlight('spark')?.summary || 'You see the big picture and inspire others. Your vision creates lasting change.',
+      Icon: Sparkles,
+      colorClass: 'bg-zerrah-lightgreen',
+      hoverText: 'hover:text-zerrah-lightgreen focus-visible:text-zerrah-lightgreen',
+      hoverRing: 'hover:ring-2 hover:ring-zerrah-lightgreen/20 focus-visible:ring-2 focus-visible:ring-zerrah-lightgreen/25',
+    },
+    {
+      id: 'decision-style',
+      title: findHighlight('decision-style')?.title || 'Decision Style',
+      description: findHighlight('decision-style')?.summary || (highlightInsights?.decisionStyle as string) || 'Intuitive',
+      Icon: Brain,
+      colorClass: 'bg-zerrah-green',
+      hoverText: 'hover:text-zerrah-green focus-visible:text-zerrah-green',
+      hoverRing: 'hover:ring-2 hover:ring-zerrah-green/20 focus-visible:ring-2 focus-visible:ring-zerrah-green/25',
+    },
+    {
+      id: 'action-style',
+      title: findHighlight('action-style')?.title || 'Action Style',
+      description: findHighlight('action-style')?.summary || (highlightInsights?.actionStyle as string) || 'Planner',
+      Icon: ArrowRight,
+      colorClass: 'bg-zerrah-blue',
+      hoverText: 'hover:text-zerrah-blue focus-visible:text-zerrah-blue',
+      hoverRing: 'hover:ring-2 hover:ring-zerrah-blue/20 focus-visible:ring-2 focus-visible:ring-zerrah-blue/25',
+    },
+  ];
 
   // Debug logging for state changes
   useEffect(() => {
@@ -1196,9 +1255,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
 
 
-                                      {/* Power Moves Grid - Using Highlights from API */}
-           {activeSection === 'climate-signature' && (
-           <div className="space-y-12 relative">
+          {/* Your Signature - icon-driven UI */}
+          {activeSection === 'climate-signature' && (
+          <div className="space-y-8 relative">
              {/* Background Pattern */}
              <div className="absolute inset-0 pointer-events-none">
                {/* Subtle Grid Pattern */}
@@ -1237,286 +1296,89 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                </p>
             </div>
 
-             {/* Enhanced Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               {/* Card 1: Power Habit */}
-               <div className="group relative h-full">
-                 <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-emerald-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-green-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
-                   {/* Enhanced Decorative Background Pattern */}
-                   <div className="absolute inset-0">
-                     {/* Subtle Grid Pattern */}
-                     <div className="absolute inset-0 opacity-[0.02]" style={{
-                       backgroundImage: `
-                         linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
-                         linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
-                       `,
-                       backgroundSize: '20px 20px'
-                     }}></div>
-                     
-                     {/* Radial Gradient Pattern */}
-                     <div className="absolute inset-0 opacity-[0.03]" style={{
-                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%)`
-                     }}></div>
-                     
-                     {/* Corner Accent */}
-                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
-                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(34, 197, 94, 0.1) 0deg, transparent 90deg)`
-                   }}></div>
+           {/* Zig-zag vertical path with circular icons and detail panel */}
+           {(() => {
+             const current = signatureItems.find(i => i.id === signatureSelected) || signatureItems[0];
+             return (
+               <div className="space-y-6">
+                 <div className="relative mx-auto max-w-md">
+                   {(() => {
+                     const GAP = 110; // vertical gap between nodes
+                     const START = 70; // top padding
+                     const WIDTH = 448; // ~28rem
+                     const CENTER = WIDTH / 2;
+                     const OFFSETS = [-40, -5, 45, 20, -25, 10, 35]; // gentle waves like the screenshot
+                     const points = signatureItems.map((_, idx) => ({
+                       x: CENTER + OFFSETS[idx % OFFSETS.length],
+                       y: START + GAP * idx,
+                     }));
+                     const height = START + GAP * (signatureItems.length - 1) + 70;
+                     const d = points.reduce((acc, p, i) => {
+                       if (i === 0) return `M ${p.x} ${p.y}`;
+                       const prev = points[i - 1];
+                       const cx = CENTER; // pull toward center to get the duolingo-like bends
+                       const cy = (prev.y + p.y) / 2;
+                       return acc + ` Q ${cx} ${cy} ${p.x} ${p.y}`;
+                     }, '');
+                     return (
+                       <>
+                         <svg className="absolute inset-0 w-full h-full" viewBox={`0 0 ${WIDTH} ${height}`} preserveAspectRatio="none" aria-hidden="true">
+                           <path d={d} stroke="#D6EDE4" strokeWidth="6" fill="none" strokeLinecap="round" />
+                         </svg>
+                         <div style={{ height: `${height}px` }} className="relative">
+                           {signatureItems.map((it, idx) => {
+                             const p = points[idx];
+                             const isLeft = p.x < CENTER;
+                             const isActive = signatureSelected === it.id;
+                             const Icon = it.Icon;
+                             return (
+                               <div key={it.id} className="absolute" style={{ top: `${p.y - 32}px`, left: `${p.x}px`, transform: 'translateX(-50%)' }}>
+                                 <button
+                                   onClick={() => setSignatureSelected(it.id)}
+                                   className={`relative group w-16 h-16 rounded-full border transition-all flex items-center justify-center shadow-sm ${
+                                     isActive
+                                       ? it.colorClass + ' text-white border-transparent'
+                                       : `border-sage-200 bg-sage-50 text-sage-400 ${it.hoverRing} ${it.hoverText} hover:scale-105 focus-visible:scale-105`
+                                   } animate-${(idx % 2 === 0 ? 'float' : 'float-delayed')}`}
+                                   aria-label={it.title}
+                                 >
+                                   <Icon className="w-7 h-7" />
+                                 </button>
+                                 {isActive && (
+                                   <div className={`absolute ${isLeft ? 'left-20' : 'right-20'} top-1/2 -translate-y-1/2 w-64`}>
+                                     <div className={`absolute ${isLeft ? '-left-2' : '-right-2'} top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-sage-200 rotate-45 ${isLeft ? 'border-l border-t' : 'border-r border-b'}`}></div>
+                                     <div className="relative bg-white border border-sage-200 rounded-xl shadow-md p-3">
+                                       <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md text-white ${it.colorClass}`}>
+                                         <Icon className="w-4 h-4" />
+                                         <span className="text-sm font-semibold">{it.title}</span>
+                                       </div>
+                                       <p className="mt-2 text-sm text-sage-800 leading-relaxed">{it.description}</p>
+                                     </div>
+                                   </div>
+                                 )}
+                               </div>
+                             );
+                           })}
+                         </div>
+                       </>
+                     );
+                   })()}
                  </div>
-                   
-                  <div className="relative z-10 space-y-4 flex-1 flex flex-col justify-center">
-                     {/* Enhanced Icon Container */}
-                    <div className="w-14 h-14 mx-auto bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center group-hover:from-green-200 group-hover:to-emerald-200 transition-all duration-300 shadow-lg border border-green-200">
-                      <Lightbulb className="w-8 h-8 text-green-600" />
-                   </div>
-                     
-                     {/* Enhanced Title */}
-                     <h3 className="text-lg font-bold text-gray-900 text-center bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                        {findHighlight('power-habit')?.title || 'Your Power Habit'}
-                      </h3>
-                     
-                     {/* Enhanced Description */}
-                     <p className="text-xs text-gray-600 text-center leading-relaxed flex-1">
-                        {findHighlight('power-habit')?.subtext || 
-                       "You're taking steps toward sustainability — every small action counts and builds momentum."}
-                    </p>
-                   </div>
-                 </div>
-               </div>
-
-               {/* Card 2: Power Move */}
-               <div className="group relative h-full">
-                 <div className="absolute inset-0 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-purple-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
-                   {/* Enhanced Decorative Background Pattern */}
-                   <div className="absolute inset-0">
-                     {/* Subtle Grid Pattern */}
-                     <div className="absolute inset-0 opacity-[0.02]" style={{
-                       backgroundImage: `
-                         linear-gradient(rgba(147, 51, 234, 0.1) 1px, transparent 1px),
-                         linear-gradient(90deg, rgba(147, 51, 234, 0.1) 1px, transparent 1px)
-                       `,
-                       backgroundSize: '20px 20px'
-                     }}></div>
-                     
-                     {/* Radial Gradient Pattern */}
-                     <div className="absolute inset-0 opacity-[0.03]" style={{
-                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(147, 51, 234, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%)`
-                     }}></div>
-                     
-                     {/* Corner Accent */}
-                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
-                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(147, 51, 234, 0.1) 0deg, transparent 90deg)`
-                   }}></div>
-                 </div>
-                   
-                  <div className="relative z-10 space-y-4 flex-1 flex flex-col justify-center">
-                     {/* Enhanced Icon Container */}
-                    <div className="w-14 h-14 mx-auto bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl flex items-center justify-center group-hover:from-purple-200 group-hover:to-indigo-200 transition-all duration-300 shadow-lg border border-purple-200">
-                      <Zap className="w-8 h-8 text-purple-600" />
-                   </div>
-                     
-                     {/* Enhanced Title */}
-                     <h3 className="text-lg font-bold text-gray-900 text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                        {findHighlight('power-move')?.title || 'Your Power Move'}
-                      </h3>
-                     
-                     {/* Enhanced Description */}
-                     <p className="text-xs text-gray-600 text-center leading-relaxed flex-1">
-                        {findHighlight('power-move')?.subtext || 
-                       "Try creating a 7-day visual tracker to improve one small habit. Builders like you thrive on small systems."}
-                    </p>
+                 <div className="bg-white/90 backdrop-blur-sm border border-sage-200 rounded-3xl p-6 shadow relative overflow-hidden">
+                   <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-gradient-to-br from-sage-100 to-emerald-100 opacity-40" />
+                   <div className="relative">
+                     <div className={`inline-flex items-center gap-3 px-4 py-2 rounded-xl text-white shadow ${current.colorClass}`}>
+                       <current.Icon className="w-6 h-6" />
+                       <span className="font-semibold">{current.title}</span>
+                     </div>
+                     <p className="mt-4 text-sage-800 text-base leading-relaxed">{current.description}</p>
                    </div>
                  </div>
                </div>
-
-               {/* Card 3: Go Further */}
-               <div className="group relative h-full">
-                 <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-blue-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
-                   {/* Enhanced Decorative Background Pattern */}
-                   <div className="absolute inset-0">
-                     {/* Subtle Grid Pattern */}
-                     <div className="absolute inset-0 opacity-[0.02]" style={{
-                       backgroundImage: `
-                         linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-                         linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
-                       `,
-                       backgroundSize: '20px 20px'
-                     }}></div>
-                     
-                     {/* Radial Gradient Pattern */}
-                     <div className="absolute inset-0 opacity-[0.03]" style={{
-                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%)`
-                     }}></div>
-                     
-                     {/* Corner Accent */}
-                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
-                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(59, 130, 246, 0.1) 0deg, transparent 90deg)`
-                   }}></div>
-                 </div>
-                   
-                  <div className="relative z-10 space-y-4 flex-1 flex flex-col justify-center">
-                     {/* Enhanced Icon Container */}
-                    <div className="w-14 h-14 mx-auto bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-300 shadow-lg border border-blue-200">
-                      <Target className="w-8 h-8 text-blue-600" />
-                   </div>
-                     
-                     {/* Enhanced Title */}
-                     <h3 className="text-lg font-bold text-gray-900 text-center bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                        {findHighlight('go-further')?.title || 'Go Further'}
-                      </h3>
-                     
-                     {/* Enhanced Description */}
-                     <p className="text-xs text-gray-600 text-center leading-relaxed flex-1">
-                        {findHighlight('go-further')?.subtext || 
-                       "Want to go further? Choose one area to focus on and build sustainable habits over time."}
-                    </p>
-                   </div>
-                 </div>
-               </div>
-
-               {/* Card 4: Your Spark */}
-               <div className="group relative h-full">
-                 <div className="absolute inset-0 bg-gradient-to-br from-amber-100 to-orange-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-amber-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
-                   {/* Enhanced Decorative Background Pattern */}
-                   <div className="absolute inset-0">
-                     {/* Subtle Grid Pattern */}
-                     <div className="absolute inset-0 opacity-[0.02]" style={{
-                       backgroundImage: `
-                         linear-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px),
-                         linear-gradient(90deg, rgba(245, 158, 11, 0.1) 1px, transparent 1px)
-                       `,
-                       backgroundSize: '20px 20px'
-                     }}></div>
-                     
-                     {/* Radial Gradient Pattern */}
-                     <div className="absolute inset-0 opacity-[0.03]" style={{
-                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.1) 0%, transparent 50%)`
-                     }}></div>
-                     
-                     {/* Corner Accent */}
-                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
-                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(245, 158, 11, 0.1) 0deg, transparent 90deg)`
-                   }}></div>
-                 </div>
-                   
-                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
-                     {/* Enhanced Icon Container */}
-                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl flex items-center justify-center group-hover:from-amber-200 group-hover:to-orange-200 transition-all duration-300 shadow-lg border border-amber-200">
-                       <Sparkles className="w-10 h-10 text-amber-600" />
-                   </div>
-                     
-                     {/* Enhanced Title */}
-                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                        {findHighlight('spark')?.title || 'Your Spark'}
-                    </h3>
-                     
-                     {/* Enhanced Description */}
-                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
-                        {findHighlight('spark')?.summary || 
-                         "You see the big picture and inspire others. Your vision creates lasting change."}
-                      </p>
-                   </div>
-                 </div>
-               </div>
-
-               {/* Card 5: Decision Style */}
-               <div className="group relative h-full">
-                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-emerald-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
-                   {/* Enhanced Decorative Background Pattern */}
-                   <div className="absolute inset-0">
-                     {/* Subtle Grid Pattern */}
-                     <div className="absolute inset-0 opacity-[0.02]" style={{
-                       backgroundImage: `
-                         linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px),
-                         linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px)
-                       `,
-                       backgroundSize: '20px 20px'
-                     }}></div>
-                     
-                     {/* Radial Gradient Pattern */}
-                     <div className="absolute inset-0 opacity-[0.03]" style={{
-                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.1) 0%, transparent 50%)`
-                     }}></div>
-                     
-                     {/* Corner Accent */}
-                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
-                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(16, 185, 129, 0.1) 0deg, transparent 90deg)`
-                   }}></div>
-                 </div>
-                   
-                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
-                     {/* Enhanced Icon Container */}
-                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center group-hover:from-emerald-200 group-hover:to-teal-200 transition-all duration-300 shadow-lg border border-emerald-200">
-                       <Brain className="w-10 h-10 text-emerald-600" />
-                   </div>
-                     
-                     {/* Enhanced Title */}
-                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                        {findHighlight('decision-style')?.title || 'Decision Style'}
-                      </h3>
-                     
-                     {/* Enhanced Description */}
-                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
-                        {findHighlight('decision-style')?.summary || 
-                         highlightInsights?.decisionStyle || 'Intuitive'}
-                      </p>
-                   </div>
-                 </div>
-               </div>
-
-               {/* Card 6: Action Style */}
-               <div className="group relative h-full">
-                 <div className="absolute inset-0 bg-gradient-to-br from-rose-100 to-pink-100 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                 <div className="relative bg-white rounded-3xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:scale-105 hover:border-rose-200 transition-all duration-500 overflow-hidden h-full flex flex-col">
-                   {/* Enhanced Decorative Background Pattern */}
-                   <div className="absolute inset-0">
-                     {/* Subtle Grid Pattern */}
-                     <div className="absolute inset-0 opacity-[0.02]" style={{
-                       backgroundImage: `
-                         linear-gradient(rgba(244, 63, 94, 0.1) 1px, transparent 1px),
-                         linear-gradient(90deg, rgba(244, 63, 94, 0.1) 1px, transparent 1px)
-                       `,
-                       backgroundSize: '20px 20px'
-                     }}></div>
-                     
-                     {/* Radial Gradient Pattern */}
-                     <div className="absolute inset-0 opacity-[0.03]" style={{
-                       backgroundImage: `radial-gradient(circle at 20% 80%, rgba(244, 63, 94, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%)`
-                     }}></div>
-                     
-                     {/* Corner Accent */}
-                     <div className="absolute top-0 right-0 w-16 h-16 opacity-[0.05]" style={{
-                       backgroundImage: `conic-gradient(from 0deg at 50% 50%, rgba(244, 63, 94, 0.1) 0deg, transparent 90deg)`
-                   }}></div>
-                 </div>
-                   
-                   <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-center">
-                     {/* Enhanced Icon Container */}
-                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-rose-100 to-pink-100 rounded-2xl flex items-center justify-center group-hover:from-rose-200 group-hover:to-pink-200 transition-all duration-300 shadow-lg border border-rose-200">
-                       <ArrowRight className="w-10 h-10 text-rose-600" />
-                   </div>
-                     
-                     {/* Enhanced Title */}
-                      <h3 className="text-xl font-bold text-gray-900 text-center bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
-                        {findHighlight('action-style')?.title || 'Action Style'}
-                      </h3>
-                     
-                     {/* Enhanced Description */}
-                      <p className="text-sm text-gray-600 text-center leading-relaxed flex-1">
-                        {findHighlight('action-style')?.summary || 
-                         highlightInsights?.actionStyle || 'Planner'}
-                    </p>
-                 </div>
-               </div>
-             </div>
+             );
+           })()}
            </div>
-           </div>
-           )}
+          )}
 
 
 
