@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initializeDatabase = exports.syncDatabase = exports.UserPersonality = exports.EventLog = exports.UserSession = exports.UserActivity = exports.User = void 0;
+exports.initializeDatabase = exports.syncDatabase = exports.ShareContent = exports.UserPersonality = exports.EventLog = exports.UserSession = exports.UserActivity = exports.User = void 0;
 const db_1 = __importDefault(require("../db"));
 const User_1 = __importDefault(require("./User"));
 exports.User = User_1.default;
@@ -15,6 +15,8 @@ const EventLog_1 = __importDefault(require("./EventLog"));
 exports.EventLog = EventLog_1.default;
 const UserPersonality_1 = __importDefault(require("./UserPersonality"));
 exports.UserPersonality = UserPersonality_1.default;
+const ShareContent_1 = __importDefault(require("./ShareContent"));
+exports.ShareContent = ShareContent_1.default;
 // Define associations
 const defineAssociations = () => {
     // UserSession belongs to User

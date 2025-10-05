@@ -1029,11 +1029,65 @@ function ActionSpotlightCards() {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-30 font-['Proxima Nova']">
+      {/* Mobile: horizontal scroll with snapping */}
+      <div className="md:hidden overflow-x-auto snap-x snap-mandatory px-4">
+        <div className="inline-flex gap-4">
+          {actionSpotlightData.map((card, idx) => (
+            <motion.div
+              key={`m-${card.title}`}
+              className="w-[18rem] shrink-0 snap-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.2 }}
+              viewport={{ once: true }}
+              onHoverStart={() => setHovered(idx)}
+              onHoverEnd={() => setHovered(null)}
+            >
+              <div className="w-full flex flex-col items-center mb-6">
+                <div className="text-3xl mb-2 flex justify-center">{card.icon}</div>
+                <h3 className="text-xl font-extrabold text-amber-800 tracking-tight text-center">{card.title}</h3>
+                {card.subtext && (
+                  <div className="text-sm text-gray-600 font-medium mt-1 text-center">{card.subtext}</div>
+                )}
+              </div>
+              <motion.div
+                className={`relative bg-white rounded-3xl overflow-hidden cursor-pointer transition-all duration-500 aspect-[4/5] h-[clamp(20rem,55vw,37.5rem)]`}
+                onClick={() => handleGifClick(card)}
+                whileHover={{ y: -2 }}
+              >
+                <motion.img
+                  src={card.gif}
+                  alt={card.title}
+                  className="w-full h-full object-cover transition-all duration-300"
+                  whileHover={flipped[idx] ? {} : { scale: 1.02 }}
+                  whileTap={flipped[idx] ? {} : { scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                />
+                <div className="absolute inset-0 bg-white/10 pointer-events-none rounded-3xl" />
+                <motion.div 
+                  className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2 cursor-pointer"
+                  animate={heartPulse[idx] ? { scale: [1, 1.3, 1], color: ['#10b981', '#f43f5e', '#10b981'] } : { scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={(e: React.MouseEvent<HTMLDivElement>) => { e.stopPropagation(); handleHeartClick(idx); }}
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </svg>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop/Tablet: fluid auto-fit grid */}
+      <div className="hidden md:grid [grid-template-columns:repeat(auto-fit,minmax(18rem,1fr))] gap-x-8 gap-y-12 px-4 font-['Proxima Nova']">
         {actionSpotlightData.map((card, idx) => (
           <motion.div
             key={card.title}
-            className="group relative cursor-pointer mx-4 md:mx-8 mt-12"
+            className="group relative cursor-pointer mt-12"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.2 }}
@@ -1041,7 +1095,6 @@ function ActionSpotlightCards() {
             onHoverStart={() => setHovered(idx)}
             onHoverEnd={() => setHovered(null)}
           >
-            {/* Card heading (icon + title) on top of gif */}
             <div className="w-full flex flex-col items-center mb-8">
               <div className="text-4xl mb-2 flex justify-center">{card.icon}</div>
               <h3 className="text-2xl md:text-3xl font-extrabold text-amber-800 tracking-tight text-center">{card.title}</h3>
@@ -1049,16 +1102,12 @@ function ActionSpotlightCards() {
                 <div className="text-base md:text-lg text-gray-600 font-medium mt-2 text-center">{card.subtext}</div>
               )}
             </div>
-            {/* Add margin below subtext and above gif */}
             <div className="mb-8" />
-            {/* Card visual container (gif) */}
             <motion.div
-              className={`relative bg-white rounded-[2.5rem] overflow-hidden cursor-pointer transition-all duration-500 aspect-[4/5] mx-3`}
-              style={{ minHeight: 600, minWidth: 370, boxShadow: hovered === idx ? '0 8px 24px rgba(0,0,0,0.1)' : '0 10px 20px rgba(0,0,0,0.05)' }}
+              className={`relative bg-white rounded-[2.5rem] overflow-hidden cursor-pointer transition-all duration-500 aspect-[4/5] md:aspect-[3/4] h-[clamp(20rem,55vw,37.5rem)]`}
               onClick={() => handleGifClick(card)}
               whileHover={{ y: -4 }}
             >
-              {/* GIF/Image */}
               <motion.img
                 src={card.gif}
                 alt={card.title}
@@ -1067,9 +1116,7 @@ function ActionSpotlightCards() {
                 whileTap={flipped[idx] ? {} : { scale: 0.98 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 15 }}
               />
-              {/* Light overlay for glow effect */}
               <div className="absolute inset-0 bg-white/10 pointer-events-none rounded-[2.5rem]" />
-              {/* Heart icon */}
               <motion.div 
                 className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2 cursor-pointer"
                 animate={heartPulse[idx] ? { scale: [1, 1.3, 1], color: ['#10b981', '#f43f5e', '#10b981'] } : { scale: 1 }}

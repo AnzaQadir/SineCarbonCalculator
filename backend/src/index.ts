@@ -10,6 +10,7 @@ import sessionRoutes from './routes/sessionRoutes';
 import userPersonalityRoutes from './routes/userPersonalityRoutes';
 import shareRoutes from './routes/shareRoutes';
 import { initializeDatabase } from './models';
+import authRoutes from './routes/authRoutes';
 
 // Load environment variables (only in development)
 if (process.env.NODE_ENV !== 'production') {
@@ -63,6 +64,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/user-personality', userPersonalityRoutes);
 app.use('/api/share', shareRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

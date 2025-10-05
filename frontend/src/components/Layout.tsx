@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, Compass } from 'lucide-react';
 import Footer from './Footer';
 import { useUserStore } from '@/stores/userStore';
+import { API_BASE_URL } from '@/services/api';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const { user } = useUserStore();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_BASE_URL.replace(/\/$/, '')}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch {}
+    try {
+      // Reset UI/session like after user check fails
+      localStorage.removeItem('zerrah_user_id');
+      const { clearUser } = useUserStore.getState();
+      clearUser();
+    } catch {}
+    window.location.href = '/';
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -34,9 +51,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* CTA (extreme right) */}
           <div className="flex items-center justify-end relative">
             {!user ? (
-              <Link to="/signup" className="ml-8 text-white rounded-xl px-8 py-3 font-semibold text-lg shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:scale-[1.02] active:scale-[0.98]" style={{ backgroundColor: '#5E1614' }}>
-                Join The Community
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link to="/login" className="text-[#5E1614] rounded-xl px-6 py-3 font-semibold text-lg shadow-sm transition-all duration-200 ease-in-out hover:bg-white hover:shadow-sm hover:scale-[1.01] active:scale-[0.99] border border-[#5E1614]/20">
+                  Sign in
+                </Link>
+                <Link to="/signup" className="ml-2 text-white rounded-xl px-8 py-3 font-semibold text-lg shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:scale-[1.02] active:scale-[0.98]" style={{ backgroundColor: '#5E1614' }}>
+                  Join The Community
+                </Link>
+              </div>
             ) : (
               <div className="flex items-center gap-2 ml-4">
                 <button
@@ -48,7 +70,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </button>
                 {userMenuOpen && (
                   <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-lg p-2 z-50">
-                    
                     <NavLink 
                       to="/journey" 
                       onClick={() => setUserMenuOpen(false)}
@@ -57,6 +78,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       <Compass className="h-4 w-4" />
                       <span>View Journey</span>
                     </NavLink>
+                    <button
+                      onClick={handleLogout}
+                      className="mt-1 w-full text-left text-gray-700 px-3 py-2 rounded-lg font-medium hover:bg-gray-50 hover:text-[#5E1614]"
+                    >
+                      Log out
+                    </button>
                   </div>
                 )}
               </div>
@@ -108,14 +135,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   Reflections
                 </Link>
                 {!user ? (
-                  <Link 
-                    to="/signup" 
-                    className="mt-8 text-white rounded-xl px-6 py-3 font-semibold text-lg text-center shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:scale-[1.02] active:scale-[0.98]" 
-                    style={{ backgroundColor: '#5E1614' }} 
-                    onClick={() => setMobileNavOpen(false)}
-                  >
-                    Join the community
-                  </Link>
+                  <>
+                    <Link 
+                      to="/login" 
+                      className="text-[#5E1614] rounded-xl px-6 py-3 font-semibold text-lg text-center shadow-sm transition-all duration-200 ease-in-out hover:bg-white hover:shadow-sm hover:scale-[1.01] active:scale-[0.99] border border-[#5E1614]/20" 
+                      onClick={() => setMobileNavOpen(false)}
+                    >
+                      Sign in
+                    </Link>
+                    <Link 
+                      to="/signup" 
+                      className="mt-4 text-white rounded-xl px-6 py-3 font-semibold text-lg text-center shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:scale-[1.02] active:scale-[0.98]" 
+                      style={{ backgroundColor: '#5E1614' }} 
+                      onClick={() => setMobileNavOpen(false)}
+                    >
+                      Join the community
+                    </Link>
+                  </>
                 ) : (
                   <>
                     <div className="mt-2 text-gray-700 font-semibold px-4 flex items-center gap-2">Hi {user.name} <img src="/images/panda.svg" alt="Bobo" className="w-8 h-8" /></div>
@@ -127,6 +163,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       <Compass className="h-5 w-5" />
                       <span>View Journey</span>
                     </Link>
+                    <button
+                      onClick={() => { setMobileNavOpen(false); handleLogout(); }}
+                      className="mt-2 text-gray-800 hover:text-[#5E1614] hover:bg-gray-50 text-lg font-semibold px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-2"
+                    >
+                      Log out
+                    </button>
                   </>
                 )}
               </nav>

@@ -45,7 +45,9 @@ const recommendationRoutes_1 = require("./routes/recommendationRoutes");
 const userRoutes_1 = require("./routes/userRoutes");
 const sessionRoutes_1 = __importDefault(require("./routes/sessionRoutes"));
 const userPersonalityRoutes_1 = __importDefault(require("./routes/userPersonalityRoutes"));
+const shareRoutes_1 = __importDefault(require("./routes/shareRoutes"));
 const models_1 = require("./models");
+const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 // Load environment variables (only in development)
 if (process.env.NODE_ENV !== 'production') {
     dotenv_1.default.config();
@@ -90,6 +92,8 @@ app.use('/api/recommendations', recommendationRoutes_1.recommendationRoutes);
 app.use('/api/users', userRoutes_1.userRoutes);
 app.use('/api/sessions', sessionRoutes_1.default);
 app.use('/api/user-personality', userPersonalityRoutes_1.default);
+app.use('/api/share', shareRoutes_1.default);
+app.use('/api/auth', authRoutes_1.default);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({
