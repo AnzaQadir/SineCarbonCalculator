@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Menu, X, Compass } from 'lucide-react';
+import { Menu, X, Compass, LogOut } from 'lucide-react';
 import Footer from './Footer';
 import { useUserStore } from '@/stores/userStore';
 import { API_BASE_URL } from '@/services/api';
@@ -80,9 +80,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </NavLink>
                     <button
                       onClick={handleLogout}
-                      className="mt-1 w-full text-left text-gray-700 px-3 py-2 rounded-lg font-medium hover:bg-gray-50 hover:text-[#5E1614]"
+                      className="mt-1 w-full flex items-center gap-2 text-left text-gray-700 px-3 py-2 rounded-lg font-medium hover:bg-gray-50 hover:text-[#5E1614]"
                     >
-                      Log out
+                      <LogOut className="h-4 w-4" />
+                      <span>Log out</span>
                     </button>
                   </div>
                 )}
@@ -167,7 +168,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       onClick={() => { setMobileNavOpen(false); handleLogout(); }}
                       className="mt-2 text-gray-800 hover:text-[#5E1614] hover:bg-gray-50 text-lg font-semibold px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-2"
                     >
-                      Log out
+                      <LogOut className="h-5 w-5" />
+                      <span>Log out</span>
                     </button>
                   </>
                 )}

@@ -681,7 +681,8 @@ function PoeticJourneyQuiz() {
       options: [
         { value: 'A', label: 'Rail and Bus' },
         { value: 'B', label: 'Mix of Flights & Trains' },
-        { value: 'C', label: 'Frequent Flyer' }
+        { value: 'C', label: 'Frequent Flyer' },
+        { value: 'D', label: 'Car / Drive' }
       ]
     },
 
@@ -876,6 +877,7 @@ function PoeticJourneyQuiz() {
       question: 'How many years young are you?',
       type: 'select',
       options: [
+        { value: '10-17', label: '10-17' },
         { value: '18-24', label: '18-24' },
         { value: '25-34', label: '25-34' },
         { value: '35-44', label: '35-44' },
