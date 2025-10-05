@@ -157,8 +157,22 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
   };
 
   const [showShareOptions, setShowShareOptions] = useState(false);
+  // Resolve a global user name (prop → localStorage → fallback)
+  const resolveUserName = (): string => {
+    if (userName && userName.trim()) return userName.trim();
+    try {
+      const raw = localStorage.getItem('zerrah_user_data');
+      if (raw) {
+        const data = JSON.parse(raw);
+        const n = (data?.firstName || data?.name || '').toString().trim();
+        if (n) return n;
+      }
+    } catch {}
+    return 'friend';
+  };
+  const displayName = resolveUserName();
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -172,7 +186,7 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
           className="rounded-2xl shadow-2xl overflow-hidden relative"
           style={{
             backgroundImage: `linear-gradient(135deg, ${gradient[0]}, ${gradient[1]})`,
-            maxHeight: '85vh',
+            maxHeight: '92vh',
           }}
           ref={cardRef}
         >
@@ -184,7 +198,7 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
               opacity: 0.3,
             }}
           />
-          <div className="relative flex flex-col items-center text-center px-6 sm:px-10 pt-2 sm:pt-3 pb-12 overflow-y-auto">
+          <div className="relative flex flex-col items-center text-center px-6 sm:px-10 pt-1 sm:pt-2 pb-6 overflow-y-auto" style={{ maxHeight: 'calc(92vh - 56px)' }}>
             {/* Magnetic theme chips + flip toggle */}
             <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-slate-700 shadow-md flex items-center gap-2">
               {([
@@ -236,9 +250,9 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
               transition={{ duration: 0.2 }}
             />
 
-            {/* Headline */}
+            {/* Greeting + Archetype */}
             <div className="text-white/90 text-base sm:text-lg mt-1 mb-1 font-semibold">
-              {`Hey ${userName || 'friend'} !!!`}
+              {`Hi ${displayName}, you are a`}
             </div>
             <h1 className="text-white font-extrabold tracking-tight leading-tight text-2xl sm:text-3xl md:text-4xl">
               {headline}
@@ -250,12 +264,12 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
 
             {/* Illustration framed to harmonize with all themes */}
             <motion.div
-              className="mt-2 sm:mt-3 mb-4 sm:mb-6 w-full max-w-sm mx-auto"
+              className="mt-1 sm:mt-2 mb-2 sm:mb-3 w-full max-w-sm mx-auto"
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.2 }}
             >
               <div className="rounded-2xl shadow-none p-0 mx-auto">
-                <div className="relative h-[320px] sm:h-[340px] rounded-xl overflow-hidden">
+                <div className="relative h-[280px] sm:h-[320px] rounded-xl overflow-hidden">
                   <img
                     src={illustrationSrc}
                     alt="Illustration"
@@ -268,13 +282,13 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
             </motion.div>
 
             {/* CTA with Bobo cuddling on the right */}
-            <div className="relative flex items-start justify-center gap-2 mt-2 mb-6">
+            <div className="relative flex items-start justify-center gap-2 mt-2 mb-2">
               {!showShareOptions ? (
                 <motion.button
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setShowShareOptions(true)}
-                  className="inline-flex items-center justify-center rounded-full bg-black text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 shadow-lg mt-10 sm:mt-10 mb-10"
+                  className="inline-flex items-center justify-center rounded-full bg-black text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 shadow-lg mt-4 sm:mt-6 mb-2"
                 >
                   Share it
                 </motion.button>
@@ -314,7 +328,7 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
               <motion.img
                 src={mascotSrc}
                 alt="Bobo"
-                className="w-20 sm:w-24 md:w-28 ml-4 -mr-2 -mt-2 sm:-mt-3 mb-10 select-none"
+                className="w-20 sm:w-24 md:w-28 ml-4 -mr-2 -mt-4 sm:-mt-5 mb-0 select-none object-contain"
                 whileHover={{ scale: 1.06 }}
               />
             </div>

@@ -169,6 +169,20 @@ module.exports = {
           800: '#075985',
           900: '#0C4A6E',
         },
+        brand: {
+          teal: '#16626D',
+          emerald: '#18A07A',
+          amber: '#F59E0B',
+          oxblood: '#5E1614',
+          sage: '#A7D58E',
+        },
+      },
+      boxShadow: {
+        brand: '0 10px 40px rgba(0,0,0,.06)',
+      },
+      backgroundImage: {
+        'brand-radial':
+          'radial-gradient(60% 50% at 20% 0%, rgba(22,98,109,.08), transparent), radial-gradient(40% 35% at 80% 100%, rgba(167,213,142,.10), transparent)',
       },
       borderRadius: {
         lg: "var(--radius)",

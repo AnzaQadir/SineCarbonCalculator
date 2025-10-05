@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { X, Share2, TrendingUp, Leaf, Car, Utensils, Trash2, Shirt, Wind, BarChart3, Coffee, Beef, Trees } from 'lucide-react';
+import { X, Share2, TrendingUp, Leaf, Car, Utensils, Trash2, Shirt, Wind, BarChart3, Coffee, Beef, Trees, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuizStore } from '@/stores/quizStore';
 import Layout from '@/components/Layout';
 import ClimateRing from '@/components/ClimateRing';
@@ -32,6 +32,21 @@ const PersonalizedDashboard: React.FC = () => {
   const [showDetailView, setShowDetailView] = useState(false);
   const [currentGraphIndex, setCurrentGraphIndex] = useState(0);
   const [isAutoFetching, setIsAutoFetching] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const categoryImpactRef = useRef<HTMLDivElement | null>(null);
+  const impactAvoidedRef = useRef<HTMLDivElement | null>(null);
+  const ringRef = useRef<HTMLDivElement | null>(null);
+  const shareRef = useRef<HTMLDivElement | null>(null);
+  const scrollToSection = (el: HTMLElement | null) => {
+    if (!el) return;
+    try {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (_) {
+      const headerHeight = 96;
+      const top = el.getBoundingClientRect().top + window.scrollY - headerHeight;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     console.log('=== QUIZ RESULTS DEBUG ===');
@@ -209,25 +224,7 @@ const PersonalizedDashboard: React.FC = () => {
     }
   };
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'homeEnergy':
-      case 'home':
-        return 'from-gray-600 to-gray-700';
-      case 'transport':
-        return 'from-blue-500 to-blue-600';
-      case 'food':
-        return 'from-orange-500 to-orange-600';
-      case 'waste':
-        return 'from-purple-500 to-purple-600';
-      case 'clothing':
-        return 'from-pink-500 to-pink-600';
-      case 'airQuality':
-        return 'from-teal-500 to-teal-600';
-      default:
-        return 'from-gray-500 to-gray-600';
-    }
-  };
+  const getCategoryColor = (_category: string) => 'from-brand-teal to-brand-emerald';
 
   const getCategoryName = (category: string) => {
     switch (category) {
@@ -491,18 +488,109 @@ const PersonalizedDashboard: React.FC = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-6 py-8 flex gap-8">
+          {/* Left Sidebar Navigation - Desktop Only */}
+          <aside className={`hidden lg:block ${sidebarCollapsed ? 'w-16' : 'w-80'} transition-all duration-300 flex-shrink-0`}>
+            <div className="sticky top-6 lg:top-10">
+              <div className={`bg-white/95 backdrop-blur-2xl rounded-3xl ${sidebarCollapsed ? 'p-3' : 'p-7'} shadow-xl border border-slate-200/40 transition-all duration-300`}>
+                <div className="mb-6 flex items-center justify-between">
+                  {!sidebarCollapsed && (
+                    <div>
+                      <h3 className="text-xl font-bold text-brand-teal mb-2">Dashboard</h3>
+                      <p className="text-sm text-brand-teal/80">Quick navigation</p>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => setSidebarCollapsed(v => !v)}
+                    aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                    className="ml-auto inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-teal text-white shadow-brand hover:opacity-90 transition"
+                  >
+                    {sidebarCollapsed ? (
+                      <ChevronRight className="w-6 h-6" />
+                    ) : (
+                      <ChevronLeft className="w-6 h-6" />
+                    )}
+                  </button>
+                </div>
+
+                <nav className="space-y-3">
+                  <button
+                    onClick={() => scrollToSection(categoryImpactRef.current)}
+                    className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group border-slate-200/60 bg-white/70 text-brand-teal/70 hover:text-brand-teal hover:border-slate-300 hover:bg-slate-50/50`}
+                  >
+                    <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-4'}`}>
+                      <div className={`w-3 h-3 rounded-full bg-slate-300 group-hover:bg-slate-400`} />
+                      {!sidebarCollapsed && (
+                        <div>
+                          <div className="font-medium">Category Impact</div>
+                          <div className="text-xs text-brand-teal/60 mt-1">Your footprint by area</div>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => scrollToSection(impactAvoidedRef.current)}
+                    className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group border-slate-200/60 bg-white/70 text-brand-teal/70 hover:text-brand-teal hover:border-slate-300 hover:bg-slate-50/50`}
+                  >
+                    <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-4'}`}>
+                      <div className={`w-3 h-3 rounded-full bg-slate-300 group-hover:bg-slate-400`} />
+                      {!sidebarCollapsed && (
+                        <div>
+                          <div className="font-medium">Impact Avoided</div>
+                          <div className="text-xs text-brand-teal/60 mt-1">Positive equivalences</div>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => scrollToSection(ringRef.current)}
+                    className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group border-slate-200/60 bg-white/70 text-brand-teal/70 hover:text-brand-teal hover:border-slate-300 hover:bg-slate-50/50`}
+                  >
+                    <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-4'}`}>
+                      <div className={`w-3 h-3 rounded-full bg-slate-300 group-hover:bg-slate-400`} />
+                      {!sidebarCollapsed && (
+                        <div>
+                          <div className="font-medium">Zerrah Ring</div>
+                          <div className="text-xs text-brand-teal/60 mt-1">Overall progress</div>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => scrollToSection(shareRef.current)}
+                    className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group border-slate-200/60 bg-white/70 text-brand-teal/70 hover:text-brand-teal hover:border-slate-300 hover:bg-slate-50/50`}
+                  >
+                    <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-4'}`}>
+                      <div className={`w-3 h-3 rounded-full bg-slate-300 group-hover:bg-slate-400`} />
+                      {!sidebarCollapsed && (
+                        <div>
+                          <div className="font-medium">Share Progress</div>
+                          <div className="text-xs text-brand-teal/60 mt-1">Export or share</div>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                </nav>
+              </div>
+            </div>
+          </aside>
+
+          {/* Main Column */}
+          <div className="flex-1 min-w-0">
           {/* Header */}
           <div className="flex items-center justify-between mb-12">
             <div className="flex-1">
               <motion.h1 
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-4xl font-bold text-slate-800 tracking-tight mb-2"
+                className="text-4xl md:text-5xl font-bold tracking-tight mb-2 bg-gradient-to-r from-brand-teal to-brand-emerald bg-clip-text text-transparent"
               >
                 Zerrah Dashboard
               </motion.h1>
-              <p className="text-slate-600 text-lg font-medium">
+              <p className="text-brand-teal/80 text-lg md:text-xl font-medium">
                 Your personalized climate impact overview
               </p>
             </div>
@@ -528,14 +616,16 @@ const PersonalizedDashboard: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 mb-12"
+            className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-brand border border-brand-teal/10 mb-12 p-8 scroll-mt-28 md:scroll-mt-32"
+            ref={categoryImpactRef}
+            style={{ border: '1px solid transparent', background: 'linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, #16626D40, #18A07A40) border-box' }}
           >
             <div className="flex items-center mb-8">
               <div className="flex-1">
-                <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-brand-teal to-brand-emerald bg-clip-text text-transparent">
                   Category Impact
                 </h2>
-                <p className="text-slate-500 mt-2 font-medium">
+                <p className="text-slate-600 mt-2 font-medium">
                   Your environmental footprint across different lifestyle areas
                 </p>
               </div>
@@ -639,7 +729,7 @@ const PersonalizedDashboard: React.FC = () => {
                     </div>
 
                     {/* Category Name */}
-                    <h3 className="text-center font-semibold text-slate-800 text-sm">
+                    <h3 className="text-center font-semibold text-slate-700 text-sm">
                       {getCategoryName(category)}
                     </h3>
                   </motion.div>
@@ -679,7 +769,7 @@ const PersonalizedDashboard: React.FC = () => {
                     </div>
 
                     {/* Category Name */}
-                    <h3 className="text-center font-semibold text-slate-800 text-sm">
+                    <h3 className="text-center font-semibold text-slate-700 text-sm">
                       {getCategoryName(category)}
                     </h3>
                   </motion.div>
@@ -694,45 +784,7 @@ const PersonalizedDashboard: React.FC = () => {
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
           </div>
 
-          {/* Impact in numbers Section */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 mb-12"
-          >
-            <div className="flex items-center mb-8">
-              <div className="flex-1">
-                <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
-                  Quantified Impact
-                </h3>
-                <p className="text-slate-500 mt-2 font-medium">
-                  Your lifestyle choices translated into tangible environmental metrics
-                </p>
-              </div>
-            </div>
-            {(() => {
-              const equivalenceData = getEquivalenceData();
-              const items = [
-                { label: 'Car KmDriven', value: `${formatInt(equivalenceData.km)} km`, icon: <Car className="h-7 w-7 text-slate-700" /> },
-                { label: 'T-Shirts', value: formatInt(equivalenceData.tshirts), icon: <Shirt className="h-7 w-7 text-blue-600" /> },
-                { label: 'Coffee Cups', value: formatInt(equivalenceData.coffeeCups), icon: <Coffee className="h-7 w-7 text-amber-600" /> },
-                { label: 'Burgers', value: formatInt(equivalenceData.burgers), icon: <Beef className="h-7 w-7 text-rose-600" /> },
-                { label: 'Flights', value: formatInt(equivalenceData.flights), icon: <TrendingUp className="h-7 w-7 text-slate-700" /> }
-              ];
-              return (
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                  {items.map((it, idx) => (
-                    <div key={it.label} className={`text-center ${idx !== 0 ? 'md:border-l md:border-slate-200' : ''}`}>
-                      <div className="flex justify-center mb-1">{it.icon}</div>
-                      <div className="text-2xl font-bold text-slate-800 mb-1">{it.value}</div>
-                      <div className="text-sm text-slate-600">{it.label}</div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
-          </motion.div>
+          
 
           {/* Section Divider */}
           <div className="flex justify-center mb-8">
@@ -744,14 +796,16 @@ const PersonalizedDashboard: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0 }}
-            className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 mb-12"
+            className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-brand border border-brand-teal/10 mb-12 p-8 scroll-mt-28 md:scroll-mt-32"
+            ref={impactAvoidedRef}
+            style={{ border: '1px solid transparent', background: 'linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, #16626D40, #18A07A40) border-box' }}
           >
             <div className="flex items-center mb-8">
               <div className="flex-1">
-                <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
+                <h3 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-brand-teal to-brand-emerald bg-clip-text text-transparent">
                   Impact Avoided
                 </h3>
-                <p className="text-slate-500 mt-2 font-medium">
+                <p className="text-slate-600 mt-2 font-medium">
                   Environmental benefits from your sustainable choices vs. conventional practices
                 </p>
               </div>
@@ -823,94 +877,7 @@ const PersonalizedDashboard: React.FC = () => {
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
           </div>
 
-          {/* Emissions Data Section */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1 }}
-            className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 mb-12"
-          >
-            <div className="flex items-center mb-8">
-              <div className="flex-1">
-                <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
-                  Carbon Emissions
-                </h3>
-                <p className="text-slate-500 mt-2 font-medium">
-                  Your annual carbon footprint breakdown by lifestyle category
-                </p>
-              </div>
-            </div>
-            {(() => {
-              console.log('=== EMISSIONS DEBUG ===');
-              console.log('quizResults:', quizResults);
-              console.log('quizResults.impactMetricAndEquivalence:', quizResults?.impactMetricAndEquivalence);
-              console.log('quizResults.impactMetricAndEquivalence?.emissionsKg:', quizResults?.impactMetricAndEquivalence?.emissionsKg);
-              
-              if (!quizResults?.impactMetricAndEquivalence?.emissionsKg) {
-                console.log('No emissions data found');
-                const emissionsData = {
-                  home: 0,
-                  transport: 0,
-                  food: 0,
-                  clothing: 0,
-                  waste: 0,
-                  total: 0,
-                  perPerson: 0
-                };
-                const items = [
-                  { label: 'Home', value: formatInt(emissionsData.home), icon: <Leaf className="h-7 w-7 text-gray-600" /> },
-                  { label: 'Transport', value: formatInt(emissionsData.transport), icon: <Car className="h-7 w-7 text-blue-600" /> },
-                  { label: 'Food', value: formatInt(emissionsData.food), icon: <Utensils className="h-7 w-7 text-orange-600" /> },
-                  { label: 'Clothing', value: formatInt(emissionsData.clothing), icon: <Shirt className="h-7 w-7 text-pink-600" /> },
-                  { label: 'Waste', value: formatInt(emissionsData.waste), icon: <Trash2 className="h-7 w-7 text-purple-600" /> }
-                ];
-                return (
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                    {items.map((it, idx) => (
-                      <div key={it.label} className={`text-center ${idx !== 0 ? 'md:border-l md:border-slate-200' : ''}`}>
-                        <div className="flex justify-center mb-1">{it.icon}</div>
-                        <div className="text-2xl font-bold text-slate-800 mb-1">{it.value}</div>
-                        <div className="text-sm text-slate-600">{it.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                );
-              } else {
-                const emissionsData = quizResults.impactMetricAndEquivalence.emissionsKg;
-                console.log('Using real emissions data:', emissionsData);
-                const items = [
-                  { label: 'Home', value: formatInt(emissionsData.home), icon: <Leaf className="h-7 w-7 text-gray-600" /> },
-                  { label: 'Transport', value: formatInt(emissionsData.transport), icon: <Car className="h-7 w-7 text-blue-600" /> },
-                  { label: 'Food', value: formatInt(emissionsData.food), icon: <Utensils className="h-7 w-7 text-orange-600" /> },
-                  { label: 'Clothing', value: formatInt(emissionsData.clothing), icon: <Shirt className="h-7 w-7 text-pink-600" /> },
-                  { label: 'Waste', value: formatInt(emissionsData.waste), icon: <Trash2 className="h-7 w-7 text-purple-600" /> }
-                ];
-                return (
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                    {items.map((it, idx) => (
-                      <div key={it.label} className={`text-center ${idx !== 0 ? 'md:border-l md:border-slate-200' : ''}`}>
-                        <div className="flex justify-center mb-1">{it.icon}</div>
-                        <div className="text-2xl font-bold text-slate-800 mb-1">{it.value}</div>
-                        <div className="text-sm text-slate-600">{it.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                );
-              }
-            })()}
-            
-            {/* Total Emissions */}
-            {quizResults?.impactMetricAndEquivalence?.emissionsKg?.total && (
-              <div className="mt-8 pt-6 border-t border-slate-200">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-slate-800 mb-2">
-                    {formatInt(quizResults.impactMetricAndEquivalence.emissionsKg.total)} kg CO₂e/year
-                  </div>
-                  <div className="text-sm text-slate-600">Total Carbon Footprint</div>
-                </div>
-              </div>
-            )}
-          </motion.div>
+          
 
           {/* Section Divider */}
           <div className="flex justify-center mb-8">
@@ -922,15 +889,17 @@ const PersonalizedDashboard: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.3 }}
-            className="flex justify-center mb-12"
+            className="relative flex justify-center mb-12 bg-white/90 backdrop-blur-xl rounded-3xl shadow-brand border border-brand-teal/10 p-8 scroll-mt-28 md:scroll-mt-32"
+            ref={ringRef}
+            style={{ border: '1px solid transparent', background: 'linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, #16626D40, #18A07A40) border-box' }}
           >
             <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
               <div className="flex items-center mb-8">
                 <div className="flex-1">
-                  <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
+                  <h3 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-brand-teal to-brand-emerald bg-clip-text text-transparent">
                     Zerrah Ring
                   </h3>
-                  <p className="text-slate-500 mt-2 font-medium">
+                  <p className="text-slate-600 mt-2 font-medium">
                     Your comprehensive sustainability progress across all dimensions
                   </p>
                 </div>
@@ -1020,7 +989,8 @@ const PersonalizedDashboard: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.4 }}
-            className="text-center mt-8"
+            className="text-center mt-8 scroll-mt-28 md:scroll-mt-32"
+            ref={shareRef}
           >
             <button
               onClick={async () => {
@@ -1059,12 +1029,13 @@ const PersonalizedDashboard: React.FC = () => {
                   }
                 }
               }}
-              className="bg-gradient-to-r from-slate-600 to-slate-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 mx-auto"
+              className="bg-gradient-to-r from-brand-teal to-brand-emerald text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-brand hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 mx-auto focus:outline-none focus:ring-2 focus:ring-brand-teal focus:ring-offset-2"
             >
               <Share2 className="h-5 w-5" />
               Share Progress
             </button>
           </motion.div>
+          </div>
         </div>
       </div>
     </Layout>
