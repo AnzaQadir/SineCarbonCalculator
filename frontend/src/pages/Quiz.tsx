@@ -13,6 +13,16 @@ import { useQuizStore } from '@/stores/quizStore';
 import { getSessionId, setUserData } from '@/services/session';
 import { useUserStore } from '@/stores/userStore';
 
+// Utility function to shuffle array
+const shuffleArray = (array: any[]): any[] => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
 // Add a type for questions
 interface Question {
   key: string;
@@ -120,8 +130,8 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
-                className="text-slate-800 font-serif text-3xl lg:text-4xl font-bold tracking-wide mb-2"
-                style={{ fontFamily: 'Cormorant Garamond, serif' }}
+                className="text-slate-800 font-proxima text-3xl lg:text-4xl font-bold tracking-wide mb-2"
+                style={{ fontFamily: 'Proxima Nova, sans-serif' }}
               >
                 <motion.span
                   animate={{ 
@@ -204,7 +214,7 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.7 }}
               className="text-4xl lg:text-6xl xl:text-7xl font-bold text-slate-900 leading-tight tracking-tight -mt-4"
-              style={{ fontFamily: 'Cormorant Garamond, serif' }}
+              style={{ fontFamily: 'Proxima Nova, sans-serif' }}
             >
               Let's begin your
               <span className="block text-slate-900">
@@ -539,6 +549,8 @@ function PoeticJourneyQuiz() {
   const [existingUser, setExistingUser] = useState<any>(null);
   const [showExistingUserScreen, setShowExistingUserScreen] = useState(false);
   const [answers, setAnswers] = useState<Record<string, any>>({});
+  // State to store shuffled options for each question to maintain consistent order
+  const [shuffledOptions, setShuffledOptions] = useState<Record<string, { value: string; label: string }[]>>({});
   const setQuizAnswers = useQuizStore(state => state.setQuizAnswers);
   // Divider slide state
   const [showDivider, setShowDivider] = useState(false);
@@ -1020,6 +1032,25 @@ function PoeticJourneyQuiz() {
   // Store answers in the same structure as CalculatorState
   const answersRef = useRef<any>({});
 
+  // Initialize shuffled options for all questions with options (excluding demographic questions)
+  useEffect(() => {
+    const initialShuffledOptions: Record<string, { value: string; label: string }[]> = {};
+    // Demographic questions should maintain logical/alphabetical order for better UX
+    const demographicKeys = ['age', 'gender', 'profession', 'country', 'location', 'householdSize'];
+    
+    questions.forEach(q => {
+      if (q.options && q.options.length > 0) {
+        // Don't shuffle demographic questions - keep them in logical order
+        if (demographicKeys.includes(q.key)) {
+          initialShuffledOptions[q.key] = q.options; // Keep original order
+        } else {
+          initialShuffledOptions[q.key] = shuffleArray(q.options); // Shuffle non-demographic questions
+        }
+      }
+    });
+    setShuffledOptions(initialShuffledOptions);
+  }, []); // Run once on component mount
+
   // Debug: Track answers state changes
   useEffect(() => {
     console.log('=== ANSWERS STATE CHANGED ===');
@@ -1350,7 +1381,7 @@ function PoeticJourneyQuiz() {
                 transition={{ duration: 0.8, delay: 0.6 }}
                 className="text-5xl md:text-6xl font-serif mb-8 text-slate-900 leading-tight tracking-tight" 
                 style={{ 
-                  fontFamily: 'Cormorant Garamond, serif',
+                  fontFamily: 'Proxima Nova, sans-serif',
                   fontWeight: 600,
                   letterSpacing: '-0.02em'
                 }}
@@ -1768,7 +1799,7 @@ function PoeticJourneyQuiz() {
                       h-[calc(100vh-var(--app-header-h,72px)-2rem)] md:h-[calc(100vh-var(--app-header-h,80px)-3rem)]">
         {/* Card Header */}
         <div className="p-4 md:p-6 pb-2">
-          <h2 className="text-2xl md:text-3xl font-serif text-sage-800 text-center mb-2 tracking-wide" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 700 }}>{section.title}</h2>
+          <h2 className="text-2xl md:text-3xl font-proxima text-sage-800 text-center mb-2 tracking-wide" style={{ fontFamily: 'Proxima Nova, sans-serif', fontWeight: 700 }}>{section.title}</h2>
         </div>
         {/* Scrollable Body */}
         <div className="px-6 md:px-8 flex flex-col items-center justify-start mb-4 overflow-y-auto pb-6 min-h-0">
@@ -1828,8 +1859,8 @@ function PoeticJourneyQuiz() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-2xl md:text-3xl lg:text-4xl font-serif text-sage-800 text-center mt-2 mb-6 lg:mb-8 leading-tight" 
-            style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}
+            className="text-2xl md:text-3xl lg:text-4xl font-proxima text-sage-800 text-center mt-2 mb-6 lg:mb-8 leading-tight" 
+            style={{ fontFamily: 'Proxima Nova, sans-serif', fontWeight: 600 }}
           >
             {q.question}
           </motion.div>
@@ -1841,7 +1872,7 @@ function PoeticJourneyQuiz() {
               value={getNestedValue(answers, q.key) || ''}
               onChange={(v) => handleSelect(q.key, v)}
               placeholder="Enter your country"
-              options={[
+              options={shuffledOptions[q.key] || [
                 { value: 'United States', label: 'United States' },
                 { value: 'Canada', label: 'Canada' },
                 { value: 'United Kingdom', label: 'United Kingdom' },
@@ -1907,7 +1938,7 @@ function PoeticJourneyQuiz() {
             })()
           ) : q.type === 'personality' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {q.options?.map((opt) => (
+              {(shuffledOptions[q.key] || q.options)?.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => handleSelect(q.key, opt.value)}
@@ -1919,7 +1950,7 @@ function PoeticJourneyQuiz() {
               ))}
             </div>
           ) : Array.isArray(q.options) ? (
-            q.options.map((opt) => (
+            (shuffledOptions[q.key] || q.options).map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => handleSelect(q.key, opt.value)}
