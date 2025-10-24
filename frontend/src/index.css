@@ -97,7 +97,7 @@ html, body {
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-proxima antialiased;
   }
 }
 
