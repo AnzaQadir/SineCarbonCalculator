@@ -721,11 +721,6 @@ const Index = () => {
               >
                 Take the Quiz
               </motion.button>
-              <div className="mt-12 animate-bounce opacity-80 transition-opacity duration-300">
-                <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mx-auto text-amber-400">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
             </motion.div>
             {/* Soft gradient fade at section bottom for closure */}
             <div className="absolute left-0 right-0 bottom-0 h-16 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #F3FDF8 80%)' }} />
