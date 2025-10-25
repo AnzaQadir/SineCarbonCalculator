@@ -843,10 +843,10 @@ function PoeticJourneyQuiz() {
       question: 'How full is your trash bin at the end of a typical day?',
       type: 'select',
       options: [
-        { value: 'A', label: 'Almost empty (less than 1/4 full)' },
-        { value: 'B', label: 'Half full' },
-        { value: 'C', label: 'Mostly full (3/4 full)' },
-        { value: 'D', label: 'Full or overflowing' }
+        { value: 'A', label: 'Almost Empty (Less Than 1/4 Full)' },
+        { value: 'B', label: 'Half Full' },
+        { value: 'C', label: 'Mostly Full (3/4 Full)' },
+        { value: 'D', label: 'Full Or OverFlowing' }
       ]
     },
     {
@@ -1036,7 +1036,7 @@ function PoeticJourneyQuiz() {
   useEffect(() => {
     const initialShuffledOptions: Record<string, { value: string; label: string }[]> = {};
     // Demographic questions should maintain logical/alphabetical order for better UX
-    const demographicKeys = ['age', 'gender', 'profession', 'country', 'location', 'householdSize'];
+    const demographicKeys = ['age', 'gender', 'profession', 'country', 'location', 'householdSize', 'homeSize', 'weeklyKm'];
     
     questions.forEach(q => {
       if (q.options && q.options.length > 0) {

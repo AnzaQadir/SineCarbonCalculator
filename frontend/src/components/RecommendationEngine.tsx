@@ -731,28 +731,18 @@ const RecommendationEngine: React.FC<RecommendationEngineProps> = ({
                 </div>
 
                 {/* Additional Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="mb-6">
                   {/* Enabler */}
                   {selectedCard.enabler && (
                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                       <h5 className="text-base font-semibold text-black mb-2">
                         What You'll Need
                       </h5>
-                      <p className="text-gray-700 leading-relaxed text-sm">{selectedCard.enabler}</p>
-                    </div>
-                  )}
-
-                  {/* Prerequisites */}
-                  {selectedCard.prerequisites.length > 0 && (
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                      <h5 className="text-base font-semibold text-black mb-2">
-                        Prerequisites
-                      </h5>
                       <ul className="space-y-1">
-                        {selectedCard.prerequisites.map((prereq, idx) => (
+                        {selectedCard.enabler.split(/\s*\+\s*/).map((item, idx) => (
                           <li key={idx} className="flex items-center gap-2 text-gray-700 text-sm">
                             <div className="w-1.5 h-1.5 bg-black rounded-full"></div>
-                            {prereq}
+                            {item.trim()}
                           </li>
                         ))}
                       </ul>
