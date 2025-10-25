@@ -998,7 +998,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-radial-gradient from-emerald-200/10 via-transparent to-transparent"></div>
             </div>
 
-        <div className="max-w-7xl mx-auto px-6 pt-0 pb-12 space-y-12 relative z-10">
+        <div className="max-w-full mx-auto px-6 pt-0 pb-12 space-y-12 relative z-10">
           
           {/* Back Button */}
           {onBack && (
@@ -1014,9 +1014,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           )}
 
           {/* Main Content Layout with Left Sidebar */}
-          <div className="flex gap-8">
+          <div className="flex gap-12">
             {/* Left Sidebar Navigation - Desktop Only */}
-            <aside className={`hidden lg:block ${sidebarCollapsed ? 'w-16' : 'w-96'} transition-all duration-300 flex-shrink-0`}>
+            <aside className={`hidden lg:block ${sidebarCollapsed ? 'w-16' : 'w-[420px]'} transition-all duration-300 flex-shrink-0`}>
               <div className="sticky top-6 lg:top-10">
                 <div className={`bg-white/95 backdrop-blur-2xl rounded-3xl ${sidebarCollapsed ? 'p-3' : 'p-7'} shadow-xl border border-sage-200/40 transition-all duration-300`}>
                   {/* Sidebar Header */}
@@ -1154,9 +1154,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
             </aside>
 
-            {/* Nested Child Panel for Personalized Dashboard */}
+                         {/* Nested Child Panel for Personalized Dashboard */}
             {showDashboardPanel && !sidebarCollapsed && (
-              <aside className="hidden lg:block w-64 transition-all duration-300 flex-shrink-0">
+              <aside className="hidden lg:block w-[320px] transition-all duration-300 flex-shrink-0">
                 <div className="sticky top-6 lg:top-10">
                   <div className="bg-white/95 backdrop-blur-2xl rounded-3xl p-6 shadow-xl border border-sage-200/40 ml-4">
                     {/* Child Panel Header */}
@@ -1269,72 +1269,84 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           
            {/* Profile Section */}
            {activeSection === 'climate-self' && (
-           <div className="space-y-1">
+           <div className="space-y-12">
              {/* Section Header */}
-             <div className="text-center space-y-3">
-               <h2 className="text-3xl md:text-4xl font-bold text-sage-800">
-                 Your Climate Self
-               </h2>
-              <div className="flex justify-center mt-2">
-                <Button
-                  onClick={() => setShowShareCard(true)}
-                  className="bg-sage-600 hover:bg-sage-700 text-white px-5 py-2 rounded-xl"
-                >
-                  Share
-                </Button>
-              </div>
-               <p className="text-lg text-sage-600 max-w-2xl mx-auto">
-                 Meet the part of you already making a difference.
+             <div className="text-center space-y-8 relative z-10 mt-8 mb-8">
+               <div className="space-y-6">
+                 <div className="inline-block">
+                   <h2 className="text-6xl md:text-7xl font-light bg-gradient-to-r from-sage-800 via-sage-700 to-emerald-800 bg-clip-text text-transparent leading-none tracking-wider">
+                     Your Climate Self
+                   </h2>
+                 </div>
+               </div>
+               <p className="text-lg md:text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-light tracking-wide italic">
+                 Meet the part of you already making a difference
                </p>
-             </div>
-             
-             {/* Profile Content */}
-             <div className="flex flex-col items-center justify-start bg-gradient-to-br from-sage-50 to-cream-50 rounded-3xl shadow-xl border border-sage-100">
-             
-            {/* Personality Name with Enhanced Typography */}
-            <div className="text-center mb-0 mt-4">
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sage-700 to-sage-800 bg-clip-text text-transparent mb-2">
-              {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Eco in Progress'}
-            </h1>
-              <div className="w-24 h-1 bg-gradient-to-r from-sage-300 to-cream-300 mx-auto rounded-full"></div>
-            </div>
-
-            {/* Main Avatar with Enhanced Styling */}
-            <div className="mb-6">
-              <div className="inline-block rounded-3xl overflow-hidden border border-sage-200 shadow-2xl bg-white">
-                <img
-                  src={profileImage}
-                  alt="Profile Avatar"
-                  className="block w-[15rem] h-auto object-contain"
-                  style={{ objectPosition: 'center top' }}
-                />
-              </div>
-            </div>
-             
-             {/* Hook Line with Enhanced Styling */}
-             <div className="text-center max-w-3xl mx-auto mb-6">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-sage-100">
-                <p className="m-0 text-xl font-medium text-black italic leading-relaxed">
-                  {dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}
-                </p>
-              </div>
-            </div>
-             
-             {/* Detailed Personality Description with Enhanced Layout */}
-             <div className="text-center max-w-3xl mx-auto mb-8">
-               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-md border border-sage-100">
-                 <p className="text-lg text-black leading-relaxed">
-                 {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
-               </p>
+               <div className="flex justify-center mt-4">
+                 <Button
+                   onClick={() => setShowShareCard(true)}
+                   className="bg-sage-600 hover:bg-sage-700 text-white px-8 py-3 rounded-2xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                 >
+                   Share Your Climate Self
+                 </Button>
                </div>
              </div>
              
-            {/* Integrated Dashboard Button removed as requested */}
-
-
-
-
-         </div>
+                           {/* Profile Content - Three Column Layout */}
+              <div className="max-w-[1200px] mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                  
+                  {/* Left Column - Avatar */}
+                  <div className="lg:col-span-1">
+                    <div className="sticky top-6">
+                      <div className="bg-gradient-to-br from-white to-sage-50/50 rounded-3xl p-6 shadow-xl border border-sage-200/50">
+                        <div className="flex justify-center mb-4">
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-gradient-to-br from-sage-200 to-emerald-200 rounded-3xl blur-xl opacity-50"></div>
+                            <div className="relative rounded-3xl overflow-hidden border-2 border-white shadow-2xl bg-white">
+                              <img
+                                src={profileImage}
+                                alt="Profile Avatar"
+                                className="block w-[14rem] h-auto object-contain"
+                                style={{ objectPosition: 'center top' }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        {/* Personality Name */}
+                        <div className="text-center">
+                          <h1 className="text-xl md:text-2xl font-light bg-gradient-to-r from-sage-800 via-sage-700 to-emerald-800 bg-clip-text text-transparent leading-tight">
+                            {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Eco in Progress'}
+                          </h1>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Right Columns - Content */}
+                  <div className="lg:col-span-2 space-y-4">
+                    {/* Hook Line */}
+                    <div className="bg-gradient-to-br from-sage-50/80 to-emerald-50/60 backdrop-blur-sm rounded-3xl px-6 py-3 shadow-xl border border-sage-200/50">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-1.5 h-full bg-gradient-to-b from-sage-500 to-emerald-500 rounded-full"></div>
+                        <div className="flex-1">
+                          <p className="m-0 text-lg font-light text-sage-800 italic leading-relaxed">
+                            "{dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}"
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Description */}
+                    <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-sage-200/50">
+                      <p className="text-base text-sage-700 leading-relaxed font-light tracking-wide">
+                        {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
+                      </p>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
            </div>
            )}
 
@@ -1362,61 +1374,70 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           {/* Your Signature - icon-driven UI */}
           {activeSection === 'climate-signature' && (
           <div className="space-y-8 relative">
-             {/* Background Pattern */}
-             <div className="absolute inset-0 pointer-events-none">
-               {/* Subtle Grid Pattern */}
-               <div className="absolute inset-0 opacity-[0.03]" style={{
+             {/* Enhanced Background Pattern */}
+             <div className="absolute inset-0 pointer-events-none overflow-hidden">
+               {/* Animated Grid Pattern */}
+               <div className="absolute inset-0 opacity-[0.04] animate-pulse" style={{
                  backgroundImage: `
-                   linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
-                   linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
+                   linear-gradient(rgba(34, 197, 94, 0.15) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(34, 197, 94, 0.15) 1px, transparent 1px)
                  `,
-                 backgroundSize: '40px 40px'
+                 backgroundSize: '60px 60px'
                }}></div>
                
-               {/* Floating Geometric Shapes */}
-               <div className="absolute top-10 left-10 w-20 h-20 border border-sage-200/20 rounded-full"></div>
-               <div className="absolute top-20 right-20 w-12 h-12 border border-sage-300/20 rotate-45"></div>
-               <div className="absolute bottom-20 left-20 w-16 h-16 border border-sage-200/20 rounded-full"></div>
-               <div className="absolute bottom-10 right-10 w-8 h-8 border border-sage-300/20 rotate-45"></div>
+               {/* Floating Geometric Shapes with Animation */}
+               <div className="absolute top-10 left-10 w-20 h-20 border border-sage-200/30 rounded-full animate-float"></div>
+               <div className="absolute top-20 right-20 w-12 h-12 border border-sage-300/30 rotate-45 animate-float-delayed"></div>
+               <div className="absolute bottom-20 left-20 w-16 h-16 border border-sage-200/30 rounded-full animate-float"></div>
+               <div className="absolute bottom-10 right-10 w-8 h-8 border border-sage-300/30 rotate-45 animate-float-delayed"></div>
                
-               {/* Organic Flow Lines */}
-               <div className="absolute top-1/4 left-0 w-32 h-px bg-gradient-to-r from-transparent via-sage-200/30 to-transparent"></div>
-               <div className="absolute bottom-1/4 right-0 w-32 h-px bg-gradient-to-l from-transparent via-sage-200/30 to-transparent"></div>
+               {/* Additional floating elements */}
+               <div className="absolute top-1/3 left-1/4 w-6 h-6 bg-sage-200/20 rounded-full animate-float"></div>
+               <div className="absolute bottom-1/3 right-1/4 w-4 h-4 bg-emerald-200/20 rounded-full animate-float-delayed"></div>
                
-               {/* Radial Gradient Overlay */}
-               <div className="absolute inset-0 bg-radial-gradient from-sage-50/50 via-transparent to-transparent"></div>
+               {/* Organic Flow Lines with Gradient */}
+               <div className="absolute top-1/4 left-0 w-48 h-px bg-gradient-to-r from-transparent via-sage-300/40 to-transparent"></div>
+               <div className="absolute bottom-1/4 right-0 w-48 h-px bg-gradient-to-l from-transparent via-emerald-300/40 to-transparent"></div>
+               
+               {/* Radial Gradient Overlay with Multiple Layers */}
+               <div className="absolute inset-0 bg-radial-gradient from-sage-50/60 via-transparent to-transparent"></div>
+               <div className="absolute inset-0 bg-radial-gradient from-emerald-50/30 via-transparent to-transparent" style={{ transform: 'scale(1.2)' }}></div>
+               
+               {/* Subtle particle effects */}
+               <div className="absolute top-1/2 left-1/3 w-2 h-2 bg-sage-400/30 rounded-full animate-ping"></div>
+               <div className="absolute top-2/3 right-1/3 w-1 h-1 bg-emerald-400/40 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
            </div>
 
                           {/* Enhanced Header Section */}
-            <div className="text-center space-y-4 relative z-10 mt-0">
-            <div className="text-center space-y-2">
-                <h2 className="text-4xl md:text-5xl font-bold text-black leading-tight tracking-tight mt-0 mb-0">
-                   Your Signature
-              </h2>
-                {/* underline removed */}
-               </div>
-              <p className="text-xl text-black max-w-3xl mx-auto leading-relaxed font-light tracking-wide">
-                 Your current habits are the foundation—let's build on what's working and transform what isn't
-               </p>
+            <div className="text-center space-y-10 relative z-10 mt-12 mb-16">
+              <div className="space-y-6">
+                <div className="inline-block">
+                  <h2 className="text-6xl md:text-7xl font-light bg-gradient-to-r from-sage-800 via-sage-700 to-emerald-800 bg-clip-text text-transparent leading-none tracking-wider">
+                    Your Signature
+                  </h2>
+                </div>
+              </div>
+              <p className="text-lg md:text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-light tracking-wide italic">
+                Your unique approach to sustainability, captured in every choice you make
+              </p>
             </div>
 
            {/* Zig-zag vertical path with circular icons and detail panel */}
            {(() => {
-             const current = signatureItems.find(i => i.id === signatureSelected) || signatureItems[0];
              return (
-               <div className="space-y-6">
-                 <div className="relative mx-auto max-w-md">
+               <div className="space-y-12">
+                 <div className={`relative mx-auto ${sidebarCollapsed ? 'max-w-[1400px]' : 'max-w-[1200px]'} px-4`}>
                    {(() => {
-                     const GAP = 110; // vertical gap between nodes
-                     const START = 70; // top padding
-                     const WIDTH = 448; // ~28rem
-                     const CENTER = WIDTH / 2;
-                     const OFFSETS = [-40, -5, 45, 20, -25, 10, 35]; // gentle waves like the screenshot
+                     const GAP = 160; // reduced vertical gap for better fit
+                     const START = 60; // reduced top padding
+                     const WIDTH = sidebarCollapsed ? 1400 : 1200; // responsive width based on sidebar state
+                     const CENTER = WIDTH / 2; // Always centered horizontally
+                     const OFFSETS = [0, 0, 0, 0, 0, 0, 0]; // straight vertical path for center alignment
                      const points = signatureItems.map((_, idx) => ({
                        x: CENTER + OFFSETS[idx % OFFSETS.length],
                        y: START + GAP * idx,
                      }));
-                     const height = START + GAP * (signatureItems.length - 1) + 70;
+                     const height = START + GAP * (signatureItems.length - 1) + 80;
                      const d = points.reduce((acc, p, i) => {
                        if (i === 0) return `M ${p.x} ${p.y}`;
                        const prev = points[i - 1];
@@ -1426,40 +1447,112 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      }, '');
                      return (
                        <>
+                         {/* Enhanced path with gradient and glow */}
                          <svg className="absolute inset-0 w-full h-full" viewBox={`0 0 ${WIDTH} ${height}`} preserveAspectRatio="none" aria-hidden="true">
-                           <path d={d} stroke="#D6EDE4" strokeWidth="6" fill="none" strokeLinecap="round" />
+                           <defs>
+                             <linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                               <stop offset="0%" stopColor="#A7F3D0" />
+                               <stop offset="50%" stopColor="#6EE7B7" />
+                               <stop offset="100%" stopColor="#34D399" />
+                             </linearGradient>
+                             <filter id="glow">
+                               <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                               <feMerge> 
+                                 <feMergeNode in="coloredBlur"/>
+                                 <feMergeNode in="SourceGraphic"/>
+                               </feMerge>
+                             </filter>
+                           </defs>
+                           <path 
+                             d={d} 
+                             stroke="url(#pathGradient)" 
+                             strokeWidth="6" 
+                             fill="none" 
+                             strokeLinecap="round"
+                             filter="url(#glow)"
+                             className="drop-shadow-lg"
+                           />
+                           {/* Subtle arrow indicators */}
+                           {points.slice(0, -1).map((p, i) => {
+                             const nextP = points[i + 1];
+                             const angle = Math.atan2(nextP.y - p.y, nextP.x - p.x);
+                             const arrowX = p.x + Math.cos(angle) * 20;
+                             const arrowY = p.y + Math.sin(angle) * 20;
+                             return (
+                               <g key={i}>
+                                 <path
+                                   d={`M ${arrowX - 8} ${arrowY - 4} L ${arrowX} ${arrowY} L ${arrowX - 8} ${arrowY + 4} Z`}
+                                   fill="#34D399"
+                                   opacity="0.6"
+                                 />
+                               </g>
+                             );
+                           })}
                          </svg>
                          <div style={{ height: `${height}px` }} className="relative">
                            {signatureItems.map((it, idx) => {
                              const p = points[idx];
-                             const isLeft = p.x < CENTER;
-                             const isActive = signatureSelected === it.id;
+                             // Alternate sides for visual interest (even indices left, odd indices right)
+                             const isLeft = idx % 2 === 0;
                              const Icon = it.Icon;
                              return (
-                               <div key={it.id} className="absolute" style={{ top: `${p.y - 32}px`, left: `${p.x}px`, transform: 'translateX(-50%)' }}>
+                               <div key={it.id} className="absolute" style={{ top: `${p.y - 24}px`, left: '50%', transform: 'translateX(-50%)' }}>
+                                 {/* Centered icon with smaller size */}
                                  <button
                                    onClick={() => setSignatureSelected(it.id)}
-                                   className={`relative group w-16 h-16 rounded-full border transition-all flex items-center justify-center shadow-sm ${
-                                     isActive
-                                       ? it.colorClass + ' text-white border-transparent'
-                                       : `border-sage-200 bg-sage-50 text-sage-400 ${it.hoverRing} ${it.hoverText} hover:scale-105 focus-visible:scale-105`
-                                   } animate-${(idx % 2 === 0 ? 'float' : 'float-delayed')}`}
+                                   className={`relative group w-16 h-16 rounded-full border transition-all duration-700 flex items-center justify-center overflow-visible z-20 ${
+                                     signatureSelected === it.id
+                                       ? it.colorClass + ' text-white border-transparent scale-110 shadow-2xl'
+                                       : `border-sage-400/30 bg-white/90 text-sage-700 ${it.hoverRing} ${it.hoverText} hover:scale-105 focus-visible:scale-105 hover:bg-white hover:shadow-lg`
+                                   }`}
                                    aria-label={it.title}
                                  >
-                                   <Icon className="w-7 h-7" />
-                                 </button>
-                                 {isActive && (
-                                   <div className={`absolute ${isLeft ? 'left-20' : 'right-20'} top-1/2 -translate-y-1/2 w-64`}>
-                                     <div className={`absolute ${isLeft ? '-left-2' : '-right-2'} top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-sage-200 rotate-45 ${isLeft ? 'border-l border-t' : 'border-r border-b'}`}></div>
-                                     <div className="relative bg-white border border-sage-200 rounded-xl shadow-md p-3">
-                                       <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md text-white ${it.colorClass}`}>
-                                         <Icon className="w-4 h-4" />
-                                         <span className="text-sm font-semibold">{it.title}</span>
+                                   <Icon className="w-6 h-6 transition-transform duration-300" />
+                                   {/* Enhanced glow effect for active state */}
+                                   {signatureSelected === it.id && (
+                                     <>
+                                       {/* Outer glow ring */}
+                                       <div className="absolute inset-0 rounded-full bg-white/30 animate-pulse scale-125"></div>
+                                       {/* Multiple glow layers for depth */}
+                                       <div className="absolute -inset-2 rounded-full opacity-70 pointer-events-none">
+                                         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/50 to-white/30 blur-lg"></div>
                                        </div>
-                                       <p className="mt-2 text-sm text-sage-800 leading-relaxed">{it.description}</p>
+                                     </>
+                                   )}
+                                   {/* Enhanced shadow for selected state */}
+                                   <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
+                                     signatureSelected === it.id 
+                                       ? 'shadow-2xl shadow-sage-400/60' 
+                                       : 'shadow-xl'
+                                   }`}></div>
+                                 </button>
+                                 {/* Cards positioned to left and right with gap from icon - fixed size regardless of sidebar */}
+                                 <div className={`absolute ${isLeft ? 'right-full mr-4' : 'left-full ml-4'} top-1/2 -translate-y-1/2 w-[220px] z-10 ${signatureSelected === it.id ? 'scale-105' : 'hover:scale-105'}`}>
+                                   {/* Refined card design */}
+                                     <div className={`relative bg-white/95 backdrop-blur-sm border rounded-xl shadow-lg p-3.5 transition-all duration-700 ${
+                                     signatureSelected === it.id 
+                                       ? (it.id === 'power-habit' ? 'border-red-400/60 bg-gradient-to-br from-red-50/70 to-white shadow-xl ring-2 ring-red-200/40' :
+                                          it.id === 'power-move' ? 'border-orange-400/60 bg-gradient-to-br from-orange-50/70 to-white shadow-xl ring-2 ring-orange-200/40' :
+                                          it.id === 'go-further' ? 'border-yellow-400/60 bg-gradient-to-br from-yellow-50/70 to-white shadow-xl ring-2 ring-yellow-200/40' :
+                                          it.id === 'spark' ? 'border-green-400/60 bg-gradient-to-br from-green-50/70 to-white shadow-xl ring-2 ring-green-200/40' :
+                                          it.id === 'decision-style' ? 'border-emerald-400/60 bg-gradient-to-br from-emerald-50/70 to-white shadow-xl ring-2 ring-emerald-200/40' :
+                                          'border-blue-400/60 bg-gradient-to-br from-blue-50/70 to-white shadow-xl ring-2 ring-blue-200/40')
+                                       : 'border-sage-300/50 hover:border-sage-400/60 hover:shadow-xl'
+                                   }`}>
+                                     {/* Refined header */}
+                                     <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white shadow-md mb-3 ${it.colorClass} transition-transform duration-300 ${signatureSelected === it.id ? 'scale-105 shadow-lg' : ''}`}>
+                                       <Icon className="w-4 h-4" />
+                                       <span className="text-xs font-semibold tracking-wide">{it.title}</span>
                                      </div>
+                                     <p className="text-xs leading-relaxed font-bold text-sage-700 transition-colors duration-300">
+                                       {signatureSelected === it.id ? (
+                                         <span className="font-bold text-sage-800">{it.description}</span>
+                                       ) : (
+                                         it.description
+                                       )}
+                                     </p>
                                    </div>
-                                 )}
+                                 </div>
                                </div>
                              );
                            })}
@@ -1467,16 +1560,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                        </>
                      );
                    })()}
-                 </div>
-                 <div className="bg-white/90 backdrop-blur-sm border border-sage-200 rounded-3xl p-6 shadow relative overflow-hidden">
-                   <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-gradient-to-br from-sage-100 to-emerald-100 opacity-40" />
-                   <div className="relative">
-                     <div className={`inline-flex items-center gap-3 px-4 py-2 rounded-xl text-white shadow ${current.colorClass}`}>
-                       <current.Icon className="w-6 h-6" />
-                       <span className="font-semibold">{current.title}</span>
-                     </div>
-                     <p className="mt-4 text-sage-800 text-base leading-relaxed">{current.description}</p>
-                   </div>
                  </div>
                </div>
              );
