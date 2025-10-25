@@ -1294,20 +1294,20 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
              
                            {/* Profile Content - Three Column Layout */}
               <div className="max-w-[1200px] mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                   
                   {/* Left Column - Avatar */}
                   <div className="lg:col-span-1">
                     <div className="sticky top-6">
-                      <div className="bg-gradient-to-br from-white to-sage-50/50 rounded-3xl p-6 shadow-xl border border-sage-200/50">
+                      <div className="bg-gradient-to-br from-white via-sage-50/30 to-emerald-50/30 rounded-3xl p-5 shadow-xl border border-sage-200/50 hover:shadow-2xl transition-all duration-300">
                         <div className="flex justify-center mb-4">
-                          <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-br from-sage-200 to-emerald-200 rounded-3xl blur-xl opacity-50"></div>
-                            <div className="relative rounded-3xl overflow-hidden border-2 border-white shadow-2xl bg-white">
+                          <div className="relative group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-sage-200 to-emerald-200 rounded-3xl blur-xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
+                            <div className="relative rounded-3xl overflow-hidden border-2 border-white shadow-2xl bg-white transform group-hover:scale-105 transition-transform duration-300">
                               <img
                                 src={profileImage}
                                 alt="Profile Avatar"
-                                className="block w-[14rem] h-auto object-contain"
+                                className="block w-[13rem] h-auto object-contain"
                                 style={{ objectPosition: 'center top' }}
                               />
                             </div>
@@ -1315,7 +1315,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                         </div>
                         {/* Personality Name */}
                         <div className="text-center">
-                          <h1 className="text-xl md:text-2xl font-light bg-gradient-to-r from-sage-800 via-sage-700 to-emerald-800 bg-clip-text text-transparent leading-tight">
+                          <h1 className="text-lg md:text-xl font-semibold bg-gradient-to-r from-sage-800 via-sage-700 to-emerald-800 bg-clip-text text-transparent leading-tight">
                             {dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || 'Eco in Progress'}
                           </h1>
                         </div>
@@ -1324,13 +1324,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   </div>
                   
                   {/* Right Columns - Content */}
-                  <div className="lg:col-span-2 space-y-4">
+                  <div className="lg:col-span-2 space-y-6">
                     {/* Hook Line */}
-                    <div className="bg-gradient-to-br from-sage-50/80 to-emerald-50/60 backdrop-blur-sm rounded-3xl px-6 py-3 shadow-xl border border-sage-200/50">
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-1.5 h-full bg-gradient-to-b from-sage-500 to-emerald-500 rounded-full"></div>
+                    <div className="bg-gradient-to-br from-sage-50/90 to-emerald-50/70 backdrop-blur-sm rounded-3xl px-8 py-6 shadow-xl border border-sage-200/50 hover:shadow-2xl transition-all duration-300">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 w-1.5 h-full bg-gradient-to-b from-sage-500 via-emerald-500 to-emerald-600 rounded-full animate-pulse"></div>
                         <div className="flex-1">
-                          <p className="m-0 text-lg font-light text-sage-800 italic leading-relaxed">
+                          <p className="m-0 text-xl font-medium text-sage-800 italic leading-relaxed">
                             "{dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}"
                           </p>
                         </div>
@@ -1338,8 +1338,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </div>
                     
                     {/* Description */}
-                    <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-sage-200/50">
-                      <p className="text-base text-sage-700 leading-relaxed font-light tracking-wide">
+                    <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-sage-200/50 hover:shadow-xl transition-all duration-300">
+                      <p className="text-lg text-sage-700 leading-relaxed font-normal tracking-wide">
                         {dynamicPersonality?.comprehensivePowerMoves?.personality?.description || "Your unique approach to sustainability combines awareness with action, creating meaningful change through thoughtful choices."}
                       </p>
                     </div>
@@ -1497,59 +1497,59 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                              const Icon = it.Icon;
                              return (
                                <div key={it.id} className="absolute" style={{ top: `${p.y - 24}px`, left: '50%', transform: 'translateX(-50%)' }}>
-                                 {/* Centered icon with smaller size */}
+                                 {/* Centered icon with enhanced design */}
                                  <button
                                    onClick={() => setSignatureSelected(it.id)}
-                                   className={`relative group w-16 h-16 rounded-full border transition-all duration-700 flex items-center justify-center overflow-visible z-20 ${
+                                   className={`relative group w-20 h-20 rounded-full border-2 transition-all duration-500 flex items-center justify-center overflow-visible z-20 ${
                                      signatureSelected === it.id
-                                       ? it.colorClass + ' text-white border-transparent scale-110 shadow-2xl'
-                                       : `border-sage-400/30 bg-white/90 text-sage-700 ${it.hoverRing} ${it.hoverText} hover:scale-105 focus-visible:scale-105 hover:bg-white hover:shadow-lg`
+                                       ? it.colorClass + ' text-white border-transparent scale-110 shadow-2xl ring-4 ring-white/50'
+                                       : `border-sage-300/40 bg-white/95 backdrop-blur-sm text-sage-700 ${it.hoverRing} ${it.hoverText} hover:scale-110 focus-visible:scale-110 hover:bg-white hover:shadow-xl hover:border-sage-400/60`
                                    }`}
                                    aria-label={it.title}
                                  >
-                                   <Icon className="w-6 h-6 transition-transform duration-300" />
+                                   <Icon className={`w-7 h-7 transition-transform duration-300 ${signatureSelected === it.id ? 'scale-110' : 'group-hover:scale-110'}`} />
                                    {/* Enhanced glow effect for active state */}
                                    {signatureSelected === it.id && (
                                      <>
-                                       {/* Outer glow ring */}
-                                       <div className="absolute inset-0 rounded-full bg-white/30 animate-pulse scale-125"></div>
-                                       {/* Multiple glow layers for depth */}
-                                       <div className="absolute -inset-2 rounded-full opacity-70 pointer-events-none">
-                                         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/50 to-white/30 blur-lg"></div>
+                                       {/* Outer glow ring with animation */}
+                                       <div className="absolute inset-0 rounded-full bg-white/40 animate-pulse scale-125"></div>
+                                       {/* Animated glow layers for depth */}
+                                       <div className="absolute -inset-3 rounded-full opacity-60 pointer-events-none">
+                                         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/60 via-white/40 to-white/20 blur-xl"></div>
+                                       </div>
+                                       {/* Additional shimmer effect */}
+                                       <div className="absolute -inset-4 rounded-full opacity-30 pointer-events-none animate-ping">
+                                         <div className="absolute inset-0 rounded-full bg-white blur-2xl"></div>
                                        </div>
                                      </>
                                    )}
-                                   {/* Enhanced shadow for selected state */}
+                                   {/* Enhanced shadow for all states */}
                                    <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
                                      signatureSelected === it.id 
-                                       ? 'shadow-2xl shadow-sage-400/60' 
-                                       : 'shadow-xl'
+                                       ? 'shadow-2xl shadow-current/40' 
+                                       : 'shadow-lg'
                                    }`}></div>
                                  </button>
                                  {/* Cards positioned to left and right with gap from icon - fixed size regardless of sidebar */}
-                                 <div className={`absolute ${isLeft ? 'right-full mr-4' : 'left-full ml-4'} top-1/2 -translate-y-1/2 w-[220px] z-10 ${signatureSelected === it.id ? 'scale-105' : 'hover:scale-105'}`}>
+                                 <div className={`absolute ${isLeft ? 'right-full mr-5' : 'left-full ml-5'} top-1/2 -translate-y-1/2 w-[240px] z-10 transition-all duration-500 ${signatureSelected === it.id ? 'scale-105' : 'hover:scale-102'}`}>
                                    {/* Refined card design */}
-                                     <div className={`relative bg-white/95 backdrop-blur-sm border rounded-xl shadow-lg p-3.5 transition-all duration-700 ${
+                                     <div className={`relative bg-white/98 backdrop-blur-sm border-2 rounded-2xl shadow-lg p-4 transition-all duration-500 ${
                                      signatureSelected === it.id 
-                                       ? (it.id === 'power-habit' ? 'border-red-400/60 bg-gradient-to-br from-red-50/70 to-white shadow-xl ring-2 ring-red-200/40' :
-                                          it.id === 'power-move' ? 'border-orange-400/60 bg-gradient-to-br from-orange-50/70 to-white shadow-xl ring-2 ring-orange-200/40' :
-                                          it.id === 'go-further' ? 'border-yellow-400/60 bg-gradient-to-br from-yellow-50/70 to-white shadow-xl ring-2 ring-yellow-200/40' :
-                                          it.id === 'spark' ? 'border-green-400/60 bg-gradient-to-br from-green-50/70 to-white shadow-xl ring-2 ring-green-200/40' :
-                                          it.id === 'decision-style' ? 'border-emerald-400/60 bg-gradient-to-br from-emerald-50/70 to-white shadow-xl ring-2 ring-emerald-200/40' :
-                                          'border-blue-400/60 bg-gradient-to-br from-blue-50/70 to-white shadow-xl ring-2 ring-blue-200/40')
-                                       : 'border-sage-300/50 hover:border-sage-400/60 hover:shadow-xl'
+                                       ? (it.id === 'power-habit' ? 'border-red-400/70 bg-gradient-to-br from-red-50/80 to-white/90 shadow-2xl ring-2 ring-red-200/50 scale-105' :
+                                          it.id === 'power-move' ? 'border-orange-400/70 bg-gradient-to-br from-orange-50/80 to-white/90 shadow-2xl ring-2 ring-orange-200/50 scale-105' :
+                                          it.id === 'go-further' ? 'border-yellow-400/70 bg-gradient-to-br from-yellow-50/80 to-white/90 shadow-2xl ring-2 ring-yellow-200/50 scale-105' :
+                                          it.id === 'spark' ? 'border-green-400/70 bg-gradient-to-br from-green-50/80 to-white/90 shadow-2xl ring-2 ring-green-200/50 scale-105' :
+                                          it.id === 'decision-style' ? 'border-emerald-400/70 bg-gradient-to-br from-emerald-50/80 to-white/90 shadow-2xl ring-2 ring-emerald-200/50 scale-105' :
+                                          'border-blue-400/70 bg-gradient-to-br from-blue-50/80 to-white/90 shadow-2xl ring-2 ring-blue-200/50 scale-105')
+                                       : 'border-sage-200/60 hover:border-sage-300/70 hover:shadow-xl hover:scale-102'
                                    }`}>
                                      {/* Refined header */}
-                                     <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white shadow-md mb-3 ${it.colorClass} transition-transform duration-300 ${signatureSelected === it.id ? 'scale-105 shadow-lg' : ''}`}>
+                                     <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white shadow-lg mb-3 ${it.colorClass} transition-all duration-300 ${signatureSelected === it.id ? 'scale-105 shadow-xl' : ''}`}>
                                        <Icon className="w-4 h-4" />
-                                       <span className="text-xs font-semibold tracking-wide">{it.title}</span>
+                                       <span className="text-xs font-bold tracking-wide">{it.title}</span>
                                      </div>
-                                     <p className="text-xs leading-relaxed font-bold text-sage-700 transition-colors duration-300">
-                                       {signatureSelected === it.id ? (
-                                         <span className="font-bold text-sage-800">{it.description}</span>
-                                       ) : (
-                                         it.description
-                                       )}
+                                     <p className="text-sm leading-relaxed font-semibold text-sage-800 transition-colors duration-300">
+                                       {it.description}
                                      </p>
                                    </div>
                                  </div>
