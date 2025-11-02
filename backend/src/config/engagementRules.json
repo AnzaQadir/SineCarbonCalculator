@@ -1,0 +1,71 @@
+{
+  "version": "overlay-v1.0",
+  "priorities": [
+    {
+      "ifPersonality": "Strategist",
+      "order": ["repair_reuse", "energy_saver", "route_optimize"]
+    },
+    {
+      "ifPersonality": "Trailblazer",
+      "order": ["community_event", "share_story", "group_action"]
+    },
+    {
+      "ifPersonality": "Coordinator",
+      "order": ["group_action", "community_event", "share_story"]
+    },
+    {
+      "ifPersonality": "Visionary",
+      "order": ["share_story", "energy_saver", "commute_switch"]
+    },
+    {
+      "ifPersonality": "Explorer",
+      "order": ["commute_switch", "route_optimize", "bundle_errands"]
+    },
+    {
+      "ifPersonality": "Catalyst",
+      "order": ["share_story", "group_action", "community_event"]
+    },
+    {
+      "ifPersonality": "Builder",
+      "order": ["repair_reuse", "energy_saver", "buy_less"]
+    },
+    {
+      "ifPersonality": "Networker",
+      "order": ["group_action", "share_story", "community_event"]
+    },
+    {
+      "ifPersonality": "Steward",
+      "order": ["repair_reuse", "energy_saver", "waste_reduce"]
+    },
+    {
+      "ifPersonality": "Seed",
+      "order": ["quick_wins", "habit_formers", "money_savers"]
+    },
+    {
+      "default": true,
+      "order": ["quick_wins", "money_savers", "habit_formers"]
+    }
+  ],
+  "quickWinsThreshold": {
+    "co2_kg": 0.2,
+    "rupees": 150
+  },
+  "levelUpThreshold": {
+    "co2_kg": 1.0,
+    "rupees": 500
+  },
+  "rotation": {
+    "cadence": "weekly",
+    "dayOfWeek": "Mon"
+  },
+  "labels": {
+    "next_rupee_win": "Next ₹ win",
+    "quick_win": "Quick Win",
+    "money_saver": "Money Saver",
+    "habit_former": "Habit Builder"
+  },
+  "copy": {
+    "eco_guilt_tone": "affirming",
+    "best_next_action_prefix": "Your Best Next Action"
+  }
+}

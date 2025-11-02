@@ -20,6 +20,8 @@ import { getPersonalityImage } from '@/utils/personalityImages';
 import { PersonalityType, PersonalityResponse } from '@/types/personality';
 import { useNavigate } from 'react-router-dom';
 import { useQuizStore } from '@/stores/quizStore';
+import { MultiCardEngagementDashboard } from '@/components/engagement/MultiCardEngagementDashboard';
+import { useUserStore } from '@/stores/userStore';
 
 type CategoryEmissions = {
   home: number;
@@ -1089,6 +1091,29 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </button>
 
                     <button
+                      onClick={() => setActiveSection('take-action')}
+                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group ${
+                        activeSection === 'take-action'
+                          ? 'border-sage-300 bg-gradient-to-r from-sage-50 to-emerald-50 text-sage-800 font-semibold shadow-md'
+                          : 'border-sage-200/60 bg-white/70 text-sage-600 hover:text-sage-700 hover:border-sage-300 hover:bg-sage-50/50'
+                      }`}
+                    >
+                      <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-4'}`}>
+                        <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          activeSection === 'take-action'
+                            ? 'bg-gradient-to-r from-sage-500 to-emerald-500 shadow-lg'
+                            : 'bg-sage-300 group-hover:bg-sage-400'
+                        }`} />
+                        {!sidebarCollapsed && (
+                          <div>
+                            <div className="font-medium">Take Action</div>
+                            <div className="text-xs text-sage-500 mt-1">Enhanced recommendations</div>
+                          </div>
+                        )}
+                      </div>
+                    </button>
+
+                    <button
                       onClick={() => navigate('/recommendations')}
                       className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group border-sage-200/60 bg-white/70 text-sage-600 hover:text-sage-700 hover:border-sage-300 hover:bg-sage-50/50`}
                     >
@@ -1096,8 +1121,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                         <div className={`w-3 h-3 rounded-full transition-all duration-300 bg-sage-300 group-hover:bg-sage-400`} />
                         {!sidebarCollapsed && (
                           <div>
-                            <div className="font-medium">Take Action</div>
-                            <div className="text-xs text-sage-500 mt-1">Get personalized recommendations</div>
+                            <div className="font-medium">Browse All</div>
+                            <div className="text-xs text-sage-500 mt-1">View all recommendations</div>
                           </div>
                         )}
                       </div>
@@ -1136,15 +1161,17 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                       <div className="flex items-center justify-between text-xs text-sage-500 mb-2">
                         <span>Progress</span>
                         <span>
-                          {activeSection === 'climate-self' ? '1' : activeSection === 'climate-signature' ? '2' : '3'} of 3
+                          {activeSection === 'climate-self' ? '1' : activeSection === 'climate-signature' ? '2' : activeSection === 'take-action' ? '3' : showDashboardPanel ? '4' : '5'} of 5
                         </span>
                       </div>
                       <div className="w-full bg-sage-200/30 rounded-full h-2">
                         <div 
                           className="bg-gradient-to-r from-sage-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
                           style={{ 
-                            width: activeSection === 'climate-self' ? '33%' : 
-                                   activeSection === 'climate-signature' ? '66%' : '100%' 
+                            width: activeSection === 'climate-self' ? '20%' : 
+                                   activeSection === 'climate-signature' ? '40%' : 
+                                   activeSection === 'take-action' ? '60%' : 
+                                   showDashboardPanel ? '80%' : '100%'
                           }}
                         />
                       </div>
@@ -1623,8 +1650,26 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                      </div> 
          */}
 
+          {/* Take Action Section - Engagement Dashboard */}
+          {activeSection === 'take-action' && (
+            <div className="space-y-8">
+              <div className="text-center space-y-6 mb-12">
+                <div className="inline-block">
+                  <h2 className="text-6xl md:text-7xl font-light bg-gradient-to-r from-sage-800 via-sage-700 to-emerald-800 bg-clip-text text-transparent leading-none tracking-wider">
+                    Take Action
+                  </h2>
+                </div>
+                <p className="text-lg md:text-xl text-sage-600 max-w-3xl mx-auto leading-relaxed font-light tracking-wide italic">
+                  Your personalized best next action to make real impact
+                </p>
+              </div>
 
-
+              {/* Engagement Dashboard */}
+              <div className="max-w-4xl mx-auto">
+                <MultiCardEngagementDashboard profileImage={useUserStore.getState().user?.profileImage} />
+              </div>
+            </div>
+          )}
 
         </div>
 

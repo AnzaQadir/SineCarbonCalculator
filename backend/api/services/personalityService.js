@@ -604,7 +604,7 @@ class PersonalityService {
                 description: "You’re not quite sure where you stand yet, but you're curious, you're here, and you're starting to pay attention. That alone matters.\n" +
                     "Maybe you haven’t figured out your routine, your values, or how it all fits together. Maybe you’re still deciding what’s realistic or meaningful for you. That’s not a flaw; it’s the beginning of growth.\n" +
                     "Like a seed in the soil, you don’t have to do everything right away. Start small. Notice one thing this week: how much plastic shows up in your day, or how often you toss leftovers. No pressure to act. Just pay attention and you’ll be on your way.",
-                hookLine: "You’re not quite sure where you stand yet and that’s okay.\n"
+                hookLine: "You’re not quite sure where you stand yet and that’s okay.**10. The Seed**\n"
             };
         }
         // Matrix mapping
@@ -629,12 +629,12 @@ class PersonalityService {
             intuitive: {
                 planner: {
                     type: 'Visionary',
-                    desc: 'You see the world not just as it is but as it could be. You\'re thoughtful, creative, and full of quiet hope. Your imagination fuels your actions: maybe you dream about green cities, cozy neighborhoods, or homes that breathe with nature. In practice, that might look like turning a corner of your space into a plant haven, journaling about future lifestyles, or slowly swapping out your habits to reflect your values. You don\'t rush change—you nurture it. Your role in the climate movement is to remind us that small seeds can grow into something beautiful. Keep sketching that future—we need it.',
+                    desc: 'You see the world not just as it is—but as it could be. You\'re thoughtful, creative, and full of quiet hope. Your imagination fuels your actions: maybe you dream about green cities, cozy neighborhoods, or homes that breathe with nature. In practice, that might look like turning a corner of your space into a plant haven, journaling about future lifestyles, or slowly swapping out your habits to reflect your values. You don\'t rush change—you nurture it. Your role in the climate movement is to remind us that small seeds can grow into something beautiful. Keep sketching that future—we need it.',
                     hookLine: 'You dream big and act small, building the future one idea at a time.'
                 },
                 experimenter: {
                     type: 'Explorer',
-                    desc: 'You like to learn by doing. You\'re not here for long-winded lectures, you want to test things out, see how it feels, and then tell your friends about it. Maybe you try biking to work, growing herbs on your windowsill, or skipping takeout for a week—just to see. You thrive when you\'re in motion, adjusting as you go. Climate action, for you, is less about perfection and more about momentum. Your honest feedback and real-world experiments help others figure out what works for *them*, too. So keep exploring—your journey is full of insight (and great stories).',
+                    desc: 'You like to learn by doing. You\'re not here for long-winded lectures—you want to test things out, see how it feels, and then tell your friends about it. Maybe you try biking to work, growing herbs on your windowsill, or skipping takeout for a week—just to see. You thrive when you\'re in motion, adjusting as you go. Climate action, for you, is less about perfection and more about momentum. Your honest feedback and real-world experiments help others figure out what works for *them*, too. So keep exploring—your journey is full of insight (and great stories).',
                     hookLine: 'You learn by doing and share what works—no fuss, just flow.'
                 },
                 collaborator: {

@@ -10,6 +10,7 @@ import { userRoutes } from './routes/userRoutes';
 import sessionRoutes from './routes/sessionRoutes';
 import userPersonalityRoutes from './routes/userPersonalityRoutes';
 import shareRoutes from './routes/shareRoutes';
+import engagementRoutes from './routes/engagementRoutes';
 import { initializeDatabase } from './models';
 import authRoutes from './routes/authRoutes';
 
@@ -71,6 +72,7 @@ app.use('/api/sessions', sessionRoutes);
 app.use('/api/user-personality', userPersonalityRoutes);
 app.use('/api/share', shareRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/v1/engagement', engagementRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
