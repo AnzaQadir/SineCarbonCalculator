@@ -298,7 +298,7 @@ function HowItWorksSection({ steps }: { steps: { title: string; desc: string; im
   return (
     <section 
       ref={sectionRef} 
-      className="w-full py-32 px-2 relative overflow-hidden font-['Proxima Nova']" 
+      className="w-full py-32 px-2 relative overflow-hidden font-['Inter']" 
       style={{ 
         background: 'linear-gradient(to right, #FEF3C7, #FFFBEB)',
         backgroundSize: '200% 200%',
@@ -1078,7 +1078,7 @@ function ActionSpotlightCards() {
       </div>
 
       {/* Desktop/Tablet: fluid auto-fit grid */}
-      <div className="hidden md:grid [grid-template-columns:repeat(auto-fit,minmax(18rem,1fr))] gap-x-8 gap-y-12 px-4 font-['Proxima Nova']">
+      <div className="hidden md:grid [grid-template-columns:repeat(auto-fit,minmax(18rem,1fr))] gap-x-8 gap-y-12 px-4 font-['Inter']">
         {actionSpotlightData.map((card, idx) => (
           <motion.div
             key={card.title}
@@ -1195,7 +1195,7 @@ function SocialRippleDiagram({ large = false }: { large?: boolean }): React.Reac
     { src: "/Personality Avatars/Seed Male.png", style: "right-8 top-1/2 -translate-y-1/2" },
   ];
   return (
-    <div className={`relative ${large ? 'w-[650px] h-[650px]' : 'w-[400px] h-[400px]'} mx-auto bg-gradient-to-br from-emerald-50 to-white rounded-3xl shadow-lg mb-12 font-['Proxima Nova']`}>
+    <div className={`relative ${large ? 'w-[650px] h-[650px]' : 'w-[400px] h-[400px]'} mx-auto bg-gradient-to-br from-emerald-50 to-white rounded-3xl shadow-lg mb-12 font-['Inter']`}>
       {/* Central personality image */}
       <motion.img
         src="/profile.jpg"
@@ -1252,7 +1252,7 @@ function PillsColumn({ pills, delay = 0 }: { pills: { text: string; color: strin
   const totalEntrance = delay + (pills.length - 1) * entranceDelay + entranceDuration;
 
   return (
-    <div className="flex flex-col items-center justify-center h-[420px] font-['Proxima Nova']">
+    <div className="flex flex-col items-center justify-center h-[420px] font-['Inter']">
       {pills.map((pill, i) => (
         <motion.div
           key={pill.text}
