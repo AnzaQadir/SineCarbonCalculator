@@ -3,7 +3,6 @@ import Layout from '@/components/Layout';
 import Calculator from '@/components/Calculator';
 import { useCalculator } from '@/hooks/useCalculator';
 import { motion } from 'framer-motion';
-// import { Leaf } from 'lucide-react';
 import ResultsDisplay from '@/components/ResultsDisplay';
 import { calculatePersonality, logEvent, checkUserExists, createSession, checkQuiz } from '@/services/api';
 import type { PersonalityResponse } from '@/services/api';

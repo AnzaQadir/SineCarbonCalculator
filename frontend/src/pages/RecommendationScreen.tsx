@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecommendationEngine from '@/components/RecommendationEngine';
-// Removed unused UI imports
-import { useUserStore } from '@/stores/userStore'; // Assuming you have a user store
-import { useQuizStore } from '@/stores/quizStore'; // Assuming you have a quiz store
+import { useUserStore } from '@/stores/userStore';
+import { useQuizStore } from '@/stores/quizStore';
 import Layout from '@/components/Layout';
 
 // Map frontend types to backend canonical types
