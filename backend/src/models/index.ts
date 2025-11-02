@@ -1,13 +1,16 @@
+import { Sequelize, Model } from 'sequelize';
 import sequelize from '../db';
+
+// Import models
 import User from './User';
 import UserActivity from './UserActivity';
 import UserSession from './UserSession';
 import EventLog from './EventLog';
 import UserPersonality from './UserPersonality';
 import ShareContent from './ShareContent';
-
-// Export models
-export { User, UserActivity, UserSession, EventLog, UserPersonality, ShareContent };
+import UserAction from './UserAction';
+import UserStreak from './UserStreak';
+import WeeklySummary from './WeeklySummary';
 
 // Define associations
 const defineAssociations = () => {
@@ -26,6 +29,16 @@ const defineAssociations = () => {
   // UserPersonality belongs to UserSession (optional)
   UserPersonality.belongsTo(UserSession, { foreignKey: 'sessionId', targetKey: 'sessionId', as: 'session' });
   UserSession.hasMany(UserPersonality, { foreignKey: 'sessionId', sourceKey: 'sessionId', as: 'personalities' });
+
+  // Engagement Layer associations
+  UserAction.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+  User.hasMany(UserAction, { foreignKey: 'userId', as: 'actions' });
+
+  UserStreak.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+  User.hasOne(UserStreak, { foreignKey: 'userId', as: 'streak' });
+
+  WeeklySummary.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+  User.hasMany(WeeklySummary, { foreignKey: 'userId', as: 'weeklySummaries' });
 };
 
 // Sync database (create tables if they don't exist)
@@ -33,7 +46,6 @@ export const syncDatabase = async () => {
   try {
     // Define associations before syncing
     defineAssociations();
-    
     await sequelize.sync({ alter: true });
     console.log('Database synchronized successfully');
   } catch (error) {
@@ -48,13 +60,24 @@ export const initializeDatabase = async () => {
     // Test connection
     await sequelize.authenticate();
     console.log('Database connection established successfully.');
-    
     // Sync models
     await syncDatabase();
   } catch (error) {
     console.error('Database initialization failed:', error);
     throw error;
   }
+};
+
+export {
+  User,
+  UserActivity,
+  UserSession,
+  EventLog,
+  UserPersonality,
+  ShareContent,
+  UserAction,
+  UserStreak,
+  WeeklySummary,
 };
 
 export default sequelize; 

@@ -3,8 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initializeDatabase = exports.syncDatabase = exports.ShareContent = exports.UserPersonality = exports.EventLog = exports.UserSession = exports.UserActivity = exports.User = void 0;
+exports.WeeklySummary = exports.UserStreak = exports.UserAction = exports.ShareContent = exports.UserPersonality = exports.EventLog = exports.UserSession = exports.UserActivity = exports.User = exports.initializeDatabase = exports.syncDatabase = void 0;
 const db_1 = __importDefault(require("../db"));
+// Import models
 const User_1 = __importDefault(require("./User"));
 exports.User = User_1.default;
 const UserActivity_1 = __importDefault(require("./UserActivity"));
@@ -17,6 +18,12 @@ const UserPersonality_1 = __importDefault(require("./UserPersonality"));
 exports.UserPersonality = UserPersonality_1.default;
 const ShareContent_1 = __importDefault(require("./ShareContent"));
 exports.ShareContent = ShareContent_1.default;
+const UserAction_1 = __importDefault(require("./UserAction"));
+exports.UserAction = UserAction_1.default;
+const UserStreak_1 = __importDefault(require("./UserStreak"));
+exports.UserStreak = UserStreak_1.default;
+const WeeklySummary_1 = __importDefault(require("./WeeklySummary"));
+exports.WeeklySummary = WeeklySummary_1.default;
 // Define associations
 const defineAssociations = () => {
     // UserSession belongs to User
@@ -31,6 +38,13 @@ const defineAssociations = () => {
     // UserPersonality belongs to UserSession (optional)
     UserPersonality_1.default.belongsTo(UserSession_1.default, { foreignKey: 'sessionId', targetKey: 'sessionId', as: 'session' });
     UserSession_1.default.hasMany(UserPersonality_1.default, { foreignKey: 'sessionId', sourceKey: 'sessionId', as: 'personalities' });
+    // Engagement Layer associations
+    UserAction_1.default.belongsTo(User_1.default, { foreignKey: 'userId', as: 'user' });
+    User_1.default.hasMany(UserAction_1.default, { foreignKey: 'userId', as: 'actions' });
+    UserStreak_1.default.belongsTo(User_1.default, { foreignKey: 'userId', as: 'user' });
+    User_1.default.hasOne(UserStreak_1.default, { foreignKey: 'userId', as: 'streak' });
+    WeeklySummary_1.default.belongsTo(User_1.default, { foreignKey: 'userId', as: 'user' });
+    User_1.default.hasMany(WeeklySummary_1.default, { foreignKey: 'userId', as: 'weeklySummaries' });
 };
 // Sync database (create tables if they don't exist)
 const syncDatabase = async () => {
