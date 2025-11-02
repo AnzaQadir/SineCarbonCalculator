@@ -5,7 +5,7 @@ import { useCalculator } from '@/hooks/useCalculator';
 import { motion } from 'framer-motion';
 // import { Leaf } from 'lucide-react';
 import ResultsDisplay from '@/components/ResultsDisplay';
-import { calculatePersonality, logEvent, checkUserExists, createSession } from '@/services/api';
+import { calculatePersonality, logEvent, checkUserExists, createSession, checkQuiz } from '@/services/api';
 import type { PersonalityResponse } from '@/services/api';
 import type { UserResponses } from '@/services/api';
 import { personalityQuestions } from '@/data/personalityQuestions';
@@ -103,7 +103,7 @@ function CircularImageReveal() {
   );
 }
 
-function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onStartB: () => void; onBack?: () => void }) {
+function QuizIntro({ onStartA, onStartB, onBack, checkingQuiz }: { onStartA: () => void; onStartB: () => void; onBack?: () => void; checkingQuiz?: boolean }) {
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
 
@@ -131,7 +131,7 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
                 className="text-slate-800 font-proxima text-3xl lg:text-4xl font-bold tracking-wide mb-2"
-                style={{ fontFamily: 'Proxima Nova, sans-serif' }}
+                style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 <motion.span
                   animate={{ 
@@ -214,7 +214,7 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.7 }}
               className="text-4xl lg:text-6xl xl:text-7xl font-bold text-slate-900 leading-tight tracking-tight -mt-4"
-              style={{ fontFamily: 'Proxima Nova, sans-serif' }}
+              style={{ fontFamily: 'Inter, sans-serif' }}
             >
               Let's begin your
               <span className="block text-slate-900">
@@ -258,9 +258,10 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
             >
               <motion.button 
                 onClick={onStartB}
-                whileHover={{ scale: 1.05, y: -4 }}
-                whileTap={{ scale: 0.98 }}
-                className="group relative w-full max-w-md mx-auto bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-800 hover:to-amber-950 text-white text-xl font-bold py-6 px-12 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden"
+                disabled={checkingQuiz}
+                whileHover={checkingQuiz ? {} : { scale: 1.05, y: -4 }}
+                whileTap={checkingQuiz ? {} : { scale: 0.98 }}
+                className={`group relative w-full max-w-md mx-auto bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-800 hover:to-amber-950 text-white text-xl font-bold py-6 px-12 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden ${checkingQuiz ? 'opacity-75 cursor-wait' : ''}`}
               >
                 {/* Animated background overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -280,20 +281,22 @@ function QuizIntro({ onStartA, onStartB, onBack }: { onStartA: () => void; onSta
                 {/* Button content */}
                 <div className="relative flex items-center justify-center">
                   <div className="text-center">
-                    <div className="font-bold text-2xl">Start Your Journey</div>
-                    <div className="text-sm font-normal opacity-90 mt-1">Discover your sustainability story with Bobo</div>
+                    <div className="font-bold text-2xl">{checkingQuiz ? 'Checking...' : 'Start Your Journey'}</div>
+                    <div className="text-sm font-normal opacity-90 mt-1">{checkingQuiz ? 'Please wait' : 'Discover your sustainability story with Bobo'}</div>
                   </div>
                 </div>
                 
                 {/* Arrow icon */}
-                <motion.svg 
-                  className="absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 text-white/90 group-hover:translate-x-1 transition-transform duration-200" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </motion.svg>
+                {!checkingQuiz && (
+                  <motion.svg 
+                    className="absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 text-white/90 group-hover:translate-x-1 transition-transform duration-200" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </motion.svg>
+                )}
               </motion.button>
             </motion.div>
           </motion.div>
@@ -311,6 +314,9 @@ const Quiz = () => {
   const [currentStep, setCurrentStep] = useState(lastStep ?? 0);
   const [started, setStarted] = useState<null | 'A' | 'B'>(null);
   const [notReady, setNotReady] = useState(false);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [checkingQuiz, setCheckingQuiz] = useState(false);
+  const { user } = useUserStore();
 
   // Track quiz start
   useEffect(() => {
@@ -354,12 +360,87 @@ const Quiz = () => {
     setLastStep(step);
   };
 
+  const handleStartQuiz = async () => {
+    // If user is logged in, check if quiz is already completed
+    if (user) {
+      setCheckingQuiz(true);
+      try {
+        const result = await checkQuiz();
+        if (result.success && result.completed) {
+          setQuizCompleted(true);
+          setCheckingQuiz(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking quiz status:', error);
+        // If error, allow proceeding anyway
+      }
+      setCheckingQuiz(false);
+    }
+    // If no user or quiz not completed, proceed
+    setStarted('B');
+  };
+
   if (started === null) {
+    // Show quiz completed message if applicable
+    if (quizCompleted) {
+      return (
+        <Layout>
+          <div className="min-h-screen bg-white flex items-center justify-center px-6">
+            <div className="max-w-2xl w-full text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="bg-gradient-to-br from-emerald-50 to-white rounded-3xl shadow-lg p-12"
+              >
+                <div className="mb-8">
+                  <img 
+                    src="/images/panda.svg" 
+                    alt="Bobo" 
+                    className="w-32 h-32 mx-auto mb-6"
+                  />
+                </div>
+                <h1 className="text-4xl font-bold text-slate-900 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  You've Already Completed Your Quiz! 🎉
+                </h1>
+                <p className="text-xl text-slate-600 mb-8">
+                  Great job! You've already discovered your sustainability story. View your journey to see your results and recommendations.
+                </p>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex gap-4 justify-center"
+                >
+                  <a
+                    href="/journey"
+                    className="bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-800 hover:to-amber-950 text-white text-lg font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    View Your Journey
+                  </a>
+                  <button
+                    onClick={() => {
+                      setQuizCompleted(false);
+                      setStarted('B');
+                    }}
+                    className="bg-white border-2 border-slate-300 hover:border-slate-400 text-slate-700 text-lg font-bold py-4 px-8 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300"
+                  >
+                    Retake Quiz
+                  </button>
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+        </Layout>
+      );
+    }
+
     return (
       <Layout>
         <QuizIntro
           onStartA={() => setStarted('A')}
-          onStartB={() => setStarted('B')}
+          onStartB={handleStartQuiz}
+          checkingQuiz={checkingQuiz}
         />
       </Layout>
     );
@@ -1381,7 +1462,7 @@ function PoeticJourneyQuiz() {
                 transition={{ duration: 0.8, delay: 0.6 }}
                 className="text-5xl md:text-6xl font-serif mb-8 text-slate-900 leading-tight tracking-tight" 
                 style={{ 
-                  fontFamily: 'Proxima Nova, sans-serif',
+                  fontFamily: 'Inter, sans-serif',
                   fontWeight: 600,
                   letterSpacing: '-0.02em'
                 }}
@@ -1799,7 +1880,7 @@ function PoeticJourneyQuiz() {
                       h-[calc(100vh-var(--app-header-h,72px)-2rem)] md:h-[calc(100vh-var(--app-header-h,80px)-3rem)]">
         {/* Card Header */}
         <div className="p-4 md:p-6 pb-2">
-          <h2 className="text-2xl md:text-3xl font-proxima text-sage-800 text-center mb-2 tracking-wide" style={{ fontFamily: 'Proxima Nova, sans-serif', fontWeight: 700 }}>{section.title}</h2>
+          <h2 className="text-2xl md:text-3xl font-proxima text-sage-800 text-center mb-2 tracking-wide" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>{section.title}</h2>
         </div>
         {/* Scrollable Body */}
         <div className="px-6 md:px-8 flex flex-col items-center justify-start mb-4 overflow-y-auto pb-6 min-h-0">
@@ -1860,7 +1941,7 @@ function PoeticJourneyQuiz() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-2xl md:text-3xl lg:text-4xl font-proxima text-sage-800 text-center mt-2 mb-6 lg:mb-8 leading-tight" 
-            style={{ fontFamily: 'Proxima Nova, sans-serif', fontWeight: 600 }}
+            style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
           >
             {q.question}
           </motion.div>

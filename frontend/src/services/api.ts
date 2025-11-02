@@ -425,4 +425,19 @@ export const getLatestUserPersonality = async (userId: string): Promise<any> => 
     console.error('Error fetching latest user personality:', error);
     throw error;
   }
+};
+
+// Check if user has completed the quiz
+export const checkQuiz = async (): Promise<{ success: boolean; completed: boolean; message?: string }> => {
+  try {
+    const response = await apiClient.get('/users/checkquiz');
+    return response.data;
+  } catch (error: any) {
+    // If unauthorized, return not completed
+    if (error.response?.status === 401) {
+      return { success: false, completed: false };
+    }
+    console.error('Error checking quiz status:', error);
+    throw error;
+  }
 }; 

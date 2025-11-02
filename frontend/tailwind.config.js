@@ -17,8 +17,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        'proxima': ['Proxima Nova', 'sans-serif'],
-        'sans': ['Proxima Nova', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        'proxima': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        'sans': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {
