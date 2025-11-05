@@ -17,6 +17,7 @@ import PersonalizedDashboard from './pages/PersonalizedDashboard';
 import EngagementHome from './pages/EngagementHome';
 import Journey from './pages/Journey';
 import ShareView from './pages/ShareView';
+import Methodology from './pages/Methodology';
 import { Analytics } from '@vercel/analytics/react';
 import { me, checkUserExists } from '@/services/api';
 import { useUserStore } from '@/stores/userStore';
@@ -90,6 +91,7 @@ function App() {
               <Route path="/engagement" element={<EngagementHome />} />
               <Route path="/journey" element={<Journey />} />
               <Route path="/share/:id" element={<ShareView />} />
+              <Route path="/methodology" element={<Methodology />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>

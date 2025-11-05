@@ -16,7 +16,7 @@ export class EmailService {
     try {
       const emailData: EmailData = {
         to: user.email,
-        subject: `You're in, ${user.firstName || 'Friend'}. And honestly… we can't wait.`,
+        subject: `🌿 Welcome to Zerrah — you're in good company!`,
         html: this.generateWelcomeEmailHTML(user),
         text: this.generateWelcomeEmailText(user),
       };
@@ -59,176 +59,380 @@ export class EmailService {
   private static generateWelcomeEmailHTML(user: User): string {
     return `
       <!DOCTYPE html>
-      <html>
+      <html lang="en">
       <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Welcome to Zerrah</title>
         <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
           body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            background: #f8f7f3;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #FCFCF8;
             margin: 0;
             padding: 0;
             color: #3a3a2c;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
           }
           .container {
             max-width: 600px;
             margin: 0 auto;
-            padding: 0;
+            padding: 16px 12px;
             background: transparent;
           }
-          .hero-bg {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16/9;
-            min-height: 250px;
-            background: #f8f7f3;
-            border-radius: 18px 18px 0 0;
-            overflow: hidden;
-          }
-          .hero-bg img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-            border-radius: 18px 18px 0 0;
-          }
-          .overlay-text {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 32px;
-            text-align: center;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            font-size: 1.5rem;
-            color: #6d5e4d;
-            background: rgba(255,255,255,0.55);
-            padding: 12px 24px 10px 24px;
-            border-radius: 18px;
-            margin: 0 auto;
-            width: fit-content;
-            max-width: 90%;
-            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.04);
-            letter-spacing: 0.01em;
-          }
-          .header {
-            background: none;
-            padding: 32px 0 0 0;
-            text-align: left;
-            border-radius: 0;
-          }
-          .header h1 {
-            color: #7a6c5d;
-            margin: 0 0 8px 0;
-            font-size: 2.2rem;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            font-weight: bold;
-          }
-          .header p {
-            color: #a89c8a;
-            margin: 0 0 0 0;
-            font-size: 1.1rem;
-          }
           .content {
-            padding: 32px 32px 24px 32px;
-            background: #fff;
-            border-radius: 0 0 18px 18px;
-            box-shadow: 0 2px 16px 0 rgba(0,0,0,0.04);
+            padding: 28px 24px;
+            background: #FFFFFF;
+            border-radius: 24px;
+            box-shadow: 0 4px 20px 0 rgba(0,0,0,0.06);
+          }
+          .bobo-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+          }
+          .bobo-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #FCFCF8;
+          }
+          .bobo-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #126E6E;
+            margin: 0;
+            letter-spacing: -0.01em;
+          }
+          .greeting {
+            font-size: 1.15rem;
+            color: #3a3a2c;
+            margin: 0 0 16px 0;
+            font-weight: 500;
+          }
+          .intro {
+            color: #4a4a3a;
+            margin-bottom: 16px;
+            font-size: 1.05rem;
+            line-height: 1.75;
+          }
+          .intro emoji {
+            font-size: 1.2em;
+            display: inline-block;
+          }
+          .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #E4C770 20%, #B4C3A0 50%, #E87A59 80%, transparent);
+            margin: 20px 0;
+            border: none;
+          }
+          .features-header {
+            color: #126E6E;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .features {
+            margin: 20px 0;
+            padding: 16px 0;
+          }
+          .features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+          }
+          .features li {
+            padding: 12px 0;
+            color: #4a4a3a;
+            font-size: 1rem;
+            line-height: 1.65;
+            border-bottom: 1px solid #F0F0EC;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+          }
+          .features li:last-child {
+            border-bottom: none;
+          }
+          .feature-emoji {
+            font-size: 1.4em;
+            flex-shrink: 0;
+            margin-top: 2px;
+          }
+          .feature-content {
+            flex: 1;
+          }
+          .features strong {
+            color: #126E6E;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+          }
+          .from-me-section {
+            margin: 20px 0;
+            padding: 20px 18px;
+            background: linear-gradient(135deg, #FCFCF8 0%, #F8F7F3 100%);
+            border-radius: 16px;
+            border-left: 3px solid #E87A59;
+          }
+          .from-me-title {
+            color: #126E6E;
+            font-weight: 600;
+            font-size: 1rem;
+            margin: 0 0 16px 0;
+          }
+          .from-me-text {
+            color: #4a4a3a;
+            font-size: 1rem;
+            line-height: 1.75;
+            margin: 0;
+          }
+          .button-wrapper {
+            text-align: center;
+            margin: 24px 0 20px 0;
           }
           .button {
             display: inline-block;
-            padding: 12px 28px;
-            background: #b6c7a2;
-            color: #fff;
+            padding: 16px 40px;
+            background: #126E6E;
+            color: #FFFFFF !important;
             text-decoration: none;
-            border-radius: 8px;
-            margin: 18px 0 10px 0;
-            font-size: 1.1rem;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            font-weight: bold;
-            letter-spacing: 0.01em;
-            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+            border-radius: 50px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 12px 0 rgba(18, 110, 110, 0.25);
+            transition: all 0.3s ease;
+            letter-spacing: -0.01em;
+          }
+          .button:hover {
+            background: #0F5A5A;
+            box-shadow: 0 6px 16px 0 rgba(18, 110, 110, 0.35);
+            transform: translateY(-1px);
+          }
+          .closing-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #F0F0EC;
+          }
+          .closing-text {
+            color: #4a4a3a;
+            font-size: 1rem;
+            line-height: 1.75;
+            margin: 0 0 16px 0;
+          }
+          .signature {
+            margin-top: 16px;
+          }
+          .signature p {
+            color: #4a4a3a;
+            margin: 8px 0;
+            font-size: 1rem;
+          }
+          .signature strong {
+            color: #126E6E;
+            font-weight: 600;
+          }
+          .signature .signature-name {
+            font-size: 1.15rem;
+            color: #126E6E;
+            margin: 12px 0 8px 0;
+          }
+          .signature .signature-title {
+            font-size: 0.95rem;
+            color: #B4C3A0;
+            margin-top: 8px;
           }
           .footer {
+            margin-top: 20px;
+            padding: 20px 0 16px 0;
+            border-top: 1px solid #F0F0EC;
+          }
+          .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 20px;
+          }
+          .footer-panda {
+            flex: 0 0 auto;
+          }
+          .footer-panda img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+          .footer-logo {
+            flex: 1;
             text-align: center;
-            padding: 20px;
-            color: #a89c8a;
-            font-size: 14px;
-            font-family: 'Georgia', 'Times New Roman', serif;
+            min-width: 200px;
           }
-          .highlight {
-            background: #f3f1e7;
-            padding: 18px;
-            border-radius: 10px;
-            margin: 24px 0;
-            color: #6d5e4d;
-            font-size: 1.1rem;
+          .logo-dots {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
           }
-          .quote {
-            background: #f6f5f2;
-            padding: 20px;
-            border-left: 4px solid #b6c7a2;
-            margin: 24px 0;
-            font-style: italic;
-            color: #7a6c5d;
-            border-radius: 8px;
+          .logo-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+          }
+          .tagline {
+            color: #126E6E;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0;
+            letter-spacing: 0.02em;
+          }
+          .social-links {
+            text-align: center;
+            margin: 16px 0 12px 0;
+          }
+          .social-links a {
+            color: #126E6E;
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin: 0 12px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+          }
+          .social-links a:hover {
+            color: #0F5A5A;
+            text-decoration: underline;
+          }
+          .footer-bottom {
+            text-align: center;
+            color: #B4C3A0;
+            font-size: 0.85rem;
+            margin-top: 20px;
           }
           @media (max-width: 600px) {
-            .container, .content { padding: 12px !important; }
-            .hero-bg { min-height: 120px; }
-            .overlay-text { font-size: 1.1rem; padding: 8px 10px; }
+            .container { padding: 16px 12px !important; }
+            .content { padding: 32px 24px !important; border-radius: 20px; }
+            .bobo-header { margin-bottom: 24px; }
+            .features li { padding: 16px 0; }
+            .button { padding: 14px 32px; font-size: 1rem; }
+            .footer-content { flex-direction: column; text-align: center; }
+            .footer-panda { margin: 0 auto; }
+            .social-links a { display: block; margin: 8px 0; }
           }
         </style>
       </head>
       <body>
         <div class="container">
-          <div class="hero-bg">
-            <!-- Replace the src below with the actual GIF URL when available -->
-            <img src="https://cdn.zerrah.com/email-assets/email.png" alt="Six gentle climate-friendly actions in watercolor animation" style="background: #f8f7f3;" />
-            <div class="overlay-text">Your habits already tell a story.</div>
-            <!-- Top-left corner left clear for logo placement -->
-          </div>
-          <div class="header">
-            <h1>🌱 You're in, ${user.firstName || 'Friend'}</h1>
-            <p>And honestly… we can't wait.</p>
-          </div>
           <div class="content">
-            <h2 style="font-family: 'Georgia', serif; color: #7a6c5d;">👋 Hey ${user.firstName || 'Friend'},</h2>
-            <p>You just did something kind of special.</p>
-            <p>You took a first step — the kind most people only think about.</p>
-            <p>And we're so glad you're here.</p>
-            <h3 style="color: #b6c7a2;">🪞 Here's what happens next:</h3>
-            <p>We'll walk you through 6 gentle reflections — how you move, what you eat, what you wear, and more.</p>
-            <p>No grades. No guilt. Just honest questions that show you what's already there.</p>
-            <p>Because your daily choices tell a story.</p>
-            <p>A quiet one. A powerful one.</p>
-            <p>And we think it's time you heard it.</p>
-            <h3 style="color: #b6c7a2;">🧭 Along the way, you'll find:</h3>
-            <ul style="color: #6d5e4d;">
-              <li>clarity over climate chaos</li>
-              <li>progress that feels real (and doable)</li>
-              <li>and a deep connection to what's always mattered: your context, your culture, your way.</li>
-            </ul>
-            <h3 style="color: #b6c7a2;">🌱 Ready?</h3>
-            <p>Let's start your climate story — the one only you can tell.</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="#" class="button">🔘 Start My Climate Story</a>
+            <div class="bobo-header">
+              <img src="https://zerrah.com/images/cute_panda.png" alt="Bobo" class="bobo-avatar" />
+              <p class="bobo-name">Bobo</p>
             </div>
-            <p style="text-align: center; font-size: 14px; color: #a89c8a;">Takes 3 minutes. No stats. No guilt. Just you.</p>
-            <div class="quote">
-              <p>"Zerrah helped me realize that I didn't need to overhaul my life to make an impact — I just needed to see it differently."</p>
-              <p style="text-align: right; margin: 0; font-size: 14px;">— Azeem, 29, Lahore</p>
+            
+            <p class="greeting">Hey friend,</p>
+            
+            <p class="intro">
+              I'm Bobo, your panda pal here at Zerrah <span style="font-size: 1.1em;">🐼</span>.
+            </p>
+            
+            <p class="intro">
+              First things first: <strong>welcome aboard!</strong> <span style="font-size: 1.2em;">🎉✨</span>
+            </p>
+            
+            <p class="intro">
+              You've just joined a space where climate action feels a little lighter — less about pressure, and more about presence.
+              Here, we believe that change begins with curiosity, not perfection.
+            </p>
+            
+            <hr class="section-divider" />
+            
+            <div class="features">
+              <p class="features-header">
+                <span style="font-size: 1.2em;">🌈</span>
+                Here's what's waiting for you inside Zerrah:
+              </p>
+              <ul>
+                <li>
+                  <span class="feature-emoji">🧭</span>
+                  <div class="feature-content">
+                    <strong>Personality quiz:</strong>
+                    Discover your Zerrah Archetype — your unique reflection of how you connect with the planet.
+                  </div>
+                </li>
+                <li>
+                  <span class="feature-emoji">📈</span>
+                  <div class="feature-content">
+                    <strong>Personalized dashboard:</strong>
+                    See your impact in everyday terms — from coffee cups and commutes to burgers and weekend getaways.
+                    Watch how small shifts add up to something big.
+                  </div>
+                </li>
+                <li>
+                  <span class="feature-emoji">💡</span>
+                  <div class="feature-content">
+                    <strong>Actionable steps:</strong>
+                    Get nudges and tips that fit your lifestyle — gentle, guilt-free, and totally doable.
+                    No "go zero-waste overnight" speeches here — just progress that feels good.
+                  </div>
+                </li>
+              </ul>
             </div>
-            <div class="highlight">
-              <h3 style="margin-top: 0;">✨ One small thing to think about before you begin:</h3>
-              <p>"What's one thing I already do that helps the planet — even just a little?"</p>
-              <p style="font-size: 14px; color: #a89c8a;">(Hint: It probably matters more than you think.)</p>
+            
+            <div class="from-me-section">
+              <p class="from-me-title">💬 From me, to you</p>
+              <p class="from-me-text">
+                I'll be popping up along the way to cheer you on <span style="font-size: 1.1em;">🏆</span>, celebrate your wins, and maybe share a joke or two <span style="font-size: 1.1em;">😄</span>.
+                Change doesn't have to be lonely — we'll walk (or waddle) through it together.
+              </p>
+            </div>
+            
+            <div class="button-wrapper">
+              <a href="https://zerrah.com/quiz" class="button">🌿 Take the Quiz and Meet Your Archetype</a>
+            </div>
+            
+            <div class="closing-section">
+              <p class="closing-text">
+                Glad you're here. Let's make change feel human — one small step (and one panda hug) at a time. <span style="font-size: 1.1em;">🤗</span>
+              </p>
+              
+              <div class="signature">
+                <p style="margin: 0;"><strong>Big (panda) hugs,</strong></p>
+                <p class="signature-name"><strong>Bobo</strong> <span style="font-size: 1.1em;">🐼</span></p>
+                <p class="signature-title">Your Zerrah guide</p>
+              </div>
             </div>
           </div>
+          
           <div class="footer">
-            <p>Questions? Reply to this email and we'll get back to you.</p>
-            <p>© 2024 Zerrah. All rights reserved.</p>
+            <div class="footer-content">
+              <div class="footer-panda">
+                <img src="https://zerrah.com/images/cute_panda.png" alt="Bobo" />
+              </div>
+              <div class="footer-logo">
+                <img src="https://zerrah.com/images/new_logo.png" alt="Zerrah" style="max-width: 180px; height: auto; margin: 0 auto 12px auto; display: block;" />
+                <p class="tagline">Small actions. Big climate impact.</p>
+              </div>
+            </div>
+            
+            <div class="social-links">
+              <a href="https://instagram.com/zerrah" target="_blank" rel="noopener">Instagram</a>
+              <a href="https://tiktok.com/@zerrah" target="_blank" rel="noopener">TikTok</a>
+              <a href="https://linkedin.com/company/zerrah" target="_blank" rel="noopener">LinkedIn</a>
+            </div>
+            
+            <div class="footer-bottom">
+              <p style="margin: 0;">Questions? Reply to this email and we'll get back to you.</p>
+              <p style="margin: 8px 0 0 0;">© 2024 Zerrah. All rights reserved.</p>
+            </div>
           </div>
         </div>
       </body>
@@ -241,42 +445,33 @@ export class EmailService {
    */
   private static generateWelcomeEmailText(user: User): string {
     return `
-🌊 You're in, ${user.firstName || 'Friend'}. And honestly… we can't wait.
+Welcome to Zerrah — you're in good company!
 
-Preview Text: One simple step. A ripple of impact. Let's see what your story holds.
+Hey friend,
 
-👋 Hey ${user.firstName || 'Friend'},
+I'm Bobo, your panda pal here at Zerrah. First things first: *welcome aboard!* 🎉
 
-You just did something kind of special.
-You took a first step — the kind most people only think about.
+You've just joined a space where climate action is less about pressure and more about presence.
 
-And we're so glad you're here.
+Here's what you can look forward to:
 
-🪞 Here's what happens next:
-We're going to walk you through 6 gentle reflections — how you move, what you eat, what you wear, and more.
-No grades. No guilt. Just honest questions that show you what's already there.
+- **Personality quiz:** Discover your Zerrah Archetype
 
-Because your daily choices tell a story.
-A quiet one. A powerful one.
-And we think it's time you heard it.
+- **Personalized dashboard:** See your impact in everyday terms (think coffee cups, car rides, and burgers)
 
-🧭 Along the way, you'll find:
-– clarity over climate chaos
-– progress that feels real (and doable)
-– and a deep connection to what's always mattered: your context, your culture, your way.
+- **Actionable steps:** Get nudges and tips that actually fit your lifestyle, without the guilt trips and "go zero-waste overnight"
 
-🌱 Ready?
-Let's start your climate story — the one only you can tell.
+I'll be popping up along the way to cheer you on, celebrate your wins, and maybe share a joke or two.
 
-🔘 Start My Climate Story
-Takes 3 minutes. No stats. No guilt. Just you.
+Take the Quiz and Meet Your Archetype
+https://zerrah.com/quiz
 
-💬 "Zerrah helped me realize that I didn't need to overhaul my life to make an impact — I just needed to see it differently."
-— Azeem, 29, Lahore
+Glad you're here. Let's make change feel human, one small step at a time.
 
-✨ One small thing to think about before you begin:
-"What's one thing I already do that helps the planet — even just a little?"
-(Hint: It probably matters more than you think.)
+Big (panda) hugs,
+
+Bobo
+Your Zerrah guide
 
 Questions? Reply to this email and we'll get back to you.
 
@@ -396,15 +591,24 @@ Questions? Reply to this email and we'll get back to you.
 
       // Configure SendGrid
       sgMail.setApiKey(sendgridApiKey);
+      
+      // Get from email - default to zerrahworld@gmail.com if not set
+      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'zerrahworld@gmail.com';
 
       // Prepare email message
       const msg = {
         to: emailData.to,
-        from: process.env.SENDGRID_FROM_EMAIL || 'noreply@zerrah.com', // Replace with your verified sender
+        from: fromEmail,
         subject: emailData.subject,
         html: emailData.html,
         text: emailData.text,
       };
+      
+      console.log('📤 Attempting to send email via SendGrid:', {
+        from: fromEmail,
+        to: emailData.to,
+        subject: emailData.subject
+      });
 
       // Send email
       const [response] = await sgMail.send(msg);
@@ -416,13 +620,46 @@ Questions? Reply to this email and we'll get back to you.
         headers: response.headers,
       });
 
-    } catch (error) {
-      console.error('❌ Error sending email via SendGrid:', error);
+    } catch (error: any) {
+      console.error('❌ Error sending email via SendGrid:', error.message);
+      
+      // Provide more specific error information
+      if (error.code === 401) {
+        const errorMessage = error.response?.body?.errors?.[0]?.message || '';
+        
+        if (errorMessage.toLowerCase().includes('credits') || errorMessage.toLowerCase().includes('maximum')) {
+          console.error('   💳 SendGrid Credits Exhausted!');
+          console.error('   Your free tier limit (100 emails/day) has been reached.');
+          console.error('   Solutions:');
+          console.error('     1. Wait for daily reset (credits reset at midnight UTC)');
+          console.error('     2. Upgrade your SendGrid plan at https://sendgrid.com/pricing');
+          console.error('     3. Check your usage at https://app.sendgrid.com/stats/overview');
+        } else {
+          console.error('   🔑 Authentication failed (401 Unauthorized)');
+          console.error('   Possible causes:');
+          console.error('     1. API key is invalid or has been revoked');
+          console.error('     2. API key does not have "Mail Send" permissions');
+          console.error('     3. Sender email is not verified in SendGrid');
+        }
+        
+        if (error.response && error.response.body && error.response.body.errors) {
+          console.error('\n   SendGrid error details:');
+          error.response.body.errors.forEach((err: any) => {
+            console.error(`     - ${err.message || JSON.stringify(err)}`);
+          });
+        }
+      } else if (error.code === 403) {
+        console.error('   🚫 Access forbidden (403)');
+        console.error('   The API key may not have sufficient permissions');
+      } else if (error.response && error.response.body) {
+        console.error('   SendGrid Response:', JSON.stringify(error.response.body, null, 2));
+      }
       
       // Fallback to console logging if SendGrid fails
-      console.log('📧 Email would be sent (SendGrid failed):', {
+      console.log('\n📧 Email would be sent (SendGrid failed):', {
         to: emailData.to,
         subject: emailData.subject,
+        from: process.env.SENDGRID_FROM_EMAIL || 'zerrahworld@gmail.com',
         htmlLength: emailData.html.length,
       });
     }
