@@ -20,6 +20,7 @@ import { getPersonalityImage } from '@/utils/personalityImages';
 import { PersonalityType, PersonalityResponse } from '@/types/personality';
 import { useNavigate } from 'react-router-dom';
 import { useQuizStore } from '@/stores/quizStore';
+import { EngagementSection } from '@/components/engagement';
 
 type CategoryEmissions = {
   home: number;
@@ -332,11 +333,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const [dynamicPersonality, setDynamicPersonality] = useState<PersonalityResponse | null>(null);
     const [showJourney, setShowJourney] = useState(false);
   const [showStoryModal, setShowStoryModal] = useState(false);
-  const [activeSection, setActiveSection] = useState<'climate-self' | 'climate-signature' | 'take-action'>('climate-self');
+  const [activeSection, setActiveSection] = useState<'climate-self' | 'climate-signature' | 'take-action' | 'engagement'>('climate-self');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showShareCard, setShowShareCard] = useState(false);
   const [signatureSelected, setSignatureSelected] = useState<string>('power-habit');
   const [showDashboardPanel, setShowDashboardPanel] = useState(false);
+  const [showEngagementPanel, setShowEngagementPanel] = useState(false);
 
  
   const journeyRef = useRef<HTMLDivElement>(null);
@@ -1128,6 +1130,29 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                         )}
                       </div>
                     </button>
+
+                    <button
+                      onClick={() => setActiveSection('engagement')}
+                      className={`w-full text-left ${sidebarCollapsed ? 'px-2 py-3' : 'px-5 py-5'} rounded-2xl border transition-all duration-300 group ${
+                        activeSection === 'engagement'
+                          ? 'border-sage-300 bg-gradient-to-r from-sage-50 to-emerald-50 text-sage-800 font-semibold shadow-md'
+                          : 'border-sage-200/60 bg-white/70 text-sage-600 hover:text-sage-700 hover:border-sage-300 hover:bg-sage-50/50'
+                      }`}
+                    >
+                      <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-4'}`}>
+                        <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          activeSection === 'engagement'
+                            ? 'bg-gradient-to-r from-sage-500 to-emerald-500 shadow-lg'
+                            : 'bg-sage-300 group-hover:bg-sage-400'
+                        }`} />
+                        {!sidebarCollapsed && (
+                          <div>
+                            <div className="font-medium">Next Actions</div>
+                            <div className="text-xs text-sage-500 mt-1">Your best next steps</div>
+                          </div>
+                        )}
+                      </div>
+                    </button>
                   </nav>
 
                   {/* Progress Indicator */}
@@ -1259,8 +1284,38 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </aside>
             )}
 
+            {/* Engagement Panel for Next Actions */}
+            {showEngagementPanel && !sidebarCollapsed && (
+              <aside className="hidden lg:block w-[420px] transition-all duration-300 flex-shrink-0">
+                <div className="sticky top-6 lg:top-10">
+                  <div className="bg-white/95 backdrop-blur-2xl rounded-3xl p-6 shadow-xl border border-sage-200/40 ml-4 max-h-[calc(100vh-8rem)] overflow-y-auto">
+                    {/* Engagement Panel Header */}
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-lg font-bold text-sage-800 mb-1">Next Actions</h4>
+                          <p className="text-sm text-sage-600">Your best next steps</p>
+                        </div>
+                        <button
+                          onClick={() => setShowEngagementPanel(false)}
+                          className="ml-auto inline-flex items-center justify-center w-8 h-8 rounded-full border border-sage-200 text-sage-700 hover:bg-sage-50 transition shadow-sm"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Engagement Section */}
+                    <div className="space-y-4">
+                      <EngagementSection />
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            )}
+
             {/* Main Content Area */}
-            <div className={`flex-1 min-w-0 transition-all duration-300 ${showDashboardPanel ? 'lg:ml-4' : ''}`}>
+            <div className={`flex-1 min-w-0 transition-all duration-300 ${showDashboardPanel || showEngagementPanel ? 'lg:ml-4' : ''}`}>
               {/* Scroll container so content scrolls while sidebar stays sticky */}
               <div className="lg:max-h-[calc(100vh-8rem)] overflow-y-auto overscroll-contain pr-2 scroll-smooth">
 
@@ -1349,6 +1404,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
            </div>
            )}
+
+            {/* Engagement - Next Actions (Full Width) */}
+            {activeSection === 'engagement' && (
+              <div className="mt-8">
+                <EngagementSection />
+              </div>
+            )}
 
            {/* Impact Metrics Section - Speedometer Gauge (Hidden) */}
            {/* <div className="space-y-8">

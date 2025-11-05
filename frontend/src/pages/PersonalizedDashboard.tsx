@@ -6,6 +6,7 @@ import { useQuizStore } from '@/stores/quizStore';
 import Layout from '@/components/Layout';
 import ClimateRing from '@/components/ClimateRing';
 import html2canvas from 'html2canvas';
+// Removed EngagementSection from Dashboard; Next Actions now lives in ResultsDisplay only
 
 interface CategoryScore {
   score: number;

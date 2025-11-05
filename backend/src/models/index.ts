@@ -5,9 +5,13 @@ import UserSession from './UserSession';
 import EventLog from './EventLog';
 import UserPersonality from './UserPersonality';
 import ShareContent from './ShareContent';
+import UserAction from './UserAction';
+import UserStreak from './UserStreak';
+import WeeklySummary from './WeeklySummary';
+import AppConfig from './AppConfig';
 
 // Export models
-export { User, UserActivity, UserSession, EventLog, UserPersonality, ShareContent };
+export { User, UserActivity, UserSession, EventLog, UserPersonality, ShareContent, UserAction, UserStreak, WeeklySummary, AppConfig };
 
 // Define associations
 const defineAssociations = () => {
@@ -26,6 +30,18 @@ const defineAssociations = () => {
   // UserPersonality belongs to UserSession (optional)
   UserPersonality.belongsTo(UserSession, { foreignKey: 'sessionId', targetKey: 'sessionId', as: 'session' });
   UserSession.hasMany(UserPersonality, { foreignKey: 'sessionId', sourceKey: 'sessionId', as: 'personalities' });
+
+  // UserAction belongs to User
+  UserAction.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+  User.hasMany(UserAction, { foreignKey: 'userId', as: 'actions' });
+
+  // UserStreak belongs to User
+  UserStreak.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+  User.hasOne(UserStreak, { foreignKey: 'userId', as: 'streak' });
+
+  // WeeklySummary belongs to User
+  WeeklySummary.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+  User.hasMany(WeeklySummary, { foreignKey: 'userId', as: 'weeklySummaries' });
 };
 
 // Sync database (create tables if they don't exist)

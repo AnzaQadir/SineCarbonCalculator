@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const jwt_1 = require("../utils/jwt");
 const COOKIE_NAME = process.env.COOKIE_NAME || 'zerrah_token';
+const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME || 'zerrah_session_id';
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
 class AuthController {
     static async login(req, res) {
@@ -16,12 +17,24 @@ class AuthController {
                 return res.status(401).json({ success: false, message: 'Invalid credentials' });
             }
             const token = (0, jwt_1.signJwt)({ sub: email }, JWT_SECRET, 7 * 24 * 60 * 60);
+            const isProd = process.env.NODE_ENV === 'production';
             res.cookie(COOKIE_NAME, token, {
                 httpOnly: true,
-                sameSite: 'lax',
-                secure: false,
+                sameSite: isProd ? 'none' : 'lax',
+                secure: isProd,
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
+            // Ensure a session cookie exists for tracking
+            const existingSessionId = req.sessionId || req.cookies?.[SESSION_COOKIE];
+            if (!existingSessionId) {
+                // session middleware will create one on next request, but we can hint here
+                res.cookie(SESSION_COOKIE, 'pending', {
+                    httpOnly: true,
+                    sameSite: isProd ? 'none' : 'lax',
+                    secure: isProd,
+                    maxAge: 365 * 24 * 60 * 60 * 1000
+                });
+            }
             return res.json({ success: true, email });
         }
         catch (e) {
@@ -29,7 +42,9 @@ class AuthController {
         }
     }
     static async logout(req, res) {
-        res.clearCookie(COOKIE_NAME);
+        const isProd = process.env.NODE_ENV === 'production';
+        res.clearCookie(COOKIE_NAME, { httpOnly: true, sameSite: isProd ? 'none' : 'lax', secure: isProd });
+        res.clearCookie(SESSION_COOKIE, { httpOnly: true, sameSite: isProd ? 'none' : 'lax', secure: isProd });
         return res.json({ success: true });
     }
     static async me(req, res) {
