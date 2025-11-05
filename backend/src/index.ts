@@ -12,6 +12,8 @@ import userPersonalityRoutes from './routes/userPersonalityRoutes';
 import shareRoutes from './routes/shareRoutes';
 import { initializeDatabase } from './models';
 import authRoutes from './routes/authRoutes';
+import engagementRoutes from './routes/engagementRoutes';
+import { EngagementRuleOverlayService } from './services/engagementRuleOverlayService';
 
 // Load environment variables (only in development)
 if (process.env.NODE_ENV !== 'production') {
@@ -71,6 +73,7 @@ app.use('/api/sessions', sessionRoutes);
 app.use('/api/user-personality', userPersonalityRoutes);
 app.use('/api/share', shareRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/v1/engagement', engagementRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -141,6 +144,9 @@ const startServer = async () => {
     try {
       await initializeDatabase();
       console.log('Database initialized successfully');
+      
+      // Initialize default engagement rules
+      await EngagementRuleOverlayService.initializeDefaults();
     } catch (dbError) {
       console.error('Database initialization failed:', dbError);
       if (dbError instanceof Error) {
