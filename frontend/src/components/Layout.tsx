@@ -44,6 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <NavLink to="/" className={({ isActive }) => `text-lg font-semibold px-5 py-2.5 rounded-lg transition-all duration-200 ease-in-out ${isActive ? 'text-[#5E1614] bg-white shadow-sm ring-1 ring-gray-100' : 'text-gray-600'} hover:bg-white hover:text-[#5E1614] hover:shadow-sm hover:ring-1 hover:ring-gray-100`}>Home</NavLink>
             <NavLink to="/quiz" className={({ isActive }) => `text-lg font-semibold px-5 py-2.5 rounded-lg transition-all duration-200 ease-in-out ${isActive ? 'text-[#5E1614] bg-white shadow-sm ring-1 ring-gray-100' : 'text-gray-600'} hover:bg-white hover:text-[#5E1614] hover:shadow-sm hover:ring-1 hover:ring-gray-100`}>Quiz</NavLink>
             <NavLink to="/reflections" className={({ isActive }) => `text-lg font-semibold px-5 py-2.5 rounded-lg transition-all duration-200 ease-in-out ${isActive ? 'text-[#5E1614] bg-white shadow-sm ring-1 ring-gray-100' : 'text-gray-600'} hover:bg-white hover:text-[#5E1614] hover:shadow-sm hover:ring-1 hover:ring-gray-100`}>Reflections</NavLink>
+            <NavLink to="/methodology" className={({ isActive }) => `text-lg font-semibold px-5 py-2.5 rounded-lg transition-all duration-200 ease-in-out ${isActive ? 'text-[#5E1614] bg-white shadow-sm ring-1 ring-gray-100' : 'text-gray-600'} hover:bg-white hover:text-[#5E1614] hover:shadow-sm hover:ring-1 hover:ring-gray-100`}>Methodology</NavLink>
           </nav>
           {/* CTA (extreme right) */}
           <div className="flex items-center justify-end relative">
@@ -131,6 +132,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   onClick={() => setMobileNavOpen(false)}
                 >
                   Reflections
+                </Link>
+                <Link 
+                  to="/methodology" 
+                  className="text-gray-800 hover:text-[#5E1614] hover:bg-gray-50 text-lg font-semibold px-4 py-3 rounded-lg transition-all duration-200" 
+                  onClick={() => setMobileNavOpen(false)}
+                >
+                  Methodology
                 </Link>
                 {!user ? (
                   <>
