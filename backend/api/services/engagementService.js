@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getNextActions = getNextActions;
 exports.markActionDone = markActionDone;
+exports.updateStreak = updateStreak;
 const models_1 = require("../models");
 const engagementRuleOverlayService_1 = require("./engagementRuleOverlayService");
 const recommendationCatalogService_1 = require("./recommendationCatalogService");
@@ -31,6 +32,43 @@ function cardToNextAction(card, type, rules, personality) {
     else if (type === 'level_up') {
         whyShown += ' • Bigger impact';
     }
+    const behaviorSteps = card.behaviorDistance === 'small' ? 2 : card.behaviorDistance === 'medium' ? 4 : 6;
+    const avgMinutes = card.behaviorDistance === 'small' ? 3 : card.behaviorDistance === 'medium' ? 10 : 30;
+    const recommendation = {
+        id: card.id,
+        category: card.domain,
+        title: card.action,
+        subtitle,
+        metrics: {
+            pkrMonth: estimatedRupees,
+            minutes: undefined,
+            kgco2eMonth: weeklyCo2 * 4.33,
+        },
+        effort: {
+            steps: behaviorSteps,
+            requiresPurchase: card.prerequisites.some((p) => p.toLowerCase().includes('buy') || p.toLowerCase().includes('purchase')),
+            avgMinutesToDo: avgMinutes,
+        },
+        tags: [...(card.chips || []), ...(card.accessTags || [])],
+        regions: [],
+        why: card.why,
+        how: [],
+        context_requirements: card.accessTags || [],
+        triggers: [],
+        utility_model: {
+            pkr_month: estimatedRupees,
+            minutes: undefined,
+            kgco2e_month: Number((weeklyCo2 * 4.33).toFixed(3)),
+        },
+        fit_rules: [],
+        verify: [],
+        rewards: {},
+        messages: subtitle ? { web_subtitle: subtitle } : {},
+        empathy_note: null,
+        cta: null,
+        story_snippet: null,
+        metadata: null,
+    };
     return {
         id: card.id,
         title: card.action,
@@ -48,6 +86,7 @@ function cardToNextAction(card, type, rules, personality) {
             summary: card.why,
             // In a real app, this might link to a detailed article
         },
+        recommendation,
     };
 }
 /**
@@ -134,7 +173,12 @@ async function getNextActions(userId) {
             maxItems: 20, // Get default recommendations
         });
         if (candidates.length === 0) {
-            throw new Error('No recommendations available in catalog');
+            console.error(`[Engagement Service] No recommendations available in catalog after all fallbacks`);
+            // Return empty state instead of throwing
+            return {
+                primary: null,
+                alternatives: [],
+            };
         }
     }
     const primaryCard = candidates[0];
@@ -264,6 +308,7 @@ async function getStreak(userId) {
 }
 /**
  * Update user streak based on last action date
+ * Exported for use in enhanced learning service
  */
 async function updateStreak(userId) {
     const today = new Date();

@@ -2,10 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getNextActionsHandler = getNextActionsHandler;
 exports.actionDoneHandler = actionDoneHandler;
+exports.getBucketListHandler = getBucketListHandler;
 exports.getHomeFeedHandler = getHomeFeedHandler;
 exports.getWeeklyRecapHandler = getWeeklyRecapHandler;
 const models_1 = require("../models");
 const engagementService_1 = require("../services/engagementService");
+const enhancedEngagementService_1 = require("../services/engagement/enhancedEngagementService");
+const learning_1 = require("../services/engagement/learning");
+const bucketListService_1 = require("../services/engagement/bucketListService");
 const models_2 = require("../models");
 const sequelize_1 = require("sequelize");
 /**
@@ -29,7 +33,12 @@ async function getNextActionsHandler(req, res) {
         if (!userId) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-        const result = await (0, engagementService_1.getNextActions)(userId);
+        // Feature flag: use enhanced scoring if available
+        // For now, default to enhanced. Can be controlled via environment variable or config
+        const useEnhanced = process.env.USE_ENHANCED_SCORING !== 'false';
+        const result = useEnhanced
+            ? await (0, enhancedEngagementService_1.getNextActionsEnhanced)(userId)
+            : await (0, engagementService_1.getNextActions)(userId);
         return res.json(result);
     }
     catch (error) {
@@ -60,14 +69,22 @@ async function actionDoneHandler(req, res) {
         if (!userId) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-        const { recommendationId, context } = req.body;
+        const { recommendationId, context, outcome } = req.body;
         if (!recommendationId) {
             return res.status(400).json({
                 success: false,
                 message: 'recommendationId is required',
             });
         }
-        const result = await (0, engagementService_1.markActionDone)(userId, recommendationId, context || {});
+        // Validate outcome if provided
+        const validOutcome = outcome && ['done', 'snooze', 'dismiss'].includes(outcome)
+            ? outcome
+            : 'done'; // Default to 'done' for backward compatibility
+        // Support enhanced learning if outcome is provided or enabled
+        const useEnhancedLearning = process.env.USE_ENHANCED_LEARNING !== 'false';
+        const result = useEnhancedLearning
+            ? await (0, learning_1.markDoneAndLearn)(userId, recommendationId, validOutcome, context || {})
+            : await (0, engagementService_1.markActionDone)(userId, recommendationId, context || {});
         return res.json({
             ok: true,
             ...result,
@@ -86,6 +103,31 @@ async function actionDoneHandler(req, res) {
  * GET /v1/engagement/home-feed
  * Returns a unified feed for "Your Week" sections
  */
+/**
+ * GET /v1/engagement/bucket-list
+ * Returns all recommendations user has marked as DONE or SNOOZE
+ */
+async function getBucketListHandler(req, res) {
+    try {
+        const userEmail = req.userEmail;
+        if (!userEmail) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        const userId = await getUserIdFromEmail(userEmail);
+        if (!userId) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        const result = await (0, bucketListService_1.getBucketList)(userId);
+        return res.json(result);
+    }
+    catch (error) {
+        console.error('Error getting bucket list:', error);
+        return res.status(500).json({
+            success: false,
+            message: error instanceof Error ? error.message : 'Failed to get bucket list',
+        });
+    }
+}
 async function getHomeFeedHandler(req, res) {
     try {
         const userEmail = req.userEmail;
@@ -179,9 +221,10 @@ async function getWeeklyRecapHandler(req, res) {
             });
             const rupeesSaved = actions.reduce((sum, a) => sum + Number(a.impactRupees), 0);
             const co2SavedKg = actions.reduce((sum, a) => sum + Number(a.impactCo2Kg), 0);
+            // Use ISO date string for DATEONLY column to avoid driver inconsistencies
             summary = await models_2.WeeklySummary.create({
                 userId,
-                weekStart: lastMonday,
+                weekStart: weekStartStr, // DATEONLY accepts string format
                 rupeesSaved,
                 co2SavedKg,
                 actionsCount: actions.length,

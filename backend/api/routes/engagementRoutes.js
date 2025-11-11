@@ -14,4 +14,5 @@ router.get('/next-actions', engagementController_1.getNextActionsHandler);
 router.post('/action-done', engagementController_1.actionDoneHandler);
 router.get('/home-feed', engagementController_1.getHomeFeedHandler);
 router.get('/weekly-recap', engagementController_1.getWeeklyRecapHandler);
+router.get('/bucket-list', engagementController_1.getBucketListHandler);
 exports.default = router;

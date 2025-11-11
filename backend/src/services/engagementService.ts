@@ -2,7 +2,7 @@ import { User, UserPersonality, UserAction, UserStreak, WeeklySummary } from '..
 import { EngagementRuleOverlayService } from './engagementRuleOverlayService';
 import { queryCatalog } from './recommendationCatalogService';
 import { Card } from '../types/recommendationCatalog';
-import { NextAction, NextActionsResponse, Impact } from '../types/engagement';
+import { NextAction, NextActionsResponse, Impact, RecommendationDetails } from '../types/engagement';
 import { Op } from 'sequelize';
 
 // Helper to estimate rupees savings from CO2 (rough conversion: 1 kg CO2 ≈ 50-100 rupees depending on source)
@@ -39,6 +39,49 @@ function cardToNextAction(
     whyShown += ' • Bigger impact';
   }
 
+  const behaviorSteps =
+    card.behaviorDistance === 'small' ? 2 : card.behaviorDistance === 'medium' ? 4 : 6;
+  const avgMinutes =
+    card.behaviorDistance === 'small' ? 3 : card.behaviorDistance === 'medium' ? 10 : 30;
+
+  const recommendation: RecommendationDetails = {
+    id: card.id,
+    category: card.domain,
+    title: card.action,
+    subtitle,
+    metrics: {
+      pkrMonth: estimatedRupees,
+      minutes: undefined,
+      kgco2eMonth: weeklyCo2 * 4.33,
+    },
+    effort: {
+      steps: behaviorSteps,
+      requiresPurchase: card.prerequisites.some((p) =>
+        p.toLowerCase().includes('buy') || p.toLowerCase().includes('purchase')
+      ),
+      avgMinutesToDo: avgMinutes,
+    },
+    tags: [...(card.chips || []), ...(card.accessTags || [])],
+    regions: [],
+    why: card.why,
+    how: [],
+    context_requirements: card.accessTags || [],
+    triggers: [],
+    utility_model: {
+      pkr_month: estimatedRupees,
+      minutes: undefined,
+      kgco2e_month: Number((weeklyCo2 * 4.33).toFixed(3)),
+    },
+    fit_rules: [],
+    verify: [],
+    rewards: {},
+    messages: subtitle ? { web_subtitle: subtitle } : {},
+    empathy_note: null,
+    cta: null,
+    story_snippet: null,
+    metadata: null,
+  };
+
   return {
     id: card.id,
     title: card.action,
@@ -56,6 +99,7 @@ function cardToNextAction(
       summary: card.why,
       // In a real app, this might link to a detailed article
     },
+    recommendation,
   };
 }
 
@@ -155,7 +199,12 @@ export async function getNextActions(userId: string): Promise<NextActionsRespons
     });
     
     if (candidates.length === 0) {
-      throw new Error('No recommendations available in catalog');
+      console.error(`[Engagement Service] No recommendations available in catalog after all fallbacks`);
+      // Return empty state instead of throwing
+      return {
+        primary: null,
+        alternatives: [],
+      };
     }
   }
 
@@ -312,8 +361,9 @@ async function getStreak(userId: string): Promise<{ current: number; longest: nu
 
 /**
  * Update user streak based on last action date
+ * Exported for use in enhanced learning service
  */
-async function updateStreak(userId: string): Promise<{ current: number; longest: number }> {
+export async function updateStreak(userId: string): Promise<{ current: number; longest: number }> {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
   today.setUTCHours(today.getUTCHours() - 5); // PKT timezone

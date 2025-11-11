@@ -5,4 +5,6 @@ export { StreakRing } from './StreakRing';
 export { WeeklyRecapCard } from './WeeklyRecapCard';
 export { ShareComposer } from './ShareComposer';
 export { EngagementSection } from './EngagementSection';
+export { BucketList } from './BucketList';
+export { DetailsPanel } from './DetailsPanel';
 

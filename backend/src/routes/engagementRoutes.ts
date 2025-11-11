@@ -5,6 +5,7 @@ import {
   actionDoneHandler,
   getHomeFeedHandler,
   getWeeklyRecapHandler,
+  getBucketListHandler,
 } from '../controllers/engagementController';
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.get('/next-actions', getNextActionsHandler);
 router.post('/action-done', actionDoneHandler);
 router.get('/home-feed', getHomeFeedHandler);
 router.get('/weekly-recap', getWeeklyRecapHandler);
+router.get('/bucket-list', getBucketListHandler);
 
 export default router;
 

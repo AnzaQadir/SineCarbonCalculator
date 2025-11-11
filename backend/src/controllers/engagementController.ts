@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { User } from '../models';
 import { getNextActions, markActionDone } from '../services/engagementService';
+import { getNextActionsEnhanced } from '../services/engagement/enhancedEngagementService';
+import { markDoneAndLearn } from '../services/engagement/learning';
+import { getBucketList } from '../services/engagement/bucketListService';
 import { WeeklySummary, UserAction } from '../models';
 import { Op } from 'sequelize';
 
@@ -29,7 +32,14 @@ export async function getNextActionsHandler(req: AuthenticatedRequest, res: Resp
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    const result = await getNextActions(userId);
+    // Feature flag: use enhanced scoring if available
+    // For now, default to enhanced. Can be controlled via environment variable or config
+    const useEnhanced = process.env.USE_ENHANCED_SCORING !== 'false';
+    
+    const result = useEnhanced
+      ? await getNextActionsEnhanced(userId)
+      : await getNextActions(userId);
+    
     return res.json(result);
   } catch (error) {
     console.error('Error getting next actions:', error);
@@ -62,7 +72,7 @@ export async function actionDoneHandler(req: AuthenticatedRequest, res: Response
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    const { recommendationId, context } = req.body;
+    const { recommendationId, context, outcome } = req.body;
 
     if (!recommendationId) {
       return res.status(400).json({
@@ -71,7 +81,17 @@ export async function actionDoneHandler(req: AuthenticatedRequest, res: Response
       });
     }
 
-    const result = await markActionDone(userId, recommendationId, context || {});
+    // Validate outcome if provided
+    const validOutcome = outcome && ['done', 'snooze', 'dismiss'].includes(outcome) 
+      ? outcome as 'done' | 'snooze' | 'dismiss'
+      : 'done'; // Default to 'done' for backward compatibility
+
+    // Support enhanced learning if outcome is provided or enabled
+    const useEnhancedLearning = process.env.USE_ENHANCED_LEARNING !== 'false';
+    
+    const result = useEnhancedLearning
+      ? await markDoneAndLearn(userId, recommendationId, validOutcome, context || {})
+      : await markActionDone(userId, recommendationId, context || {});
 
     return res.json({
       ok: true,
@@ -91,6 +111,33 @@ export async function actionDoneHandler(req: AuthenticatedRequest, res: Response
  * GET /v1/engagement/home-feed
  * Returns a unified feed for "Your Week" sections
  */
+/**
+ * GET /v1/engagement/bucket-list
+ * Returns all recommendations user has marked as DONE or SNOOZE
+ */
+export async function getBucketListHandler(req: AuthenticatedRequest, res: Response) {
+  try {
+    const userEmail = req.userEmail;
+    if (!userEmail) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+
+    const userId = await getUserIdFromEmail(userEmail);
+    if (!userId) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const result = await getBucketList(userId);
+    return res.json(result);
+  } catch (error) {
+    console.error('Error getting bucket list:', error);
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to get bucket list',
+    });
+  }
+}
+
 export async function getHomeFeedHandler(req: AuthenticatedRequest, res: Response) {
   try {
     const userEmail = req.userEmail;
@@ -200,7 +247,7 @@ export async function getWeeklyRecapHandler(req: AuthenticatedRequest, res: Resp
       // Use ISO date string for DATEONLY column to avoid driver inconsistencies
       summary = await WeeklySummary.create({
         userId,
-        weekStart: weekStartStr,
+        weekStart: weekStartStr as any, // DATEONLY accepts string format
         rupeesSaved,
         co2SavedKg,
         actionsCount: actions.length,

@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, ChevronDown, ChevronUp, Zap, TrendingUp } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronUp, Zap, TrendingUp, Clock, X } from 'lucide-react';
 import { NextAction } from '@/services/engagementService';
+import { EffortMeter } from './EffortMeter';
 
 interface AlternativeActionCardProps {
   action: NextAction;
-  onDone: () => void;
+  onAction: (outcome: 'done' | 'snooze' | 'dismiss') => void;
   isLoading?: boolean;
 }
 
 export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
   action,
-  onDone,
+  onAction,
   isLoading = false,
 }) => {
   const [showLearn, setShowLearn] = useState(false);
@@ -41,14 +42,12 @@ export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       className="bg-white rounded-2xl shadow-lg border border-slate-200/40 p-5 md:p-6"
     >
-      {/* Badge */}
-      <div className="flex items-center justify-between mb-3">
-        <span
-          className={`inline-flex items-center gap-2 px-3 py-1 ${badgeConfig.bgColor} ${badgeConfig.textColor} text-xs font-semibold rounded-full border ${badgeConfig.borderColor}`}
-        >
+      <div className="flex items-start justify-between gap-4 mb-4">
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-400 flex items-center gap-2">
           <BadgeIcon className="w-3 h-3" />
           {badgeConfig.label}
-        </span>
+        </p>
+        <EffortMeter effort={action.recommendation?.effort} />
       </div>
 
       {/* Title & Subtitle */}
@@ -61,38 +60,49 @@ export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
         )}
       </div>
 
-      {/* Impact Chips */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <div className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg">
-          <span className="text-red-700 font-semibold text-xs">
-            –₨{Math.round(action.previewImpact.rupees)}
-          </span>
-        </div>
-        <div className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg">
-          <span className="text-green-700 font-semibold text-xs">
-            –{action.previewImpact.co2_kg.toFixed(2)} kg CO₂
-          </span>
+      {/* Action Buttons */}
+      <div className="flex flex-col gap-2 mb-3">
+        {/* Do it now */}
+        <button
+          onClick={() => onAction('done')}
+          disabled={isLoading}
+          className="w-full bg-gradient-to-r from-brand-teal to-brand-emerald text-white font-medium py-2.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+        >
+          {isLoading ? (
+            <>
+              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span>Processing...</span>
+            </>
+          ) : (
+            <>
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Do it now</span>
+            </>
+          )}
+        </button>
+
+        <div className="flex gap-2">
+          {/* Save for later */}
+          <button
+            onClick={() => onAction('snooze')}
+            disabled={isLoading}
+            className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-3 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 text-xs border border-slate-200"
+          >
+            <Clock className="w-3 h-3" />
+            <span>Save for later</span>
+          </button>
+
+          {/* Not useful */}
+          <button
+            onClick={() => onAction('dismiss')}
+            disabled={isLoading}
+            className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 font-medium py-2 px-3 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 text-xs border border-red-200"
+          >
+            <X className="w-3 h-3" />
+            <span>Not useful</span>
+          </button>
         </div>
       </div>
-
-      {/* Primary CTA */}
-      <button
-        onClick={onDone}
-        disabled={isLoading}
-        className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 px-4 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mb-3 text-sm"
-      >
-        {isLoading ? (
-          <>
-            <div className="w-4 h-4 border-2 border-slate-600 border-t-transparent rounded-full animate-spin" />
-            <span>Marking Done...</span>
-          </>
-        ) : (
-          <>
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Mark Done</span>
-          </>
-        )}
-      </button>
 
       {/* Learn More Toggle */}
       {action.learn && (

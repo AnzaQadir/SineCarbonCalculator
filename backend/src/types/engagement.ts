@@ -3,6 +3,38 @@ export type Impact = {
   co2_kg: number;
 };
 
+export type RecommendationDetails = {
+  id: string;
+  category: string;
+  title: string;
+  subtitle?: string | null;
+  metrics: {
+    pkrMonth?: number;
+    minutes?: number;
+    kgco2eMonth?: number;
+  };
+  effort: {
+    steps?: number;
+    requiresPurchase?: boolean;
+    avgMinutesToDo?: number;
+  };
+  tags: string[];
+  regions: string[];
+  why?: string | null;
+  how?: string[];
+  context_requirements?: string[];
+  triggers?: Array<Record<string, any>>;
+  utility_model?: Record<string, any>;
+  fit_rules?: Array<Record<string, any>>;
+  verify?: string[];
+  rewards?: Record<string, any>;
+  messages?: Record<string, any>;
+  empathy_note?: string | null;
+  cta?: Record<string, any> | null;
+  story_snippet?: string | null;
+  metadata?: Record<string, any> | null;
+};
+
 export type NextAction = {
   id: string;
   title: string;
@@ -16,10 +48,11 @@ export type NextAction = {
     summary: string;
     url?: string;
   };
+  recommendation: RecommendationDetails;
 };
 
 export type NextActionsResponse = {
-  primary: NextAction;
+  primary: NextAction | null;
   alternatives: NextAction[];
 };
 
