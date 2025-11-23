@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ChevronDown, ChevronUp, Zap, TrendingUp, Clock, X } from 'lucide-react';
 import { NextAction } from '@/services/engagementService';
 import { EffortMeter } from './EffortMeter';
+import { DetailsPanel } from './DetailsPanel';
 
 interface AlternativeActionCardProps {
   action: NextAction;
@@ -15,7 +16,7 @@ export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
   onAction,
   isLoading = false,
 }) => {
-  const [showLearn, setShowLearn] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const badgeConfig =
     action.type === 'quick_win'
@@ -104,56 +105,30 @@ export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
         </div>
       </div>
 
-      {/* Learn More Toggle */}
-      {action.learn && (
-        <div className="mb-3">
-          <button
-            onClick={() => setShowLearn(!showLearn)}
-            className="w-full flex items-center justify-between text-xs text-brand-teal hover:text-brand-emerald transition-colors"
-          >
-            <span>{showLearn ? 'Hide details' : 'Curious? Open details'}</span>
-            {showLearn ? (
-              <ChevronUp className="w-3 h-3" />
-            ) : (
-              <ChevronDown className="w-3 h-3" />
-            )}
-          </button>
-
-          <AnimatePresence>
-            {showLearn && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="mt-2 pt-2 border-t border-slate-200">
-                  <p className="text-xs text-slate-600 mb-1">{action.learn.summary}</p>
-                  {action.learn.url && (
-                    <a
-                      href={action.learn.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-brand-teal hover:underline"
-                    >
-                      Learn more →
-                    </a>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
-
-      {/* Footer: Source • Last updated • Why shown */}
-      <div className="pt-3 border-t border-slate-200">
-        <p className="text-xs text-slate-500 space-y-0.5">
-          <div>{action.source}</div>
-          <div className="text-slate-400">{action.whyShown}</div>
-        </p>
+      {/* Details Toggle */}
+      <div className="mt-4">
+        <button
+          onClick={() => setShowDetails((prev) => !prev)}
+          className="flex w-full items-center justify-between rounded-xl bg-white px-4 py-3 text-sm font-semibold text-brand-teal transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal"
+        >
+          <span>{showDetails ? 'Hide details' : 'Curious? Open details'}</span>
+          {showDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
       </div>
+
+      <AnimatePresence initial={false}>
+        {showDetails && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden pt-4"
+          >
+            <DetailsPanel item={action} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

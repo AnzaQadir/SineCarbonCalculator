@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, Clock, Leaf, TrendingUp } from 'lucide-react';
+import { X, CheckCircle2, Clock } from 'lucide-react';
 import { BucketIcon } from './icons/BucketIcon';
 import { getBucketList, type BucketListResponse } from '@/services/engagementService';
 
@@ -211,22 +211,6 @@ export const BucketList: React.FC<BucketListProps> = ({ onClose }) => {
                     {item.subtitle && (
                       <p className="text-sm text-slate-600 mb-3 line-clamp-2">{item.subtitle}</p>
                     )}
-
-                    {/* Impact */}
-                    <div className="flex gap-2 mb-3">
-                      <div className="flex-1 inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg">
-                        <TrendingUp className="w-3.5 h-3.5 text-red-600" />
-                        <span className="text-red-700 font-semibold text-xs">
-                          –₨{Math.round(item.previewImpact.rupees)}
-                        </span>
-                      </div>
-                      <div className="flex-1 inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg">
-                        <Leaf className="w-3.5 h-3.5 text-green-600" />
-                        <span className="text-green-700 font-semibold text-xs">
-                          –{item.previewImpact.co2_kg.toFixed(2)} kg CO₂
-                        </span>
-                      </div>
-                    </div>
 
                     {/* Category */}
                     <div className="text-xs text-slate-500 uppercase tracking-wide">

@@ -128,8 +128,18 @@ async function seedRecommendationCatalog() {
 async function seedUserPersonalityExtended(userId) {
     await models_1.UserPersonalityExtended.upsert({
         userId,
-        archetypeScores: { Strategist: 0.6, Builder: 0.3, Trailblazer: 0.1 },
-        personaVector: { TimeSaver: 0.6, MoneyMax: 0.3, EcoGuardian: 0.1, SocialSharer: 0.0 },
+        archetypeScores: { Catalyst: 0.4, Navigator: 0.3, Explorer: 0.3 },
+        personaVector: {
+            money: 0.15,
+            time: 0.20,
+            comfort: 0.10,
+            health: 0.10,
+            carbon: 0.15,
+            mastery: 0.10,
+            social: 0.10,
+            certainty: 0.05,
+            streak: 0.05,
+        },
         weightPrefs: {
             pkr: 1.0,
             time: 1.6,

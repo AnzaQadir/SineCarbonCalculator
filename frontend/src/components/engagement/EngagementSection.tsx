@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   BestNextActionCard,
@@ -21,6 +21,13 @@ import {
   type WeeklyRecap,
 } from '@/services/engagementService';
 
+// Module-level singleton to prevent duplicate API calls across multiple component instances
+const globalLoadingState = {
+  isLoading: false,
+  isBucketLoading: false,
+  isRecapLoading: false,
+};
+
 export const EngagementSection: React.FC = () => {
   const [nextActions, setNextActions] = useState<NextActionsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,19 +43,71 @@ export const EngagementSection: React.FC = () => {
     done: number;
     snoozed: number;
   } | null>(null);
+  
+  // Use module-level singleton to prevent duplicate calls across component instances
+  // This ensures only one set of API calls happens even if multiple EngagementSection components are rendered
 
   const hasBucketStats = Boolean(bucketSummary && bucketSummary.total > 0);
-  const doneRatio = hasBucketStats && bucketSummary ? bucketSummary.done / bucketSummary.total : 0;
-  const laterRatio = hasBucketStats && bucketSummary ? bucketSummary.snoozed / bucketSummary.total : 0;
-  const outerRadius = 52;
-  const innerRadius = 41;
-  const outerCircumference = 2 * Math.PI * outerRadius;
-  const innerCircumference = 2 * Math.PI * innerRadius;
-  const doneOffset = outerCircumference * (1 - doneRatio);
-  const laterOffset = innerCircumference * (1 - laterRatio);
+  
+  // Calculate ratios based on Done + Later total (not including other items)
+  const doneCount = bucketSummary?.done || 0;
+  const laterCount = bucketSummary?.snoozed || 0;
+  const totalCount = doneCount + laterCount;
+  
+  // If there are items, calculate proportions; otherwise show empty ring
+  const doneRatio = totalCount > 0 ? doneCount / totalCount : 0;
+  const laterRatio = totalCount > 0 ? laterCount / totalCount : 0;
+  
+  // Single ring configuration
+  const ringRadius = 46;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  
+  // Calculate segment lengths - these will fill the entire ring
+  const doneLength = ringCircumference * doneRatio;
+  const laterLength = ringCircumference * laterRatio;
+  
+  // Calculate offsets for proper positioning
+  // After -90 rotation, the circle starts at the top (12 o'clock)
+  // strokeDasharray pattern: [visibleLength] [gapLength] repeats
+  // strokeDashoffset shifts where the pattern starts
+  
+  // Done segment: show doneLength starting from top
+  // Pattern: [doneLength visible] [ringCircumference gap]
+  // Offset: ringCircumference - doneLength positions visible part at top (position 0)
+  const doneOffset = ringCircumference - doneLength;
+  
+  // Later segment: show laterLength starting right after done ends
+  // Pattern: [laterLength visible] [ringCircumference gap]  
+  // We want visible part to start at position doneLength around the circle
+  // Offset calculation: shift pattern so visible part starts at doneLength
+  // Since pattern repeats every (laterLength + ringCircumference), we need:
+  // offset = ringCircumference - doneLength - laterLength
+  const laterOffset = ringCircumference - doneLength - laterLength;
+  
+  // Debug logging to help diagnose ring rendering
+  console.log('[Ring Debug]', {
+    doneCount,
+    laterCount,
+    totalCount,
+    doneRatio: doneRatio.toFixed(3),
+    laterRatio: laterRatio.toFixed(3),
+    doneLength: doneLength.toFixed(2),
+    laterLength: laterLength.toFixed(2),
+    ringCircumference: ringCircumference.toFixed(2),
+    doneOffset: doneOffset.toFixed(2),
+    laterOffset: laterOffset.toFixed(2),
+    willRenderLater: laterRatio > 0 && laterLength > 0,
+  });
 
   const refreshBucketSummary = useCallback(async () => {
+    // Prevent duplicate calls using module-level singleton
+    if (globalLoadingState.isBucketLoading) {
+      console.log('[Engagement] Bucket list already loading, skipping duplicate call');
+      return;
+    }
+
     try {
+      globalLoadingState.isBucketLoading = true;
       const bucket = await getBucketList();
       setBucketSummary({
         total: bucket.total,
@@ -57,11 +116,24 @@ export const EngagementSection: React.FC = () => {
       });
     } catch (err) {
       console.warn('[Engagement] Unable to refresh bucket summary:', err);
+    } finally {
+      globalLoadingState.isBucketLoading = false;
     }
   }, []);
 
   // Load next actions and weekly recap
   useEffect(() => {
+    // Use module-level singleton to prevent duplicate calls across component instances
+    if (globalLoadingState.isLoading || globalLoadingState.isRecapLoading || globalLoadingState.isBucketLoading) {
+      console.log('[Engagement] Already loading, skipping duplicate call');
+      return;
+    }
+
+    // Set all flags immediately before any async operations (atomic check-and-set)
+    globalLoadingState.isLoading = true;
+    globalLoadingState.isRecapLoading = true;
+    globalLoadingState.isBucketLoading = true;
+
     const loadData = async () => {
       try {
         setLoading(true);
@@ -75,11 +147,12 @@ export const EngagementSection: React.FC = () => {
           return null;
         });
         
-        const recapPromise = getWeeklyRecap().catch((err) => {
-          console.warn('[Engagement] Error loading weekly recap (may not have data yet):', err);
-          // This is expected for new users, so just return null
-          return null;
-        });
+        const recapPromise = getWeeklyRecap()
+          .catch((err) => {
+            console.warn('[Engagement] Error loading weekly recap (may not have data yet):', err);
+            // This is expected for new users, so just return null
+            return null;
+          });
 
         const [actions, recap] = await Promise.all([actionsPromise, recapPromise]);
 
@@ -110,11 +183,38 @@ export const EngagementSection: React.FC = () => {
         }
       } finally {
         setLoading(false);
+        globalLoadingState.isLoading = false;
+        globalLoadingState.isRecapLoading = false;
+      }
+    };
+
+    const loadBucket = async () => {
+      try {
+        const bucket = await getBucketList();
+        setBucketSummary({
+          total: bucket.total,
+          done: bucket.doneCount,
+          snoozed: bucket.snoozedCount,
+        });
+      } catch (err) {
+        console.warn('[Engagement] Unable to refresh bucket summary:', err);
+      } finally {
+        globalLoadingState.isBucketLoading = false;
       }
     };
 
     loadData();
-    refreshBucketSummary();
+    loadBucket();
+
+    // Cleanup function to reset the flags if component unmounts during loading
+    return () => {
+      // Only reset if this component was the one loading (to avoid race conditions)
+      // In practice, the finally blocks handle this, but this is a safety net
+      if (globalLoadingState.isLoading || globalLoadingState.isRecapLoading || globalLoadingState.isBucketLoading) {
+        // Don't reset here - let the async operations finish and reset themselves
+        // This prevents one component unmounting from canceling another component's loading
+      }
+    };
   }, [refreshBucketSummary]);
 
   const handleAction = async (recommendationId: string, outcome: 'done' | 'snooze' | 'dismiss') => {
@@ -253,57 +353,57 @@ export const EngagementSection: React.FC = () => {
                       <stop offset="100%" stopColor="#10b981" />
                     </linearGradient>
                     <linearGradient id="laterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#fb923c" />
-                      <stop offset="100%" stopColor="#facc15" />
+                      <stop offset="0%" stopColor="#fbbf24" />
+                      <stop offset="100%" stopColor="#eab308" />
                     </linearGradient>
                   </defs>
 
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r={outerRadius}
-                    stroke="rgba(15,118,110,0.12)"
-                    strokeWidth="10"
-                    fill="none"
-                  />
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r={innerRadius}
-                    stroke="rgba(245,158,11,0.12)"
-                    strokeWidth="10"
-                    fill="none"
-                  />
-
-                  {hasBucketStats && (
-                    <>
-                      <circle
-                        cx="60"
-                        cy="60"
-                        r={outerRadius}
-                        stroke="url(#doneGradient)"
-                        strokeWidth="10"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeDasharray={outerCircumference}
-                        strokeDashoffset={doneOffset}
-                        transform="rotate(-90 60 60)"
-                      />
-                      <circle
-                        cx="60"
-                        cy="60"
-                        r={innerRadius}
-                        stroke="url(#laterGradient)"
-                        strokeWidth="10"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeDasharray={innerCircumference}
-                        strokeDashoffset={laterOffset}
-                        transform="rotate(-90 60 60)"
-                      />
-                    </>
+                  {/* Background ring (light gray) - only visible if no items */}
+                  {totalCount === 0 && (
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r={ringRadius}
+                      stroke="rgba(0,0,0,0.08)"
+                      strokeWidth="10"
+                      fill="none"
+                    />
                   )}
 
+                  {/* Done segment (green) - starts from top, shows what's completed */}
+                  {doneRatio > 0 && (
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r={ringRadius}
+                      stroke="url(#doneGradient)"
+                      strokeWidth="10"
+                      fill="none"
+                      strokeLinecap={laterRatio > 0 ? "butt" : "round"}
+                      strokeDasharray={`${doneLength} ${ringCircumference}`}
+                      strokeDashoffset={ringCircumference - doneLength}
+                      transform="rotate(-90 60 60)"
+                    />
+                  )}
+                  
+                  {/* Later segment (yellow) - continues immediately after done, shows what's to do */}
+                  {laterRatio > 0 && laterLength > 0 && (
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r={ringRadius}
+                      stroke="#fbbf24"
+                      strokeWidth="10"
+                      fill="none"
+                      strokeLinecap={doneRatio > 0 ? "butt" : "round"}
+                      strokeDasharray={`${laterLength} ${ringCircumference - laterLength}`}
+                      strokeDashoffset={ringCircumference - doneLength}
+                      transform="rotate(-90 60 60)"
+                      style={{ opacity: 1 }}
+                    />
+                  )}
+
+                  {/* Center circles for depth */}
                   <circle cx="60" cy="60" r="32" fill="rgba(15,118,110,0.12)" />
                   <circle cx="60" cy="60" r="28" fill="rgba(15,118,110,0.18)" />
                 </g>
@@ -329,8 +429,8 @@ export const EngagementSection: React.FC = () => {
                   <span>Done</span>
                   <span className="text-slate-500 font-medium">{bucketSummary.done}</span>
                 </div>
-                <div className="flex items-center justify-end gap-2 text-sm font-semibold text-amber-600">
-                  <span className="inline-flex h-2 w-2 rounded-full bg-amber-400" aria-hidden="true" />
+                <div className="flex items-center justify-end gap-2 text-sm font-semibold text-yellow-600">
+                  <span className="inline-flex h-2 w-2 rounded-full bg-yellow-500" aria-hidden="true" />
                   <span>Later</span>
                   <span className="text-slate-500 font-medium">{bucketSummary.snoozed}</span>
                 </div>

@@ -27,7 +27,17 @@ UserPersonalityExtended.init({
         type: sequelize_1.DataTypes.JSONB,
         allowNull: false,
         field: 'persona_vector',
-        defaultValue: { TimeSaver: 0.25, MoneyMax: 0.25, EcoGuardian: 0.25, SocialSharer: 0.25 },
+        defaultValue: {
+            money: 0.111,
+            time: 0.111,
+            comfort: 0.111,
+            health: 0.111,
+            carbon: 0.111,
+            mastery: 0.111,
+            social: 0.111,
+            certainty: 0.111,
+            streak: 0.111,
+        },
     },
     weightPrefs: {
         type: sequelize_1.DataTypes.JSONB,

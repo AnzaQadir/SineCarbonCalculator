@@ -8,7 +8,7 @@ import { queryCatalog } from '../recommendationCatalogService';
 import { Card } from '../../types/recommendationCatalog';
 import { NextAction, NextActionsResponse, RecommendationDetails } from '../../types/engagement';
 import { Op } from 'sequelize';
-import { archetypesToPersona } from './persona';
+import { archetypesToPersona, type PersonaVec } from './persona';
 import { weightsFromPersona } from './weights';
 import { scoreAction, rankMMR, type CatalogItem, type ScoredItem } from './ranker';
 import { startOfTodayInKarachi, isSprintWeek, isMonthEnd } from '../../utils/timezone';
@@ -100,6 +100,73 @@ function cardToCatalogItem(card: Card, record?: RecommendationRecord): CatalogIt
   };
 }
 
+/**
+ * Generate fallback steps based on category and context
+ */
+function generateFallbackSteps(
+  category: string,
+  title: string,
+  subtitle: string | null | undefined,
+  why: string | null | undefined,
+  requiresPurchase: boolean
+): string[] {
+  const categoryLower = category.toLowerCase();
+  const actionContext = subtitle || why || title;
+
+  switch (categoryLower) {
+    case 'transport':
+      return [
+        `Pick the trip you will shift: ${actionContext}`,
+        requiresPurchase
+          ? 'Book the ticket or reserve the seat and note departure details.'
+          : 'Plan the route and timings so the swap feels easy.',
+        'Take the trip and reflect on how the change felt.',
+      ];
+    case 'food':
+      return [
+        `Choose the meal or moment to try: ${actionContext}`,
+        requiresPurchase
+          ? 'Shop or prep the ingredients and set them where you will see them.'
+          : 'Prep what you already have so the swap is ready to go.',
+        'Cook or assemble it and note how it went for next time.',
+      ];
+    case 'home':
+      return [
+        `Decide which spot or habit to tackle first: ${actionContext}`,
+        requiresPurchase
+          ? 'Pick up any supplies or tools you need before you start.'
+          : 'Gather the tools you already own and set a start time.',
+        'Make the change and do a quick reset afterward.',
+      ];
+    case 'waste':
+      return [
+        `Identify where the waste shows up: ${actionContext}`,
+        requiresPurchase
+          ? 'Collect any containers or gear you need to support the new habit.'
+          : 'Set up bins or reminders with what you already have.',
+        'Put the new routine into practice and review at week end.',
+      ];
+    case 'clothing':
+    case 'clothes':
+      return [
+        `Choose the item or purchase you will shift: ${actionContext}`,
+        requiresPurchase
+          ? 'Line up the resale/borrow options and set alerts or bookmarks.'
+          : 'Open your preferred resale or swap source and save a search.',
+        'Follow through on your next purchase moment and log the win.',
+      ];
+    default:
+      // Generic fallback steps
+      return [
+        `Plan when you'll do this: ${actionContext}`,
+        requiresPurchase
+          ? 'Gather any supplies or tools you need.'
+          : 'Use what you already have to get started.',
+        'Take action and track your progress.',
+      ];
+  }
+}
+
 function buildRecommendationDetails(
   scored: ScoredItem,
   record: RecommendationRecord | undefined,
@@ -122,6 +189,19 @@ function buildRecommendationDetails(
   if (typeof metrics.kgco2eMonth === 'number')
     fallbackUtility.kgco2e_month = metrics.kgco2eMonth;
 
+  // Get existing how steps or generate fallback
+  const existingHow = Array.isArray(metadata?.how) ? metadata.how : [];
+  const title = record?.title || card?.action || scored.item.title || scored.item.id;
+  const subtitle = record?.subtitle || scored.item.subtitle || (card?.levels?.start ? card.levels.start : card?.why) || null;
+  const why = metadata?.why ?? card?.why ?? null;
+  const requiresPurchase = typeof effort.requiresPurchase === 'boolean' ? effort.requiresPurchase : false;
+  const category = record?.category || scored.item.category;
+  
+  // Use existing steps if available, otherwise generate fallback
+  const howSteps = existingHow.length > 0 
+    ? existingHow 
+    : generateFallbackSteps(category, title, subtitle, why, requiresPurchase);
+
   return {
     id: record?.id || scored.item.id,
     category: record?.category || scored.item.category,
@@ -136,7 +216,7 @@ function buildRecommendationDetails(
     tags,
     regions,
     why: metadata?.why ?? card?.why ?? null,
-    how: Array.isArray(metadata?.how) ? metadata.how : [],
+    how: howSteps,
     context_requirements: Array.isArray(metadata?.contextRequirements)
       ? metadata.contextRequirements
       : [],
@@ -214,15 +294,16 @@ async function getDoneTodayIds(userId: string, today: Date): Promise<Set<string>
  */
 function explainWhy(
   comps: { U: number; E: number; F: number; N: number; RC: number; D: number },
-  persona: { TimeSaver: number; MoneyMax: number; EcoGuardian: number; SocialSharer: number }
+  persona: PersonaVec
 ): string {
   const top = Object.entries({ U: 'impact', F: 'fit', N: 'freshness' })
     .sort((a, b) => (comps as any)[b[0]] - (comps as any)[a[0]])[0][1];
 
+  // Find top persona dimension
   const personaTilt = Object.entries(persona)
     .sort((a, b) => b[1] - a[1])[0][0]
-    .replace(/([A-Z])/g, ' $1')
-    .trim();
+    .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space before capital letters
+    .replace(/^./, (str) => str.toUpperCase()); // Capitalize first letter
 
   return `Personality: ${personaTilt} • Picked for ${top}`;
 }
@@ -234,7 +315,7 @@ function scoredItemToNextAction(
   scored: ScoredItem,
   type: 'best' | 'quick_win' | 'level_up',
   rules: any,
-  persona: { TimeSaver: number; MoneyMax: number; EcoGuardian: number; SocialSharer: number },
+  persona: PersonaVec,
   personality?: string,
   context?: {
     catalogRecordMap?: Map<string, RecommendationRecord>;

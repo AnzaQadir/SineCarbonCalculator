@@ -5,10 +5,15 @@ interface UserPersonalityExtendedAttributes {
   userId: string;
   archetypeScores: Record<string, number>;
   personaVector: {
-    TimeSaver: number;
-    MoneyMax: number;
-    EcoGuardian: number;
-    SocialSharer: number;
+    money: number;
+    time: number;
+    comfort: number;
+    health: number;
+    carbon: number;
+    mastery: number;
+    social: number;
+    certainty: number;
+    streak: number;
   };
   weightPrefs: {
     pkr: number;
@@ -29,10 +34,15 @@ class UserPersonalityExtended extends Model<UserPersonalityExtendedAttributes, U
   public userId!: string;
   public archetypeScores!: Record<string, number>;
   public personaVector!: {
-    TimeSaver: number;
-    MoneyMax: number;
-    EcoGuardian: number;
-    SocialSharer: number;
+    money: number;
+    time: number;
+    comfort: number;
+    health: number;
+    carbon: number;
+    mastery: number;
+    social: number;
+    certainty: number;
+    streak: number;
   };
   public weightPrefs!: {
     pkr: number;
@@ -68,7 +78,17 @@ UserPersonalityExtended.init(
       type: DataTypes.JSONB,
       allowNull: false,
       field: 'persona_vector',
-      defaultValue: { TimeSaver: 0.25, MoneyMax: 0.25, EcoGuardian: 0.25, SocialSharer: 0.25 },
+      defaultValue: {
+        money: 0.111,
+        time: 0.111,
+        comfort: 0.111,
+        health: 0.111,
+        carbon: 0.111,
+        mastery: 0.111,
+        social: 0.111,
+        certainty: 0.111,
+        streak: 0.111,
+      },
     },
     weightPrefs: {
       type: DataTypes.JSONB,
