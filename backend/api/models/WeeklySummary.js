@@ -24,38 +24,46 @@ WeeklySummary.init({
     weekStart: {
         type: sequelize_1.DataTypes.DATEONLY,
         allowNull: false,
+        field: 'week_start',
     },
     rupeesSaved: {
         type: sequelize_1.DataTypes.DECIMAL(12, 2),
         allowNull: false,
+        field: 'rupees_saved',
     },
     co2SavedKg: {
         type: sequelize_1.DataTypes.DECIMAL(12, 3),
         allowNull: false,
+        field: 'co2_saved_kg',
     },
     actionsCount: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
+        field: 'actions_count',
     },
     cityText: {
         type: sequelize_1.DataTypes.TEXT,
         allowNull: true,
+        field: 'city_text',
+    },
+    createdAt: {
+        type: sequelize_1.DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize_1.DataTypes.NOW,
+        field: 'created_at',
     },
 }, {
     sequelize: db_1.default,
     modelName: 'WeeklySummary',
     tableName: 'weekly_summaries',
-    timestamps: true,
+    timestamps: false, // Only createdAt, no updatedAt
     indexes: [
         {
-            fields: ['userId'],
-        },
-        {
-            fields: ['weekStart'],
-        },
-        {
             unique: true,
-            fields: ['userId', 'weekStart'],
+            fields: ['userId', 'week_start'],
+        },
+        {
+            fields: ['userId'],
         },
     ],
 });

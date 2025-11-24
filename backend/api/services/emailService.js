@@ -578,10 +578,8 @@ Questions? Reply to this email and we'll get back to you.
             }
             // Configure SendGrid
             mail_1.default.setApiKey(sendgridApiKey);
-            
             // Get from email - default to zerrahworld@gmail.com if not set
             const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'zerrahworld@gmail.com';
-            
             // Prepare email message
             const msg = {
                 to: emailData.to,
@@ -590,13 +588,11 @@ Questions? Reply to this email and we'll get back to you.
                 html: emailData.html,
                 text: emailData.text,
             };
-            
             console.log('📤 Attempting to send email via SendGrid:', {
                 from: fromEmail,
                 to: emailData.to,
                 subject: emailData.subject
             });
-            
             // Send email
             const [response] = await mail_1.default.send(msg);
             console.log('📧 Email sent successfully via SendGrid:', {
@@ -608,11 +604,9 @@ Questions? Reply to this email and we'll get back to you.
         }
         catch (error) {
             console.error('❌ Error sending email via SendGrid:', error.message);
-            
             // Provide more specific error information
             if (error.code === 401) {
                 const errorMessage = error.response?.body?.errors?.[0]?.message || '';
-                
                 if (errorMessage.toLowerCase().includes('credits') || errorMessage.toLowerCase().includes('maximum')) {
                     console.error('   💳 SendGrid Credits Exhausted!');
                     console.error('   Your free tier limit (100 emails/day) has been reached.');
@@ -620,45 +614,28 @@ Questions? Reply to this email and we'll get back to you.
                     console.error('     1. Wait for daily reset (credits reset at midnight UTC)');
                     console.error('     2. Upgrade your SendGrid plan at https://sendgrid.com/pricing');
                     console.error('     3. Check your usage at https://app.sendgrid.com/stats/overview');
-                    console.error('     4. OR verify sender email in SendGrid dashboard');
-                } else {
+                }
+                else {
                     console.error('   🔑 Authentication failed (401 Unauthorized)');
                     console.error('   Possible causes:');
                     console.error('     1. API key is invalid or has been revoked');
                     console.error('     2. API key does not have "Mail Send" permissions');
-                    console.error('     3. Sender email is not verified in SendGrid (MOST COMMON!)');
-                    console.error(`     4. Verify ${process.env.SENDGRID_FROM_EMAIL || 'zerrahworld@gmail.com'} at:`);
-                    console.error('        https://app.sendgrid.com/settings/sender_auth');
+                    console.error('     3. Sender email is not verified in SendGrid');
                 }
-                
                 if (error.response && error.response.body && error.response.body.errors) {
                     console.error('\n   SendGrid error details:');
                     error.response.body.errors.forEach((err) => {
                         console.error(`     - ${err.message || JSON.stringify(err)}`);
                     });
                 }
-                
-                // Try Gmail SMTP as fallback if configured
-                if (process.env.GMAIL_APP_PASSWORD) {
-                    console.log('\n🔄 Attempting fallback to Gmail SMTP...');
-                    try {
-                        const GmailService = require('./gmailService').GmailService;
-                        const sent = await GmailService.sendEmail(emailData);
-                        if (sent) {
-                            console.log('✅ Email sent successfully via Gmail SMTP fallback!');
-                            return;
-                        }
-                    } catch (gmailError) {
-                        console.error('   Gmail fallback also failed:', gmailError.message);
-                    }
-                }
-            } else if (error.code === 403) {
+            }
+            else if (error.code === 403) {
                 console.error('   🚫 Access forbidden (403)');
                 console.error('   The API key may not have sufficient permissions');
-            } else if (error.response && error.response.body) {
+            }
+            else if (error.response && error.response.body) {
                 console.error('   SendGrid Response:', JSON.stringify(error.response.body, null, 2));
             }
-            
             // Fallback to console logging if SendGrid fails
             console.log('\n📧 Email would be sent (SendGrid failed):', {
                 to: emailData.to,

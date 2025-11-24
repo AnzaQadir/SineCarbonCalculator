@@ -1,7 +1,7 @@
-import { DataTypes, Model, Sequelize } from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../db';
 
-export interface WeeklySummaryAttributes {
+interface WeeklySummaryAttributes {
   id: string;
   userId: string;
   weekStart: Date;
@@ -9,11 +9,10 @@ export interface WeeklySummaryAttributes {
   co2SavedKg: number;
   actionsCount: number;
   cityText: string | null;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
 }
 
-interface WeeklySummaryCreationAttributes extends Omit<WeeklySummaryAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+interface WeeklySummaryCreationAttributes extends Optional<WeeklySummaryAttributes, 'id' | 'createdAt'> {}
 
 class WeeklySummary extends Model<WeeklySummaryAttributes, WeeklySummaryCreationAttributes> implements WeeklySummaryAttributes {
   public id!: string;
@@ -24,7 +23,6 @@ class WeeklySummary extends Model<WeeklySummaryAttributes, WeeklySummaryCreation
   public actionsCount!: number;
   public cityText!: string | null;
   public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
 }
 
 WeeklySummary.init(
@@ -45,42 +43,51 @@ WeeklySummary.init(
     weekStart: {
       type: DataTypes.DATEONLY,
       allowNull: false,
+      field: 'week_start',
     },
     rupeesSaved: {
       type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
+      field: 'rupees_saved',
     },
     co2SavedKg: {
       type: DataTypes.DECIMAL(12, 3),
       allowNull: false,
+      field: 'co2_saved_kg',
     },
     actionsCount: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'actions_count',
     },
     cityText: {
       type: DataTypes.TEXT,
       allowNull: true,
+      field: 'city_text',
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+      field: 'created_at',
     },
   },
   {
     sequelize,
     modelName: 'WeeklySummary',
     tableName: 'weekly_summaries',
-    timestamps: true,
+    timestamps: false, // Only createdAt, no updatedAt
     indexes: [
       {
-        fields: ['userId'],
-      },
-      {
-        fields: ['weekStart'],
-      },
-      {
         unique: true,
-        fields: ['userId', 'weekStart'],
+        fields: ['userId', 'week_start'],
+      },
+      {
+        fields: ['userId'],
       },
     ],
   }
 );
 
 export default WeeklySummary;
+

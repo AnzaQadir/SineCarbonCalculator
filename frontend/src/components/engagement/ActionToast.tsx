@@ -1,119 +1,143 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, X, Trophy } from 'lucide-react';
-
-export interface ToastData {
-  rupees: number;
-  co2_kg: number;
-  streak?: {
-    current: number;
-    longest: number;
-  };
-  bonus?: {
-    awarded: boolean;
-    xp?: number;
-    label?: string;
-  };
-}
+import { X, CheckCircle2, Sparkles, TrendingUp } from 'lucide-react';
+import { ActionDoneResponse } from '@/services/engagementService';
 
 interface ActionToastProps {
-  data: ToastData | null;
-  onClose: () => void;
+  result: ActionDoneResponse;
+  onDismiss: () => void;
+  autoHideMs?: number;
 }
 
-export const ActionToast: React.FC<ActionToastProps> = ({ data, onClose }) => {
+export const ActionToast: React.FC<ActionToastProps> = ({
+  result,
+  onDismiss,
+  autoHideMs = 3000,
+}) => {
   useEffect(() => {
-    if (data) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 5000); // Auto-dismiss after 5 seconds
+    const timer = setTimeout(() => {
+      onDismiss();
+    }, autoHideMs);
 
-      return () => clearTimeout(timer);
-    }
-  }, [data, onClose]);
+    return () => clearTimeout(timer);
+  }, [onDismiss, autoHideMs]);
+
+  // Handle ESC key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onDismiss();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onDismiss]);
+
+  const rupees = Math.round(result.verifiedImpact.rupees);
+  const co2 = result.verifiedImpact.co2_kg.toFixed(2);
 
   return (
     <AnimatePresence>
-      {data && (
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 50 }}
-          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-full px-4"
-        >
-          <div className="bg-white rounded-lg shadow-2xl border-2 border-green-500 p-4 relative">
-            {/* Close Button */}
-            <button
-              onClick={onClose}
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors"
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.95 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 max-w-sm w-full mx-4"
+      >
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-white to-cream-50 shadow-2xl border border-slate-100">
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-teal/5 via-transparent to-brand-emerald/5 pointer-events-none" />
+          
+          {/* Close button */}
+          <button
+            onClick={onDismiss}
+            className="absolute top-3 right-3 z-10 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100/50 transition-all"
+            aria-label="Dismiss"
+          >
+            <X className="w-4 h-4" />
+          </button>
+
+          <div className="relative p-6">
+            {/* Success icon with animation */}
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', delay: 0.1, damping: 15 }}
+              className="flex justify-center mb-4"
             >
-              <X className="h-4 w-4" />
-            </button>
-
-            {/* Success Icon */}
-            <div className="flex items-start gap-3 mb-3">
-              <div className="bg-green-100 rounded-full p-2">
-                <CheckCircle2 className="h-6 w-6 text-green-600" />
+              <div className="relative">
+                <CheckCircle2 className="w-12 h-12 text-brand-emerald" strokeWidth={2.5} />
+                <motion.div
+                  animate={{ rotate: 360, scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <Sparkles className="w-6 h-6 text-brand-amber opacity-60" />
+                </motion.div>
               </div>
-              <div className="flex-1">
-                <h4 className="font-semibold text-gray-900 mb-1">
-                  Nice! Verified ✓
-                </h4>
-                
-                {/* Impact */}
-                <div className="flex items-center gap-3 text-sm mb-2">
-                  <span className="text-green-600 font-semibold">
-                    –₹{data.rupees}
-                  </span>
-                  <span className="text-gray-300">•</span>
-                  <span className="text-emerald-600 font-semibold">
-                    –{data.co2_kg} kg CO₂
-                  </span>
-                </div>
+            </motion.div>
 
-                {/* Streak */}
-                {data.streak && (
-                  <div className="flex items-center gap-1 text-xs text-gray-600">
-                    <span className="font-medium">Day {data.streak.current} streak</span>
-                    {data.streak.current > 5 && (
-                      <span className="text-yellow-600">🔥</span>
-                    )}
-                    {data.streak.longest > data.streak.current && (
-                      <span className="text-gray-400">
-                        (Best: {data.streak.longest})
-                      </span>
-                    )}
+            {/* Main message */}
+            <motion.h3
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-center text-xl font-bold text-slate-800 mb-6"
+            >
+              Action completed! ✨
+            </motion.h3>
+
+            {/* Impact metrics - clean and minimal */}
+            <div className="space-y-4 mb-5">
+              {/* CO₂ Impact - Hero metric */}
+              <div className="text-center">
+                <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-brand-teal/10 to-brand-emerald/10 border border-brand-teal/20">
+                  <TrendingUp className="w-5 h-5 text-brand-emerald" />
+                  <div>
+                    <div className="text-2xl font-bold text-brand-teal">
+                      {co2} kg
+                    </div>
+                    <div className="text-xs text-slate-500 font-medium">CO₂ saved</div>
                   </div>
-                )}
+                </div>
+              </div>
 
-                {/* Bonus */}
-                {data.bonus?.awarded && (
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="mt-2 flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-lg px-2 py-1"
-                  >
-                    <Trophy className="h-4 w-4 text-yellow-600" />
-                    <span className="text-xs font-semibold text-yellow-800">
-                      {data.bonus.label}: +{data.bonus.xp} XP
-                    </span>
-                  </motion.div>
-                )}
+              {/* Secondary metrics - compact */}
+              <div className="flex items-center justify-center gap-4 text-sm">
+                <div className="text-center">
+                  <div className="font-semibold text-slate-700">₨{rupees}</div>
+                  <div className="text-xs text-slate-500">saved</div>
+                </div>
+                <div className="w-px h-8 bg-slate-200" />
+                <div className="text-center">
+                  <div className="font-semibold text-brand-teal">{result.streak.current}</div>
+                  <div className="text-xs text-slate-500">day streak</div>
+                </div>
               </div>
             </div>
 
-            {/* Progress Bar */}
-            <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+            {/* Bonus - if awarded */}
+            {result.bonus?.awarded && (
               <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: '100%' }}
-                transition={{ duration: 5, ease: 'linear' }}
-                className="h-full bg-green-500"
-              />
-            </div>
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="mt-4 pt-4 border-t border-slate-100"
+              >
+                <div className="flex items-center justify-center gap-2 text-sm">
+                  <span className="text-xl">🎍</span>
+                  <span className="font-semibold text-brand-amber">
+                    {result.bonus.label}
+                  </span>
+                  <span className="text-brand-amber/80">+{result.bonus.xp} XP</span>
+                </div>
+              </motion.div>
+            )}
           </div>
-        </motion.div>
-      )}
+        </div>
+      </motion.div>
     </AnimatePresence>
   );
 };
+

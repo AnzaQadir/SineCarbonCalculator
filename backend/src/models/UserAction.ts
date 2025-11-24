@@ -1,21 +1,21 @@
-import { DataTypes, Model, Sequelize } from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../db';
 
-export interface UserActionAttributes {
+interface UserActionAttributes {
   id: string;
   userId: string;
   recommendationId: string;
   occurredAt: Date;
   impactRupees: number;
   impactCo2Kg: number;
+  surface: string;
+  metadata: Record<string, any>;
   source: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-interface UserActionCreationAttributes extends Omit<UserActionAttributes, 'id' | 'occurredAt' | 'createdAt' | 'updatedAt'> {
-  occurredAt?: Date;
-}
+interface UserActionCreationAttributes extends Optional<UserActionAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
 
 class UserAction extends Model<UserActionAttributes, UserActionCreationAttributes> implements UserActionAttributes {
   public id!: string;
@@ -24,6 +24,8 @@ class UserAction extends Model<UserActionAttributes, UserActionCreationAttribute
   public occurredAt!: Date;
   public impactRupees!: number;
   public impactCo2Kg!: number;
+  public surface!: string;
+  public metadata!: Record<string, any>;
   public source!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -45,9 +47,8 @@ UserAction.init(
       },
     },
     recommendationId: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING, // Using string since catalog uses string IDs
       allowNull: false,
-      comment: 'ID from recommendation catalog (e.g., clothing_repair_first_kit)',
     },
     occurredAt: {
       type: DataTypes.DATE,
@@ -57,15 +58,39 @@ UserAction.init(
     impactRupees: {
       type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
+      defaultValue: 0,
+      field: 'impact_rupees',
     },
     impactCo2Kg: {
       type: DataTypes.DECIMAL(12, 3),
       allowNull: false,
+      defaultValue: 0,
+      field: 'impact_co2_kg',
+    },
+    surface: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'web',
+    },
+    metadata: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: {},
     },
     source: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'catalog:v1',
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
@@ -75,21 +100,17 @@ UserAction.init(
     timestamps: true,
     indexes: [
       {
-        fields: ['userId'],
+        fields: ['userId', 'occurredAt'],
       },
       {
         fields: ['recommendationId'],
       },
       {
-        fields: ['occurredAt'],
-      },
-      {
-        unique: true,
         fields: ['userId', 'recommendationId'],
-        name: 'unique_user_reco_per_day',
       },
     ],
   }
 );
 
 export default UserAction;
+

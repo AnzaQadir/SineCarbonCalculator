@@ -20,22 +20,29 @@ UserStreak.init({
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
+        field: 'current_streak_days',
     },
     longestStreakDays: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
+        field: 'longest_streak_days',
     },
     lastActionDate: {
         type: sequelize_1.DataTypes.DATEONLY,
         allowNull: true,
+        field: 'last_action_date',
+    },
+    updatedAt: {
+        type: sequelize_1.DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize_1.DataTypes.NOW,
     },
 }, {
     sequelize: db_1.default,
     modelName: 'UserStreak',
     tableName: 'user_streaks',
-    timestamps: true,
-    updatedAt: true,
-    createdAt: false,
+    timestamps: false, // Only updatedAt, no createdAt
+    updatedAt: 'updatedAt',
 });
 exports.default = UserStreak;

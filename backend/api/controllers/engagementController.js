@@ -1,147 +1,295 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EngagementController = void 0;
-const engagementService_1 = require("../services/engagementService");
+exports.getNextActionsHandler = getNextActionsHandler;
+exports.actionDoneHandler = actionDoneHandler;
+exports.getBucketListHandler = getBucketListHandler;
+exports.getHomeFeedHandler = getHomeFeedHandler;
+exports.getWeeklyRecapHandler = getWeeklyRecapHandler;
 const models_1 = require("../models");
-class EngagementController {
-    // Helper to get userId from email or direct userId
-    static async getUserId(req) {
-        if (req.userId) {
-            return req.userId;
+const engagementService_1 = require("../services/engagementService");
+const enhancedEngagementService_1 = require("../services/engagement/enhancedEngagementService");
+const learning_1 = require("../services/engagement/learning");
+const bucketListService_1 = require("../services/engagement/bucketListService");
+const models_2 = require("../models");
+const sequelize_1 = require("sequelize");
+/**
+ * Get user ID from email (helper for authenticated requests)
+ */
+async function getUserIdFromEmail(email) {
+    const user = await models_1.User.findOne({ where: { email } });
+    return user?.id || null;
+}
+/**
+ * GET /v1/engagement/next-actions
+ * Returns 1 primary and 2 alternatives ranked via Rule Overlay
+ */
+async function getNextActionsHandler(req, res) {
+    try {
+        const userEmail = req.userEmail;
+        if (!userEmail) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
         }
-        if (req.userEmail) {
-            const user = await models_1.User.findOne({ where: { email: req.userEmail } });
-            return user?.id || null;
+        const userId = await getUserIdFromEmail(userEmail);
+        if (!userId) {
+            return res.status(404).json({ success: false, message: 'User not found' });
         }
-        return null;
+        // Feature flag: use enhanced scoring if available
+        // For now, default to enhanced. Can be controlled via environment variable or config
+        const useEnhanced = process.env.USE_ENHANCED_SCORING !== 'false';
+        const result = useEnhanced
+            ? await (0, enhancedEngagementService_1.getNextActionsEnhanced)(userId)
+            : await (0, engagementService_1.getNextActions)(userId);
+        return res.json(result);
     }
-    // GET /v1/engagement/next-actions (returns multiple cards)
-    static async getNextActions(req, res) {
-        try {
-            const userId = await EngagementController.getUserId(req);
-            if (!userId) {
-                return res.status(401).json({ error: 'User not authenticated' });
-            }
-            const actions = await engagementService_1.EngagementService.getNextActions(userId);
-            if (!actions) {
-                return res.status(404).json({ error: 'No actions available' });
-            }
-            res.json(actions);
-        }
-        catch (error) {
-            console.error('Error getting next actions:', error);
-            res.status(500).json({ error: 'Failed to get next actions' });
-        }
-    }
-    // GET /v1/engagement/best-next-action (legacy single action)
-    static async getBestNextAction(req, res) {
-        try {
-            const userId = await EngagementController.getUserId(req);
-            if (!userId) {
-                return res.status(401).json({ error: 'User not authenticated' });
-            }
-            const action = await engagementService_1.EngagementService.getBestNextAction(userId);
-            if (!action) {
-                return res.status(404).json({ error: 'No actions available' });
-            }
-            res.json(action);
-        }
-        catch (error) {
-            console.error('Error getting best next action:', error);
-            res.status(500).json({ error: 'Failed to get best next action' });
-        }
-    }
-    // POST /v1/engagement/action-done
-    static async actionDone(req, res) {
-        try {
-            const userId = await EngagementController.getUserId(req);
-            if (!userId) {
-                return res.status(401).json({ error: 'User not authenticated' });
-            }
-            const { recommendationId, context } = req.body;
-            if (!recommendationId) {
-                return res.status(400).json({ error: 'Recommendation ID is required' });
-            }
-            const result = await engagementService_1.EngagementService.recordActionDone(userId, recommendationId, context);
-            res.json(result);
-        }
-        catch (error) {
-            console.error('Error recording action:', error);
-            res.status(500).json({ error: 'Failed to record action' });
-        }
-    }
-    // GET /v1/engagement/home-feed
-    static async getHomeFeed(req, res) {
-        try {
-            const userId = await EngagementController.getUserId(req);
-            if (!userId) {
-                return res.status(401).json({ error: 'User not authenticated' });
-            }
-            // Get best next action
-            const bestNextAction = await engagementService_1.EngagementService.getBestNextAction(userId);
-            // Get all catalog cards (simplified for now)
-            const { queryCatalog } = require('../services/recommendationCatalogService');
-            const allCards = queryCatalog({});
-            // Group by domain
-            const sections = [
-                {
-                    title: 'Quick Wins',
-                    cards: allCards.slice(0, 3).map((card) => ({
-                        id: card.id,
-                        title: card.action,
-                        domain: card.domain,
-                        actFirst: true,
-                        learn: { summary: card.why },
-                    })),
-                },
-                {
-                    title: 'Money Savers',
-                    cards: allCards.slice(3, 6).map((card) => ({
-                        id: card.id,
-                        title: card.action,
-                        domain: card.domain,
-                        actFirst: true,
-                        learn: { summary: card.why },
-                    })),
-                },
-            ];
-            // Calculate week dates
-            const now = new Date();
-            const dayOfWeek = now.getDay();
-            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-            const weekStart = new Date(now);
-            weekStart.setDate(now.getDate() + diff);
-            res.json({
-                week: {
-                    start: weekStart.toISOString().split('T')[0],
-                    end: new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                },
-                bestNextAction,
-                sections,
-            });
-        }
-        catch (error) {
-            console.error('Error getting home feed:', error);
-            res.status(500).json({ error: 'Failed to get home feed' });
-        }
-    }
-    // GET /v1/engagement/weekly-recap
-    static async getWeeklyRecap(req, res) {
-        try {
-            const userId = await EngagementController.getUserId(req);
-            if (!userId) {
-                return res.status(401).json({ error: 'User not authenticated' });
-            }
-            const recap = await engagementService_1.EngagementService.getWeeklyRecap(userId);
-            if (!recap) {
-                return res.status(404).json({ error: 'No recap available' });
-            }
-            res.json(recap);
-        }
-        catch (error) {
-            console.error('Error getting weekly recap:', error);
-            res.status(500).json({ error: 'Failed to get weekly recap' });
-        }
+    catch (error) {
+        console.error('Error getting next actions:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error('Error details:', {
+            message: errorMessage,
+            stack: error instanceof Error ? error.stack : undefined,
+        });
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to get next actions',
+            error: errorMessage,
+        });
     }
 }
-exports.EngagementController = EngagementController;
+/**
+ * POST /v1/engagement/action-done
+ * Marks a recommendation done idempotently (per day)
+ */
+async function actionDoneHandler(req, res) {
+    try {
+        const userEmail = req.userEmail;
+        if (!userEmail) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        const userId = await getUserIdFromEmail(userEmail);
+        if (!userId) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        const { recommendationId, context, outcome, reason } = req.body;
+        if (!recommendationId) {
+            return res.status(400).json({
+                success: false,
+                message: 'recommendationId is required',
+            });
+        }
+        // Validate outcome if provided
+        const validOutcome = outcome && ['done', 'snooze', 'dismiss', 'intended'].includes(outcome)
+            ? outcome
+            : 'done'; // Default to 'done' for backward compatibility
+        // Handle "intended" event (user clicked "Do it now" - micro-commitment)
+        if (validOutcome === 'intended') {
+            await (0, learning_1.recordIntendedAction)(userId, recommendationId, {
+                device: context?.device || 'web',
+                time_of_day: context?.time_of_day,
+                archetype: context?.archetype,
+                location: context?.location,
+            });
+            return res.json({
+                ok: true,
+                message: 'Intended action recorded',
+            });
+        }
+        // Handle "snooze" with optional time context
+        if (validOutcome === 'snooze') {
+            const timeContext = reason;
+            const result = await (0, learning_1.recordSnoozedAction)(userId, recommendationId, timeContext, {
+                time_of_day: context?.time_of_day,
+                session_energy: context?.session_energy,
+            });
+            return res.json({
+                ok: true,
+                ...result,
+            });
+        }
+        // Handle "not useful" with reason
+        if (validOutcome === 'dismiss' && reason) {
+            const notUsefulReason = reason;
+            const result = await (0, learning_1.recordNotUsefulAction)(userId, recommendationId, notUsefulReason, context);
+            return res.json({
+                ok: true,
+                ...result,
+            });
+        }
+        // Support enhanced learning if outcome is provided or enabled
+        const useEnhancedLearning = process.env.USE_ENHANCED_LEARNING !== 'false';
+        const result = useEnhancedLearning
+            ? await (0, learning_1.markDoneAndLearn)(userId, recommendationId, validOutcome, context || {})
+            : await (0, engagementService_1.markActionDone)(userId, recommendationId, context || {});
+        return res.json({
+            ok: true,
+            ...result,
+        });
+    }
+    catch (error) {
+        console.error('Error marking action done:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to mark action done',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+}
+/**
+ * GET /v1/engagement/home-feed
+ * Returns a unified feed for "Your Week" sections
+ */
+/**
+ * GET /v1/engagement/bucket-list
+ * Returns all recommendations user has marked as DONE or SNOOZE
+ */
+async function getBucketListHandler(req, res) {
+    try {
+        const userEmail = req.userEmail;
+        if (!userEmail) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        const userId = await getUserIdFromEmail(userEmail);
+        if (!userId) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        const result = await (0, bucketListService_1.getBucketList)(userId);
+        return res.json(result);
+    }
+    catch (error) {
+        console.error('Error getting bucket list:', error);
+        return res.status(500).json({
+            success: false,
+            message: error instanceof Error ? error.message : 'Failed to get bucket list',
+        });
+    }
+}
+async function getHomeFeedHandler(req, res) {
+    try {
+        const userEmail = req.userEmail;
+        if (!userEmail) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        const userId = await getUserIdFromEmail(userEmail);
+        if (!userId) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        // Get actions from last 7 days
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const actions = await models_2.UserAction.findAll({
+            where: {
+                userId,
+                occurredAt: {
+                    [sequelize_1.Op.gte]: sevenDaysAgo,
+                },
+            },
+            order: [['occurredAt', 'DESC']],
+        });
+        // Group by category/domain (simplified - in real app would map to recommendation domains)
+        const feed = {
+            quickWins: actions.filter((a) => Number(a.impactCo2Kg) <= 0.25).slice(0, 5),
+            moneySavers: actions.filter((a) => Number(a.impactRupees) >= 200).slice(0, 5),
+            habitBuilders: actions.slice(0, 10), // All actions can be habit builders
+            commute: actions.filter((a) => a.metadata?.category === 'transport').slice(0, 5),
+        };
+        return res.json({
+            success: true,
+            feed,
+        });
+    }
+    catch (error) {
+        console.error('Error getting home feed:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to get home feed',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+}
+/**
+ * GET /v1/engagement/weekly-recap
+ * Returns recap numbers + share template fields
+ */
+async function getWeeklyRecapHandler(req, res) {
+    try {
+        const userEmail = req.userEmail;
+        if (!userEmail) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        const userId = await getUserIdFromEmail(userEmail);
+        if (!userId) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        // Get user for city
+        const user = await models_1.User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        // Calculate last week (Monday to Sunday, Asia/Karachi timezone)
+        const now = new Date();
+        const lastMonday = new Date(now);
+        lastMonday.setUTCDate(now.getUTCDate() - ((now.getUTCDay() + 6) % 7) - 7); // Go back to last Monday
+        lastMonday.setUTCHours(0, 0, 0, 0);
+        lastMonday.setUTCHours(lastMonday.getUTCHours() - 5); // PKT timezone
+        const lastSunday = new Date(lastMonday);
+        lastSunday.setUTCDate(lastSunday.getUTCDate() + 6);
+        lastSunday.setUTCHours(23, 59, 59, 999);
+        // Get or compute weekly summary
+        // Convert to date string for comparison (database stores as DATEONLY)
+        const weekStartStr = lastMonday.toISOString().split('T')[0];
+        let summary = await models_2.WeeklySummary.findOne({
+            where: {
+                userId,
+                weekStart: weekStartStr,
+            },
+        });
+        if (!summary) {
+            // Compute from actions
+            const actions = await models_2.UserAction.findAll({
+                where: {
+                    userId,
+                    occurredAt: {
+                        [sequelize_1.Op.gte]: lastMonday,
+                        [sequelize_1.Op.lte]: lastSunday,
+                    },
+                },
+            });
+            const rupeesSaved = actions.reduce((sum, a) => sum + Number(a.impactRupees), 0);
+            const co2SavedKg = actions.reduce((sum, a) => sum + Number(a.impactCo2Kg), 0);
+            // Use ISO date string for DATEONLY column to avoid driver inconsistencies
+            summary = await models_2.WeeklySummary.create({
+                userId,
+                weekStart: weekStartStr, // DATEONLY accepts string format
+                rupeesSaved,
+                co2SavedKg,
+                actionsCount: actions.length,
+                cityText: user.city ? `${user.city} saved 17 tons CO₂` : null,
+            });
+        }
+        const storyText = user.city
+            ? `You → ${user.city} → Community`
+            : 'You → Community';
+        return res.json({
+            rupeesSaved: Number(summary.rupeesSaved),
+            co2SavedKg: Number(summary.co2SavedKg),
+            actionsCount: summary.actionsCount,
+            cityCommunity: summary.cityText || undefined,
+            storyText,
+            shareImage: {
+                templateId: 'recap-v1',
+                fields: {
+                    rupees: Number(summary.rupeesSaved),
+                    co2: Number(summary.co2SavedKg),
+                    city: user.city || 'Community',
+                },
+            },
+        });
+    }
+    catch (error) {
+        console.error('Error getting weekly recap:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to get weekly recap',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+}

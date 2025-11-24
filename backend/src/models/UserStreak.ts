@@ -1,15 +1,15 @@
-import { DataTypes, Model, Sequelize } from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../db';
 
-export interface UserStreakAttributes {
+interface UserStreakAttributes {
   userId: string;
   currentStreakDays: number;
   longestStreakDays: number;
   lastActionDate: Date | null;
-  updatedAt?: Date;
+  updatedAt: Date;
 }
 
-interface UserStreakCreationAttributes extends Omit<UserStreakAttributes, 'updatedAt'> {}
+interface UserStreakCreationAttributes extends Optional<UserStreakAttributes, 'updatedAt'> {}
 
 class UserStreak extends Model<UserStreakAttributes, UserStreakCreationAttributes> implements UserStreakAttributes {
   public userId!: string;
@@ -33,25 +33,33 @@ UserStreak.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
+      field: 'current_streak_days',
     },
     longestStreakDays: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
+      field: 'longest_streak_days',
     },
     lastActionDate: {
       type: DataTypes.DATEONLY,
       allowNull: true,
+      field: 'last_action_date',
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
     sequelize,
     modelName: 'UserStreak',
     tableName: 'user_streaks',
-    timestamps: true,
-    updatedAt: true,
-    createdAt: false,
+    timestamps: false, // Only updatedAt, no createdAt
+    updatedAt: 'updatedAt',
   }
 );
 
 export default UserStreak;
+

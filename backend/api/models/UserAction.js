@@ -22,9 +22,8 @@ UserAction.init({
         },
     },
     recommendationId: {
-        type: sequelize_1.DataTypes.STRING,
+        type: sequelize_1.DataTypes.STRING, // Using string since catalog uses string IDs
         allowNull: false,
-        comment: 'ID from recommendation catalog (e.g., clothing_repair_first_kit)',
     },
     occurredAt: {
         type: sequelize_1.DataTypes.DATE,
@@ -34,15 +33,39 @@ UserAction.init({
     impactRupees: {
         type: sequelize_1.DataTypes.DECIMAL(12, 2),
         allowNull: false,
+        defaultValue: 0,
+        field: 'impact_rupees',
     },
     impactCo2Kg: {
         type: sequelize_1.DataTypes.DECIMAL(12, 3),
         allowNull: false,
+        defaultValue: 0,
+        field: 'impact_co2_kg',
+    },
+    surface: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'web',
+    },
+    metadata: {
+        type: sequelize_1.DataTypes.JSONB,
+        allowNull: false,
+        defaultValue: {},
     },
     source: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
         defaultValue: 'catalog:v1',
+    },
+    createdAt: {
+        type: sequelize_1.DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize_1.DataTypes.NOW,
+    },
+    updatedAt: {
+        type: sequelize_1.DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize_1.DataTypes.NOW,
     },
 }, {
     sequelize: db_1.default,
@@ -51,18 +74,13 @@ UserAction.init({
     timestamps: true,
     indexes: [
         {
-            fields: ['userId'],
+            fields: ['userId', 'occurredAt'],
         },
         {
             fields: ['recommendationId'],
         },
         {
-            fields: ['occurredAt'],
-        },
-        {
-            unique: true,
             fields: ['userId', 'recommendationId'],
-            name: 'unique_user_reco_per_day',
         },
     ],
 });

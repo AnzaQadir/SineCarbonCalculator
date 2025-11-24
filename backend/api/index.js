@@ -50,6 +50,7 @@ const shareRoutes_1 = __importDefault(require("./routes/shareRoutes"));
 const engagementRoutes_1 = __importDefault(require("./routes/engagementRoutes"));
 const models_1 = require("./models");
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
+const engagementRuleOverlayService_1 = require("./services/engagementRuleOverlayService");
 // Load environment variables (only in development)
 if (process.env.NODE_ENV !== 'production') {
     dotenv_1.default.config();
@@ -165,6 +166,8 @@ const startServer = async () => {
         try {
             await (0, models_1.initializeDatabase)();
             console.log('Database initialized successfully');
+            // Initialize default engagement rules
+            await engagementRuleOverlayService_1.EngagementRuleOverlayService.initializeDefaults();
         }
         catch (dbError) {
             console.error('Database initialization failed:', dbError);

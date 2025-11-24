@@ -1,147 +1,217 @@
-import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { motion } from 'framer-motion';
-import { CheckCircle2, Sparkles, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
-
-export interface BestNextAction {
-  id: string;
-  title: string;
-  category: string;
-  cta: string;
-  previewImpact: {
-    rupees: number;
-    co2_kg: number;
-    label?: string;
-  };
-  whyShown: string;
-  source: string;
-  learnMore?: {
-    summary: string;
-    url?: string;
-  };
-}
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, ChevronDown, ChevronUp, Clock, X } from 'lucide-react';
+import { NextAction, recordIntendedAction } from '@/services/engagementService';
+import { DetailsPanel } from './DetailsPanel';
+import { DoItNowFlow } from './DoItNowFlow';
+import { SnoozeToast } from './SnoozeToast';
+import { NotUsefulSheet } from './NotUsefulSheet';
+import { StreakCelebration } from './StreakCelebration';
 
 interface BestNextActionCardProps {
-  action: BestNextAction;
-  onActionDone: (actionId: string) => void;
-  isCompleted?: boolean;
+  action: NextAction;
+  onAction: (outcome: 'done' | 'snooze' | 'dismiss', reason?: string) => void;
+  isLoading?: boolean;
+  tone?: 'friendly' | 'professional' | 'premium';
 }
 
-export const BestNextActionCard: React.FC<BestNextActionCardProps> = ({ 
-  action, 
-  onActionDone,
-  isCompleted = false 
+export const BestNextActionCard: React.FC<BestNextActionCardProps> = ({
+  action,
+  onAction,
+  isLoading = false,
+  tone = 'friendly',
 }) => {
   const [showDetails, setShowDetails] = useState(false);
+  const [showDoItNowFlow, setShowDoItNowFlow] = useState(false);
+  const [showSnoozeToast, setShowSnoozeToast] = useState(false);
+  const [showNotUsefulSheet, setShowNotUsefulSheet] = useState(false);
+  const [showStreakCelebration, setShowStreakCelebration] = useState(false);
+  const [streakData, setStreakData] = useState<{ streak: number; points?: number } | null>(null);
+
+  // Record "intended" event when DoItNowFlow opens
+  useEffect(() => {
+    if (showDoItNowFlow) {
+      recordIntendedAction(action.id, {
+        device: 'web',
+        time_of_day: new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening',
+      });
+    }
+  }, [showDoItNowFlow, action.id]);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      className="bg-white rounded-2xl shadow-xl border border-slate-200/40 p-6 md:p-8"
     >
-      <Card className="relative overflow-hidden border-2 border-green-500/20 bg-gradient-to-br from-green-50 to-emerald-50 shadow-lg">
-        {/* Header Badge */}
-        <div className="absolute top-4 right-4">
-          <Badge 
-            variant="secondary" 
-            className="bg-green-500 text-white flex items-center gap-1"
+      <div className="mb-6">
+        <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">
+          {action.title}
+        </h3>
+        {action.subtitle && (
+          <p className="text-sm md:text-base text-slate-600">{action.subtitle}</p>
+        )}
+      </div>
+
+      {/* Soft Segmented Control - Premium Action Zone */}
+      <div className="mb-6 rounded-3xl p-1.5 shadow-sm bg-cream-50 border border-slate-200">
+        <div className="flex gap-1.5">
+          {/* Do it now - Primary */}
+          <motion.button
+            onClick={() => {
+              if (!isLoading) {
+                setShowDoItNowFlow(true);
+              }
+            }}
+            disabled={isLoading}
+            className="relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-teal to-brand-emerald py-3.5 px-4 text-sm font-semibold text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60 shadow-md hover:shadow-lg"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <Sparkles className="h-3 w-3" />
-            {action.previewImpact.label || 'Next ₹ win'}
-          </Badge>
-        </div>
-
-        <CardContent className="p-6 pt-8">
-          {/* Title */}
-          <div className="mb-4">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              {action.title}
-            </h3>
-            
-            {/* Impact Preview */}
-            <div className="flex items-center gap-4 text-sm">
-              <span className="text-green-600 font-semibold">
-                Save ₹{action.previewImpact.rupees}
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Processing...
               </span>
-              <span className="text-gray-400">•</span>
-              <span className="text-emerald-600 font-semibold">
-                {action.previewImpact.co2_kg} kg CO₂
-              </span>
-            </div>
-          </div>
-
-          {/* Primary CTA */}
-          <div className="mb-4">
-            {isCompleted ? (
-              <Button 
-                disabled 
-                className="w-full bg-green-100 text-green-700 hover:bg-green-100"
-              >
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                Done Today
-              </Button>
             ) : (
-              <Button 
-                onClick={() => onActionDone(action.id)}
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-              >
-                {action.cta}
-              </Button>
+              <span className="flex items-center justify-center gap-2">
+                <CheckCircle2 className="h-4 w-4" />
+                Do it now
+              </span>
             )}
-          </div>
+          </motion.button>
 
-          {/* Why Shown */}
-          <div className="text-xs text-gray-500 mb-3">
-            <span className="font-medium">Why shown:</span> {action.whyShown}
-          </div>
+          {/* Will do it later - Secondary */}
+          <button
+            onClick={() => {
+              if (!isLoading) {
+                setShowSnoozeToast(true);
+              }
+            }}
+            disabled={isLoading}
+            className="flex-1 rounded-2xl border border-sky-300 bg-transparent py-3 px-4 text-sm font-medium text-sky-600 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-sky-50 hover:border-sky-400"
+          >
+            <span className="flex items-center justify-center gap-2">
+              <Clock className="h-4 w-4" />
+              Will do it later
+            </span>
+          </button>
 
-          {/* Learn More (Collapsible) */}
-          {action.learnMore && (
-            <div className="border-t border-gray-200 pt-3">
-              <button
-                onClick={() => setShowDetails(!showDetails)}
-                className="w-full flex items-center justify-between text-sm text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <span className="font-medium">Curious? Open details</span>
-                {showDetails ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </button>
+          {/* Not useful - Muted */}
+          <button
+            onClick={() => {
+              if (!isLoading) {
+                setShowNotUsefulSheet(true);
+              }
+            }}
+            disabled={isLoading}
+            className="flex-1 rounded-2xl border border-pink-300 bg-transparent py-3 px-4 text-sm font-medium text-pink-400 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-pink-50 hover:border-pink-400"
+          >
+            <span className="flex items-center justify-center gap-2">
+              <X className="h-4 w-4" />
+              Not useful
+            </span>
+          </button>
+        </div>
+      </div>
 
-              {showDetails && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-3 text-sm text-gray-600"
-                >
-                  <p className="mb-2">{action.learnMore.summary}</p>
-                  {action.learnMore.url && (
-                    <a
-                      href={action.learnMore.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-green-600 hover:text-green-700 inline-flex items-center gap-1"
-                    >
-                      Learn more <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
-                </motion.div>
-              )}
-            </div>
-          )}
+      {/* Learn More Toggle */}
+      <div className="mb-2">
+        <button
+          onClick={() => setShowDetails((prev) => !prev)}
+          className="flex w-full items-center justify-between rounded-xl bg-white px-4 py-3 text-sm font-semibold text-brand-teal transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal"
+        >
+          <span>{showDetails ? 'Hide details' : 'Curious? Open details'}</span>
+          {showDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+      </div>
 
-          {/* Source Footer */}
-          <div className="mt-4 pt-3 border-t border-gray-200 text-xs text-gray-400">
-            {action.source}
-          </div>
-        </CardContent>
-      </Card>
+      <AnimatePresence initial={false}>
+        {showDetails && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden pt-4"
+          >
+            <DetailsPanel item={action} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Do It Now Flow */}
+      <AnimatePresence>
+        {showDoItNowFlow && action.recommendation && (
+          <DoItNowFlow
+            recommendation={action.recommendation}
+            onDone={() => {
+              setShowDoItNowFlow(false);
+              // Small delay to allow modal to close smoothly before action
+              setTimeout(() => {
+                onAction('done');
+              }, 200);
+            }}
+            onExit={() => setShowDoItNowFlow(false)}
+            tone={tone}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Snooze Toast */}
+      <AnimatePresence>
+        {showSnoozeToast && (
+          <SnoozeToast
+            onDismiss={() => {
+              setShowSnoozeToast(false);
+              // Small delay to allow toast to close smoothly before action
+              setTimeout(() => {
+                onAction('snooze');
+              }, 200);
+            }}
+            onSelectTime={(time) => {
+              setShowSnoozeToast(false);
+              // Small delay to allow toast to close smoothly before action
+              setTimeout(() => {
+                onAction('snooze', time);
+              }, 200);
+            }}
+            tone={tone}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Not Useful Sheet */}
+      <AnimatePresence>
+        {showNotUsefulSheet && (
+          <NotUsefulSheet
+            onSelectReason={(reason) => {
+              setShowNotUsefulSheet(false);
+              // Small delay to allow sheet to close smoothly before action
+              setTimeout(() => {
+                onAction('dismiss', reason);
+              }, 200);
+            }}
+            onDismiss={() => setShowNotUsefulSheet(false)}
+            tone={tone}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Streak Celebration */}
+      <AnimatePresence>
+        {showStreakCelebration && streakData && (
+          <StreakCelebration
+            streak={streakData.streak}
+            points={streakData.points}
+            onComplete={() => {
+              setShowStreakCelebration(false);
+              setStreakData(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
+

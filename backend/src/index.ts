@@ -13,6 +13,7 @@ import shareRoutes from './routes/shareRoutes';
 import engagementRoutes from './routes/engagementRoutes';
 import { initializeDatabase } from './models';
 import authRoutes from './routes/authRoutes';
+import { EngagementRuleOverlayService } from './services/engagementRuleOverlayService';
 
 // Load environment variables (only in development)
 if (process.env.NODE_ENV !== 'production') {
@@ -143,6 +144,9 @@ const startServer = async () => {
     try {
       await initializeDatabase();
       console.log('Database initialized successfully');
+      
+      // Initialize default engagement rules
+      await EngagementRuleOverlayService.initializeDefaults();
     } catch (dbError) {
       console.error('Database initialization failed:', dbError);
       if (dbError instanceof Error) {
