@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle2, Clock } from 'lucide-react';
+import { X, CheckCircle2, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { BucketIcon } from './icons/BucketIcon';
-import { getBucketList, type BucketListResponse } from '@/services/engagementService';
+import { getBucketList, markActionDone, recordIntendedAction, type BucketListResponse, type BucketListItem } from '@/services/engagementService';
+import { DetailsPanel } from './DetailsPanel';
+import { DoItNowFlow } from './DoItNowFlow';
+import { SnoozeToast } from './SnoozeToast';
+import { NotUsefulSheet } from './NotUsefulSheet';
 
 interface BucketListProps {
   onClose: () => void;
@@ -13,24 +17,76 @@ export const BucketList: React.FC<BucketListProps> = ({ onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'done' | 'snoozed'>('all');
+  const [selectedItem, setSelectedItem] = useState<BucketListItem | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showDetailsPanel, setShowDetailsPanel] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [showDoItNowFlow, setShowDoItNowFlow] = useState(false);
+  const [showSnoozeToast, setShowSnoozeToast] = useState(false);
+  const [showNotUsefulSheet, setShowNotUsefulSheet] = useState(false);
 
-  useEffect(() => {
-    const loadBucketList = async () => {
-      try {
+  const loadBucketList = async (showLoading = true) => {
+    try {
+      if (showLoading) {
         setLoading(true);
-        setError(null);
-        const result = await getBucketList();
-        setData(result);
-      } catch (err) {
-        console.error('Error loading bucket list:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load bucket list');
-      } finally {
+      }
+      setError(null);
+      const result = await getBucketList();
+      setData(result);
+    } catch (err) {
+      console.error('Error loading bucket list:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load bucket list');
+    } finally {
+      if (showLoading) {
         setLoading(false);
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     loadBucketList();
   }, []);
+
+  // Record "intended" event when DoItNowFlow opens
+  useEffect(() => {
+    if (showDoItNowFlow && selectedItem) {
+      recordIntendedAction(selectedItem.id, {
+        device: 'web',
+        time_of_day: new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening',
+      });
+    }
+  }, [showDoItNowFlow, selectedItem]);
+
+  const handleAction = async (recommendationId: string, outcome: 'done' | 'snooze' | 'dismiss', reason?: string) => {
+    try {
+      setActionLoading(recommendationId);
+      console.log('[BucketList] Processing action:', { recommendationId, outcome });
+      
+      const result = await markActionDone(recommendationId, outcome, reason, { surface: 'web' });
+      console.log('[BucketList] Action processed, result:', result);
+
+      // Refresh bucket list after action (without showing loading spinner)
+      await loadBucketList(false);
+
+      // Close modal if action was done or dismissed (item will be removed or status changed)
+      if (outcome === 'done' || outcome === 'dismiss') {
+        setShowDetailModal(false);
+        setSelectedItem(null);
+        setShowDetailsPanel(false);
+      } else if (outcome === 'snooze') {
+        // For snooze, just update the selected item status
+        if (selectedItem) {
+          setSelectedItem({ ...selectedItem, status: 'snoozed' });
+        }
+      }
+    } catch (error) {
+      console.error('[BucketList] Error processing action:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process action. Please try again.';
+      alert(errorMessage);
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const filteredItems = data?.items.filter((item) => {
     if (filter === 'all') return true;
@@ -178,7 +234,12 @@ export const BucketList: React.FC<BucketListProps> = ({ onClose }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ delay: index * 0.05 }}
-                    className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-lg transition-shadow"
+                    onClick={() => {
+                      setSelectedItem(item);
+                      setShowDetailModal(true);
+                      setShowDetailsPanel(false);
+                    }}
+                    className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-lg transition-shadow cursor-pointer"
                   >
                     {/* Status Badge */}
                     <div className="flex items-center justify-between mb-3">
@@ -230,6 +291,206 @@ export const BucketList: React.FC<BucketListProps> = ({ onClose }) => {
           </p>
         </div>
       </motion.div>
+
+      {/* Detail Modal - Same design as BestNextActionCard */}
+      <AnimatePresence>
+        {showDetailModal && selectedItem && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            onClick={() => {
+              setShowDetailModal(false);
+              setSelectedItem(null);
+              setShowDetailsPanel(false);
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-xl border border-slate-200/40 p-6 md:p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto relative"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => {
+                  setShowDetailModal(false);
+                  setSelectedItem(null);
+                  setShowDetailsPanel(false);
+                }}
+                className="absolute top-6 right-6 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors z-10"
+              >
+                <X className="h-4 w-4 text-gray-600" />
+              </button>
+
+              {/* Header */}
+              <div className="mb-6">
+                <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">
+                  {selectedItem.title}
+                </h3>
+                {selectedItem.subtitle && (
+                  <p className="text-sm md:text-base text-slate-600">{selectedItem.subtitle}</p>
+                )}
+              </div>
+
+              {/* Soft Segmented Control - Premium Action Zone - Only show for "Saved for Later" items */}
+              {selectedItem.status === 'snoozed' && (
+                <div className="mb-6 rounded-3xl p-1.5 shadow-sm bg-cream-50 border border-slate-200">
+                  <div className="flex gap-1.5">
+                    {/* Do it now - Primary */}
+                    <motion.button
+                      onClick={() => {
+                        if (!actionLoading) {
+                          setShowDoItNowFlow(true);
+                        }
+                      }}
+                      disabled={actionLoading === selectedItem.id}
+                      className="relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-teal to-brand-emerald py-3.5 px-4 text-sm font-semibold text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60 shadow-md hover:shadow-lg"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {actionLoading === selectedItem.id ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          Processing...
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-2">
+                          <CheckCircle2 className="h-4 w-4" />
+                          Do it now
+                        </span>
+                      )}
+                    </motion.button>
+
+                    {/* Will do it later - Secondary */}
+                    <button
+                      onClick={() => {
+                        if (!actionLoading) {
+                          setShowSnoozeToast(true);
+                        }
+                      }}
+                      disabled={actionLoading === selectedItem.id}
+                      className="flex-1 rounded-2xl border border-sky-300 bg-transparent py-3 px-4 text-sm font-medium text-sky-600 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-sky-50 hover:border-sky-400"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Will do it later
+                      </span>
+                    </button>
+
+                    {/* Not useful - Muted */}
+                    <button
+                      onClick={() => {
+                        if (!actionLoading) {
+                          setShowNotUsefulSheet(true);
+                        }
+                      }}
+                      disabled={actionLoading === selectedItem.id}
+                      className="flex-1 rounded-2xl border border-pink-300 bg-transparent py-3 px-4 text-sm font-medium text-pink-400 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-pink-50 hover:border-pink-400"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <X className="h-4 w-4" />
+                        Not useful
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Learn More Toggle */}
+              <div className="mb-2">
+                <button
+                  onClick={() => setShowDetailsPanel((prev) => !prev)}
+                  className="flex w-full items-center justify-between rounded-xl bg-white px-4 py-3 text-sm font-semibold text-brand-teal transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal"
+                >
+                  <span>{showDetailsPanel ? 'Hide details' : 'Curious? Open details'}</span>
+                  {showDetailsPanel ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+
+              <AnimatePresence initial={false}>
+                {showDetailsPanel && selectedItem.recommendation && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden pt-4"
+                  >
+                    <DetailsPanel
+                      item={{
+                        id: selectedItem.id,
+                        category: selectedItem.category,
+                        title: selectedItem.title,
+                        subtitle: selectedItem.subtitle,
+                        previewImpact: selectedItem.previewImpact,
+                        recommendation: selectedItem.recommendation,
+                      }}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Do It Now Flow */}
+              <AnimatePresence>
+                {showDoItNowFlow && selectedItem.recommendation && (
+                  <DoItNowFlow
+                    recommendation={selectedItem.recommendation}
+                    onDone={() => {
+                      setShowDoItNowFlow(false);
+                      setTimeout(() => {
+                        handleAction(selectedItem.id, 'done');
+                      }, 200);
+                    }}
+                    onExit={() => setShowDoItNowFlow(false)}
+                    tone="friendly"
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* Snooze Toast */}
+              <AnimatePresence>
+                {showSnoozeToast && (
+                  <SnoozeToast
+                    onDismiss={() => {
+                      setShowSnoozeToast(false);
+                      setTimeout(() => {
+                        handleAction(selectedItem.id, 'snooze');
+                      }, 200);
+                    }}
+                    onSelectTime={(time) => {
+                      setShowSnoozeToast(false);
+                      setTimeout(() => {
+                        handleAction(selectedItem.id, 'snooze', time);
+                      }, 200);
+                    }}
+                    tone="friendly"
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* Not Useful Sheet */}
+              <AnimatePresence>
+                {showNotUsefulSheet && (
+                  <NotUsefulSheet
+                    onSelectReason={(reason) => {
+                      setShowNotUsefulSheet(false);
+                      setTimeout(() => {
+                        handleAction(selectedItem.id, 'dismiss', reason);
+                      }, 200);
+                    }}
+                    onDismiss={() => setShowNotUsefulSheet(false)}
+                    tone="friendly"
+                  />
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

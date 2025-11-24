@@ -16,6 +16,7 @@ function outcomeToEventType(outcome) {
         done: 'DONE',
         snooze: 'SNOOZE',
         dismiss: 'DISMISS',
+        intended: 'INTENDED',
     };
     return mapping[outcome];
 }
@@ -23,7 +24,7 @@ function outcomeToEventType(outcome) {
  * Get all event types
  */
 function getAllEventTypes() {
-    return ['SHOWN', 'DONE', 'DISMISS', 'SNOOZE'];
+    return ['SHOWN', 'DONE', 'DISMISS', 'SNOOZE', 'INTENDED'];
 }
 /**
  * Check if event type is a completion type (DONE)

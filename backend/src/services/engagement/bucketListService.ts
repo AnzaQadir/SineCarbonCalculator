@@ -6,8 +6,148 @@
 import { UserActionEvent } from '../../models';
 import RecommendationCatalog from '../../models/RecommendationCatalog';
 import { queryCatalog } from '../recommendationCatalogService';
-import { NextAction } from '../../types/engagement';
+import { NextAction, RecommendationDetails } from '../../types/engagement';
 import { Op } from 'sequelize';
+import { Card } from '../../types/recommendationCatalog';
+
+type RecommendationRecord = InstanceType<typeof RecommendationCatalog>;
+
+/**
+ * Generate fallback steps for a recommendation
+ */
+function generateFallbackSteps(
+  category: string,
+  title: string,
+  subtitle: string | null | undefined,
+  why: string | null | undefined,
+  requiresPurchase: boolean
+): string[] {
+  const categoryLower = category.toLowerCase();
+  const actionContext = subtitle || why || title;
+
+  switch (categoryLower) {
+    case 'transport':
+      return [
+        `Pick the trip you will shift: ${actionContext}`,
+        requiresPurchase
+          ? 'Book the ticket or reserve the seat and note departure details.'
+          : 'Plan the route and timings so the swap feels easy.',
+        'Take the trip and reflect on how the change felt.',
+      ];
+    case 'food':
+      return [
+        `Choose the meal or moment to try: ${actionContext}`,
+        requiresPurchase
+          ? 'Shop or prep the ingredients and set them where you will see them.'
+          : 'Prep what you already have so the swap is ready to go.',
+        'Cook or assemble it and note how it went for next time.',
+      ];
+    case 'home':
+      return [
+        `Decide which spot or habit to tackle first: ${actionContext}`,
+        requiresPurchase
+          ? 'Pick up any supplies or tools you need before you start.'
+          : 'Gather the tools you already own and set a start time.',
+        'Make the change and do a quick reset afterward.',
+      ];
+    case 'waste':
+      return [
+        `Identify where the waste shows up: ${actionContext}`,
+        requiresPurchase
+          ? 'Collect any containers or gear you need to support the new habit.'
+          : 'Set up bins or reminders with what you already have.',
+        'Put the new routine into practice and review at week end.',
+      ];
+    case 'clothing':
+    case 'clothes':
+      return [
+        `Choose the item or purchase you will shift: ${actionContext}`,
+        requiresPurchase
+          ? 'Line up the resale/borrow options and set alerts or bookmarks.'
+          : 'Open your preferred resale or swap source and save a search.',
+        'Follow through on your next purchase moment and log the win.',
+      ];
+    default:
+      return [
+        `Plan when you'll do this: ${actionContext}`,
+        requiresPurchase
+          ? 'Gather any supplies or tools you need.'
+          : 'Use what you already have to get started.',
+        'Take action and track your progress.',
+      ];
+  }
+}
+
+/**
+ * Build full recommendation details from catalog record and card
+ */
+function buildRecommendationDetails(
+  record: RecommendationRecord | undefined,
+  card: Card | undefined
+): RecommendationDetails {
+  const metadata = (record as any)?.metadata || {};
+  const metrics = (record?.metrics as Record<string, number>) || {};
+  const effort = (record?.effort as Record<string, number | boolean>) || {};
+  const tags =
+    Array.isArray(record?.tags) && record.tags.length > 0
+      ? record.tags
+      : card
+      ? [...(card.chips || []), ...(card.accessTags || [])]
+      : [];
+  const regions = Array.isArray(record?.regions) ? record.regions : [];
+
+  const fallbackUtility: Record<string, number | undefined> = {};
+  if (typeof metrics.pkrMonth === 'number') fallbackUtility.pkr_month = metrics.pkrMonth;
+  if (typeof metrics.minutes === 'number') fallbackUtility.minutes = metrics.minutes;
+  if (typeof metrics.kgco2eMonth === 'number')
+    fallbackUtility.kgco2e_month = metrics.kgco2eMonth;
+
+  const existingHow = Array.isArray(metadata?.how) ? metadata.how : [];
+  const title = record?.title || card?.action || record?.id || '';
+  const subtitle = record?.subtitle || (card?.levels?.start ? card.levels.start : card?.why) || null;
+  const why = metadata?.why ?? card?.why ?? null;
+  const requiresPurchase = typeof effort.requiresPurchase === 'boolean' ? effort.requiresPurchase : false;
+  const category = record?.category || card?.domain || '';
+
+  const howSteps = existingHow.length > 0 
+    ? existingHow 
+    : generateFallbackSteps(category, title, subtitle, why, requiresPurchase);
+
+  return {
+    id: record?.id || card?.id || '',
+    category: record?.category || card?.domain || '',
+    title: record?.title || card?.action || '',
+    subtitle: record?.subtitle || (card?.levels?.start ? card.levels.start : card?.why) || null,
+    metrics: metrics,
+    effort: effort,
+    tags,
+    regions,
+    why: metadata?.why ?? card?.why ?? null,
+    how: howSteps,
+    context_requirements: Array.isArray(metadata?.contextRequirements)
+      ? metadata.contextRequirements
+      : [],
+    triggers: Array.isArray(metadata?.triggers) ? metadata.triggers : [],
+    utility_model:
+      metadata?.utilityModel && Object.keys(metadata.utilityModel).length > 0
+        ? metadata.utilityModel
+        : Object.keys(fallbackUtility).length > 0
+        ? fallbackUtility
+        : undefined,
+    fit_rules: Array.isArray(metadata?.fitRules) ? metadata.fitRules : [],
+    verify: Array.isArray(metadata?.verify) ? metadata.verify : [],
+    rewards: metadata?.rewards || {},
+    messages: metadata?.messages || {},
+    empathy_note:
+      typeof metadata?.empathyNote === 'string' ? metadata.empathyNote : metadata?.empathyNote ?? null,
+    cta: metadata?.cta ?? null,
+    story_snippet:
+      typeof metadata?.storySnippet === 'string'
+        ? metadata.storySnippet
+        : metadata?.storySnippet ?? null,
+    metadata: metadata || null,
+  };
+}
 
 export interface BucketListItem {
   id: string;
@@ -21,6 +161,7 @@ export interface BucketListItem {
   status: 'done' | 'snoozed';
   addedAt: Date;
   lastUpdatedAt: Date;
+  recommendation?: RecommendationDetails;
 }
 
 export interface BucketListResponse {
@@ -138,6 +279,10 @@ export async function getBucketList(userId: string): Promise<BucketListResponse>
     const firstEvent = allEvents[allEvents.length - 1]; // Oldest (first added)
     const lastEvent = allEvents[0]; // Most recent
 
+    // Build full recommendation details
+    const oldCard = oldCatalogMap.get(recId);
+    const recommendation = buildRecommendationDetails(catalogItem, oldCard);
+
     items.push({
       id: recId,
       title,
@@ -150,6 +295,7 @@ export async function getBucketList(userId: string): Promise<BucketListResponse>
       status,
       addedAt: firstEvent.occurredAt,
       lastUpdatedAt: lastEvent.occurredAt,
+      recommendation,
     });
   }
 

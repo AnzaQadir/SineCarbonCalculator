@@ -120,8 +120,8 @@ export async function markDoneAndLearn(
     throw new Error('Recommendation not found');
   }
 
-  const weeklyCo2 = card.estImpactKgPerYear / 52;
-  const estimatedRupees = Math.round(weeklyCo2 * 75); // Rough conversion
+  let weeklyCo2 = card.estImpactKgPerYear / 52;
+  let estimatedRupees = Math.round(weeklyCo2 * 75); // Rough conversion
 
   // 3) Persist event with correct type (for learning)
   const { outcomeToEventType } = await import('./eventTypes');
@@ -137,16 +137,47 @@ export async function markDoneAndLearn(
   // 3b) Also persist to UserAction if done (for existing streak/impact tracking)
   if (outcome === 'done') {
     const { UserAction } = await import('../../models');
-    await UserAction.create({
-      userId,
-      recommendationId: recId,
-      occurredAt: new Date(),
-      impactRupees: estimatedRupees,
-      impactCo2Kg: weeklyCo2,
-      surface: ctx?.surface || 'web',
-      metadata: ctx,
-      source: 'catalog:v1',
-    });
+    const todayStart = startOfTodayInKarachi();
+    const todayEnd = new Date(todayStart);
+    todayEnd.setUTCDate(todayEnd.getUTCDate() + 1);
+
+    try {
+      // Try to create the record
+      await UserAction.create({
+        userId,
+        recommendationId: recId,
+        occurredAt: new Date(),
+        impactRupees: estimatedRupees,
+        impactCo2Kg: weeklyCo2,
+        surface: ctx?.surface || 'web',
+        metadata: ctx || {},
+        source: 'catalog:v1',
+      });
+    } catch (error: any) {
+      // Handle unique constraint violation (race condition)
+      if (error?.name === 'SequelizeUniqueConstraintError' || error?.code === '23505') {
+        // Record already exists, fetch it and use its values
+        const existing = await UserAction.findOne({
+          where: {
+            userId,
+            recommendationId: recId,
+            occurredAt: {
+              [Op.gte]: todayStart,
+              [Op.lt]: todayEnd,
+            },
+          },
+        });
+        
+        if (existing) {
+          estimatedRupees = Number(existing.impactRupees);
+          weeklyCo2 = Number(existing.impactCo2Kg);
+        }
+        // If we can't find it, continue with the estimated values
+      } else {
+        // Re-throw if it's a different error
+        throw error;
+      }
+    }
   }
 
   // 4) Update weights (tiny nudges)
@@ -220,5 +251,116 @@ async function getStreak(userId: string): Promise<{ current: number; longest: nu
     current: streak.currentStreakDays,
     longest: streak.longestStreakDays,
   };
+}
+
+/**
+ * Handle "intended" event - user clicked "Do it now" (micro-commitment)
+ * Large positive ranking boost: +0.4 relevance, +0.3 contextual match, +0.2 archetype fit
+ */
+export async function recordIntendedAction(
+  userId: string,
+  recId: string,
+  ctx: { device?: string; time_of_day?: string; archetype?: string; location?: string }
+): Promise<void> {
+  await UserActionEvent.create({
+    userId,
+    recommendationId: recId,
+    eventType: 'INTENDED',
+    occurredAt: new Date(),
+    metadata: ctx,
+  } as any);
+
+  // Apply large positive ranking boost
+  const W = await getUserWeights(userId);
+  W.fit += 0.4; // Relevance boost
+  W.recency += 0.3; // Contextual match
+  W.fit += 0.2; // Archetype fit reinforcement
+  const clamped = clampWeights(W);
+  await saveUserWeights(userId, clamped);
+}
+
+/**
+ * Handle "snoozed" event with time context
+ * Reduce immediate ranking, increase future resurfacing score
+ */
+export async function recordSnoozedAction(
+  userId: string,
+  recId: string,
+  timeContext?: 'evening' | 'weekend' | 'no_reminders',
+  ctx?: { time_of_day?: string; session_energy?: string }
+): Promise<{ cooldown_days: number }> {
+  await UserActionEvent.create({
+    userId,
+    recommendationId: recId,
+    eventType: 'SNOOZE',
+    occurredAt: new Date(),
+    metadata: {
+      reason: 'timing',
+      time_context: timeContext,
+      ...ctx,
+    },
+  } as any);
+
+  // Reduce immediate ranking, increase future match
+  const W = await getUserWeights(userId);
+  W.recency -= 0.2; // Reduce immediate ranking
+  W.recency += 0.3; // Increase future resurfacing when context matches
+  const clamped = clampWeights(W);
+  await saveUserWeights(userId, clamped);
+
+  // Adaptive cooldown: 1-3 days
+  const cooldownDays = timeContext === 'weekend' ? 3 : timeContext === 'evening' ? 1 : 2;
+  return { cooldown_days: cooldownDays };
+}
+
+/**
+ * Handle "not useful" event with reason
+ * Apply reason-specific penalties and cooldowns
+ */
+export async function recordNotUsefulAction(
+  userId: string,
+  recId: string,
+  reason: 'not_relevant' | 'too_hard' | 'already_doing',
+  ctx?: Record<string, any>
+): Promise<{ cooldown_days: number; adjustments: Partial<WeightPrefs> }> {
+  await UserActionEvent.create({
+    userId,
+    recommendationId: recId,
+    eventType: 'DISMISS',
+    occurredAt: new Date(),
+    metadata: {
+      reason,
+      ...ctx,
+    },
+  } as any);
+
+  const W = await getUserWeights(userId);
+  const adjustments: Partial<WeightPrefs> = {};
+  let cooldownDays = 30;
+
+  // Reason-specific handling
+  if (reason === 'not_relevant') {
+    // Category penalty
+    W.fit -= 0.4;
+    adjustments.fit = -0.4;
+    cooldownDays = 60;
+  } else if (reason === 'too_hard') {
+    // Prefer lower effort actions
+    W.effort += 0.3; // Higher effort penalty = prefer lower effort
+    adjustments.effort = 0.3;
+    cooldownDays = 30;
+  } else if (reason === 'already_doing') {
+    // Mastery mode - unlock next level
+    W.novelty += 0.2; // Prefer new challenges
+    W.fit += 0.1; // Still relevant, just level up
+    adjustments.novelty = 0.2;
+    adjustments.fit = 0.1;
+    cooldownDays = 90;
+  }
+
+  const clamped = clampWeights(W);
+  await saveUserWeights(userId, clamped);
+
+  return { cooldown_days: cooldownDays, adjustments };
 }
 

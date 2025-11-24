@@ -206,11 +206,11 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ item, onLearnMore })
         )}
       </div>
 
-      {/* Interesting learning */}
+      {/* Did you know */}
       {item.learn?.summary && (
         <div className="rounded-3xl border border-emerald-100/80 bg-gradient-to-br from-emerald-50 via-white to-white px-5 py-4 shadow-[0_8px_24px_-12px_rgba(16,185,129,0.45)]">
           <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-500">
-            Interesting learning
+            Did you know?
           </p>
           <p className="mt-3 text-sm leading-relaxed text-slate-600">
             {item.learn.summary}

@@ -4,7 +4,7 @@ import sequelize from '../db';
 interface UserActionEventAttributes {
   userId: string;
   recommendationId: string;
-  eventType: 'SHOWN' | 'DONE' | 'DISMISS' | 'SNOOZE';
+  eventType: 'SHOWN' | 'DONE' | 'DISMISS' | 'SNOOZE' | 'INTENDED';
   occurredAt: Date;
 }
 
@@ -13,7 +13,7 @@ interface UserActionEventCreationAttributes extends Optional<UserActionEventAttr
 class UserActionEvent extends Model<UserActionEventAttributes, UserActionEventCreationAttributes> implements UserActionEventAttributes {
   public userId!: string;
   public recommendationId!: string;
-  public eventType!: 'SHOWN' | 'DONE' | 'DISMISS' | 'SNOOZE';
+  public eventType!: 'SHOWN' | 'DONE' | 'DISMISS' | 'SNOOZE' | 'INTENDED';
   public occurredAt!: Date;
 }
 
@@ -39,7 +39,7 @@ UserActionEvent.init(
       allowNull: false,
       field: 'event_type',
       validate: {
-        isIn: [['SHOWN', 'DONE', 'DISMISS', 'SNOOZE']],
+        isIn: [['SHOWN', 'DONE', 'DISMISS', 'SNOOZE', 'INTENDED']],
       },
     },
     occurredAt: {

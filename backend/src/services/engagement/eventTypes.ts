@@ -2,9 +2,13 @@
  * Event type definitions and utilities for user action events
  */
 
-export type ActionEventType = 'SHOWN' | 'DONE' | 'DISMISS' | 'SNOOZE';
+export type ActionEventType = 'SHOWN' | 'DONE' | 'DISMISS' | 'SNOOZE' | 'INTENDED';
 
-export type ActionOutcome = 'done' | 'snooze' | 'dismiss';
+export type ActionOutcome = 'done' | 'snooze' | 'dismiss' | 'intended';
+
+export type NotUsefulReason = 'not_relevant' | 'too_hard' | 'already_doing';
+
+export type SnoozeTime = 'evening' | 'weekend' | 'no_reminders';
 
 /**
  * Map outcome to event type
@@ -14,6 +18,7 @@ export function outcomeToEventType(outcome: ActionOutcome): ActionEventType {
     done: 'DONE',
     snooze: 'SNOOZE',
     dismiss: 'DISMISS',
+    intended: 'INTENDED',
   };
   return mapping[outcome];
 }
@@ -22,7 +27,7 @@ export function outcomeToEventType(outcome: ActionOutcome): ActionEventType {
  * Get all event types
  */
 export function getAllEventTypes(): ActionEventType[] {
-  return ['SHOWN', 'DONE', 'DISMISS', 'SNOOZE'];
+  return ['SHOWN', 'DONE', 'DISMISS', 'SNOOZE', 'INTENDED'];
 }
 
 /**

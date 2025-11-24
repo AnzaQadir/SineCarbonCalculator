@@ -69,7 +69,7 @@ async function actionDoneHandler(req, res) {
         if (!userId) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-        const { recommendationId, context, outcome } = req.body;
+        const { recommendationId, context, outcome, reason } = req.body;
         if (!recommendationId) {
             return res.status(400).json({
                 success: false,
@@ -77,9 +77,43 @@ async function actionDoneHandler(req, res) {
             });
         }
         // Validate outcome if provided
-        const validOutcome = outcome && ['done', 'snooze', 'dismiss'].includes(outcome)
+        const validOutcome = outcome && ['done', 'snooze', 'dismiss', 'intended'].includes(outcome)
             ? outcome
             : 'done'; // Default to 'done' for backward compatibility
+        // Handle "intended" event (user clicked "Do it now" - micro-commitment)
+        if (validOutcome === 'intended') {
+            await (0, learning_1.recordIntendedAction)(userId, recommendationId, {
+                device: context?.device || 'web',
+                time_of_day: context?.time_of_day,
+                archetype: context?.archetype,
+                location: context?.location,
+            });
+            return res.json({
+                ok: true,
+                message: 'Intended action recorded',
+            });
+        }
+        // Handle "snooze" with optional time context
+        if (validOutcome === 'snooze') {
+            const timeContext = reason;
+            const result = await (0, learning_1.recordSnoozedAction)(userId, recommendationId, timeContext, {
+                time_of_day: context?.time_of_day,
+                session_energy: context?.session_energy,
+            });
+            return res.json({
+                ok: true,
+                ...result,
+            });
+        }
+        // Handle "not useful" with reason
+        if (validOutcome === 'dismiss' && reason) {
+            const notUsefulReason = reason;
+            const result = await (0, learning_1.recordNotUsefulAction)(userId, recommendationId, notUsefulReason, context);
+            return res.json({
+                ok: true,
+                ...result,
+            });
+        }
         // Support enhanced learning if outcome is provided or enabled
         const useEnhancedLearning = process.env.USE_ENHANCED_LEARNING !== 'false';
         const result = useEnhancedLearning

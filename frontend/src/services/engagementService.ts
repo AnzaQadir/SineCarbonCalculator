@@ -96,6 +96,7 @@ export type BucketListItem = {
   status: 'done' | 'snoozed';
   addedAt: string;
   lastUpdatedAt: string;
+  recommendation?: RecommendationDetails;
 };
 
 export type BucketListResponse = {
@@ -172,12 +173,44 @@ export async function getNextActions(): Promise<NextActionsResponse> {
 }
 
 /**
+ * Record "intended" event (user clicked "Do it now" - micro-commitment)
+ */
+export async function recordIntendedAction(
+  recommendationId: string,
+  context?: { device?: string; time_of_day?: string; archetype?: string; location?: string }
+): Promise<void> {
+  const url = `${API_BASE_URL}/v1/engagement/action-done`;
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        recommendationId,
+        outcome: 'intended',
+        context: context || { device: 'web' },
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn('[Engagement Service] Failed to record intended action');
+    }
+  } catch (error) {
+    console.error('[Engagement Service] recordIntendedAction failed:', error);
+  }
+}
+
+/**
  * Mark an action with an outcome (done, snooze, dismiss)
  */
 export async function markActionDone(
   recommendationId: string,
   outcome: 'done' | 'snooze' | 'dismiss' = 'done',
-  context?: { surface?: string; variant?: string }
+  reason?: string,
+  context?: { surface?: string; variant?: string; time_of_day?: string; session_energy?: string }
 ): Promise<ActionDoneResponse> {
   const url = `${API_BASE_URL}/v1/engagement/action-done`;
   
@@ -185,6 +218,7 @@ export async function markActionDone(
     url,
     recommendationId,
     outcome,
+    reason,
     context,
   });
   
@@ -198,6 +232,7 @@ export async function markActionDone(
       body: JSON.stringify({
         recommendationId,
         outcome,
+        reason,
         context: context || { surface: 'web' },
       }),
     });

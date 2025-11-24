@@ -1,41 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, ChevronDown, ChevronUp, Zap, TrendingUp, Clock, X } from 'lucide-react';
-import { NextAction } from '@/services/engagementService';
-import { EffortMeter } from './EffortMeter';
+import { CheckCircle2, ChevronDown, ChevronUp, Clock, X } from 'lucide-react';
+import { NextAction, recordIntendedAction } from '@/services/engagementService';
 import { DetailsPanel } from './DetailsPanel';
+import { DoItNowFlow } from './DoItNowFlow';
+import { SnoozeToast } from './SnoozeToast';
+import { NotUsefulSheet } from './NotUsefulSheet';
+import { StreakCelebration } from './StreakCelebration';
 
 interface AlternativeActionCardProps {
   action: NextAction;
-  onAction: (outcome: 'done' | 'snooze' | 'dismiss') => void;
+  onAction: (outcome: 'done' | 'snooze' | 'dismiss', reason?: string) => void;
   isLoading?: boolean;
+  tone?: 'friendly' | 'professional' | 'premium';
 }
 
 export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
   action,
   onAction,
   isLoading = false,
+  tone = 'friendly',
 }) => {
   const [showDetails, setShowDetails] = useState(false);
+  const [showDoItNowFlow, setShowDoItNowFlow] = useState(false);
+  const [showSnoozeToast, setShowSnoozeToast] = useState(false);
+  const [showNotUsefulSheet, setShowNotUsefulSheet] = useState(false);
+  const [showStreakCelebration, setShowStreakCelebration] = useState(false);
+  const [streakData, setStreakData] = useState<{ streak: number; points?: number } | null>(null);
 
-  const badgeConfig =
-    action.type === 'quick_win'
-      ? {
-          icon: Zap,
-          label: 'Quick Win',
-          bgColor: 'bg-sky-100',
-          textColor: 'text-sky-700',
-          borderColor: 'border-sky-200',
-        }
-      : {
-          icon: TrendingUp,
-          label: 'Level Up',
-          bgColor: 'bg-amber-100',
-          textColor: 'text-amber-700',
-          borderColor: 'border-amber-200',
-        };
-
-  const BadgeIcon = badgeConfig.icon;
+  // Record "intended" event when DoItNowFlow opens
+  useEffect(() => {
+    if (showDoItNowFlow) {
+      recordIntendedAction(action.id, {
+        device: 'web',
+        time_of_day: new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening',
+      });
+    }
+  }, [showDoItNowFlow, action.id]);
 
   return (
     <motion.div
@@ -43,15 +44,6 @@ export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       className="bg-white rounded-2xl shadow-lg border border-slate-200/40 p-5 md:p-6"
     >
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <p className="text-xs uppercase tracking-[0.3em] text-slate-400 flex items-center gap-2">
-          <BadgeIcon className="w-3 h-3" />
-          {badgeConfig.label}
-        </p>
-        <EffortMeter effort={action.recommendation?.effort} />
-      </div>
-
-      {/* Title & Subtitle */}
       <div className="mb-4">
         <h4 className="text-lg md:text-xl font-bold text-slate-800 mb-1">
           {action.title}
@@ -61,46 +53,64 @@ export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
         )}
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col gap-2 mb-3">
-        {/* Do it now */}
-        <button
-          onClick={() => onAction('done')}
-          disabled={isLoading}
-          className="w-full bg-gradient-to-r from-brand-teal to-brand-emerald text-white font-medium py-2.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
-        >
-          {isLoading ? (
-            <>
-              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Processing...</span>
-            </>
-          ) : (
-            <>
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Do it now</span>
-            </>
-          )}
-        </button>
-
-        <div className="flex gap-2">
-          {/* Save for later */}
-          <button
-            onClick={() => onAction('snooze')}
+      {/* Soft Segmented Control - Premium Action Zone */}
+      <div className="mb-3 rounded-3xl p-1.5 shadow-sm bg-cream-50 border border-slate-200">
+        <div className="flex gap-1.5">
+          {/* Do it now - Primary */}
+          <motion.button
+            onClick={() => {
+              if (!isLoading) {
+                setShowDoItNowFlow(true);
+              }
+            }}
             disabled={isLoading}
-            className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-3 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 text-xs border border-slate-200"
+            className="relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-teal to-brand-emerald py-2.5 px-3 text-sm font-semibold text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60 shadow-md hover:shadow-lg"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <Clock className="w-3 h-3" />
-            <span>Save for later</span>
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-1.5">
+                <div className="h-3 h-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Processing...
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                Do it now
+              </span>
+            )}
+          </motion.button>
+
+          {/* Will do it later - Secondary */}
+          <button
+            onClick={() => {
+              if (!isLoading) {
+                setShowSnoozeToast(true);
+              }
+            }}
+            disabled={isLoading}
+            className="flex-1 rounded-2xl border border-sky-300 bg-transparent py-2.5 px-3 text-xs font-medium text-sky-600 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-sky-50 hover:border-sky-400"
+          >
+            <span className="flex items-center justify-center gap-1.5">
+              <Clock className="h-3 w-3" />
+              Will do it later
+            </span>
           </button>
 
-          {/* Not useful */}
+          {/* Not useful - Muted */}
           <button
-            onClick={() => onAction('dismiss')}
+            onClick={() => {
+              if (!isLoading) {
+                setShowNotUsefulSheet(true);
+              }
+            }}
             disabled={isLoading}
-            className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 font-medium py-2 px-3 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 text-xs border border-red-200"
+            className="flex-1 rounded-2xl border border-pink-300 bg-transparent py-2.5 px-3 text-xs font-medium text-pink-400 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-pink-50 hover:border-pink-400"
           >
-            <X className="w-3 h-3" />
-            <span>Not useful</span>
+            <span className="flex items-center justify-center gap-1.5">
+              <X className="h-3 w-3" />
+              Not useful
+            </span>
           </button>
         </div>
       </div>
@@ -127,6 +137,78 @@ export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
           >
             <DetailsPanel item={action} />
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Do It Now Flow */}
+      <AnimatePresence>
+        {showDoItNowFlow && action.recommendation && (
+          <DoItNowFlow
+            recommendation={action.recommendation}
+            onDone={() => {
+              setShowDoItNowFlow(false);
+              // Small delay to allow modal to close smoothly before action
+              setTimeout(() => {
+                onAction('done');
+              }, 200);
+            }}
+            onExit={() => setShowDoItNowFlow(false)}
+            tone={tone}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Snooze Toast */}
+      <AnimatePresence>
+        {showSnoozeToast && (
+          <SnoozeToast
+            onDismiss={() => {
+              setShowSnoozeToast(false);
+              // Small delay to allow toast to close smoothly before action
+              setTimeout(() => {
+                onAction('snooze');
+              }, 200);
+            }}
+            onSelectTime={(time) => {
+              setShowSnoozeToast(false);
+              // Small delay to allow toast to close smoothly before action
+              setTimeout(() => {
+                onAction('snooze', time);
+              }, 200);
+            }}
+            tone={tone}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Not Useful Sheet */}
+      <AnimatePresence>
+        {showNotUsefulSheet && (
+          <NotUsefulSheet
+            onSelectReason={(reason) => {
+              setShowNotUsefulSheet(false);
+              // Small delay to allow sheet to close smoothly before action
+              setTimeout(() => {
+                onAction('dismiss', reason);
+              }, 200);
+            }}
+            onDismiss={() => setShowNotUsefulSheet(false)}
+            tone={tone}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Streak Celebration */}
+      <AnimatePresence>
+        {showStreakCelebration && streakData && (
+          <StreakCelebration
+            streak={streakData.streak}
+            points={streakData.points}
+            onComplete={() => {
+              setShowStreakCelebration(false);
+              setStreakData(null);
+            }}
+          />
         )}
       </AnimatePresence>
     </motion.div>

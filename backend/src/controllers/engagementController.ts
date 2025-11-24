@@ -3,7 +3,8 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { User } from '../models';
 import { getNextActions, markActionDone } from '../services/engagementService';
 import { getNextActionsEnhanced } from '../services/engagement/enhancedEngagementService';
-import { markDoneAndLearn } from '../services/engagement/learning';
+import { markDoneAndLearn, recordIntendedAction, recordSnoozedAction, recordNotUsefulAction } from '../services/engagement/learning';
+import type { NotUsefulReason, SnoozeTime } from '../services/engagement/eventTypes';
 import { getBucketList } from '../services/engagement/bucketListService';
 import { WeeklySummary, UserAction } from '../models';
 import { Op } from 'sequelize';
@@ -72,7 +73,7 @@ export async function actionDoneHandler(req: AuthenticatedRequest, res: Response
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    const { recommendationId, context, outcome } = req.body;
+    const { recommendationId, context, outcome, reason } = req.body;
 
     if (!recommendationId) {
       return res.status(400).json({
@@ -82,9 +83,46 @@ export async function actionDoneHandler(req: AuthenticatedRequest, res: Response
     }
 
     // Validate outcome if provided
-    const validOutcome = outcome && ['done', 'snooze', 'dismiss'].includes(outcome) 
-      ? outcome as 'done' | 'snooze' | 'dismiss'
+    const validOutcome = outcome && ['done', 'snooze', 'dismiss', 'intended'].includes(outcome) 
+      ? outcome as 'done' | 'snooze' | 'dismiss' | 'intended'
       : 'done'; // Default to 'done' for backward compatibility
+
+    // Handle "intended" event (user clicked "Do it now" - micro-commitment)
+    if (validOutcome === 'intended') {
+      await recordIntendedAction(userId, recommendationId, {
+        device: context?.device || 'web',
+        time_of_day: context?.time_of_day,
+        archetype: context?.archetype,
+        location: context?.location,
+      });
+      return res.json({
+        ok: true,
+        message: 'Intended action recorded',
+      });
+    }
+
+    // Handle "snooze" with optional time context
+    if (validOutcome === 'snooze') {
+      const timeContext = reason as SnoozeTime | undefined;
+      const result = await recordSnoozedAction(userId, recommendationId, timeContext, {
+        time_of_day: context?.time_of_day,
+        session_energy: context?.session_energy,
+      });
+      return res.json({
+        ok: true,
+        ...result,
+      });
+    }
+
+    // Handle "not useful" with reason
+    if (validOutcome === 'dismiss' && reason) {
+      const notUsefulReason = reason as NotUsefulReason;
+      const result = await recordNotUsefulAction(userId, recommendationId, notUsefulReason, context);
+      return res.json({
+        ok: true,
+        ...result,
+      });
+    }
 
     // Support enhanced learning if outcome is provided or enabled
     const useEnhancedLearning = process.env.USE_ENHANCED_LEARNING !== 'false';

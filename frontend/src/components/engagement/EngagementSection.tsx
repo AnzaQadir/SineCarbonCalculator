@@ -4,9 +4,6 @@ import {
   BestNextActionCard,
   AlternativeActionCard,
   ActionToast,
-  StreakRing,
-  WeeklyRecapCard,
-  ShareComposer,
   BucketList,
   DetailsPanel,
 } from './index';
@@ -14,18 +11,15 @@ import { BucketIcon } from './icons/BucketIcon';
 import {
   getNextActions,
   markActionDone,
-  getWeeklyRecap,
   getBucketList,
   type NextActionsResponse,
   type ActionDoneResponse,
-  type WeeklyRecap,
 } from '@/services/engagementService';
 
 // Module-level singleton to prevent duplicate API calls across multiple component instances
 const globalLoadingState = {
   isLoading: false,
   isBucketLoading: false,
-  isRecapLoading: false,
 };
 
 export const EngagementSection: React.FC = () => {
@@ -33,9 +27,6 @@ export const EngagementSection: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toastResult, setToastResult] = useState<ActionDoneResponse | null>(null);
-  const [streak, setStreak] = useState<{ current: number; longest: number } | null>(null);
-  const [weeklyRecap, setWeeklyRecap] = useState<WeeklyRecap | null>(null);
-  const [showShareComposer, setShowShareComposer] = useState(false);
   const [showBucketList, setShowBucketList] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bucketSummary, setBucketSummary] = useState<{
@@ -121,40 +112,30 @@ export const EngagementSection: React.FC = () => {
     }
   }, []);
 
-  // Load next actions and weekly recap
+  // Load next actions
   useEffect(() => {
     // Use module-level singleton to prevent duplicate calls across component instances
-    if (globalLoadingState.isLoading || globalLoadingState.isRecapLoading || globalLoadingState.isBucketLoading) {
+    if (globalLoadingState.isLoading || globalLoadingState.isBucketLoading) {
       console.log('[Engagement] Already loading, skipping duplicate call');
       return;
     }
 
     // Set all flags immediately before any async operations (atomic check-and-set)
     globalLoadingState.isLoading = true;
-    globalLoadingState.isRecapLoading = true;
     globalLoadingState.isBucketLoading = true;
 
     const loadData = async () => {
       try {
         setLoading(true);
         setError(null); // Clear previous errors
-        console.log('[Engagement] Loading next actions and weekly recap...');
+        console.log('[Engagement] Loading next actions...');
         
-        // Load next actions and weekly recap independently (don't fail one if other fails)
-        const actionsPromise = getNextActions().catch((err) => {
+        // Load next actions
+        const actions = await getNextActions().catch((err) => {
           console.error('[Engagement] Error loading next actions:', err);
           // Don't set error state here - we'll handle it gracefully below
           return null;
         });
-        
-        const recapPromise = getWeeklyRecap()
-          .catch((err) => {
-            console.warn('[Engagement] Error loading weekly recap (may not have data yet):', err);
-            // This is expected for new users, so just return null
-            return null;
-          });
-
-        const [actions, recap] = await Promise.all([actionsPromise, recapPromise]);
 
         // Handle next actions
         if (actions) {
@@ -166,15 +147,6 @@ export const EngagementSection: React.FC = () => {
           // Don't set a harsh error - just show empty state
           setNextActions(null);
         }
-        
-        // Handle weekly recap (optional, so null is fine)
-        if (recap) {
-          console.log('[Engagement] Weekly recap loaded:', recap);
-          setWeeklyRecap(recap);
-        } else {
-          // Weekly recap is optional - set to null but don't show error
-          setWeeklyRecap(null);
-        }
       } catch (error) {
         console.error('[Engagement] Unexpected error loading engagement data:', error);
         // Only set error for truly unexpected errors
@@ -184,7 +156,6 @@ export const EngagementSection: React.FC = () => {
       } finally {
         setLoading(false);
         globalLoadingState.isLoading = false;
-        globalLoadingState.isRecapLoading = false;
       }
     };
 
@@ -210,41 +181,39 @@ export const EngagementSection: React.FC = () => {
     return () => {
       // Only reset if this component was the one loading (to avoid race conditions)
       // In practice, the finally blocks handle this, but this is a safety net
-      if (globalLoadingState.isLoading || globalLoadingState.isRecapLoading || globalLoadingState.isBucketLoading) {
+      if (globalLoadingState.isLoading || globalLoadingState.isBucketLoading) {
         // Don't reset here - let the async operations finish and reset themselves
         // This prevents one component unmounting from canceling another component's loading
       }
     };
   }, [refreshBucketSummary]);
 
-  const handleAction = async (recommendationId: string, outcome: 'done' | 'snooze' | 'dismiss') => {
+  const handleAction = async (recommendationId: string, outcome: 'done' | 'snooze' | 'dismiss', reason?: string) => {
     try {
       setActionLoading(recommendationId);
-      console.log('[Engagement] Processing action:', { recommendationId, outcome });
+      console.log('[Engagement] Processing action:', { recommendationId, outcome, reason });
       
-      const result = await markActionDone(recommendationId, outcome, { surface: 'web' });
+      const result = await markActionDone(recommendationId, outcome, reason, { surface: 'web' });
       console.log('[Engagement] Action processed, result:', result);
 
-      // Only show toast and update streak for "done" actions
+      // Only show toast for "done" actions
       if (outcome === 'done') {
         setToastResult(result);
-        setStreak(result.streak);
       }
 
-      // Refresh next actions (especially for "done" and "dismiss" to remove them)
-      if (outcome === 'done' || outcome === 'dismiss') {
-        console.log('[Engagement] Refreshing next actions...');
-        const updatedActions = await getNextActions().catch((err) => {
-          console.error('[Engagement] Error refreshing next actions:', err);
-          return null;
-        });
-        
-        if (updatedActions) {
-          console.log('[Engagement] Next actions refreshed:', updatedActions);
-          setNextActions(updatedActions);
-        }
+      // Refresh next actions after ANY action to update recommendations
+      console.log('[Engagement] Refreshing next actions after', outcome);
+      const updatedActions = await getNextActions().catch((err) => {
+        console.error('[Engagement] Error refreshing next actions:', err);
+        return null;
+      });
+      
+      if (updatedActions) {
+        console.log('[Engagement] Next actions refreshed:', updatedActions);
+        setNextActions(updatedActions);
       }
 
+      // Refresh bucket summary for done and snooze actions
       if (outcome === 'done' || outcome === 'snooze') {
         refreshBucketSummary();
       }
@@ -338,11 +307,6 @@ export const EngagementSection: React.FC = () => {
           <p className="text-slate-600 mt-2 font-medium">— or choose your own win —</p>
         </div>
         <div className="flex items-center justify-end gap-5 pr-4 md:pr-8">
-          {streak && (
-            <div className="hidden md:block">
-              <StreakRing currentStreak={streak.current} longestStreak={streak.longest} />
-            </div>
-          )}
           <div className="flex items-center gap-4">
             <div className="relative">
               <svg width="132" height="132" viewBox="0 0 132 132">
@@ -358,17 +322,16 @@ export const EngagementSection: React.FC = () => {
                     </linearGradient>
                   </defs>
 
-                  {/* Background ring (light gray) - only visible if no items */}
-                  {totalCount === 0 && (
-                    <circle
-                      cx="60"
-                      cy="60"
-                      r={ringRadius}
-                      stroke="rgba(0,0,0,0.08)"
-                      strokeWidth="10"
-                      fill="none"
-                    />
-                  )}
+                  {/* Background ring (light green) - shows remaining/unfilled portion */}
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r={ringRadius}
+                    stroke="rgba(24, 160, 122, 0.15)"
+                    strokeWidth="10"
+                    fill="none"
+                    transform="rotate(-90 60 60)"
+                  />
 
                   {/* Done segment (green) - starts from top, shows what's completed */}
                   {doneRatio > 0 && (
@@ -481,34 +444,11 @@ export const EngagementSection: React.FC = () => {
         </div>
       )}
 
-      {/* Weekly Recap */}
-      {weeklyRecap ? (
-        <WeeklyRecapCard
-          recap={weeklyRecap}
-          onShare={() => setShowShareComposer(true)}
-        />
-      ) : (
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 md:p-8">
-          <div className="mb-2 text-slate-800 font-bold text-lg">Your Week</div>
-          <p className="text-slate-600 text-sm">
-            Your first weekly recap will appear after your first action. Mark any Next Action as done to start your streak.
-          </p>
-        </div>
-      )}
-
       {/* Toast */}
       {toastResult && (
         <ActionToast
           result={toastResult}
           onDismiss={() => setToastResult(null)}
-        />
-      )}
-
-      {/* Share Composer */}
-      {showShareComposer && weeklyRecap && (
-        <ShareComposer
-          recap={weeklyRecap}
-          onClose={() => setShowShareComposer(false)}
         />
       )}
 

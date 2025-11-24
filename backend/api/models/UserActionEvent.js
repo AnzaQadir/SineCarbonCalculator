@@ -28,7 +28,7 @@ UserActionEvent.init({
         allowNull: false,
         field: 'event_type',
         validate: {
-            isIn: [['SHOWN', 'DONE', 'DISMISS', 'SNOOZE']],
+            isIn: [['SHOWN', 'DONE', 'DISMISS', 'SNOOZE', 'INTENDED']],
         },
     },
     occurredAt: {
