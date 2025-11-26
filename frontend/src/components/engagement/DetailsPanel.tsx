@@ -2,6 +2,7 @@ import React, { useState, Fragment } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import type { RecommendationDetails } from '@/services/engagementService';
+import { Checklist } from './Checklist';
 
 type DetailsPanelProps = {
   item: {
@@ -24,43 +25,6 @@ const FALLBACK_STEPS = [
 ];
 
 const groupTitleClass = 'text-xs font-semibold text-slate-500 uppercase tracking-wide';
-
-function formatNumber(value: number | null | undefined, decimals = 0) {
-  if (value === null || value === undefined) return null;
-  return decimals > 0 ? value.toFixed(decimals) : value.toString();
-}
-
-function buildMetricCells(recommendation: RecommendationDetails) {
-  const metrics = recommendation.metrics || {};
-  const utility = recommendation.utility_model || {};
-
-  const money = metrics.pkrMonth ?? utility.pkr_month ?? null;
-  const time = metrics.minutes ?? utility.minutes ?? null;
-  const co2 = metrics.kgco2eMonth ?? utility.kgco2e_month ?? null;
-
-  const cells: Array<{ label: string; value: string }> = [];
-
-  if (money !== null) {
-    const formatted = formatNumber(money);
-    if (formatted) {
-      cells.push({ label: 'Rs/mo', value: formatted });
-    }
-  }
-  if (time !== null) {
-    const formatted = formatNumber(time);
-    if (formatted) {
-      cells.push({ label: 'Time', value: `${formatted} min/mo` });
-    }
-  }
-  if (co2 !== null) {
-    const formatted = formatNumber(co2, 2);
-    if (formatted) {
-      cells.push({ label: 'CO₂/mo', value: `${formatted} kg` });
-    }
-  }
-
-  return cells;
-}
 
 function buildEffortLine(effort?: RecommendationDetails['effort']) {
   if (!effort) return null;
@@ -111,7 +75,6 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ item, onLearnMore })
   const [howOpen, setHowOpen] = useState(false);
 
   const recommendation = item.recommendation || ({} as RecommendationDetails);
-  const metrics = buildMetricCells(recommendation);
   const effortLine = buildEffortLine(recommendation.effort);
   const howSteps = (Array.isArray(recommendation.how) && recommendation.how.length > 0
     ? recommendation.how
@@ -140,35 +103,6 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ item, onLearnMore })
         )}
       </header>
 
-      {/* Metrics */}
-      {metrics.length > 0 && (
-        <div className="space-y-3">
-          <div className="border-t border-slate-200 pt-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">
-              Impact snapshot
-            </p>
-            <div
-              className="grid gap-3"
-              style={{
-                gridTemplateColumns: `repeat(${Math.min(metrics.length, 3)}, minmax(0, 1fr))`,
-              }}
-            >
-              {metrics.map((cell) => (
-                <div
-                  key={cell.label}
-                  className="rounded-2xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50 px-4 py-4 shadow-sm"
-                >
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400">
-                    {cell.label}
-                  </span>
-                  <p className="mt-2 text-2xl font-semibold text-slate-900">{cell.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Effort */}
       {effortLine && (
         <div className="rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-3 text-sm text-slate-600">
@@ -190,18 +124,7 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ item, onLearnMore })
         </button>
         {howOpen && (
           <div id="how-to-do-it" className="border-t border-slate-200 bg-white px-5 py-5">
-            <ol className="space-y-3 text-sm text-slate-700">
-              {howSteps.map((step, index) => (
-                <li key={`${step}-${index}`} className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-teal focus:ring-brand-teal"
-                    aria-label={`Step ${index + 1}: ${step}`}
-                  />
-                  <span className="leading-relaxed">{step}</span>
-                </li>
-              ))}
-            </ol>
+            <Checklist steps={howSteps} />
           </div>
         )}
       </div>

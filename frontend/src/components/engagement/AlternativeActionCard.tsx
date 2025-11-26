@@ -12,6 +12,8 @@ interface AlternativeActionCardProps {
   action: NextAction;
   onAction: (outcome: 'done' | 'snooze' | 'dismiss', reason?: string) => void;
   isLoading?: boolean;
+  isDisabled?: boolean;
+  isSnoozed?: boolean;
   tone?: 'friendly' | 'professional' | 'premium';
 }
 
@@ -19,6 +21,8 @@ export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
   action,
   onAction,
   isLoading = false,
+  isDisabled = false,
+  isSnoozed = false,
   tone = 'friendly',
 }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -59,19 +63,24 @@ export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
           {/* Do it now - Primary */}
           <motion.button
             onClick={() => {
-              if (!isLoading) {
+              if (!isLoading && !isDisabled) {
                 setShowDoItNowFlow(true);
               }
             }}
-            disabled={isLoading}
+            disabled={isLoading || isDisabled}
             className="relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-teal to-brand-emerald py-2.5 px-3 text-sm font-semibold text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60 shadow-md hover:shadow-lg"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={!isDisabled && !isLoading ? { scale: 1.02 } : {}}
+            whileTap={!isDisabled && !isLoading ? { scale: 0.98 } : {}}
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-1.5">
                 <div className="h-3 h-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 Processing...
+              </span>
+            ) : isDisabled ? (
+              <span className="flex items-center justify-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                {isSnoozed ? 'Saved for later' : 'Done'}
               </span>
             ) : (
               <span className="flex items-center justify-center gap-1.5">
@@ -84,27 +93,27 @@ export const AlternativeActionCard: React.FC<AlternativeActionCardProps> = ({
           {/* Will do it later - Secondary */}
           <button
             onClick={() => {
-              if (!isLoading) {
+              if (!isLoading && !isDisabled) {
                 setShowSnoozeToast(true);
               }
             }}
-            disabled={isLoading}
+            disabled={isLoading || isDisabled}
             className="flex-1 rounded-2xl border border-sky-300 bg-transparent py-2.5 px-3 text-xs font-medium text-sky-600 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-sky-50 hover:border-sky-400"
           >
             <span className="flex items-center justify-center gap-1.5">
               <Clock className="h-3 w-3" />
-              Will do it later
+              {isDisabled && isSnoozed ? 'Saved for later' : 'Will do it later'}
             </span>
           </button>
 
           {/* Not useful - Muted */}
           <button
             onClick={() => {
-              if (!isLoading) {
+              if (!isLoading && !isDisabled) {
                 setShowNotUsefulSheet(true);
               }
             }}
-            disabled={isLoading}
+            disabled={isLoading || isDisabled}
             className="flex-1 rounded-2xl border border-pink-300 bg-transparent py-2.5 px-3 text-xs font-medium text-pink-400 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-pink-50 hover:border-pink-400"
           >
             <span className="flex items-center justify-center gap-1.5">

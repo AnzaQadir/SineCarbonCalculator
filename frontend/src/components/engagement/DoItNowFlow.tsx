@@ -151,8 +151,7 @@ export const DoItNowFlow: React.FC<DoItNowFlowProps> = ({
             </button>
             <motion.button
               onClick={onDone}
-              disabled={!allStepsCompleted && steps.length > 0}
-              className="flex-1 px-6 py-4 bg-gradient-to-r from-brand-teal to-brand-emerald text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+              className="flex-1 px-6 py-4 bg-gradient-to-r from-brand-teal to-brand-emerald text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 relative overflow-hidden"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >

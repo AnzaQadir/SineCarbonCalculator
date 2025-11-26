@@ -72,11 +72,23 @@ export const MultiCardEngagementDashboard: React.FC<MultiCardEngagementDashboard
           bonus: result.bonus,
         });
 
-        // Refresh actions after 2 seconds
+        // Refresh actions after a delay to allow backend to process
+        // Retry if no actions are returned initially
         setTimeout(async () => {
           const newActions = await getNextActions();
-          setActions(newActions);
-        }, 2000);
+          if (newActions && (newActions.primary || newActions.alternatives.length > 0)) {
+            setActions(newActions);
+          } else {
+            // Retry once more after additional delay
+            setTimeout(async () => {
+              const retryActions = await getNextActions();
+              if (retryActions && (retryActions.primary || retryActions.alternatives.length > 0)) {
+                setActions(retryActions);
+              }
+              // If still empty, keep previous state (don't set to empty to avoid showing "all caught up" prematurely)
+            }, 1000);
+          }
+        }, 500);
       }
     } catch (error) {
       console.error('Error recording action:', error);

@@ -34,6 +34,10 @@ export const EngagementSection: React.FC = () => {
     done: number;
     snoozed: number;
   } | null>(null);
+  // Track completed, snoozed, and dismissed actions to disable them
+  const [completedActions, setCompletedActions] = useState<Set<string>>(new Set());
+  const [snoozedActions, setSnoozedActions] = useState<Set<string>>(new Set());
+  const [dismissedActions, setDismissedActions] = useState<Set<string>>(new Set());
   
   // Use module-level singleton to prevent duplicate calls across component instances
   // This ensures only one set of API calls happens even if multiple EngagementSection components are rendered
@@ -196,24 +200,91 @@ export const EngagementSection: React.FC = () => {
       const result = await markActionDone(recommendationId, outcome, reason, { surface: 'web' });
       console.log('[Engagement] Action processed, result:', result);
 
-      // Only show toast for "done" actions
+      // Track completed/snoozed/dismissed actions to disable them
       if (outcome === 'done') {
+        setCompletedActions(prev => new Set(prev).add(recommendationId));
+        // Remove from other states if it was there
+        setSnoozedActions(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(recommendationId);
+          return newSet;
+        });
+        setDismissedActions(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(recommendationId);
+          return newSet;
+        });
         setToastResult(result);
+      } else if (outcome === 'snooze') {
+        setSnoozedActions(prev => new Set(prev).add(recommendationId));
+        // Remove from other states if it was there
+        setCompletedActions(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(recommendationId);
+          return newSet;
+        });
+        setDismissedActions(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(recommendationId);
+          return newSet;
+        });
+      } else if (outcome === 'dismiss') {
+        setDismissedActions(prev => new Set(prev).add(recommendationId));
+        // Remove from other states if it was there
+        setCompletedActions(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(recommendationId);
+          return newSet;
+        });
+        setSnoozedActions(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(recommendationId);
+          return newSet;
+        });
       }
 
-      // Refresh next actions after ANY action to update recommendations
-      console.log('[Engagement] Refreshing next actions after', outcome);
-      const updatedActions = await getNextActions().catch((err) => {
-        console.error('[Engagement] Error refreshing next actions:', err);
-        return null;
-      });
-      
-      if (updatedActions) {
-        console.log('[Engagement] Next actions refreshed:', updatedActions);
-        setNextActions(updatedActions);
+      // Reorder actions: if primary is done/snoozed/dismissed, move it to end of alternatives and promote first alternative
+      if ((outcome === 'done' || outcome === 'snooze' || outcome === 'dismiss') && nextActions?.primary?.id === recommendationId) {
+        const currentPrimary = nextActions.primary;
+        const currentAlternatives = [...nextActions.alternatives];
+        
+        // If there are alternatives, promote the first one to primary
+        if (currentAlternatives.length > 0) {
+          // Move primary to end of alternatives (disabled)
+          const newAlternatives = [...currentAlternatives, currentPrimary];
+          
+          // Promote first alternative to primary
+          const newPrimary = newAlternatives.shift()!;
+          
+          setNextActions({
+            primary: newPrimary,
+            alternatives: newAlternatives
+          });
+          
+          console.log('[Engagement] Reordered actions: moved primary to alternatives, promoted first alternative', {
+            oldPrimary: currentPrimary.id,
+            newPrimary: newPrimary.id,
+            alternativesCount: newAlternatives.length
+          });
+        } else {
+          // No alternatives available, just set primary to null (will show "all caught up")
+          setNextActions({
+            primary: null,
+            alternatives: [currentPrimary]
+          });
+          
+          console.log('[Engagement] No alternatives to promote, moved primary to alternatives only');
+        }
+      } else if ((outcome === 'done' || outcome === 'snooze' || outcome === 'dismiss') && nextActions?.alternatives) {
+        // If an alternative was done/snoozed/dismissed, just update the state (it stays in place but disabled)
+        // No reordering needed for alternatives
+        console.log('[Engagement] Alternative action marked as', outcome, ', keeping in place');
       }
 
-      // Refresh bucket summary for done and snooze actions
+      // Don't refresh next actions API for any outcome - keep existing actions and reorder locally
+      // This provides a smoother UX without waiting for API calls
+
+      // Refresh bucket summary for done and snooze actions to update counts
       if (outcome === 'done' || outcome === 'snooze') {
         refreshBucketSummary();
       }
@@ -246,7 +317,7 @@ export const EngagementSection: React.FC = () => {
     );
   }
 
-  if (!nextActions && !loading) {
+  if ((!nextActions || (!nextActions.primary && nextActions.alternatives.length === 0)) && !loading) {
     return (
       <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 text-center">
         <div className="text-6xl mb-4">🎉</div>
@@ -409,6 +480,8 @@ export const EngagementSection: React.FC = () => {
           action={nextActions.primary}
           onAction={(outcome) => handleAction(nextActions.primary!.id, outcome)}
           isLoading={actionLoading === nextActions.primary.id}
+          isDisabled={completedActions.has(nextActions.primary.id) || snoozedActions.has(nextActions.primary.id) || dismissedActions.has(nextActions.primary.id)}
+          isSnoozed={snoozedActions.has(nextActions.primary.id)}
         />
       ) : (
         <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 text-center">
@@ -439,6 +512,8 @@ export const EngagementSection: React.FC = () => {
               action={alt}
               onAction={(outcome) => handleAction(alt.id, outcome)}
               isLoading={actionLoading === alt.id}
+              isDisabled={completedActions.has(alt.id) || snoozedActions.has(alt.id) || dismissedActions.has(alt.id)}
+              isSnoozed={snoozedActions.has(alt.id)}
             />
           ))}
         </div>

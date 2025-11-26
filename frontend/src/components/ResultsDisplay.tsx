@@ -1146,17 +1146,20 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                       <div className="flex items-center justify-between text-xs text-sage-500 mb-2">
                         <span>Progress</span>
                         <span>
-                          {activeSection === 'climate-self' ? '1' : activeSection === 'climate-signature' ? '2' : activeSection === 'take-action' ? '3' : showDashboardPanel ? '4' : '5'} of 5
+                          {showDashboardPanel ? '3' :
+                           activeSection === 'climate-self' ? '1' : 
+                           activeSection === 'climate-signature' ? '2' : 
+                           activeSection === 'engagement' ? '4' : '1'} of 4
                         </span>
                       </div>
                       <div className="w-full bg-sage-200/30 rounded-full h-2">
                         <div 
                           className="bg-gradient-to-r from-sage-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
                           style={{ 
-                            width: activeSection === 'climate-self' ? '20%' : 
-                                   activeSection === 'climate-signature' ? '40%' : 
-                                   activeSection === 'take-action' ? '60%' : 
-                                   showDashboardPanel ? '80%' : '100%'
+                            width: showDashboardPanel ? '75%' :
+                                   activeSection === 'climate-self' ? '25%' : 
+                                   activeSection === 'climate-signature' ? '50%' : 
+                                   activeSection === 'engagement' ? '100%' : '25%'
                           }}
                         />
                       </div>
@@ -1373,7 +1376,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                         <div className="flex-shrink-0 w-1.5 h-full bg-gradient-to-b from-sage-500 via-emerald-500 to-emerald-600 rounded-full animate-pulse"></div>
                         <div className="flex-1">
                           <p className="m-0 text-xl font-medium text-sage-800 italic leading-relaxed">
-                            "{dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action."}"
+                            "{(dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || "Your unique approach to sustainability combines awareness with action.").trim().replace(/\*\*.*?\*\*/g, '').replace(/\n/g, ' ')}"
                           </p>
                         </div>
                       </div>
@@ -1812,7 +1815,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         {showShareCard && (
           <SocialShareCard
             headline={dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype || dynamicPersonality?.personalityType || 'Your Climate Self'}
-            subheadline={dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || 'Your unique climate hook—shine with your strengths.'}
+            subheadline={(dynamicPersonality?.comprehensivePowerMoves?.personality?.hookLine || 'Your unique climate hook—shine with your strengths.').trim().replace(/\*\*.*?\*\*/g, '').replace(/\n/g, ' ').trim()}
             illustrationSrc={profileImage}
             mascotSrc={'/images/panda.svg'}
             logoSrc={'/images/new_logo.png'}

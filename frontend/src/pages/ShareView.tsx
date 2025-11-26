@@ -41,7 +41,9 @@ export default function ShareView() {
   // Minimal display: render the SocialShareCard using payload fields
   const { payload } = record;
   const headline = payload?.headline || payload?.comprehensivePowerMoves?.personality?.archetype || 'Your Climate Self';
-  const subheadline = payload?.comprehensivePowerMoves?.personality?.hookLine || 'Your unique climate hook—shine with your strengths.';
+  // Clean hookline: remove markdown formatting and extra text
+  const rawHookline = payload?.comprehensivePowerMoves?.personality?.hookLine || 'Your unique climate hook—shine with your strengths.';
+  const subheadline = rawHookline.trim().replace(/\*\*.*?\*\*/g, '').replace(/\n/g, ' ').trim();
   const illustrationSrc = payload?.profileImage || '/images/profile.jpg';
   const userName = payload?.userName || undefined;
 

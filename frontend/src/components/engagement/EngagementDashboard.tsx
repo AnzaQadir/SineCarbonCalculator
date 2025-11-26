@@ -78,11 +78,23 @@ export const EngagementDashboard: React.FC<EngagementDashboardProps> = ({
           bonus: result.bonus,
         });
 
-        // Refresh best action after 2 seconds
+        // Refresh best action after a delay to allow backend to process
+        // Retry if no action is returned initially
         setTimeout(async () => {
           const newAction = await getBestNextAction();
-          setBestAction(newAction);
-        }, 2000);
+          if (newAction) {
+            setBestAction(newAction);
+          } else {
+            // Retry once more after additional delay
+            setTimeout(async () => {
+              const retryAction = await getBestNextAction();
+              if (retryAction) {
+                setBestAction(retryAction);
+              }
+              // If still null, keep previous state (don't set to null to avoid showing "all caught up" prematurely)
+            }, 1000);
+          }
+        }, 500);
       }
     } catch (error) {
       console.error('Error recording action:', error);

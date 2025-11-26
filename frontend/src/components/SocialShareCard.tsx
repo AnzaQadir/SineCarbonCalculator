@@ -68,9 +68,27 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
 
   const ensureShare = async (): Promise<string> => {
     if (shareUrl) return shareUrl;
-    const envBase = (import.meta as any).env?.VITE_API_BASE || (import.meta as any).env?.VITE_BACKEND_URL;
-    // Force local backend when env is not provided
-    const apiBase = envBase || 'http://localhost:3000/api';
+    // Use the same API base URL logic as api.ts
+    const envBase = (import.meta as any).env?.VITE_API_BASE_URL || (import.meta as any).env?.VITE_API_BASE || (import.meta as any).env?.VITE_BACKEND_URL;
+    let apiBase: string;
+    if (typeof window !== 'undefined') {
+      const sameOrigin = `${window.location.protocol}//${window.location.host}`;
+      if (!envBase) {
+        // Prefer proxy when running Vite on 8080
+        if (window.location.port === '8080') {
+          apiBase = '/api';
+        } else {
+          apiBase = 'http://localhost:3000/api';
+        }
+      } else if (envBase === sameOrigin || envBase === 'http://localhost:8080' || envBase === 'https://localhost:8080') {
+        // If env points to the frontend origin, use the proxy path
+        apiBase = '/api';
+      } else {
+        apiBase = envBase;
+      }
+    } else {
+      apiBase = envBase || 'http://localhost:3000/api';
+    }
     const payload = {
       headline,
       subheadline,
@@ -81,15 +99,36 @@ const SocialShareCard: React.FC<SocialShareCardProps> = ({
     };
     // Pre-generate a UUID client-side so link creation cannot fail due to DB
     const clientId = (globalThis.crypto?.randomUUID && globalThis.crypto.randomUUID()) || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    const res = await fetch(`${apiBase}/share`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: clientId, contentType: 'personality', payload }),
-    });
-    const json = await res.json();
-    if (!json?.success || !json?.url) throw new Error(json?.error || 'Failed to create share');
-    setShareUrl(json.url);
-    return json.url as string;
+    
+    try {
+      const res = await fetch(`${apiBase}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: clientId, contentType: 'personality', payload }),
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Share API error:', res.status, errorText);
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
+      }
+      
+      const json = await res.json();
+      if (!json?.success || !json?.url) {
+        console.error('Share API response error:', json);
+        throw new Error(json?.error || 'Failed to create share link');
+      }
+      
+      setShareUrl(json.url);
+      return json.url as string;
+    } catch (error: any) {
+      console.error('Error creating share link:', error);
+      // Re-throw with a user-friendly message
+      if (error.message) {
+        throw error;
+      }
+      throw new Error('Network error: Could not connect to server');
+    }
   };
 
   const handleShare = async () => {
