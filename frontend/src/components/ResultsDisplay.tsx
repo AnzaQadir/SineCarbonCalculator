@@ -156,6 +156,7 @@ interface ResultsDisplayProps {
       stretchCTA: string;
     };
     tone: string;
+    gender?: 'boy' | 'girl' | 'male' | 'female';
   };
 }
 
@@ -548,11 +549,24 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     return impacts[step] || 'Medium Impact';
   };
 
+  // Extract gender from API response (comprehensivePowerMoves.gender) or fallback to prop
+  // Normalize to 'boy' or 'girl' format
+  const normalizeGender = (g: string | undefined): 'boy' | 'girl' => {
+    if (!g) return gender; // fallback to prop
+    const normalized = g.toLowerCase();
+    if (normalized === 'girl' || normalized === 'female') return 'girl';
+    if (normalized === 'boy' || normalized === 'male') return 'boy';
+    return gender; // fallback to prop if unrecognized
+  };
+  
+  const apiGender = comprehensivePowerMoves?.gender || dynamicPersonality?.comprehensivePowerMoves?.gender;
+  const effectiveGender = normalizeGender(apiGender);
+
   // Update the profile image logic to use the new archetype from comprehensivePowerMoves
   const archetype = dynamicPersonality?.comprehensivePowerMoves?.personality?.archetype;
   const profileImage = dynamicPersonality && archetype ? 
-    getPersonalityImage(archetype as PersonalityType, gender) : 
-    (dynamicPersonality ? getPersonalityImage(personalityType, gender) : '');
+    getPersonalityImage(archetype as PersonalityType, effectiveGender) : 
+    (dynamicPersonality ? getPersonalityImage(personalityType, effectiveGender) : '');
 
   // Update generateStory to use backend data everywhere
   const generateStory = async () => {
@@ -1760,7 +1774,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   topCategory={(dynamicPersonality?.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality?.dominantCategory || '').slice(1)}
                   badge={dynamicPersonality?.badge}
                   personality={personalityType}
-                  profileImage={getPersonalityImage(personalityType, gender)}
+                  profileImage={getPersonalityImage(personalityType, effectiveGender)}
                 />
               </div>
 
@@ -1782,7 +1796,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                   topCategory={(dynamicPersonality?.dominantCategory || '').charAt(0).toUpperCase() + (dynamicPersonality?.dominantCategory || '').slice(1)}
                   badge={dynamicPersonality?.badge}
                   personality={personalityType}
-                  profileImage={getPersonalityImage(personalityType, gender)}
+                  profileImage={getPersonalityImage(personalityType, effectiveGender)}
                 />
               )}
 
