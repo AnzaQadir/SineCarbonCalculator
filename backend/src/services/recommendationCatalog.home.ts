@@ -7,7 +7,7 @@ export const homeCatalog: Catalog = {
     {
       id: 'home_led_sweep',
       domain: 'home',
-      action: 'Swap high-use bulbs to LEDs and set a lights-off routine',
+      action: 'Swap a few of your most-used bulbs to LEDs.',
       levels: {
         start: 'Replace your 3 most-used bulbs (kitchen, living room, hallway).',
         levelUp: 'Swap remaining high-use bulbs and add a ‘lights off when leaving’ habit.',
@@ -39,7 +39,7 @@ export const homeCatalog: Catalog = {
     {
       id: 'home_thermostat_1c',
       domain: 'home',
-      action: 'Adjust thermostat by 1°C and add a simple schedule',
+      action: 'Nudge your thermostat by 1°C and keep a simple schedule.',
       levels: {
         start: 'Shift by 1°C for a week (warmer in summer, cooler in winter).',
         levelUp: 'Set a daily schedule (sleep/away) that fits your routine.',
@@ -71,7 +71,7 @@ export const homeCatalog: Catalog = {
     {
       id: 'home_hotwater_showers',
       domain: 'home',
-      action: 'Shorten showers and optimize hot-water use',
+      action: 'Shorten showers slightly and turn off hot water while soaping.',
       levels: {
         start: 'Cut showers by ~1 minute and turn off tap while soaping.',
         levelUp: 'Install a low-flow showerhead or aerator; set a simple timer.',
@@ -103,7 +103,7 @@ export const homeCatalog: Catalog = {
     {
       id: 'home_vampire_power_strip',
       domain: 'home',
-      action: 'Use a switchable power strip to cut standby power',
+      action: 'Put standby devices on a switchable strip and turn them fully off.',
       levels: {
         start: 'Set up one ‘entertainment corner’ on a power strip and switch off when done.',
         levelUp: 'Add two more zones (office chargers, console area).',
@@ -135,7 +135,7 @@ export const homeCatalog: Catalog = {
     {
       id: 'home_cold_wash_offpeak',
       domain: 'home',
-      action: 'Wash clothes cold and run laundry off-peak',
+      action: 'Set your next laundry load to cold and wash only full loads.',
       levels: {
         start: 'Switch detergent and set ‘cold’ as your default.',
         levelUp: 'Run full loads and schedule off-peak where available.',
@@ -167,7 +167,7 @@ export const homeCatalog: Catalog = {
     {
       id: 'home_line_dry_two_loads',
       domain: 'home',
-      action: 'Line-dry two loads per week',
+      action: 'Air-dry at least one laundry load each week.',
       levels: {
         start: 'Air-dry one load this week (towels or shirts).',
         levelUp: 'Make it two loads/week; keep the dryer for heavy linens.',
@@ -199,7 +199,7 @@ export const homeCatalog: Catalog = {
     {
       id: 'home_energy_audit_seal_leaks',
       domain: 'home',
-      action: 'Book a home energy check and seal easy drafts',
+      action: 'Check your home for drafts and seal one small gap.',
       levels: {
         start: 'Request a free/low-cost energy check or do a quick self-audit.',
         levelUp: 'Seal door/window gaps with simple weatherstripping; insulate hot-water pipes.',

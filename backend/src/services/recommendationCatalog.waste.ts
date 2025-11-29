@@ -7,7 +7,7 @@ export const wasteCatalog: Catalog = {
     {
       id: 'waste_reusable_kit_basics',
       domain: 'waste',
-      action: 'Carry a tiny reusable kit (tote, bottle, cup)',
+      action: 'Keep a small reusable kit ready in your bag.',
       levels: {
         start: 'Pack one item you’ll use most (e.g., bottle).',
         levelUp: 'Add two more (tote + cup) to your bag/desk.',
@@ -39,7 +39,7 @@ export const wasteCatalog: Catalog = {
     {
       id: 'waste_bulk_refill_staples',
       domain: 'waste',
-      action: 'Refill or buy staples in bulk to cut packaging',
+      action: 'Refill one pantry staple in bulk instead of buying new packaging.',
       levels: {
         start: 'Refill one staple (rice/beans/oats) this month.',
         levelUp: 'Shift 3 staples to bulk/refill and bring jars/bags.',
@@ -71,7 +71,7 @@ export const wasteCatalog: Catalog = {
     {
       id: 'waste_compost_setup',
       domain: 'waste',
-      action: 'Set up compost (service or DIY) for food scraps',
+      action: 'Start collecting food scraps so they can be composted instead of trashed.',
       levels: {
         start: 'Collect scraps in a sealed bin for one week.',
         levelUp: 'Enroll in a service or start a simple balcony bin.',
@@ -103,7 +103,7 @@ export const wasteCatalog: Catalog = {
     {
       id: 'waste_ewaste_calendar',
       domain: 'waste',
-      action: 'Set a quarterly e-waste drop-off reminder',
+      action: 'Start an e-waste box and set a reminder to drop it off.',
       levels: {
         start: 'Gather dead batteries/cables in one box.',
         levelUp: 'Find your nearest e-waste site and add a date.',
@@ -135,7 +135,7 @@ export const wasteCatalog: Catalog = {
     {
       id: 'waste_sort_station_labels',
       domain: 'waste',
-      action: 'Create a simple home sort-station with labels',
+      action: 'Set up simple labeled bins so sorting waste is easy at home.',
       levels: {
         start: 'Set up two bins: recycle + trash (or compost where available).',
         levelUp: 'Add clear labels that guests understand at a glance.',
@@ -167,7 +167,7 @@ export const wasteCatalog: Catalog = {
     {
       id: 'waste_jar_reuse_shelf',
       domain: 'waste',
-      action: 'Keep a small jar-reuse shelf for storage and refills',
+      action: 'Save a few clean jars so you can reuse them for storage or refills.',
       levels: {
         start: 'Save and wash two jars; remove labels.',
         levelUp: 'Use jars for pantry storage or take to refill stores.',
@@ -199,7 +199,7 @@ export const wasteCatalog: Catalog = {
     {
       id: 'waste_fridge_eat_me_first',
       domain: 'waste',
-      action: 'Create an ‘Eat Me First’ fridge box',
+      action: 'Make a small \'Eat Me First\' box in your fridge.',
       levels: {
         start: 'Place a small box and add items expiring soon.',
         levelUp: 'Cook from the box twice a week.',

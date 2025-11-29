@@ -8,7 +8,7 @@ exports.clothingCatalog = {
         {
             id: 'clothing_repair_first_kit',
             domain: 'clothing',
-            action: 'Adopt a repair-first rule with a simple mending kit',
+            action: 'Create a tiny repair kit so small fixes become effortless.',
             levels: {
                 start: 'Assemble needle, thread, buttons, and fabric glue.',
                 levelUp: 'Fix one easy item (loose button, small tear) this week.',
@@ -40,9 +40,9 @@ exports.clothingCatalog = {
         {
             id: 'clothing_care_cold_airdry_depill',
             domain: 'clothing',
-            action: 'Care to last: wash cold, air-dry, and de-pill knits',
+            action: 'Wash on cold and air-dry a few clothes to make them last longer.',
             levels: {
-                start: 'Set “cold” as default; hang one delicates load.',
+                start: 'Set "cold" as default; hang one delicates load.',
                 levelUp: 'Air-dry weekly basics; use a fabric shaver on knits.',
                 stretch: 'Make air-dry your norm; rotate gentle-care items each week.'
             },
@@ -72,7 +72,7 @@ exports.clothingCatalog = {
         {
             id: 'clothing_secondhand_first',
             domain: 'clothing',
-            action: 'Make second-hand-first your search habit',
+            action: 'Search second-hand before buying new to save money and emissions.',
             levels: {
                 start: 'Browse a thrift/resale app for your next item.',
                 levelUp: 'Buy one second-hand wardrobe staple this month.',
@@ -104,7 +104,7 @@ exports.clothingCatalog = {
         {
             id: 'clothing_capsule_repeat_week',
             domain: 'clothing',
-            action: 'Run a capsule “repeat outfit” week',
+            action: 'Repeat outfits for a week using 4 simple pieces.',
             levels: {
                 start: 'Pick 5–7 pieces for the week; repeat outfits guilt-free.',
                 levelUp: 'Extend to two weeks; note what you actually wear.',
@@ -136,7 +136,7 @@ exports.clothingCatalog = {
         {
             id: 'clothing_mend_tailor_monthly',
             domain: 'clothing',
-            action: 'Mend or tailor one item per month',
+            action: 'Pick one item to mend or tailor each month.',
             levels: {
                 start: 'Pick one item to mend or tailor this month.',
                 levelUp: 'Book a local tailor or DIY; set a date.',
@@ -168,7 +168,7 @@ exports.clothingCatalog = {
         {
             id: 'clothing_swap_event_friends',
             domain: 'clothing',
-            action: 'Host or join a small clothing swap with friends',
+            action: 'Do a small clothing swap with 2–3 friends.',
             levels: {
                 start: 'Invite 2–3 friends; each bring 3 items.',
                 levelUp: 'Make a 1-hour swap—simple rules, tea, good vibes.',
@@ -200,7 +200,7 @@ exports.clothingCatalog = {
         {
             id: 'clothing_pause_24hr_rule',
             domain: 'clothing',
-            action: 'Use a 24-hour pause-to-consider rule before buying',
+            action: 'Use a 24-hour pause before buying clothes online.',
             levels: {
                 start: 'Add to cart; wait 24 hours before purchase.',
                 levelUp: 'Ask 3 questions: need, versatility, care effort.',
