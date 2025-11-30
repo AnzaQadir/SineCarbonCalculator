@@ -78,17 +78,13 @@ export default function PremiumSideNav({ chapters, activeId, onRequestScroll }: 
           </div>
         </div>
 
-        {/* Zerrah signature dots at bottom */}
-        <div className="flex gap-1.5 mt-8">
-          {['#16626D', '#E9839D', '#87CEEB', '#F9E28C'].map((color, i) => (
-            <motion.div
-              key={i}
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: color }}
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
-            />
-          ))}
+        {/* Bottom section - Logo */}
+        <div className="flex-shrink-0 mt-auto">
+          <img 
+            src="/images/new_logo.png" 
+            alt="Zerrah Logo" 
+            className="h-24 w-auto object-contain opacity-90"
+          />
         </div>
       </div>
     </aside>

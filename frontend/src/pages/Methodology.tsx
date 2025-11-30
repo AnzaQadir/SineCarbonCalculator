@@ -15,6 +15,16 @@ import WhyThisMattersSection from '@/components/methodology/WhyThisMattersSectio
 import JourneyMap from '@/components/methodology/JourneyMap';
 import PremiumFooterCTA from '@/components/methodology/PremiumFooterCTA';
 
+// Chapter 3 components
+import Chapter3Hero from '@/components/methodology/chapter3/Chapter3Hero';
+import FiveLifestyleAreas from '@/components/methodology/chapter3/FiveLifestyleAreas';
+import EmissionFactors from '@/components/methodology/chapter3/EmissionFactors';
+import CalculationFlow from '@/components/methodology/chapter3/CalculationFlow';
+import HumanEquivalences from '@/components/methodology/chapter3/HumanEquivalences';
+import ImpactAvoided from '@/components/methodology/chapter3/ImpactAvoided';
+import TotalFootprint from '@/components/methodology/chapter3/TotalFootprint';
+import Chapter3Closing from '@/components/methodology/chapter3/Chapter3Closing';
+
 function useActiveSection(ids: string[]) {
   const [activeId, setActiveId] = useState<string>(ids[0] || 'hero');
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -121,13 +131,37 @@ export default function Methodology() {
         {/* Why This Matters */}
         <WhyThisMattersSection />
 
-        {/* Chapter 3: How the dashboard works */}
+        {/* Chapter 3: How the Zerrah dashboard works */}
         <PremiumChapterCard
           chapterNumber={3}
-          title="How the Zerrah dashboard works"
+          title="How the Zerrah Dashboard Works"
           summary="A comprehensive view of your carbon footprint across lifestyle areas, translated into relatable equivalents and positive impact tracking."
           id="chapter3"
         />
+
+        {/* Chapter 3 Hero */}
+        <Chapter3Hero />
+
+        {/* Five Lifestyle Areas */}
+        <FiveLifestyleAreas />
+
+        {/* Emission Factors */}
+        <EmissionFactors />
+
+        {/* Calculation Flow */}
+        <CalculationFlow />
+
+        {/* Human Equivalences */}
+        <HumanEquivalences />
+
+        {/* Impact Avoided */}
+        <ImpactAvoided />
+
+        {/* Total Footprint */}
+        <TotalFootprint />
+
+        {/* Chapter 3 Closing */}
+        <Chapter3Closing />
 
         {/* Journey Map */}
         <JourneyMap />
