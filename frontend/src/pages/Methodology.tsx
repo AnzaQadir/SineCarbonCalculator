@@ -10,8 +10,6 @@ import PremiumChapterCard from '@/components/methodology/PremiumChapterCard';
 import BehavioralScienceSection from '@/components/methodology/BehavioralScienceSection';
 import PremiumGridDiagram from '@/components/methodology/PremiumGridDiagram';
 import PremiumArchetypeGrid from '@/components/methodology/PremiumArchetypeGrid';
-import StoryExamplesSlider from '@/components/methodology/StoryExamplesSlider';
-import WhyThisMattersSection from '@/components/methodology/WhyThisMattersSection';
 import JourneyMap from '@/components/methodology/JourneyMap';
 import PremiumFooterCTA from '@/components/methodology/PremiumFooterCTA';
 
@@ -24,6 +22,15 @@ import HumanEquivalences from '@/components/methodology/chapter3/HumanEquivalenc
 import ImpactAvoided from '@/components/methodology/chapter3/ImpactAvoided';
 import TotalFootprint from '@/components/methodology/chapter3/TotalFootprint';
 import Chapter3Closing from '@/components/methodology/chapter3/Chapter3Closing';
+
+// Chapter 2 components
+import Chapter2Hero from '@/components/methodology/chapter2/Chapter2Hero';
+import SimpleQuizSection from '@/components/methodology/chapter2/SimpleQuizSection';
+import PersonalityMappingSection from '@/components/methodology/chapter2/PersonalityMappingSection';
+import NudgeTheorySection from '@/components/methodology/chapter2/NudgeTheorySection';
+import FoggModelSection from '@/components/methodology/chapter2/FoggModelSection';
+import AdaptiveSystemSection from '@/components/methodology/chapter2/AdaptiveSystemSection';
+import Chapter2Closing from '@/components/methodology/chapter2/Chapter2Closing';
 
 function useActiveSection(ids: string[]) {
   const [activeId, setActiveId] = useState<string>(ids[0] || 'hero');
@@ -118,18 +125,28 @@ export default function Methodology() {
         <PremiumArchetypeGrid cells={ARCHETYPES_3x3} />
 
         {/* Chapter 2: How Zerrah tailors recommendations */}
-        <PremiumChapterCard
-          chapterNumber={2}
-          title="How Zerrah tailors climate action recommendations for you"
-          summary="Personalized recommendations that adapt to your unique decision-making and action-taking style, making climate action feel natural and achievable."
-          id="chapter2"
-        />
+        <section id="chapter2" className="min-h-screen" />
 
-        {/* Story Examples */}
-        <StoryExamplesSlider />
+        {/* Chapter 2 Hero */}
+        <Chapter2Hero />
 
-        {/* Why This Matters */}
-        <WhyThisMattersSection />
+        {/* Simple Quiz With Real Science */}
+        <SimpleQuizSection />
+
+        {/* Mapping Your Personality */}
+        <PersonalityMappingSection />
+
+        {/* Nudge Theory */}
+        <NudgeTheorySection />
+
+        {/* Fogg Behavior Model */}
+        <FoggModelSection />
+
+        {/* Adaptive System */}
+        <AdaptiveSystemSection />
+
+        {/* Chapter 2 Closing */}
+        <Chapter2Closing />
 
         {/* Chapter 3: How the Zerrah dashboard works */}
         <PremiumChapterCard
