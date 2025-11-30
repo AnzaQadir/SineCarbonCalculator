@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/userController';
+import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
@@ -11,6 +12,9 @@ router.post('/join-community', UserController.joinCommunity);
 
 // Check if user exists
 router.get('/check', UserController.checkUserExists);
+
+// Check if user has completed the quiz (must be before /:id route)
+router.get('/checkquiz', requireAuth, UserController.checkQuiz);
 
 // Get user by ID
 router.get('/:id', UserController.getUser);

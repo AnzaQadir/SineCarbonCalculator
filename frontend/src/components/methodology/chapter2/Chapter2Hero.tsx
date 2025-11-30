@@ -2,10 +2,10 @@ import { motion } from 'framer-motion';
 import { Brain, Sparkles, Users, Compass } from 'lucide-react';
 
 const floatingIcons = [
-  { Icon: Brain, label: 'Behavioral Science', delay: 0, x: -100, y: -80 },
-  { Icon: Sparkles, label: 'Insights', delay: 0.2, x: 100, y: -60 },
-  { Icon: Users, label: 'Community', delay: 0.4, x: -80, y: 60 },
-  { Icon: Compass, label: 'Guidance', delay: 0.6, x: 80, y: 80 }
+  { Icon: Brain, label: 'Behavioral Science', delay: 0 },
+  { Icon: Sparkles, label: 'Insights', delay: 0.15 },
+  { Icon: Users, label: 'Community', delay: 0.3 },
+  { Icon: Compass, label: 'Guidance', delay: 0.45 }
 ];
 
 export default function Chapter2Hero() {
@@ -64,21 +64,19 @@ export default function Chapter2Hero() {
           </motion.p>
         </motion.div>
 
-        {/* Floating icons */}
-        <div className="relative mt-16 h-64">
-          {floatingIcons.map(({ Icon, label, delay, x, y }) => (
+        {/* Floating icons in horizontal line */}
+        <div className="relative mt-16 flex items-center justify-center gap-8 md:gap-12">
+          {floatingIcons.map(({ Icon, label, delay }, index) => (
             <motion.div
               key={label}
-              className="absolute"
-              style={{
-                left: '50%',
-                top: '50%',
-                transform: `translate(${x}px, ${y}px) translate(-50%, -50%)`
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, x: -50, scale: 0.8 }}
+              whileInView={{ opacity: 1, x: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: delay }}
+              transition={{ 
+                duration: 0.6, 
+                delay: delay,
+                ease: [0.2, 0.8, 0.2, 1]
+              }}
               animate={{
                 y: [0, -10, 0],
                 rotate: [0, 5, -5, 0]
@@ -86,7 +84,8 @@ export default function Chapter2Hero() {
               transition={{
                 duration: 3 + delay,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
+                delay: delay
               }}
             >
               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-white/40 shadow-lg flex flex-col items-center gap-2">
@@ -95,35 +94,6 @@ export default function Chapter2Hero() {
               </div>
             </motion.div>
           ))}
-
-          {/* Subtle curved lines indicating personality mapping */}
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none opacity-20"
-            aria-hidden
-          >
-            <motion.path
-              d="M 50% 50% Q 30% 30%, 20% 20%"
-              stroke="#16626D"
-              strokeWidth="2"
-              fill="none"
-              strokeDasharray="4,4"
-              initial={{ pathLength: 0, opacity: 0 }}
-              whileInView={{ pathLength: 1, opacity: 0.3 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.5, delay: 0.8 }}
-            />
-            <motion.path
-              d="M 50% 50% Q 70% 30%, 80% 20%"
-              stroke="#E9839D"
-              strokeWidth="2"
-              fill="none"
-              strokeDasharray="4,4"
-              initial={{ pathLength: 0, opacity: 0 }}
-              whileInView={{ pathLength: 1, opacity: 0.3 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.5, delay: 1 }}
-            />
-          </svg>
         </div>
       </div>
     </section>

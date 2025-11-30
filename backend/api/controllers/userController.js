@@ -1,8 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const userService_1 = require("../services/userService");
 const emailService_1 = require("../services/emailService");
+const userPersonalityService_1 = __importDefault(require("../services/userPersonalityService"));
 class UserController {
     /**
      * Handle user signup
@@ -258,6 +262,48 @@ class UserController {
             console.error('Error checking user existence:', error);
             res.status(500).json({
                 success: false,
+                error: 'Internal server error'
+            });
+        }
+    }
+    /**
+     * Check if user has completed the quiz
+     */
+    static async checkQuiz(req, res) {
+        try {
+            const userEmail = req.userEmail;
+            if (!userEmail) {
+                res.status(401).json({
+                    success: false,
+                    completed: false,
+                    message: 'Unauthorized'
+                });
+                return;
+            }
+            // Get user by email
+            const user = await userService_1.UserService.getUserByEmail(userEmail);
+            if (!user) {
+                res.status(200).json({
+                    success: true,
+                    completed: false,
+                    message: 'User not found'
+                });
+                return;
+            }
+            // Check if user has a personality record (quiz completed)
+            const userPersonalityService = new userPersonalityService_1.default();
+            const personality = await userPersonalityService.getLatestPersonality(user.id);
+            res.status(200).json({
+                success: true,
+                completed: !!personality,
+                message: personality ? 'Quiz completed' : 'Quiz not completed'
+            });
+        }
+        catch (error) {
+            console.error('Error checking quiz status:', error);
+            res.status(500).json({
+                success: false,
+                completed: false,
                 error: 'Internal server error'
             });
         }

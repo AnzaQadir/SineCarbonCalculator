@@ -44,7 +44,7 @@ export default function FiveLifestyleAreas() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.5 }}
         >
           <h2 className="font-serif text-4xl md:text-5xl font-light text-[#1C1B19] mb-6">
             The Five Lifestyle Areas
@@ -64,7 +64,7 @@ export default function FiveLifestyleAreas() {
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: 0.4, delay: index * 0.05 }}
               whileHover={{ y: -8, scale: 1.02 }}
             >
               <div

@@ -8,7 +8,7 @@ exports.foodCatalog = {
         {
             id: 'food_plus_two_plant_meals',
             domain: 'food',
-            action: 'Add two plant-forward meals each week',
+            action: 'Add two simple plant-based meals to your week.',
             levels: {
                 start: 'Swap one lunch to a plant-forward bowl this week.',
                 levelUp: 'Make it two lunches per week; save simple base recipes.',
@@ -40,7 +40,7 @@ exports.foodCatalog = {
         {
             id: 'food_cook_once_eat_twice',
             domain: 'food',
-            action: 'Cook once, eat twice with simple batch-bases',
+            action: 'Cook a bigger batch so one meal becomes two.',
             levels: {
                 start: 'Double tonight’s recipe; freeze one portion.',
                 levelUp: 'Pick two bases/week (grain + stew) for quick repeat meals.',
@@ -72,7 +72,7 @@ exports.foodCatalog = {
         {
             id: 'food_pantry_first_list',
             domain: 'food',
-            action: 'Shop the pantry first and use a smart list',
+            action: 'Look in your pantry before you write your shopping list.',
             levels: {
                 start: 'Before shopping, list 3 items you already have to use first.',
                 levelUp: 'Build your list around pantry items; add only gaps.',
@@ -104,7 +104,7 @@ exports.foodCatalog = {
         {
             id: 'food_freeze_before_waste',
             domain: 'food',
-            action: 'Freeze-before-waste routine for leftovers and produce',
+            action: 'Freeze food that\'s about to go off instead of throwing it away.',
             levels: {
                 start: 'Create a ‘freeze by’ box; move near-expiring items in.',
                 levelUp: 'Set a weekly freezer night to use what you saved.',
@@ -136,7 +136,7 @@ exports.foodCatalog = {
         {
             id: 'food_meat_light_weekdays',
             domain: 'food',
-            action: 'Make weekdays meat-light (Mon–Thu)',
+            action: 'Pick a few weekday dinners to be lighter on meat.',
             levels: {
                 start: 'Choose two meat-light dinners this week.',
                 levelUp: 'Make Mon–Thu mostly plant-forward; keep weekend flexible.',
@@ -168,7 +168,7 @@ exports.foodCatalog = {
         {
             id: 'food_seasonal_local_weekly',
             domain: 'food',
-            action: 'Cook one seasonal/local meal each week',
+            action: 'Cook one meal each week using seasonal or local produce.',
             levels: {
                 start: 'Choose one seasonal produce item to cook this week.',
                 levelUp: 'Make a weekly seasonal dish your default.',
@@ -200,7 +200,7 @@ exports.foodCatalog = {
         {
             id: 'food_low_waste_lunchkit',
             domain: 'food',
-            action: 'Pack a low-waste lunch kit for on-the-go meals',
+            action: 'Pack a simple reusable lunch kit for days you eat away from home.',
             levels: {
                 start: 'Assemble a container + utensil + napkin set.',
                 levelUp: 'Use it twice this week for lunch or takeaway.',

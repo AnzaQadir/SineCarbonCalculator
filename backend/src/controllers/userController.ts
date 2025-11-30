@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { EmailService } from '../services/emailService';
 import { SignupUserData, SignupResponse, UserActivityResponse } from '../types/user';
+import UserPersonalityService from '../services/userPersonalityService';
+import { AuthenticatedRequest } from '../middleware/auth';
 
 export class UserController {
   /**
@@ -292,6 +294,53 @@ export class UserController {
       console.error('Error checking user existence:', error);
       res.status(500).json({
         success: false,
+        error: 'Internal server error'
+      });
+    }
+  }
+
+  /**
+   * Check if user has completed the quiz
+   */
+  static async checkQuiz(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const userEmail = req.userEmail;
+
+      if (!userEmail) {
+        res.status(401).json({
+          success: false,
+          completed: false,
+          message: 'Unauthorized'
+        });
+        return;
+      }
+
+      // Get user by email
+      const user = await UserService.getUserByEmail(userEmail);
+      if (!user) {
+        res.status(200).json({
+          success: true,
+          completed: false,
+          message: 'User not found'
+        });
+        return;
+      }
+
+      // Check if user has a personality record (quiz completed)
+      const userPersonalityService = new UserPersonalityService();
+      const personality = await userPersonalityService.getLatestPersonality(user.id);
+
+      res.status(200).json({
+        success: true,
+        completed: !!personality,
+        message: personality ? 'Quiz completed' : 'Quiz not completed'
+      });
+
+    } catch (error) {
+      console.error('Error checking quiz status:', error);
+      res.status(500).json({
+        success: false,
+        completed: false,
         error: 'Internal server error'
       });
     }

@@ -28,7 +28,7 @@ export default function Chapter3Hero() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
+          transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
         >
           How the Zerrah Dashboard Works
         </motion.h1>
@@ -39,7 +39,7 @@ export default function Chapter3Hero() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
           Turning your everyday habits into clear, relatable climate insights.
         </motion.p>
@@ -53,7 +53,7 @@ export default function Chapter3Hero() {
               scale: [1, 1.2, 1],
               opacity: [0.3, 0.5, 0.3]
             }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             aria-hidden
           />
 
@@ -61,7 +61,7 @@ export default function Chapter3Hero() {
           {lifestyleIcons.map(({ Icon, label, delay }, index) => {
             const baseAngle = (index * 360) / lifestyleIcons.length;
             const radius = 220;
-            const duration = 15; // Same speed for all icons (faster)
+            const duration = 8; // Faster orbit speed
 
             return (
               <motion.div
@@ -129,7 +129,7 @@ export default function Chapter3Hero() {
                   initial={{ pathLength: 0, opacity: 0 }}
                   whileInView={{ pathLength: 1, opacity: 0.3 }}
                   viewport={{ once: false, margin: '-200px' }}
-                  transition={{ duration: 1.2, delay: index * 0.15, ease: "easeOut" }}
+                  transition={{ duration: 0.6, delay: index * 0.08, ease: "easeOut" }}
                 />
               );
             })}

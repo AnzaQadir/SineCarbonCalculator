@@ -32,6 +32,15 @@ import FoggModelSection from '@/components/methodology/chapter2/FoggModelSection
 import AdaptiveSystemSection from '@/components/methodology/chapter2/AdaptiveSystemSection';
 import Chapter2Closing from '@/components/methodology/chapter2/Chapter2Closing';
 
+// Chapter 1 components
+import Chapter1Hero from '@/components/methodology/chapter1/Chapter1Hero';
+import CoreDimensionsSection from '@/components/methodology/chapter1/CoreDimensionsSection';
+import Chapter1BehavioralScienceSection from '@/components/methodology/chapter1/Chapter1BehavioralScienceSection';
+import NineArchetypesSection from '@/components/methodology/chapter1/NineArchetypesSection';
+import SampleArchetypeCards from '@/components/methodology/chapter1/SampleArchetypeCards';
+import ToneRelevanceSection from '@/components/methodology/chapter1/ToneRelevanceSection';
+import Chapter1WhyMatters from '@/components/methodology/chapter1/Chapter1WhyMatters';
+
 function useActiveSection(ids: string[]) {
   const [activeId, setActiveId] = useState<string>(ids[0] || 'hero');
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -105,24 +114,28 @@ export default function Methodology() {
         <PremiumHero />
 
         {/* Chapter 1: How we designed the Zerrah personality types */}
-        <PremiumChapterCard
-          chapterNumber={1}
-          title="How we designed the Zerrah personality types"
-          summary="A framework rooted in behavioral science and practical observation, creating nine unique archetypes that capture the diversity of climate mindsets."
-          id="chapter1"
-        />
+        <section id="chapter1" className="min-h-screen" />
 
-        {/* Behavioral Science Section */}
-        <BehavioralScienceSection />
+        {/* Chapter 1 Hero */}
+        <Chapter1Hero />
 
-        {/* Decision × Action Grid */}
-        <PremiumGridDiagram
-          decisionAxis={['Analyst', 'Intuitive', 'Connector']}
-          actionAxis={['Planner', 'Experimenter', 'Collaborator']}
-        />
+        {/* Framing the Core Dimensions */}
+        <CoreDimensionsSection />
 
-        {/* The Nine Archetypes */}
-        <PremiumArchetypeGrid cells={ARCHETYPES_3x3} />
+        {/* Rooted in Behavioral Science */}
+        <Chapter1BehavioralScienceSection />
+
+        {/* Building the 9 Archetypes */}
+        <NineArchetypesSection />
+
+        {/* Sample Archetype Cards */}
+        <SampleArchetypeCards />
+
+        {/* Tone & Relevance */}
+        <ToneRelevanceSection />
+
+        {/* Why This Matters */}
+        <Chapter1WhyMatters />
 
         {/* Chapter 2: How Zerrah tailors recommendations */}
         <section id="chapter2" className="min-h-screen" />
@@ -149,12 +162,7 @@ export default function Methodology() {
         <Chapter2Closing />
 
         {/* Chapter 3: How the Zerrah dashboard works */}
-        <PremiumChapterCard
-          chapterNumber={3}
-          title="How the Zerrah Dashboard Works"
-          summary="A comprehensive view of your carbon footprint across lifestyle areas, translated into relatable equivalents and positive impact tracking."
-          id="chapter3"
-        />
+        <section id="chapter3" className="min-h-screen" /> {/* Placeholder for nav */}
 
         {/* Chapter 3 Hero */}
         <Chapter3Hero />
