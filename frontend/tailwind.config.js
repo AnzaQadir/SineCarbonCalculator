@@ -19,6 +19,7 @@ module.exports = {
       fontFamily: {
         'proxima': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         'sans': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        'serif': ['Cormorant Garamond', 'Georgia', 'serif'],
       },
       keyframes: {
         "accordion-down": {
