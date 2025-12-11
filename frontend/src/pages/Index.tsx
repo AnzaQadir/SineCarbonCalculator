@@ -372,7 +372,7 @@ function HowItWorksSection({ steps }: { steps: { title: string; desc: string; im
             WebkitBackfaceVisibility: 'hidden'
           }}
         >
-          How It Works
+          How Zerrah Works
         </motion.h2>
       </div>
 
@@ -657,25 +657,25 @@ const Index = () => {
   const howItWorksSteps = [
     {
       title: "Take the Quiz",
-      desc: "Answer questions across lifestyle areas that shape your environmental footprint — with no judgment.",
+      desc: "Answer simple questions about your lifestyle and choices across energy, transport, food, clothing, and waste. We're here to understand you, not to test you.",
       img: "/images/image.png",
       alt: "Take the Quiz"
     },
     {
       title: "Discover Your Story",
-      desc: "Get a personalized profile with your sustainability approach, strengths, and meaningful shifts to move forward.",
+      desc: "Meet your Zerrah Archetype and learn how you can approach climate action: your strengths, your patterns, and the shifts that fit your style.",
       img: "/images/color_story.png",
       alt: "Discover Your Story"
     },
     {
       title: "Reflect & Reimagine",
-      desc: "Use our insights to rethink daily choices in a way that feels empowering — not overwhelming.",
+      desc: "See your personalized dashboard with clear, visual insights into your footprint and the small changes that make the biggest difference.",
       img: "/images/reflect.png",
       alt: "Reflect & Reimagine"
     },
     {
       title: "Share Your Story",
-      desc: "Post your profile, swap notes with friends, or start a ripple. The smallest stories spark the biggest shifts.",
+      desc: "Celebrate progress, spark conversations, and inspire others with changes that feel honest and doable.",
       img: "/images/share_story.png",
       alt: "Share Your Story"
     }
@@ -726,6 +726,372 @@ const Index = () => {
             <div className="absolute left-0 right-0 bottom-0 h-16 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #F3FDF8 80%)' }} />
           </div>
 
+          {/* Climate Communication Problem Section */}
+          <section className="relative w-full py-32 md:py-48 px-4 md:px-12 lg:px-20 overflow-hidden">
+            {/* Warm gradient background */}
+            <div 
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(135deg, #FEF9F3 0%, #FFF5F0 50%, #FEF3E8 100%)'
+              }}
+            />
+            
+            {/* Dotted grid pattern for behavioral science feel */}
+            <div 
+              className="absolute inset-0 opacity-[0.08]"
+              style={{
+                backgroundImage: 'radial-gradient(circle, #16626D 1px, transparent 1px)',
+                backgroundSize: '32px 32px',
+                backgroundPosition: '0 0, 16px 16px'
+              }}
+            />
+
+            {/* Subtle depth orbs */}
+            <motion.div
+              className="absolute top-32 right-1/3 w-96 h-96 bg-[#16626D]/5 rounded-full blur-3xl"
+              animate={{
+                y: [0, -30, 0],
+                scale: [1, 1.1, 1],
+              }}
+              transition={{
+                duration: 12,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+            <motion.div
+              className="absolute bottom-32 left-1/4 w-72 h-72 bg-[#E9839D]/8 rounded-full blur-3xl"
+              animate={{
+                y: [0, 30, 0],
+                scale: [1, 1.15, 1],
+              }}
+              transition={{
+                duration: 14,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1.5
+              }}
+            />
+
+            <div className="relative max-w-7xl mx-auto">
+              <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+                {/* Left side: Text content - left-aligned */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                  className="space-y-10 text-left"
+                >
+                  {/* Main heading - left-aligned serif */}
+                  <h2 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-gray-900 leading-[1.1] tracking-tight">
+                    Climate change has a communication problem.
+                  </h2>
+
+                  {/* Short paragraph with generous spacing */}
+                  <div className="pt-4 space-y-4">
+                    <p className="text-lg md:text-xl text-gray-700 leading-relaxed font-light">
+                      For years, most climate messaging has sounded the same: catastrophe, deadlines, doom.It overwhelms people, and being overwhelmed shuts them down.
+                    </p>
+                    <p className="text-lg md:text-xl text-gray-700 leading-relaxed font-light">
+                      
+                    </p>
+                  </div>
+
+                  {/* Highlight block with key quote */}
+                  <div className="relative pt-8 pb-8">
+                    {/* Glass-like translucent highlight background */}
+                    <div 
+                      className="absolute inset-0 rounded-2xl backdrop-blur-sm"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(22, 98, 109, 0.08) 0%, rgba(233, 131, 157, 0.08) 100%)',
+                        border: '1px solid rgba(22, 98, 109, 0.15)'
+                      }}
+                    />
+                    {/* Content */}
+                    <div className="relative px-6 py-5">
+                      <p className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 leading-relaxed">
+                        But people don't change because they're scared. They change when they see that their actions matter.
+                      </p>
+                      {/* Handwritten-style underline */}
+                      <motion.svg
+                        className="absolute bottom-2 left-6 right-6 h-1"
+                        initial={{ pathLength: 0 }}
+                        whileInView={{ pathLength: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
+                      >
+                        <path
+                          d="M 0 0 Q 50 3 100 0 T 200 0"
+                          stroke="#E9839D"
+                          strokeWidth="2"
+                          fill="none"
+                          opacity="0.4"
+                          strokeLinecap="round"
+                        />
+                      </motion.svg>
+                    </div>
+                  </div>
+
+                  {/* Spacing divider */}
+                  <div className="pt-12"></div>
+
+                  {/* Second mini-heading with left border accent */}
+                  <div className="relative pl-6 border-l-4 border-[#16626D]/30">
+                    <h3 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold text-gray-900 leading-tight mb-6">
+                      A new way to talk about climate change
+                    </h3>
+                    
+                    {/* Text underneath in warm sans-serif */}
+                    <p className="text-lg md:text-xl text-gray-700 leading-relaxed font-light">
+                      Zerrah doesn't create panic or demand perfection. Instead, we help you understand your impact by turning behavioral science into stories — your stories — so climate action feels natural and meaningful.
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Right side: Illustration - transformation narrative */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+                  className="relative h-[600px] md:h-[700px] lg:h-[800px] flex items-center justify-center"
+                >
+                  {/* Glass-like accent overlay */}
+                  <div 
+                    className="absolute inset-0 rounded-3xl backdrop-blur-[2px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+                      border: '1px solid rgba(22, 98, 109, 0.1)'
+                    }}
+                  />
+
+                  {/* Transformation illustration */}
+                  <svg className="relative w-full h-full" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                      <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#16626D" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="#16626D" stopOpacity="0.1" />
+                      </linearGradient>
+                      <linearGradient id="coralGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#E9839D" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="#E9839D" stopOpacity="0.1" />
+                      </linearGradient>
+                      <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    </defs>
+
+                    {/* Top-left: Chaotic, desaturated scribbles (fear-based messaging) */}
+                    <motion.g
+                      initial={{ opacity: 0.4 }}
+                      animate={{ 
+                        opacity: [0.4, 0.6, 0.4],
+                        x: [0, -3, 0],
+                        y: [0, -2, 0]
+                      }}
+                      transition={{
+                        duration: 5,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      style={{ filter: 'grayscale(60%)' }}
+                    >
+                      {/* Chaotic scribbles */}
+                      <path d="M80,120 Q100,100 120,130 Q140,110 160,125 Q180,105 200,140" 
+                        stroke="#666" strokeWidth="2.5" fill="none" opacity="0.3" strokeLinecap="round" />
+                      <path d="M60,180 Q85,160 110,200 Q135,175 160,210 Q185,190 210,220" 
+                        stroke="#666" strokeWidth="2" fill="none" opacity="0.25" strokeLinecap="round" />
+                      <path d="M90,250 Q110,230 130,260 Q150,240 170,270" 
+                        stroke="#666" strokeWidth="2" fill="none" opacity="0.3" strokeLinecap="round" />
+                      
+                      {/* Jagged, disconnected shapes */}
+                      <polyline points="100,150 115,140 120,160 135,150 140,170" 
+                        stroke="#999" strokeWidth="1.5" fill="none" opacity="0.2" strokeLinecap="round" />
+                      <polyline points="70,200 90,190 95,210 110,200 115,220" 
+                        stroke="#999" strokeWidth="1.5" fill="none" opacity="0.2" strokeLinecap="round" />
+                    </motion.g>
+
+                    {/* Transformation flow - connection lines */}
+                    <motion.g
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: [0, 0.6, 0] }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      <path
+                        d="M200,200 Q300,150 400,200 Q450,180 500,200"
+                        stroke="url(#tealGrad)"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeDasharray="8,4"
+                        opacity="0.4"
+                      />
+                      <path
+                        d="M180,280 Q350,250 420,300"
+                        stroke="url(#coralGrad)"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeDasharray="6,3"
+                        opacity="0.3"
+                      />
+                    </motion.g>
+
+                    {/* Right side: Warm, calm, flowing shapes (clarity & empowerment) */}
+                    <motion.g
+                      initial={{ opacity: 0.7 }}
+                      animate={{ 
+                        opacity: [0.7, 0.95, 0.7],
+                        x: [0, 3, 0],
+                        y: [0, -2, 0]
+                      }}
+                      transition={{
+                        duration: 6,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: 0.5
+                      }}
+                    >
+                      {/* Flowing curves representing understanding */}
+                      <path d="M350,150 Q380,130 420,150 Q450,135 480,150 Q510,130 550,150" 
+                        stroke="#16626D" strokeWidth="3" fill="none" opacity="0.5" strokeLinecap="round" filter="url(#glow)" />
+                      <path d="M360,250 Q400,230 440,250 Q470,235 500,250 Q530,230 560,250" 
+                        stroke="#E9839D" strokeWidth="3" fill="none" opacity="0.5" strokeLinecap="round" filter="url(#glow)" />
+                      <path d="M340,350 Q370,330 400,350 Q430,335 460,350 Q490,330 520,350" 
+                        stroke="#16626D" strokeWidth="2.5" fill="none" opacity="0.4" strokeLinecap="round" />
+
+                      {/* Speech bubbles representing communication */}
+                      <motion.ellipse
+                        cx="420"
+                        cy="200"
+                        rx="35"
+                        ry="25"
+                        fill="#16626D"
+                        opacity="0.15"
+                        animate={{ 
+                          scale: [1, 1.1, 1],
+                          opacity: [0.15, 0.25, 0.15]
+                        }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                      />
+                      <motion.path
+                        d="M405,220 L410,235 L400,230 Z"
+                        fill="#16626D"
+                        opacity="0.15"
+                        animate={{ opacity: [0.15, 0.25, 0.15] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                      />
+
+                      <motion.ellipse
+                        cx="480"
+                        cy="300"
+                        rx="30"
+                        ry="20"
+                        fill="#E9839D"
+                        opacity="0.15"
+                        animate={{ 
+                          scale: [1, 1.15, 1],
+                          opacity: [0.15, 0.25, 0.15]
+                        }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+                      />
+                      <motion.path
+                        d="M465,315 L470,330 L460,325 Z"
+                        fill="#E9839D"
+                        opacity="0.15"
+                        animate={{ opacity: [0.15, 0.25, 0.15] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+                      />
+
+                      {/* Connected circles representing relationships and behavior */}
+                      <motion.circle
+                        cx="400"
+                        cy="400"
+                        r="20"
+                        fill="#16626D"
+                        opacity="0.25"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                        filter="url(#glow)"
+                      />
+                      <motion.circle
+                        cx="460"
+                        cy="450"
+                        r="18"
+                        fill="#E9839D"
+                        opacity="0.25"
+                        animate={{ scale: [1, 1.25, 1] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                        filter="url(#glow)"
+                      />
+                      <motion.circle
+                        cx="520"
+                        cy="420"
+                        r="15"
+                        fill="#16626D"
+                        opacity="0.2"
+                        animate={{ scale: [1, 1.3, 1] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                        filter="url(#glow)"
+                      />
+
+                      {/* Connection lines showing emotional clarity */}
+                      <motion.line
+                        x1="400" y1="400" x2="460" y2="450"
+                        stroke="#16626D" strokeWidth="2" opacity="0.3"
+                        animate={{ opacity: [0.3, 0.5, 0.3] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      />
+                      <motion.line
+                        x1="460" y1="450" x2="520" y2="420"
+                        stroke="#E9839D" strokeWidth="2" opacity="0.3"
+                        animate={{ opacity: [0.3, 0.5, 0.3] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                      />
+                      <motion.line
+                        x1="400" y1="400" x2="520" y2="420"
+                        stroke="#16626D" strokeWidth="1.5" opacity="0.2"
+                        strokeDasharray="4,2"
+                        animate={{ opacity: [0.2, 0.4, 0.2] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                      />
+                    </motion.g>
+
+                    {/* Gentle floating particles for depth */}
+                    {[...Array(8)].map((_, i) => (
+                      <motion.circle
+                        key={i}
+                        cx={250 + (i % 3) * 100}
+                        cy={500 + (i % 2) * 80}
+                        r="4"
+                        fill={i % 2 === 0 ? "#16626D" : "#E9839D"}
+                        opacity="0.15"
+                        animate={{
+                          y: [0, -20, 0],
+                          opacity: [0.15, 0.3, 0.15],
+                          scale: [1, 1.2, 1]
+                        }}
+                        transition={{
+                          duration: 4 + i * 0.3,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: i * 0.4
+                        }}
+                      />
+                    ))}
+                  </svg>
+                </motion.div>
+              </div>
+            </div>
+          </section>
+
           <HowItWorksSection steps={howItWorksSteps} />
 
           {/* Impact at a Glance Section */}
@@ -744,8 +1110,8 @@ const Index = () => {
               className="relative"
             >
               <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Why Zerrah?</h2>
-              <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Because climate change isn't just a data problem — it's a story problem.</div>
-              <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-loose">This is how the story shifts when Zerrah enters the picture.</div>
+              <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Because climate change isn't just a science problem, it's a <em>story</em> problem.</div>
+              <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-loose">We're rewriting that story in a way that creates momentum</div>
             </motion.div>
 
             {/* Headings row above columns */}
@@ -834,7 +1200,7 @@ const Index = () => {
               viewport={{ once: true }}
             >
               <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Action Spotlight</h2>
-              <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Real stories. Small shifts. Lasting change.</div>
+              <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Real people. Small shifts. Lasting change.</div>
             </motion.div>
             <ActionSpotlightCards />
             {/* Section closure: soft gradient fade at bottom */}
@@ -858,31 +1224,15 @@ const Index = () => {
               viewport={{ once: true }}
             >
               <h2 className="text-5xl md:text-6xl font-serif font-extrabold text-center text-gray-900 mb-10 tracking-tight">Reflections Archive</h2>
-              <div className="max-w-4xl mx-auto mb-10 flex flex-col md:flex-row gap-6">
-                <div className="bg-white/80 rounded-xl shadow p-6 flex-1 flex flex-col items-center">
-                  <div className="text-xl md:text-2xl italic text-gray-700 text-center mb-2">“I never thought my small changes would inspire my friends. Now we all bike to work!”</div>
-                  <div className="text-base text-gray-400 text-center">— Jamie, Toronto</div>
-                </div>
-                <div className="bg-white/80 rounded-xl shadow p-6 flex-1 flex flex-col items-center">
-                  <div className="text-xl md:text-2xl italic text-gray-700 text-center mb-2">“Sharing my story helped me realize I'm not alone in this journey.”</div>
-                  <div className="text-base text-gray-400 text-center">— Priya, Bangalore</div>
-                </div>
-              </div>
-              {/* Add margin below testimonial cards */}
-              <div className="mb-12" />
-              <div className="text-2xl md:text-3xl font-medium text-gray-500 text-center mb-8 leading-relaxed">Discover journeys, share your story, and see the ripple effect of climate action in our community.</div>
-              <div className="text-2xl md:text-3xl text-gray-400 text-center mb-16 max-w-5xl mx-auto italic leading-loose">Browse personal reflections, filter by topic or region, and inspire others with your unique perspective.</div>
               <div className="flex justify-center mb-12">
                 <SocialRippleDiagram large />
               </div>
-              <div className="text-center text-gray-500 text-2xl md:text-3xl font-semibold mb-8">Your story creates ripples.</div>
-              <div className="text-center text-[#5E1614] text-xl md:text-2xl font-bold mb-6">Ready to inspire others? Share your own climate journey.</div>
-              <div className="flex justify-center">
-                <button className="text-white rounded-full px-8 py-3 font-extrabold shadow hover:-translate-y-0.5 transition-all duration-150 text-xl md:text-2xl mt-8" style={{ backgroundColor: '#5E1614' }}>
-                  <span className="block font-extrabold">Share Your Story</span>
-                </button>
+              <div className="text-center text-gray-500 text-2xl md:text-3xl font-semibold mb-8">Your story matters.</div>
+              <div className="text-center text-[#5E1614] text-xl md:text-2xl font-bold mb-6">Ready to begin yours?</div>
+              <div className="text-center mb-6">
+                <h3 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">Take the Quiz</h3>
+                <p className="text-lg md:text-xl text-gray-600 italic">Let's shift the story one person, one choice, one moment at a time.</p>
               </div>
-              <div className="text-center text-gray-400 text-xl md:text-2xl mt-8 italic">All stories are welcome. Let's celebrate progress, not perfection.</div>
             </motion.div>
             <div className="absolute left-0 right-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #f0fdf4 80%)' }} />
           </section>
@@ -951,36 +1301,36 @@ const Index = () => {
 const actionSpotlightData = [
   {
     gif: '/gif/reversed_bike.gif',
-    title: 'Bike to work',
+    title: 'Biking instead of driving',
     impact: 'Saves 8kg CO₂, like skipping 1 car ride.',
     detail: 'Biking to work just once a week can save 8kg of CO₂ emissions, improve your health, and reduce traffic congestion. Small change, big impact!',
     icon: '🚲',
     color: 'from-blue-400 to-cyan-300',
-    subtext: 'Cut 1kg of CO₂ per 3 miles',
+    subtext: 'Cuts ~1kg CO₂ every 3 miles — and feels great.',
     impactStat: '🚴 1 ride = 8kg CO₂ saved = 1 full day\'s electricity for a fridge',
     whyItMatters: 'Transportation is the largest contributor to carbon emissions in most cities. Even one ride a week helps shift that.',
     cta: undefined,
   },
   {
     gif: '/gif/eco_friendly_market.gif',
-    title: 'Buy Local & Seasonal',
+    title: 'Buying local & seasonal',
     impact: 'Cuts food miles—like taking 3 cars off the road for a day.',
     detail: 'Choosing local or seasonal produce means your food travels less, slashing transport emissions and supporting nearby farmers. Every fresh, local bite helps the planet and your community thrive!',
     icon: '🥕',
     color: 'from-green-400 to-emerald-300',
-    subtext: 'Support farmers in your locality',
+    subtext: 'Supports nearby farmers while shrinking transport footprints.',
     impactStat: '🧺 Buying local cuts food miles by up to 90% — that\'s less packaging, refrigeration, and transport pollution.',
     whyItMatters: 'Most produce travels over 1,500 miles before reaching you. Local food travels fewer miles and supports nearby growers.',
     cta: undefined,
   },
   {
     gif: '/gif/solar_saving.gif',
-    title: 'Transition to Solar',
+    title: 'Switching to solar',
     impact: 'Saves 500kg CO₂, like a year of LEDs.',
     detail: 'Getting a home solar estimate is a big step, but it can save 500kg of CO₂ per year and lower your energy bills.',
     icon: '☀️',
     color: 'from-yellow-400 to-orange-300',
-    subtext: 'Reduce your energy bill by 40%',
+    subtext: 'Lowers bills and emissions with one long-term shift.',
     impactStat: '☀️ One home solar setup = 500kg CO₂ saved = the equivalent of planting 12 trees every year.',
     whyItMatters: 'Solar doesn\'t just save energy — it sends a signal. It shows you\'re investing in a cleaner grid for everyone.',
     cta: undefined,
@@ -1162,7 +1512,7 @@ function ActionSpotlightCards() {
             </div>
             {/* Content block */}
             <div className="bg-white/95 p-8 flex flex-col gap-6">
-              <div className="text-amber-600 text-lg font-semibold uppercase tracking-wide">Real stories. Small shifts. Lasting change.</div>
+              <div className="text-amber-600 text-lg font-semibold uppercase tracking-wide">Real people. Small shifts. Lasting change.</div>
               <div className="text-2xl md:text-3xl font-extrabold text-amber-800">{modalCard.title}</div>
               {modalCard.impactStat && (
                 <div className="text-lg md:text-xl font-semibold text-amber-700">{modalCard.impactStat}</div>
